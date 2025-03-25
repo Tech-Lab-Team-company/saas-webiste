@@ -1,0 +1,29 @@
+$padding: ("none": 0, "xs": 8, "sm": 10, "md": 16, "lg": 24, "xl": 32);
+
+@layer utilities {
+  :root {
+    @each $key, $value in $padding {
+      --padding-#{$key}: #{#{$value} + 'px'};
+    }
+  }
+  @each $key, $value in $padding {
+    .pt-#{$key} {
+      padding-top: #{#{$value} + 'px'};
+    }
+    .pb-#{$key} {
+      padding-bottom: #{#{$value} + 'px'};
+    }
+    .ps-#{$key} {
+      padding-inline-start: #{#{$value} + 'px'};
+    }
+    .pe-#{$key} {
+      padding-inline-end: #{#{$value} + 'px'};
+    }
+    .px-#{$key} {
+      padding-inline: #{#{$value} + 'px'};
+    }
+    .py-#{$key} {
+      padding-block: #{#{$value} + 'px'};
+    }
+  }
+}

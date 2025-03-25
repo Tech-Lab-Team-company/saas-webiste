@@ -1,0 +1,27 @@
+.input-image-user {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: var(--space-md);
+  input[type="file"] {
+    display: none;
+  }
+  .preview-img,
+  .input-label .image img {
+    width: calc(100 / var(--base-height) * 100vh);
+    height: calc(100 / var(--base-height) * 100vh);
+    border-radius: 50%;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  p {
+    font-family: "regular", sans-serif;
+    font-size: var(--sm-size);
+    color: #576b74;
+    margin-top: var(--space-md);
+  }
+}

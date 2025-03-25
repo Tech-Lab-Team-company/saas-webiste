@@ -1,0 +1,48 @@
+.btn-revised {
+  background-color: #212A43;
+  border: 1px solid #212A43;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  transition: 0.7s ease-in-out;
+  font-family: "regular", sans-serif;
+  cursor: pointer;
+  text-transform: capitalize;
+
+  &:disabled {
+    background-color: transparent;
+    cursor: not-allowed;
+
+    color: #212A43;
+    transition: 0.7s ease-in-out;
+  }
+  svg {
+    path {
+      transition: 0.7s ease-in-out;
+    }
+  }
+  &:hover {
+    background-color: transparent;
+    color: #212A43;
+    transition: 0.7s ease-in-out;
+    svg {
+      path {
+        transition: 0.7s ease-in-out;
+        fill: #212A43;
+      }
+    }
+  }
+}
+
+.btn-primary-opacity-1 {
+  background-color: var(--primary-color-opacity-10);
+  color: #212A43;
+
+  svg {
+    path {
+      fill: #212A43;
+    }
+  }
+}

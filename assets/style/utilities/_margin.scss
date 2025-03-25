@@ -1,0 +1,32 @@
+$margin: ("none": 0, "xs": 8, "sm": 10, "md": 16, "lg": 24, "xl": 32);
+
+@layer utilities {
+  :root {
+    @each $key, $value in $margin {
+      --margin-#{$key}: #{#{$value} + 'px'};
+    }
+  }
+
+  @each $key, $value in $margin {
+    .mt-#{$key} {
+      margin-top: #{#{$value} + 'px'};
+    }
+    .mb-#{$key} {
+      margin-bottom: #{#{$value} + 'px'};
+    }
+    .ms-#{$key} {
+      margin-inline-start: #{#{$value} + 'px'};
+    }
+    .me-#{$key} {
+      margin-inline-end: #{#{$value} + 'px'};
+    }
+    .mx-#{$key} {
+      margin-inline: #{#{$value} + 'px'};
+    }
+    .my-#{$key} {
+      margin-block: #{#{$value} + 'px'};
+    }
+  }
+}
+
+

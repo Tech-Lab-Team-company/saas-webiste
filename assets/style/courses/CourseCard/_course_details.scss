@@ -1,0 +1,24 @@
+
+@import "../../fonts" ;
+
+.info{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    font-size: 13px;
+    justify-content: end;
+
+    .info-title{
+        color: #546881;
+        font-family: "regular";
+    }
+    .info-subtitle{
+        color: #1D242D;
+        font-family: "regular";
+        display: flex;
+        gap: 3px;
+    }
+    .info-icon{
+        width: 16px;
+    }
+}

@@ -1,0 +1,16 @@
+.btn {
+  display: block;
+  color: var(--primary-color);
+  border-radius: 0.5rem;
+  padding: calc(15 / var(--base-height) * 100vh) calc(25 / var(--base-height) * 100vh);
+  font-family: 'bold', sans-serif;
+  font-size: 0.8rem;
+  transition: var(--transition-sm);
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap-sm);
+}
+

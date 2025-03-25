@@ -1,0 +1,24 @@
+$width: 100 !default;
+
+@layer utilities {
+  @for $i from 1 through $width {
+    .w-#{$i} {
+      width: #{#{$i} + '%'};
+    }
+  }
+  .w-fit {
+    width: fit-content;
+  }
+  .w-screen {
+      width: 100vw;
+  }
+  .w-min {
+      width: min-content;
+  }
+  .w-max {
+      width: max-content;
+  }
+  .max-w-full {
+    max-width: 100%;
+  }
+}

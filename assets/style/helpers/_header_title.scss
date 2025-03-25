@@ -1,0 +1,25 @@
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  .icon {
+    background-color: var(--primary-color-opacity-10);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-family: "medium", serif;
+    svg {
+      path {
+        fill: var(--primary-color);
+      }
+    }
+  }
+  .title {
+    color: var(--title-color);
+    font-family: "bold", serif;
+  }
+}

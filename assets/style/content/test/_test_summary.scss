@@ -1,0 +1,61 @@
+.test-summary {
+  .card {
+    border-radius: var(--radius-md);
+    border: 2px solid var(--test-summary-card-border);
+    background: var(--test-summary-bg);
+    padding: var(--padding-md);
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .card-body-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+
+        .card-icon {
+          display: flex;
+          width: 30px;
+          height: 30px;
+          justify-content: center;
+          align-items: center;
+          border-radius: var(--radius-sm);
+          background: var(--test-summary-icon-bg);
+        }
+
+        .card-title {
+          color: var(--dark-color);
+          font-size: var(--font-size-md);
+          font-weight: 500;
+        }
+      }
+      .update {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        color: var(--primary-color);
+
+        cursor: pointer;
+        text-decoration: underline;
+        svg,
+        path {
+          fill: var(--primary-color) !important;
+        }
+      }
+    }
+    .mark {
+      display: flex;
+      align-items: center;
+
+      font-size: var(--font-size-md);
+      font-weight: 500;
+      .text {
+        color: #546881;
+      }
+      .number {
+        color: var(--primary-color);
+      }
+    }
+  }
+}

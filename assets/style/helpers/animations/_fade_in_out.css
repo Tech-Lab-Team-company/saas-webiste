@@ -1,0 +1,17 @@
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+    transition: all 0.3s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Keep layout stable during transition */
+.card-controls,
+.add-to-cart {
+    display: inline-block;
+    vertical-align: middle;
+}

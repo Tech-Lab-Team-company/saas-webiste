@@ -1,0 +1,9 @@
+$spaces: ("xs": 8, "sm": 10, "md": 16, "lg": 24, "xl": 32, "2xl": 40, "3xl": 48, "4xl": 64);
+
+@layer utilities {
+  :root {
+    @each $key, $value in $spaces {
+      --space-#{$key}: #{#{$value} + 'px'};
+    }
+  }
+}

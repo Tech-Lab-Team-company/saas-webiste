@@ -1,0 +1,151 @@
+
+
+
+.course-card-container{
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    background-color: #FCFCFC;
+    padding: 10px;
+    border-radius: 10px;
+    
+    .container{
+        width: 100%;
+        .info-header-container{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .tab-icon{
+                padding: 8px;
+                width: 35px;
+                height: 35px;
+                border: 1px solid var(--stroke-color);
+                border-radius: 10px;
+            }
+
+            .info-header{
+                display: flex;
+                align-items: center;
+                .card-index{
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    background-color: #F0F1F4;
+                    border-radius: 5px;
+                    padding: 1px 10px;
+                    border-radius: 15px 0 0 15px;
+                    margin-left: 5px;
+                    color: #1F41BB;
+                    font-size: 14px;
+                }
+
+                .card-title{
+                    font-family: "medium";
+                }
+            }
+        }
+    }
+
+    .img-container{
+            margin-left: 10px;
+            img {
+                width: 200px;
+                height: 180px;
+                border-radius: 5px;
+        }
+    }
+
+            
+}
+
+
+ // @import "../../fonts" ;
+            // .course-card-container{
+            //     display: flex;
+            //     flex-direction: column;
+                
+            //     .card-container{
+            //         display: flex;
+            //         flex-direction: column;
+            //         justify-content: end;
+            
+            //         .card{
+            //             display: flex;
+            //             justify-content: end;
+            //             align-items: center;
+            //             width: 100%;
+            
+            //             .img-container{
+            
+                        
+            //                 img{
+            //                     border-radius: 5px;
+            //                     width: 166px;
+            //                     height: 180px;
+            //                 }
+            //             }
+            
+            
+            //             .container{
+            //                 width: 100%;
+            
+            //                 .info-header-container{
+            //                     display: flex;
+            //                     align-items: center;
+            //                     justify-content: space-between;
+            //                     width: 100%;
+            
+            //                     .tab-icon{
+            //                         padding: 8px;
+            //                         width: 35px;
+            //                         height: 35px;
+            //                         border: 1px solid #F0F1F4;
+            //                         border-radius: 10px;
+            //                     }
+            
+            //                     .info-header{
+            //                         display: flex;
+            //                         align-items: center;
+            //                         justify-content: end;
+            //                         gap:10px;
+            
+            //                         .card-title{
+            //                             margin-top: 10px;
+            //                             color: #1D242D;
+            //                             font-family: "medium";
+            //                         }
+            
+            //                         .card-index{
+            //                             display: flex;
+            //                             align-items: center;
+            //                             justify-content: end;
+            //                             margin-right: 10px;
+            //                             margin-top: 10px;
+            //                             gap: 6px;
+            //                             background-color:#1F41BB1A;
+            //                             width: fit-content;
+            //                             color:var(--primary-color) ;
+            //                             padding-right: 6px;
+            //                             padding-left: 15px ;
+            //                             border-radius: 15px 0px 0px 15px;
+            //                         }
+            //                     }
+            //                 }
+            
+            //                 .card-info{
+            //                     display: flex;
+            //                     justify-content: end;
+            //                     padding: 8px;
+            //                 }
+            
+            
+            
+            
+            //             }
+            
+            //         }
+            
+            //     }
+            
+            // }

@@ -1,0 +1,210 @@
+@import "../fonts" ;
+
+.details_course {
+  .slider-container {
+    position: relative;
+    // width: 100%;
+    // max-width: 800px;
+    // height: 300px;
+
+    // margin: auto;
+    overflow: hidden;
+    .slider {
+      position: relative;
+      width: 360px;
+      height: 180px;
+      .slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        background-size: cover;
+        background-position: center;
+        transition: opacity 0.5s ease-in-out;
+        opacity: 0;
+        z-index: 0;
+        border-radius: 20px;
+
+        &.active {
+          opacity: 1;
+          z-index: 1;
+        }
+      }
+    }
+  }
+
+  .dots {
+    position: absolute;
+    bottom: 3rem;
+    width: 23%;
+    text-align: center;
+    z-index: 999;
+
+    .dot {
+      display: inline-block;
+      width: 27px;
+      height: 7px;
+      margin: 0 5px;
+      background: #ccc;
+      border-radius: 25%;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &.active {
+        background: #fff;
+        width: 20px;
+      }
+    }
+  }
+
+  .text{
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 150%;
+    letter-spacing: -2%;
+    text-align: center;
+    // width: 330px;
+    height: 27px;
+    margin-top: 10px;
+
+
+
+  }
+
+
+
+
+//   button style
+.button_course {
+    border-bottom: 2px solid #F0F1F4;
+    width: 23rem;
+    padding: 1rem;
+    gap: 1rem;
+  
+    .button_course_container {
+      gap: 1rem;
+      .button_course_title {
+        width: 160px;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 10px;
+        background-color: #e9ecf8;
+        color: #1f41bb;
+        font-family: URW DIN Arabic;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 150%;
+        letter-spacing: -2%;
+        text-align: right;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+    }
+  }
+
+
+
+
+  
+  .course-card{
+    grid-column: span 2;
+    padding-right: 10px;
+
+    .header-container{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+
+        .tab-icon{
+            padding: 8px;
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--stroke-color);
+            border-radius: 10px;
+        }
+
+        .card-title{
+          text-align: end;
+          padding: 10px;
+          font-family:"medium";
+        }
+    }
+
+
+    .hr{
+        border: 1px solid #F3F5FA;
+    }
+
+    .course-details-header{
+        display: flex;
+        justify-content: space-between;
+        padding-top: 13px;
+
+        .buttons{
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          button{
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
+
+      }
+
+      .course-details-title{
+          display: flex;
+          gap: 10px;
+          font-family: "medium";
+      }
+    }
+
+      .coursecard:not(:first-child) {
+      margin-top: 40px;
+    }
+
+
+  }
+
+  
+
+
+
+
+//   paragraph style
+.paragraph_course {
+    display: flex;
+    align-items: center;
+    .paragraph_course_title {
+      display: flex;
+      align-items: center;
+      .title {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 150%;
+        letter-spacing: -2%;
+        text-align: right;
+      }
+      .text {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 150%;
+        letter-spacing: -2%;
+        text-align: right;
+        color: #546881;
+      }
+    }
+  }
+
+}
+
+

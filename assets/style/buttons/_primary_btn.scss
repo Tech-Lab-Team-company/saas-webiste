@@ -1,0 +1,38 @@
+.btn-primary {
+  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  color: var(--white-color);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  transition: 0.7s ease-in-out;
+  font-family: "regular", sans-serif;
+  cursor: pointer;
+  text-transform: capitalize;
+
+  &:disabled {
+    background-color: transparent;
+    cursor: not-allowed;
+    color: var(--primary-color);
+    transition: 0.7s ease-in-out;
+  }
+  svg {
+    path {
+      transition: 0.7s ease-in-out;
+    }
+  }
+  &:hover {
+    background-color: transparent;
+    color: var(--primary-color);
+    transition: 0.7s ease-in-out;
+  }
+
+  &.btn-show{
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}
+
+

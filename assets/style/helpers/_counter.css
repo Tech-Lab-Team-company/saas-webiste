@@ -1,0 +1,32 @@
+.counter-wrapper {
+  display: flex;
+  align-items: end;
+
+  gap: var(--space-sm);
+  .counter {
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'bold', sans-serif;
+    font-size: 0.8rem;
+    border-radius: 0.2rem;
+    input {
+      width: calc(50 / var(--base-height) * 100vh);
+      text-align: center;
+      outline: none;
+      background-color: #fff;
+      padding: calc(10 / var(--base-height) * 100vh);
+      border: 1px solid #E4E4E4;
+    }
+    .counter-arrow {
+      width: calc(35 / var(--base-height) * 100vh);
+      height: calc(35 / var(--base-height) * 100vh);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(10 / var(--base-height) * 100vh);
+    }
+  }
+}

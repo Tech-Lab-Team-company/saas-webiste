@@ -1,0 +1,37 @@
+@import "../fonts.scss";
+
+.tab {
+    width: 100%;
+    display: flex;
+    
+    .head {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+
+        .head-title {
+            width: 40%;
+            color: black;
+            padding: 14px;
+            border-color: none;
+            font-weight: 400;
+            font-family: "regular", sans-serif;
+        }
+        .custom-tab[aria-selected="true"] {
+            color:  var(--primary-color);
+            border-color: none;
+            border: none;
+        }
+        .custom-tab[aria-selected="false"] {
+            color: #47586E;
+        }
+    }
+    .p-tablist-active-bar {
+        // background-color: red;
+        background-color: var(--primary-color) !important;
+    }
+}
+
+
+
