@@ -1,0 +1,30 @@
+<script setup lang="ts">
+import type Tag from "~/types/tags";
+import type Category from "~/types/categories";
+import {BASE_URL} from "~/base/persention/utils/constant";
+
+const { data: categories } = await useAsyncData("blog-categories", async () => {
+  const response = await $fetch<{
+    data: Category[];
+    message: string;
+    status: number;
+  }>(`${BASE_URL}/blog_categories`, { method: "POST" });
+  return response.data; // Extract only the `data` part
+});</script>
+
+<template>
+  <section class="blogs-tags">
+    <h2 class="blogs-tags-title">
+      {{ $t("tags") }}
+    </h2>
+    <ul class="tags-list">
+      <li class="tag-item" v-for="tag in tags" :key="tag.id">
+        <NuxtLink to="/blogs">
+          {{ tag.title }}
+        </NuxtLink>
+      </li>
+    </ul>
+  </section>
+</template>
+
+<style scoped></style>
