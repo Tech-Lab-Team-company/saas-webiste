@@ -1,0 +1,30 @@
+import { ref } from "vue";
+
+export function useGeolocation() {
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
+
+
+  const getLocation = async (): Promise<{ latitude: number; longitude: number }> => {
+    if (!navigator.geolocation) {
+      error.value = "Geolocation is not supported by your browser.";
+      return;
+    }
+
+    isLoading.value = true;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        return {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }
+      },
+      (err) => {
+        error.value = err.message;
+        isLoading.value = false;
+      },
+    );
+  };
+
+  return { getLocation };
+}
