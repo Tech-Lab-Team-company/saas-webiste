@@ -1,0 +1,9 @@
+$gap: ("sm": 0.3, "md": 0.6, "lg": 0.9);
+
+@layer utilities {
+  :root {
+    @each $key, $value in $gap {
+      --transition-#{$key}: #{#{$value} + 's'};
+    }
+  }
+}

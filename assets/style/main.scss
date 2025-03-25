@@ -1,0 +1,39 @@
+@layer base, theme, layout, utilities;
+
+@import "./_normalize.scss";
+@import "./_fonts.scss";
+@import "./_variables.scss";
+
+// Auth
+@import "./auth/imports";
+
+//grid system
+@import "./grid/grid_system";
+
+//utilities
+@import "./utilities/imports";
+
+// Dialogs
+@import "./Dialogs/imports";
+
+//Form
+@import "./form/imports";
+
+// content
+@import "./content/imports";
+
+//Buttons
+@import "./buttons/imports";
+
+//Buttons
+@import "./table/imports";
+
+//Helpers
+@import "./helpers/imports";
+ 
+// Layout
+@import "./layout/imports";
+
+// Courses
+@import "./courses/imports";
+

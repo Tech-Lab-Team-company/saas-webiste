@@ -1,0 +1,37 @@
+.lang {
+  position: relative;
+  .drop-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    background-color: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 0 0 5px 5px;
+    display: none;
+    .drop-list-item {
+      padding: var(--space-sm);
+      border-bottom: 1px solid #e6e6e6;
+      color: #000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-family: 'bold', sans-serif;
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+      &:hover {
+        color: var(--primary-color);
+        background-color: var(--primary-color-rgba);
+      }
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+  &:hover .drop-list {
+    display: block;
+  }
+}

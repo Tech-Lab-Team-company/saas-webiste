@@ -1,0 +1,20 @@
+.btn-primary{
+  &.btn-icon {
+    svg {
+      path {
+        stroke: var(--white-color);
+        opacity: 1;
+      }
+    }
+  }
+  &:hover {
+    &.btn-icon {
+      svg {
+        path {
+          stroke: var(--primary-color);
+          opacity: 1;
+        }
+      }
+    }
+  }
+}

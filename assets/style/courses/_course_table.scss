@@ -1,0 +1,78 @@
+@import "../fonts.scss";
+
+.main-table {
+    width: 100%;
+    border-collapse: collapse; 
+    font-family: "regular";
+
+    thead .table-header th {
+    padding: 10px; 
+    background-color: #f3f4f6; 
+    color: #32393C;
+    
+        .head-id-container{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+    
+    }
+
+    
+    tbody .course-data .body-id-container  {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(20px);
+
+    }
+
+    tbody .course-data td {
+      
+      padding: 12px; 
+      text-align: center; 
+      font-weight: 500;
+    }
+
+    tbody .course-data .data{
+      color: #546881;
+      font-family: "light";
+    }
+
+
+    .icon{
+      width: 40px;
+      display: inline;
+      margin-right: 5px;
+      transform: translateY(5px) ;
+    }
+
+    .span{
+        display: inline;
+    }
+
+    .card-option{
+        background-color:#F4F9FD;
+        height: 40px;
+        width: 40px;
+        padding: 10px;
+        border-radius: 10px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .text-color-1{
+      font-family: "medium";
+      color:var(--third-color) ;
+    }
+    .text-color-2{
+      font-family: "medium";
+      color: var(--primary-color);
+    }
+
+    input{
+      width: 25px;
+    }
+
+       
+}

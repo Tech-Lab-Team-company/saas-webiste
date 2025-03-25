@@ -1,0 +1,29 @@
+.btn-accept {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    background-color: rgba(0, 182, 155, 1);
+    border: 1px solid rgba(0, 182, 155, 1);
+    color: var(--white-color);
+    transition: 0.7s ease-in-out;
+    cursor: pointer;
+    text-transform: capitalize;
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    svg {
+        path {
+            transition: 0.7s ease-in-out;
+        }
+    }
+    &:hover {
+        background-color: var(--white-color);
+        color: rgba(0, 182, 155, 1);
+        transition: 0.7s ease-in-out;
+        svg {
+            path {
+                transition: 0.7s ease-in-out;
+                fill: rgba(0, 182, 155, 1);
+            }
+        }
+    }
+}

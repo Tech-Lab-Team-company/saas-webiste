@@ -1,0 +1,142 @@
+@import "../fonts.scss";
+
+.course-card-grid {
+  border: 1px solid #DDE2ED;
+  padding: 0.5rem;
+  border-radius: 15px;
+  max-width: 340px;
+
+  .image-course-card {
+    position: relative;
+    width: 100%;
+    // border-radius: 40px;
+  }
+  .course-image{
+    border-radius: 8px;
+  }
+
+  .course-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: absolute;
+    top: 0.3rem;
+    background: #0000001a;
+    color: #fff;
+    padding: 0.3rem 2rem;
+    border-radius: 10px;
+  }
+
+  .course-title {
+    color: var(--third-color);
+    font-size: 1.1rem;
+    // margin-block: 0.6rem;
+    margin-top: 7px;
+    margin-bottom: 4px;
+    text-align: end;
+    font-family: "regular";
+    
+  }
+  .course-description {
+    color: var(--light-color);
+    // margin-block: 0.6rem;
+    text-align: end;
+    max-width: 100%;
+    letter-spacing: 0;
+    line-height: 1.2;
+    font-size: 14px;
+    margin-bottom: 12px;
+    font-family: "light";
+  }
+
+  .course-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:3px;
+    margin-top: 2px;
+    color: #546881;
+    justify-items: end;
+    font-family: "regular";
+  }
+
+  .course-data{
+    color:var(--third-color) ; 
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    padding-top: 10px;
+    p{
+      color: #546881;
+    }
+    
+  }
+
+  .course-students-images{
+    display: flex;
+    justify-content: end;
+  }
+
+  .course-info-img{
+    width: 37px;
+    height: 35px;
+    border-radius: 50%;
+    margin-top: 15px;
+    border: 1px solid white;
+    
+  }
+  
+  .course-info-img:not(:first-child){
+    margin-left: -10px;
+  }
+  
+  .course-actions{
+    margin-top: 15px;
+    display: flex ;
+    align-items: center;
+    gap: 20px;
+    .card-option{
+      background-color:#F4F9FD;
+      height: 40px;
+      width: 40px;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .drop{
+      background-color: var(--table-header-bg);
+      border-radius: 10px;
+      padding: 4px;
+    }
+  }
+
+  hr{
+    border: 1px solid #DDE2ED;
+    transform: scaleY(0.5);
+  }
+
+  .state{
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 7px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    padding-right: 25px;
+    padding-left: 25px;
+    border-radius: 20px;
+    font-size: 11px;
+    background-color: yrgba(87, 73, 73, 0.5); 
+    backdrop-filter: blur(20px);
+  }
+  
+  .img-container{
+    position: relative;
+  }
+
+
+}

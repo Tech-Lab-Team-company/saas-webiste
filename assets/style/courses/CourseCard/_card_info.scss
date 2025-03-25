@@ -1,0 +1,42 @@
+@import "../../fonts" ;
+.card-info-container{
+    width: 100%;
+    .card-head-container{
+        display: flex;
+        justify-content: end;
+        flex-wrap: wrap;
+        margin-bottom: 10px;  
+        gap: 20px;
+        width: 100%;
+        margin-top:10px ;
+
+        .head-item{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #F3F5FA;
+            border-radius: 20px;
+            padding: 5px 40px 5px 40px  ;
+            margin-bottom: 10px;
+
+            .title{
+                color: var(--primary-color);
+                font-size: 13px;
+
+            }
+            span{
+                color: var(--primary-color);
+                font-size: 13px;
+            }
+        }
+    } 
+
+    .details-container{
+        gap: 5px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        @media (max-width:768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+}

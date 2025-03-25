@@ -1,0 +1,36 @@
+.input-search {
+  position: relative;
+  @media (max-width: 768px) {
+    margin: 1rem 0;
+  }
+  img {
+    position: absolute;
+    top: 50%;
+    left: 9px;
+    transform: translateY(-50%);
+  }
+  .icon-remove {
+    position: absolute;
+    top: 50%;
+    right: 9px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  .input {
+    padding: var(--space-md);
+    padding-inline: 2rem;
+    background-color: transparent;
+    border: 1px solid #dde2ed;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-sm) ease-in-out;
+    width: 100%;
+    &::placeholder {
+      color: var(--placeholder-input);
+      font-family: "regular", serif;
+      font-size: 0.8rem;
+    }
+    &:focus {
+      outline: none;
+    }
+  }
+}

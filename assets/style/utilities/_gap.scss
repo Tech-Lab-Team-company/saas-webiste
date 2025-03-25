@@ -1,0 +1,15 @@
+$gap: ("xs": 4, "sm": 10, "md": 16, "lg": 24, "xl": 32);
+
+@layer utilities {
+  :root {
+    @each $key, $value in $gap {
+      --gap-#{$key}: #{#{$value} + 'px'};
+    }
+  }
+
+  @each $key, $value in $gap {
+    .gap-#{$key} {
+      gap: #{#{$value} + 'px'};
+    }
+  }
+}

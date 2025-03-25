@@ -1,0 +1,24 @@
+$height: 100 !default;
+
+@layer utilities {
+  @for $i from 1 through $height {
+    .h-#{$i} {
+      height: #{#{$i} + '%'};
+    }
+  }
+  .h-fit {
+    height: fit-content;
+  }
+  .h-screen {
+    height: 100vh;
+  }
+  .h-min {
+    height: min-content;
+  }
+  .h-max {
+    height: max-content;
+  }
+  .max-h-full {
+    max-height: 100%;
+  }
+}

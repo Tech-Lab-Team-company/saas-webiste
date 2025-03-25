@@ -1,0 +1,87 @@
+.cards-container {
+  row-gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+
+.options {
+  display: flex;
+  gap: 10px;
+  border: 1px solid #D9D9D9;
+  padding: 10px;
+  border-radius: 10px;
+
+
+  hr {
+    border: 1px solid #D9D9D9;
+  }
+
+  .option {
+    cursor: pointer;
+  }
+
+  .option-mode-white {
+    fill: white;
+  }
+
+  .option-mode {
+    fill: #1F41BB;
+
+  }
+
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    button {
+      font-weight: 400;
+    }
+  }
+
+  .search {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+
+    .input-search-container {
+      display: flex;
+      position: relative;
+      display: flex;
+    }
+
+    .input-search-container img {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding-left: 10px;
+      padding-right: 5px;
+    }
+
+    .input-search-container input {
+      padding-left: 40px;
+      width: 300px;
+    }
+  }
+
+
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+

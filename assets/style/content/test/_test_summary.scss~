@@ -1,0 +1,40 @@
+.test-summary {
+  .card {
+    border-radius: var(--radius-md);
+    border: 2px solid var(--test-summary-card-border);
+    background: var(--test-summary-card-bg);
+    padding: var(--padding-sm);
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-body-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+
+    .card-icon {
+      display: flex;
+      width: 30px;
+      height: 30px;
+      justify-content: center;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      background: var(--test-summary-icon-bg);
+    }
+      .card-title{
+        color: #000;
+        text-align: right;
+        font-family: "URW DIN Arabic";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+      }
+
+    }
+  }
+}

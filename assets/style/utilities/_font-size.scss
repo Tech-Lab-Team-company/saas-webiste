@@ -1,0 +1,14 @@
+$sizes: ("xs": 10, "sm": 10, "md": 16, "lg": 24, "xl": 32, "2xl": 40, "3xl": 48);
+
+@layer utilities {
+  :root {
+    @each $key, $value in $sizes {
+      --font-size-#{$key}: #{#{$value} + 'px'};
+    }
+  }
+  @each $key, $value in $sizes {
+    .font-size-#{$key} {
+      font-size: #{#{$value} + 'px'};
+    }
+  }
+}

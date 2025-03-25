@@ -1,0 +1,83 @@
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  background-color: var(--white-color);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  transition: 0.7s ease-in-out;
+  cursor: pointer;
+  text-transform: capitalize;
+  svg {
+    path {
+      transition: 0.7s ease-in-out;
+    }
+  }
+
+  &:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    transition: 0.7s ease-in-out;
+    .lock {
+      color: var(--white-color) !important;
+      transition: 0.7s ease-in-out;
+    }
+    svg {
+      path {
+        transition: 0.7s ease-in-out;
+        fill: var(--white-color);
+      }
+    }
+  }
+  &.non_hover {
+    &:hover {
+      background-color: var(--white-color);
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      svg {
+        path {
+          fill: none;
+        }
+      }
+    }
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    &:hover {
+      background-color: var(--white-color);
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      svg {
+        path {
+          fill: none;
+        }
+      }
+    }
+  }
+
+  &.btn-gray{
+    border:1px solid #DDE2ED ;
+    color: #3D4C5E;
+    &:hover{
+      background-color: #0B1741;
+      color: white;
+    }
+  }
+
+  &.btn-sort{
+    border: none;
+    background-color:#F0F1F4 ;
+    color: #3D4C5E;
+    font-family: "medium", sans-serif;
+    font-weight: 200;
+    padding-top: 8px;
+
+    &:hover{
+      background-color: #0B1741;
+      color: white;
+    }
+  }
+  
+}

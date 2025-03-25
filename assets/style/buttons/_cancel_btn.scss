@@ -1,0 +1,30 @@
+.btn-danger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  //   background-color: rgba(239, 56, 38, 1);
+  border: 1px solid rgba(239, 56, 38, 1);
+  color: rgba(239, 56, 38, 1);
+  transition: 0.7s ease-in-out;
+  cursor: pointer;
+  text-transform: capitalize;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  svg {
+    path {
+      transition: 0.7s ease-in-out;
+    }
+  }
+  &:hover {
+    background-color: rgba(239, 56, 38, 1);
+    color: var(--white-color);
+    transition: 0.7s ease-in-out;
+    svg {
+      path {
+        transition: 0.7s ease-in-out;
+        fill: rgba(239, 56, 38, 1);
+      }
+    }
+  }
+}

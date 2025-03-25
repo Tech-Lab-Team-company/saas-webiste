@@ -1,0 +1,76 @@
+.edit-dialog{
+    width: 50%;
+    border-radius: 0;
+
+    .dialog-header{
+        color: #1D242D;
+        padding: 15px;
+        text-align: end;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    hr{
+        margin: 0;
+        border: 1px solid #F5F5F5;
+    }
+
+    .input-dialog{
+        padding:10px ;
+
+        label{
+            text-align: end;
+            color: black;
+            font-weight: 500;
+        }
+    }
+    .input{
+        text-align: end;
+    }
+
+    .numbers-container{
+        display: flex;
+        gap: 10px;
+        @media (max-width: 1300px) {
+           flex-wrap: wrap;
+        }
+        
+        .degree-dialog {
+            padding: 10px;
+        }
+
+        .input-dialog-number{
+            width: 50%;
+                
+            @media (max-width: 1300px) {
+                width: 100%; 
+            }
+        }
+    
+    }
+
+    .edit-dialog-buttons {
+        padding: 10px;
+        display: flex ;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        
+        button{
+            width: 50%;
+        } 
+
+        
+        .btn-add{
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+
+    
+
+}
+
+
+
+

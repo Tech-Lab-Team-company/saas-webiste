@@ -1,0 +1,43 @@
+$grid-columns: 12 !default;
+
+.grid {
+  display: grid;
+}
+
+@for $i from 1 through $grid-columns {
+  .grid-cols-#{$i} {
+    grid-template-columns: repeat($i, minmax(0, 1fr));
+  }
+}
+
+@for $i from 1 through $grid-columns {
+  .col-span-#{$i} {
+    grid-column: span $i / span $i;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  @for $i from 1 through $grid-columns {
+    .md\:grid-cols-#{$i} {
+      grid-template-columns: repeat($i, minmax(0, 1fr));
+    }
+  }
+  @for $i from 1 through $grid-columns {
+    .md\:col-span-#{$i} {
+      grid-column: span $i / span $i;
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  @for $i from 1 through $grid-columns {
+    .lg\:grid-cols-#{$i} {
+      grid-template-columns: repeat($i, minmax(0, 1fr));
+    }
+  }
+  @for $i from 1 through $grid-columns {
+    .lg\:col-span-#{$i} {
+      grid-column: span $i / span $i;
+    }
+  }
+}

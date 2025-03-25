@@ -1,0 +1,108 @@
+/*table {*/
+/*    border: 1px solid #ccc;*/
+/*    border-collapse: collapse;*/
+/*    margin: 0;*/
+/*    padding: 0;*/
+/*    width: 100%;*/
+/*    table-layout: fixed;*/
+/*}*/
+
+table caption {
+    font-size: 1.5em;
+    margin: .5em 0 .75em;
+}
+table .actions-table-responsive {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+@media screen and (max-width: 1100px) {
+    table {
+        border: 0;
+    }
+
+    table caption {
+        font-size: 1.3em;
+    }
+
+    table thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    table tr {
+        border-bottom: 3px solid #ddd;
+        display: block;
+        /*margin-bottom: .625em;*/
+        td {
+            &:last-of-type {
+                justify-content: space-between !important;
+            }
+        }
+    }
+
+    table td {
+        border-bottom: 1px solid #ddd;
+        font-size: .8em;
+        text-align: right;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        gap: var(--space-sm);
+        text-overflow: ellipsis;
+        height: calc(var(--line-height) * 1em);
+        line-height: var(--line-height);
+        --line-height: 4;
+        &.line-height-responsive {
+            -webkit-line-clamp: 2;
+            height: calc(var(--line-height)* 1.3em);
+            line-height: 2;
+        }
+    }
+
+    table td::before {
+        /*
+        * aria-label has no advantage, it won't be read inside a table
+        content: attr(aria-label);
+        */
+        content: attr(data-label);
+        font-weight: bold;
+        text-transform: capitalize;
+        line-height: 1;
+        width: 35%;
+        text-align: start;
+    }
+
+    table td:last-child {
+        border-bottom: 0;
+        @media (max-width: 768px) {
+            justify-content: space-between !important;
+        }
+    }
+    table .actions-table-responsive {
+        a {
+            padding: var(--space-sm);
+            gap: 3px;
+            font-size: 0.6rem;
+            line-height: 1;
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+            span {
+                width: 90%;
+            }
+        }
+    }
+}
