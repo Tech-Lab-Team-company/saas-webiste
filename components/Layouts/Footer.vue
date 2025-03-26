@@ -10,7 +10,7 @@
 </script>
 
 <template>
-    <div class="grid gris-cols-1 md:grid-cols-4 footer-container">
+    <div class="grid grid-cols-1 md:grid-cols-4 footer-container">
         <div class="col">
            
             <p class="col-title">وسائل التواصل</p>
@@ -75,6 +75,8 @@
                 </div>  
             </div>  
         </div>
+
+        <hr class="hr"/>
         
 
     </div>
@@ -159,5 +161,4 @@
 
     
 }
-
 </style>

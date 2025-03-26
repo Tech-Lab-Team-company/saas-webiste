@@ -66,8 +66,14 @@ const toggleSubCategory = (categoryId: number) => {
 };
 </script> -->
 
+
+
+
 <script lang="ts" setup>
   import Logo from '~/public/icons/Logo.vue'
+  import {ref} from 'vue'
+
+
 </script>
 
 <template>
@@ -97,21 +103,23 @@ const toggleSubCategory = (categoryId: number) => {
           <NuxtLink 
             to="/main" 
             class="nav-link">
-            <li>المدونه</li>
+            <li >المدونه</li>
           </NuxtLink>
+
           <NuxtLink 
-            to="/main" 
+            to="/questions" 
             class="nav-link">
             <li>بنك الاسئله</li>
           </NuxtLink>
    
           <NuxtLink 
-            to="/main" 
+            to="/courses" 
             class="nav-link active">
             <li class="active">الكورسات</li>
           </NuxtLink>
+
           <NuxtLink 
-            to="/main" 
+            to="/aboutus" 
             class="nav-link">
             <li>نبذه عنا</li>
           </NuxtLink>
@@ -136,77 +144,8 @@ const toggleSubCategory = (categoryId: number) => {
 <style scoped lang="scss">
 
 
-
-
-.header{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-
-
-
-
-
-
-  .header-nav{
-    width: 100%;
-    background-color:#061147 ;
-    padding: 10px;
-  }
-  .header-title{
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 15px;
-    width: fit-content;
-    color: white;
-    text-align: center;
-    font-family: "regular";
-  }
-
-  .container{
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 40px;
-    background-color: #ffffff;
-
-    
-      .nav-links{
-        display: flex;
-        gap:20px;
-        .nav-link{
-          font-size: 18px;
-          color: #565E68;
-          font-family: "regular";
-
-          &.active{
-            color: #2525AD;
-          }
-
-        }
-
-      }
-
-      .buttons{
-        display: flex;
-        gap: 10px;
-      }
-                        
-
-  }
-
-}
-
-
-
-
-
-
+  
+  
 </style>
 
 
