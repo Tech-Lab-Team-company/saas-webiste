@@ -79,5 +79,21 @@
       color: white;
     }
   }
+
+  &.btn-stages{
+    padding: 8px 40px;
+    // border: 1px solid  #D7D7D7;
+    color: #000000;
+    border-radius: 15px;
+    border: 1px solid #d7d7d75b;
+    
+
+    &:hover{
+      background-color: #FFB949;
+      color: white;
+      border: none;
+      outline: none;
+    }
+  }
   
 }
