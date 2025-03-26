@@ -85,21 +85,18 @@ const toggleSubCategory = (categoryId: number) => {
 
 
 
-    <nav class="container ">
+    <nav class="header-container ">
 
         <div class="buttons">
-          <button class="btn btn-primary">
+          <button class="btn btn-primary btn-create ">
             انشاء حساب
           </button>
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary btn-secondary-create ">
             تسجيل الدخول
           </button>
         </div>
 
-        <ul class="nav-links">
-
-    
-         
+        <ul class="nav-links">     
           <NuxtLink 
             to="/main" 
             class="nav-link">
@@ -143,8 +140,22 @@ const toggleSubCategory = (categoryId: number) => {
 
 <style scoped lang="scss">
 
+.btn-create{
+  padding: 10px;
+  color: white;
+}
 
-  
+
+.btn-secondary-create{
+  padding: 10px;
+}
+
+
+.header{
+  gap: 0;
+  padding:0;
+  margin: 0;
+}
   
 </style>
 
