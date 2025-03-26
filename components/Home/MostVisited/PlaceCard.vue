@@ -3,7 +3,7 @@ import type { Listing } from "~/types/listing";
 import AddToBookmarkController from "~/features/ListingFeature/Presentation/controllers/add_to_bookmark_controller";
 import AddToBookmarkParams from "~/features/ListingFeature/Core/Params/add_to_bookmark_params";
 import wordSlice from "~/base/persention/utils/word_slice";
-
+import CourseCard1 from "~/components/Shared/CourseCardOne.vue";
 const prop = defineProps<{
   listing: Listing;
 }>();
@@ -19,8 +19,6 @@ const addToBookmark = async (id: number) => {
     console.error("Failed to update bookmark:", error);
   }
 };
-
-
 </script>
 
 <template>
