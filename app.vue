@@ -1,10 +1,16 @@
+<script setup lang="ts">
+import homeStarting from './components/Home/home/homestarting.vue'
+
+</script>
+
 <template>
   <div>
-    <MyLayoutHeader></MyLayoutHeader>
-    <MyLayoutFooter></MyLayoutFooter>
+    <NuxtLayout>
+      <homeStarting />
+      <!-- <NuxtPage /> -->
+    </NuxtLayout>
   </div>
 </template>
-
 
 
 <style></style>
