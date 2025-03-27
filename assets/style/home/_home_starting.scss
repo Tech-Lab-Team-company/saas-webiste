@@ -1,7 +1,7 @@
 
 @import "../fonts";
 .main-container{
-    background-color: rgba(100, 100, 100, 0.089);
+    background-color:#F5F5F5;
     margin-bottom: 20px;
 
 .container{
@@ -10,11 +10,11 @@
     align-items: center;
     margin-left: auto;
     margin-right: auto;
-    padding: 40px;
-    width: 80%;
+    padding: 50px;
+    // width: 80%;
     gap: 20px;
     position: relative;
-    @media (max-width: 1000px) {
+    @media (max-width: 786px) {
         flex-direction: column;
     }
 
@@ -52,7 +52,7 @@
         display: flex;
         justify-content: end;
         flex-direction: column;
-
+     
         animation: detailsfadein 2s ease-out;
         // animation-iteration-count: infinite;
 
@@ -71,6 +71,9 @@
             flex-direction: column;
             align-items: end;
             width: 400px;
+            @media (max-width:600px) {
+                width: 250px;
+            }
 
             .main-title{
                 font-size: 30px;
@@ -82,7 +85,7 @@
         .sub-title{
                 text-align: end;
                 color: #565E68;
-                width: 550px;
+                // width: 550px;
                 font-size: 20px;
                 margin-top: 10px;
                 line-height: 1.6;
@@ -168,6 +171,11 @@
             padding: 10px;
             z-index: 10;
             width: 450px;
+
+            @media (max-width:600px) {
+                width: 200px;
+            }
+            // overflow: hidden;
             gap: 20px;
 
             
