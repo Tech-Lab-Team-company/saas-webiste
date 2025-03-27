@@ -82,6 +82,9 @@
 
   &.btn-stages{
     padding: 8px 40px;
+    @media (max-width:768px) {
+      padding: 8px 10px;
+    }
     // border: 1px solid  #D7D7D7;
     color: #000000;
     border-radius: 15px;

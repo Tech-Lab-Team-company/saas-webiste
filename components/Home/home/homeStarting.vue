@@ -2,6 +2,7 @@
     import BackgoundCircle from '~/public/icons/BackgoundCircle.vue'
     import {onUpdated} from 'vue'
     import EducationStages from './EducationStages.vue'
+    import Students from './Students.vue'
 
     const containerRef = ref(null)
     const slides = ref(Array.from({ length: 2 }))
@@ -23,9 +24,7 @@
     <div class="main-container">
 
  
-    
-    <!-- style="background-color: rgb(32, 233, 70); color: white;" -->
-    <ClientOnly>
+        <ClientOnly>
         <swiper-container ref="containerRef">
         <swiper-slide>
         <div class="container">
@@ -97,12 +96,19 @@
 </div>
 
     <EducationStages />
+    <Students />
 
 </template>
 
 <style scoped lang="scss">
 
-
+.container{
+    
+}
 
 </style>
+
+
+
+
 

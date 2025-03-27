@@ -6,6 +6,17 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     // gap: 20px;
+
+    @media (max-width:470px) {
+        grid-template-columns: 1fr 1fr ;
+        justify-items: end;
+        gap: 20px;
+      }
+    @media (max-width:400px) {
+        grid-template-columns: 1fr ;
+        justify-items: end;
+        gap: 20px;
+      }
     justify-items: center;
     // align-items: center;
     text-align: end;
