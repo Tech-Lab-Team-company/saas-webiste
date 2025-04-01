@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import homeStarting from './components/Home/home/homestarting.vue'
+import CourseCard from "~/components/Shared/CourseCard.vue";
+
 
 </script>
 
@@ -8,6 +10,7 @@ import homeStarting from './components/Home/home/homestarting.vue'
     <NuxtLayout>
       <homeStarting />
       <!-- <NuxtPage /> -->
+      <CourseCard />
     </NuxtLayout>
   </div>
 </template>
