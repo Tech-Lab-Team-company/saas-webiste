@@ -72,9 +72,6 @@ const toggleSubCategory = (categoryId: number) => {
 <script lang="ts" setup>
   import Logo from '~/public/icons/Logo.vue'
 
-  import CourseCard1 from "~/components/Shared/CourseCardOne.vue";
-  import CourseCard2 from "~/components/Shared/CourseCardTwo.vue";
-  import CourseCard3 from "~/components/Shared/CourseCardThree.vue";
 
   import {ref} from 'vue'
 
@@ -142,9 +139,7 @@ const toggleSubCategory = (categoryId: number) => {
 
   </header>
 
-  <CourseCard1 />
-  <CourseCard2 />
-  <CourseCard3 />
+
 
 </template>
 
