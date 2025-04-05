@@ -25,7 +25,7 @@ const props = defineProps<{ blogs: Blog[] | null }>();
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="col-span-1 md:col-span-2 lg:col-span-3">
         <div class="flex justify-between items-center">
-          <h1 class="title">{{ $t("All_Articles") }}</h1>
+          <h1 class="title">{{"All_Articles" }}</h1>
           <div class="input-search">
             <div class="search-icon">
               <IconsSearch />

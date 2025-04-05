@@ -29,7 +29,10 @@ const cards = [
   },
 ];
 const splideOptions = {
-  type: "slide", 
+  type: "loop", 
+  // autoplay: true,
+  // interval: 3000,
+  // speed: 1000,
   perPage: 3, 
   perMove: 1, 
   gap: "20px",
@@ -41,7 +44,7 @@ const splideOptions = {
 
 <template>
   <div class="card-course-three">
-    <div class="slider-wrapper" dir="rtl">
+    <div class="slider-wrapper" >
       <h3 class="slider-heading">مراجعه اللغه العربيه</h3>
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(card, index) in cards" :key="index">
@@ -51,7 +54,7 @@ const splideOptions = {
               <p class="overlay-text">1500 جنيه</p>
             </div>
 
-            <div class="card-body">
+            <div class="card-body" dir="rtl">
               <h5 class="card-title">{{ card.title }}</h5>
               <div class="card-content">
                 <p class="card-text1">
