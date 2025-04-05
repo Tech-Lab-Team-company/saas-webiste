@@ -15,6 +15,7 @@
       line-height: 200%;
       letter-spacing: 0%;
       vertical-align: middle;
+      font-family: "bold";
     }
   }
 
@@ -60,6 +61,7 @@
       line-height: 30px;
       text-align: right;
       margin: 0;
+      font-family: "bold";
     }
 
     .card-text {
@@ -70,6 +72,7 @@
       color: #656b78;
       margin: 10px 0;
       border-bottom: 1px solid #656b78;
+      font-family: "regular";
     }
 
     .card-footer {
@@ -90,13 +93,13 @@
   /* splide buttons */
 
 
-  .splide__arrow--prev {
-    left: -30px;
-  }
+  // .splide__arrow--prev {
+  //   left: -50px !important;
+  // }
 
-  .splide__arrow--next {
-    right: -30px;
-  }
+  // .splide__arrow--next {
+  //   right: -20px;
+  // }
 
   .course-image {
     width: 100%;

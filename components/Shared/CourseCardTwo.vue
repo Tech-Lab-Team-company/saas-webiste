@@ -1,7 +1,6 @@
 <script setup>
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
-
 import english from "@/assets/images/english.png";
 import user from "@/public/icons/user.vue";
 
@@ -35,7 +34,10 @@ const cards = [
 
 
 const splideOptions = {
-  type: "slide", 
+  type: "loop", 
+  // autoplay: true,
+  // interval: 3000,
+  // speed: 1000,
   perPage: 3, 
   perMove: 1, 
   gap: "20px",
@@ -46,13 +48,13 @@ const splideOptions = {
 </script>
 <template>
   <div class="card-course-two">
-    <div class="slider-wrapper flex" dir="rtl">
+    <div class="slider-wrapper flex" >
     <h1 class="slider-heading">مراجعة اللغة الإنجليزية</h1>
 
     <Splide :options="splideOptions" class="splide-container">
       <SplideSlide v-for="(card, index) in cards" :key="index">
         <div class="card" :style="{ backgroundImage: `url(${card.img})` }">
-          <div class="card-body">
+          <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
               <p class="card-number">{{ card.number }}</p>

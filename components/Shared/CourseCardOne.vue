@@ -34,9 +34,12 @@ const cards = [
   },
 ];
 const splideOptions = {
-  type: "slide",   
+  type: "loop",
+  // autoplay: true,
+  // interval: 3000,
+  // speed: 1000,
   perPage: 3, 
-  perMove: 0,
+  perMove: 1,
   gap: "20px",
   pagination: false,
   arrows: true, 
@@ -45,15 +48,15 @@ const splideOptions = {
 </script>
 
 <template>
-  <div class="card-course-one" dir="rtl">
+  <div class="card-course-one" >
     <div class="slider-wrapper">
       <h3 class="slider-heading">مراجعة اللغة العربية</h3>
 
-      <Splide :options="splideOptions" class="splide-container">
+      <Splide :options="splideOptions" class="splide-container" >
         <SplideSlide v-for="(card, index) in cards" :key="index">
           <div class="card">
             <img :src="card.img" alt="Card image" class="course-image" />
-            <div class="card-body">
+            <div class="card-body" dir="rtl">
               <h5 class="card-title">{{ card.title }}</h5>
               <p class="card-text">{{ card.text }}</p>
               <div class="card-footer">
