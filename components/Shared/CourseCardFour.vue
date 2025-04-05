@@ -1,0 +1,132 @@
+<script setup>
+import { Splide, SplideSlide } from "@splidejs/vue-splide";
+import "@splidejs/vue-splide/css";
+
+import img1 from "@/assets/images/img1.png";
+import img2 from "@/assets/images/img2.png";
+import img3 from "@/assets/images/img3.png";
+import img4 from "@/assets/images/img4.png";
+import img5 from "@/assets/images/img5.png";
+
+const cards = [
+  {
+    img: img4,
+  },
+  {
+    img: img2,
+  },
+  {
+    img: img3,
+  },
+  {
+    img: img4,
+  },
+  {
+    img: img4,
+  },
+];
+
+const splideOptions = {
+  type: "loop",
+  perPage: 5,
+  perMove: 1,
+  gap: "10px",
+  pagination: false,
+  arrows: false,
+  breakpoints: {
+    1200: {
+      perPage: 4,
+    },
+    900: {
+      perPage: 3,
+    },
+    600: {
+      perPage: 2,
+    },
+    480: {
+      perPage: 1,
+    },
+  },
+  autoplay: true,
+  interval: 3000,
+  pauseOnHover: false,
+  pauseOnFocus: false,
+  resetProgress: false,
+  speed: 1000,
+  drag: true,
+  cloneStatus: true,
+  drag: false,
+};
+</script>
+<template>
+  <div class="card-course-four">
+    <div class="slider-wrapper flex" dir="ltr">
+     
+      <h1 class="slider-heading">ماذا قال الطلبه عنا ؟</h1>
+      <p class="slider-paragraph">
+        تعرّف على تجارب الطلاب وآرائهم حول رحلتهم التعليمية معنا
+      </p>
+
+      <Splide :options="splideOptions" class="splide-container">
+        <SplideSlide v-for="(card, index) in cards" :key="index">
+          <img :src="card.img" :alt="card.alt" class="slider-image" />
+        </SplideSlide>
+      </Splide>
+    </div>
+  </div>
+</template>
+<style>
+
+
+.slider-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-heading {
+  font-size: 35px;
+  color: #222;
+  text-align: center;
+  margin-bottom: 5px;
+  font-weight: 800;
+  vertical-align: middle;
+  font-family: "bold";
+}
+
+.slider-paragraph {
+  font-weight: 400;
+  font-size: 20px;
+  vertical-align: middle;
+  color: #737e8a;
+  font-family: "regular";
+  margin-bottom: 10px;
+}
+
+.splide-container {
+  width: 86%;
+  height: 100%;
+  padding-bottom: 30px;
+}
+
+.splide-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.slider-image {
+  width: 300px;
+  height: 212px;
+}
+
+/* splide buttons */
+.splide__arrow--prev {
+  left: -60px;
+}
+
+.splide__arrow--next {
+  right: -20px;
+}
+</style>
