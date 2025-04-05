@@ -2,6 +2,7 @@
 import StagesTitle from './StagesTitle.vue'
 import { register } from 'swiper/element/bundle'
 import 'swiper/css'
+import banner from '../../Global/banner.vue'
 
 const containerRef = ref(null)
 
@@ -22,8 +23,8 @@ const containerRef = ref(null)
         </div>
     </div>
     
-    <div class="gallery-container">
-        <ClientOnly>
+    <div class="gallery-container  ">
+        <ClientOnly >
             <swiper-container 
                 ref="containerRef"
                 class="gallery-track"
@@ -68,8 +69,11 @@ const containerRef = ref(null)
             </swiper-container>
         </ClientOnly>
     </div>
+
+
 </template>
 
 <style scoped lang="scss">
+
 
 </style>

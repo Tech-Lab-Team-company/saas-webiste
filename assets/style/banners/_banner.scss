@@ -1,0 +1,23 @@
+.banner{
+    display: flex;
+    justify-content: end;
+    background-image: linear-gradient(to left , #032855, #FFFFFF );
+
+    .banner-list{
+        display: flex;
+        gap: 10px;
+        padding: 20px 10px;
+        
+        .banner-item{
+            display: flex;
+            color: #FFFFFF;
+            font-family: 'regular';
+            align-items: center;
+            gap: 10px;
+            .arrow-icon{
+                width: 12px;
+            }
+        }
+    }
+}
+
