@@ -1,0 +1,44 @@
+// .course-content-container{
+//     margin-top: 30px;
+//     width: 100%;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 10px;
+//     padding-bottom:30px ;
+    
+    
+
+//     .course-content-title{
+//         width: 70%;
+//         margin-left: auto;
+//         margin-right: auto;
+//         background-color: white;
+//         padding: 15px 10px;
+//         text-align: right;
+//         display: flex;
+//         justify-content: space-between;
+//         align-items: center;
+
+//         .content-icon{
+//             width: 15px;
+//         }
+//     }
+// }
+
+
+.p-accordionheader {
+    border:none; 
+    outline: none;
+    .p-accordioncontent{
+        .p-accordioncontent-content{
+            border:none; 
+            outline: none;
+        }
+
+    }
+
+}
+
+.p-accordionpanel{
+    border:none; 
+}

@@ -12,7 +12,6 @@
     onUpdated(() => {
         console.log("containerRef.value")
         console.log(containerRef.value)
-        console.log(swiper.instance.value.activeIndex)
     })
 
     const swiper_position = ref('next')
@@ -20,9 +19,9 @@
 </script>
 
 <template>
+   
 
     <div class="main-container">
-
  
         <ClientOnly>
         <swiper-container ref="containerRef">

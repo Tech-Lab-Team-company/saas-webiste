@@ -1,0 +1,125 @@
+.card-container{
+    background-color: #F6F6F6;
+    margin-top: 20px;
+    padding: 20px;
+    display: flex;
+    // justify-content: space-between;
+    // align-items: center;
+    gap: 10px;
+
+    .card-text{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+
+        .card-text-title{
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            position: relative;
+
+            .icon{
+                position: absolute;
+                left: 50%;
+                top: 100%;
+                transform: translateX(-50%);
+            }
+
+            .card-text-subject-title{
+                background-color: #FF931E0D;
+                color: #FFB949;
+                padding: 6px;
+                border-radius: 20px;
+                font-weight: 500;
+            }
+
+            .card-text-main-title{
+                font-weight: 700;
+                font-size: 18px;
+                text-align: right; 
+            }
+        }
+
+        .card-text-description{
+
+            text-align: right;
+            margin-top: 15px;
+            padding: 0 10px;
+            color: #6F777B;
+            font-weight: 500;
+            margin-left: auto;
+            font-size: 18px;
+            line-height: 150%;
+        }
+
+        hr{
+            border-color:  #d9dbde27;
+            width: 50%;
+            margin-left: auto;
+            margin-right: 10px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .card-text-footer{
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+      
+            padding: 0 10px;
+            font-weight: 800;
+           
+           
+            .card-profile{
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                img{
+                    width: 30px;
+                }
+            }
+
+            .salary{
+                color:#FFB949;
+                font-size: 23px;
+                
+                span{
+                    font-size: 18px;
+                    font-weight: 500;
+                }
+            }
+        }
+
+        .btns{
+            button{
+                width: 100%;
+                background-color: #FFB949;
+                color:white;
+                margin-top:20px;
+                padding: 10px;
+                border-radius: 15px;
+            }
+        }
+
+
+    }
+
+
+
+    .card-video{
+        
+        overflow: hidden;
+        width: 1000px;
+        border-radius: 20px;
+        height: 250px;
+
+        video{
+            
+        }
+    }
+
+}
