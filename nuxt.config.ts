@@ -4,8 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxt/image', 'nuxt-swiper' ],
   css: [
-    "@/assets/style/main.min.css",
-    // "@/assets/style/main.css",
+    // "@/assets/style/main.min.css",
+    "@/assets/style/main.css",
 
   ],
 })

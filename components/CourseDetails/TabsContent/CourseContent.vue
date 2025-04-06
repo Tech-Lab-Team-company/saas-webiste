@@ -1,4 +1,10 @@
 <script setup lang="ts">
+
+    // import Accordion from 'primevue/accordion';
+    // import AccordionPanel from 'primevue/accordionpanel';
+    // import AccordionHeader from 'primevue/accordionheader';
+    // import AccordionContent from 'primevue/accordioncontent';
+
     import Accordion from 'primevue/accordion';
     import AccordionPanel from 'primevue/accordionpanel';
     import AccordionHeader from 'primevue/accordionheader';
@@ -7,6 +13,7 @@
     import coursenotesicon from '~/public/icons/coursenotesicon.vue';
     import microphoneicon from '~/public/icons/microphoneicon.vue';
     import bookicon from '~/public/icons/bookicon.vue';
+
 
     const content = ref([
         {
