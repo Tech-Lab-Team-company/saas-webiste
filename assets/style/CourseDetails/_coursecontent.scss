@@ -1,44 +1,146 @@
-// .course-content-container{
-//     margin-top: 30px;
-//     width: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     gap: 10px;
-//     padding-bottom:30px ;
-    
-    
+.course-content-container{
+    border: none;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
 
-//     .course-content-title{
-//         width: 70%;
-//         margin-left: auto;
-//         margin-right: auto;
-//         background-color: white;
-//         padding: 15px 10px;
-//         text-align: right;
-//         display: flex;
-//         justify-content: space-between;
-//         align-items: center;
+    .course-content-panel{
+        border: none;
+        
+       .course-content-header{
+            border: none;
+            direction: rtl;
+            border-radius: 5px;
+            border: none;
+            padding: 15px;
+            background-color: white;
+            margin-top: 10px;
 
-//         .content-icon{
-//             width: 15px;
-//         }
-//     }
-// }
+        }
 
+        .course-content-body{
+            border: none;
+            background-color: white;
+            border-radius: 5px;
+            // padding: 10px;
+            margin-top: 3px;
+            
 
-.p-accordionheader {
-    border:none; 
-    outline: none;
-    .p-accordioncontent{
-        .p-accordioncontent-content{
-            border:none; 
-            outline: none;
+            .p-accordioncontent-content{
+                border: none;
+                width: 100%;
+            }
+
+            .course-class-container{
+                .course-class-panel{
+                    direction: rtl;
+                    .course-class-header{
+                        border: none;
+                        &:not(:nth-child(2)){
+                            padding: 15px 0;
+                        }
+                    }
+                    .course-class-body{
+                        color:#656B78;
+                        font-size: 15px;
+                        padding: 5px;
+                        border-color: #d9d9d925;
+
+                   
+                    }
+                }
+            }
+        }
+        
+        &.p-accordionpanel-active{
+            .course-content-header{
+                border: none;
+                background-color: #FFB949;
+                color: white;
+                border-radius: 5px;            
+            }
         }
 
     }
-
 }
 
-.p-accordionpanel{
-    border:none; 
+
+
+.course-class-container{
+    .course-class-panel{
+        border:none;
+        border-bottom: 1px solid #D9D9D9;
+        border-radius: 0;
+
+        .course-class-hr{
+            border: none;
+        }
+
+        &.p-accordionpanel-active{
+            .course-class-hr{
+                width: 100%;
+                border: none;
+                height: 1px;
+                background-image: linear-gradient(to left , #FF931E 0% 20%, #FFF4E9 75% ); 
+            }
+        }
+      
+
+        .course-class-header{
+            background-color: white;
+            color: black;
+            padding: 10px;
+            margin: 0;
+            border-radius: 0;
+            padding-bottom: 10px;
+            margin-right: 15px;
+            margin-left: 15px;
+        }
+
+        .course-class-body{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            align-items: start;
+            padding: 10px 10px;
+            border-bottom: 1px solid #d9d9d955;
+            border-radius: 0;
+
+                
+                .course-body-details{
+                    width: 80%;
+                    margin-left: auto;
+                    margin-right: auto;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding-bottom: 5px;
+                    cursor: pointer;
+                    padding: 3px 10px;
+                    
+                    &:not(:last-child){
+                        
+                        margin-bottom: 5px;
+                        border-bottom: 1px solid #d9d9d96c;
+                    }
+
+                    &:first-child{
+                        color:#D38911;
+                    }
+            
+                    &.active{
+                        color:#D38911;
+                    }
+                }
+
+            
+
+           
+        }
+
+        
+    }
 }
+

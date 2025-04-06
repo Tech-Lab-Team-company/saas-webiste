@@ -10,10 +10,22 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
     const value = ref('0');
 
     const tab_value = ref('content');
+    const activetab = ref(1);
 
 </script>
 
 <template>
+
+    
+
+    <div v-if="activetab==0">
+        <CourseDetailsCourseVideo />
+    </div>
+
+    <div v-if="activetab!=0">
+       <CourseDetailsCourseCard />
+    </div>
+
     <div class="course-tabs">
         <RightDots class="right-dots" />
         <RightDots class="left-dots" />
@@ -53,7 +65,8 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
                     <CourseDetailsTabsContentCourseHomework />
                 </div>
                 <div v-if="tab_value === 'content'">
-                    <CourseDetailsTabsContentCourseContent />
+                    <CourseDetailsTabsContentCourseContent
+                        @coursechanged="activetab=$event" />
                 </div>
                 <div v-if="tab_value === 'urls'">
                     <CourseDetailsTabsContentCourseUrls />
@@ -72,73 +85,5 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
 
 </template>
 
-<style scoped lang="scss">
-    .course-tabs{
-        width: 100%;
-        position: relative;
-        background-color: #F6F6F6;
-        margin-top: 20px;
-
-
-        .right-dots{
-            position: absolute;
-            left: -100px;
-            top: 10px;
-            height: 200px;
-            transform: scaleX(-1);
-        }
-
-        .left-dots{
-            position: absolute;
-            right: -100px;
-            top: 10px;
-            height: 200px;
-        }
-
-
-        .tabs-container{
-            width: 100%;
-            padding-top: 25px;
-
-            hr{
-                width: 70%;
-                border-color: #FFB9494D;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .tabs-header{
-                width: 100%;
-                display: flex;
-                justify-content: center;
-                gap: 20px;
-                
-                .tab-title{
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    padding-bottom: 10px;
-                    cursor: pointer;
-
-                    &.active-tab{
-
-                        border-bottom: 2px solid #FF931E;
-                    }
-                }
-            }  
-            
-            
-            .tabs-content{
-                width: 100%;
-                margin-left: auto;
-                margin-right: auto;
-                text-align: center;
-                padding-bottom: 30px;
-              
-                
-            }
-        }
-
-    }
-</style>
+<style scoped ></style>
 
