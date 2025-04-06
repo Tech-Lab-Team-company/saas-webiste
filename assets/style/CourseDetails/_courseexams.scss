@@ -1,0 +1,37 @@
+.exams-timer-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url(../../public//images/background.png);
+    height: 700px;
+
+    .timer-container{
+        img{
+            width: 100%;
+        }
+    }
+
+    .exams-timer-text{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        .main-title{
+            font-size: 20px;
+
+            span{
+                text-decoration: underline;
+                font-weight: 600;
+            }
+        }
+
+        .second-title{
+            color:#6F777B;
+            font-size: 21px;
+        }
+    }
+}  

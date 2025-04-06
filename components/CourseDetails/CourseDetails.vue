@@ -1,5 +1,5 @@
 <script scoped lang="ts">
-import { CourseDetailsCourseCard, CourseDetailsCourseTabs, GlobalBanner } from '#components';
+import {CourseDetailsCourseTabs, GlobalBanner } from '#components';
 
 
 
@@ -7,11 +7,8 @@ import { CourseDetailsCourseCard, CourseDetailsCourseTabs, GlobalBanner } from '
 
 <template>
     <GlobalBanner />
-    <CourseDetailsCourseCard />
     <CourseDetailsCourseTabs />
 
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped></style>
