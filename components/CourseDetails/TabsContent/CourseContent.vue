@@ -21,10 +21,10 @@ import Downarrow from '~/public/icons/downarrow.vue';
 <style scoped lang="scss"></style> -->
 
 <script setup lang="ts">
-    import Accordion from 'primevue/accordion';
-    import AccordionPanel from 'primevue/accordionpanel';
-    import AccordionHeader from 'primevue/accordionheader';
-    import AccordionContent from 'primevue/accordioncontent';
+    // import Accordion from 'primevue/accordion';
+    // import AccordionPanel from 'primevue/accordionpanel';
+    // import AccordionHeader from 'primevue/accordionheader';
+    // import AccordionContent from 'primevue/accordioncontent';
 
     const content = ref([
         {

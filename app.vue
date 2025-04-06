@@ -15,10 +15,10 @@ import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
   <div>
     <NuxtLayout>
 
-      <CourseDetails />
+      <!-- <CourseDetails /> -->
       <!-- <homeStarting /> -->
       <!-- <NuxtPage /> -->
-      <CourseCard />
+      <!-- <CourseCard /> -->
 
       <!-- <homeStarting /> -->
       <NuxtPage />
