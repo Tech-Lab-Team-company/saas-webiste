@@ -49,7 +49,4 @@ import discoverbtnIcon from '~/public/icons/discoverbtnIcon.vue';
 
 </template>
 
-<style scoped lang="scss">
-
-
-</style>
+<style scoped></style>

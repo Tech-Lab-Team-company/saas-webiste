@@ -54,24 +54,5 @@
 
 <style scoped lang="scss">
 
-    .second-banner{
-        margin-top: 10px;
-        padding: 15px;
-        background-color: #F6F6F6;
-        width: 100%;
-        .track{
 
-            .banner-logos{
-                display: flex;  
-                align-items: center;
-                justify-content: space-between;                
-            }
-
-            .logo{
-                width: 150px;
-                height: 120px;
-            }
-        }
-
-    }
 </style>

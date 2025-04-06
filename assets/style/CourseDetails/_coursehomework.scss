@@ -1,72 +1,73 @@
-// .course-exam-container{
-//     margin-top: 40px;
-//     display: flex;
-//     width: 100%;
-//     align-items: center;
-//     border: 1px solid black;
-//     width: 70%;
-//     margin-left: auto;
-//     margin-right: auto;
-//     justify-content: space-between;
-//     padding: 10px;
-//     border-radius: 10px;
+
+.course-homework-container{
+    margin-top: 40px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border: 1px solid black;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 10px;
     
 
-//     .btns{
-//         button{
-//             background-color: #FFB949;
-//             color:white;
-//             padding: 10px;
-//             border-radius: 10px;
-//         }
-//     }
+    .btns{
+        button{
+            background-color: #FFB949;
+            color:white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+    }
 
-//     .exam-rate{
-//         display: flex;
-//         flex-direction: column;
-//         align-items: center;
-//         gap: 3px;
+    .homework-rate{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
 
-//         .details{
-//             text-decoration: underline;
-//             cursor: pointer;
-//             padding-left: 20px;
-//         }
+        .details{
+            text-decoration: underline;
+            cursor: pointer;
+            padding-left: 20px;
+        }
 
-//     }
-//     .course-exam-content{
-//         display: flex;
-//         flex-direction: column;
-//         justify-content: end;
-//         gap: 6px;
-//         width: 40%;
+    }
+    .course-homework-content{
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        gap: 6px;
+        width: 40%;
 
-//         .exam-title{
-//             display: flex;
-//             align-items: center;
-//             justify-content: end;
-//             gap: 10px;
-//             font-size: 20px;
+        .homework-title{
+            display: flex;
+            align-items: center;
+            justify-content: end;
+            gap: 10px;
+            font-size: 20px;
 
-//             &.exam-date{
-//                 color: #6F777B;
-//                 font-size: 12px;
-//                 gap:5px;
+            &.homework-date{
+                color: #6F777B;
+                font-size: 12px;
+                gap:5px;
 
-//                 .exam-icon{
-//                     width: 13px;
-//                 }
-//             }
-//         }
+                .homework-icon{
+                    width: 13px;
+                }
+            }
+        }
 
-//         .exam-date-container{
+        .homework-date-container{
         
-//             display: flex;
-//             justify-content: space-between;
-//             align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             
-//             margin-right: 5px;
+            margin-right: 5px;
             
-//         }
-//     }
-// }
+        }
+    }
+}

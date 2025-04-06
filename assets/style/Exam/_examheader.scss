@@ -1,0 +1,42 @@
+.exam-header{
+    width: 100%;
+    padding-right: 20px;
+    padding-left: 20px;
+    background-image: url('../../public/images/background.png');
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .exam-header-container{
+             width: 60%;
+        .exam-header-text{
+            display: flex;
+            align-items: center;
+            justify-content: end;
+            gap: 5px;   
+            
+            .exam-title{
+                font-size: 25px;
+            }
+
+        }
+
+        .exam-title-hr{
+            border: none;
+            height: 4px;
+            border-radius:5px ;
+            background-image: linear-gradient(to left ,#D38911 ,#FFFFFF);
+            margin-top: 10px;
+            margin-bottom: 10px;
+  
+        }
+    }
+
+    .exam-btn{
+        padding: 10px;
+        border-radius: 10px;
+
+        border: 2px solid #D38911;
+
+    } 
+}

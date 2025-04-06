@@ -14,11 +14,13 @@ import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
 <template>
   <div>
     <NuxtLayout>
-
-      <CourseDetails />
+      <Exam />
+      <!-- <CourseDetailsCourseExams /> -->
+      <!-- <CourseDetails /> -->
       <!-- <homeStarting /> -->
       <!-- <NuxtPage /> -->
-      <CourseCard />
+      <!-- <CourseCard /> -->
+
 
       <!-- <homeStarting /> -->
       <NuxtPage />
