@@ -18,6 +18,11 @@ import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
 
       <Exam />
       <!-- <CourseDetailsCourseExams /> -->
+
+
+      <!-- <Exam /> -->
+      <!-- <CourseDetailsCourseExams /> -->
+
       <!-- <CourseDetails /> -->
       <!-- <homeStarting /> -->
       <!-- <NuxtPage /> -->
