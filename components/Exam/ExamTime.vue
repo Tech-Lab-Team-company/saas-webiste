@@ -43,8 +43,11 @@
     <!-- <ExamQuestionsText 
         @SendAnswerIndex ="questionIndex = $event"/> -->
 
+    <ExamQuestionsAudio 
+        @SendAnswerIndex ="questionIndex = $event"/>
         <!-- <ExamQuestionImage 
             @SendAnswerIndex ="questionIndex = $event"/> -->
+
 
             <ExamQuetionChoose 
              @SendAnswerIndex ="questionIndex = $event"/>

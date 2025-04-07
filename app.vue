@@ -16,17 +16,17 @@ import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
     <NuxtLayout>
 
 
-
       <Exam />
+      <!-- <CourseDetailsCourseExams /> -->
+
+
+      <!-- <Exam /> -->
       <!-- <CourseDetailsCourseExams /> -->
 
       <!-- <CourseDetails /> -->
       <!-- <homeStarting /> -->
       <!-- <NuxtPage /> -->
       <!-- <CourseCard /> -->
-
-
-
 
 
       <!-- <homeStarting /> -->
