@@ -8,7 +8,6 @@
     const questions = ref([
         {
             questionNumber : 'السؤال الاول',
-           
             questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
             answers : [
                 '(1) انّ الطُلابَ مجتهدون',
@@ -51,6 +50,28 @@
         },
         {
             questionNumber : 'السؤال الثانى',
+            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
+            answers : [
+                '(1) انّ الطُلابَ مجتهدون',
+                '(2) انّ في الحديقةِ شجرةً',
+                '(3) انّ في الحديقةِ شجرةً',
+                '(4) انّ في الحديقةِ شجرةً',
+            ]
+        },
+        {
+            questionNumber : 'السؤال الثانى',
+            aduio:'ad',
+            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
+            answers : [
+                '(1) انّ الطُلابَ مجتهدون',
+                '(2) انّ في الحديقةِ شجرةً',
+                '(3) انّ في الحديقةِ شجرةً',
+                '(4) انّ في الحديقةِ شجرةً',
+            ]
+        },
+        {
+            questionNumber : 'السؤال الثانى',
+            aduio:'ad',
             questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
             answers : [
                 '(1) انّ الطُلابَ مجتهدون',
@@ -63,14 +84,21 @@
 
 
     const emit = defineEmits(['SendAnswerIndex'])
-    const SendEmit =()=>[
+    const SendEmit =()=>{
         emit('SendAnswerIndex', QuestionIndex.value)
-    ]
+    }
 
+    const selected = ref([])
     const IncreaseIndex = ()=>{
-        if(QuestionIndex.value < questions.value.length - 1){
+        
+        if(selected.value[QuestionIndex.value] == undefined){
+            return;
+        }
+
+        else if(QuestionIndex.value < questions.value.length - 1){
             QuestionIndex.value++
         }
+
         SendEmit();
     }
 
@@ -84,6 +112,7 @@
         SendEmit();
     }
 
+
 </script>
 
 <template>
@@ -92,6 +121,10 @@
         <div class="question-title">
             <p class="question-number">{{ questions[QuestionIndex].questionNumber }}</p>
             <img v-if="questions[QuestionIndex].img" :src="questions[QuestionIndex].img" alt="image">
+            <!-- <img class="aduio-image" v-if="questions[QuestionIndex].aduio" src="../../public/images/Aduio.png" alt="image"> -->
+            <audio v-if="questions[QuestionIndex].aduio" controls >
+                <source src="../../public/Aduio/aduio.mp3" type="audio/mpeg">
+            </audio>
             <p class="question-text"> {{ questions[QuestionIndex].questionText }}</p>
         </div>
         
@@ -100,19 +133,19 @@
                 <div class="question">
                     
                     <label for="answer1" @click="SelectedAnswer[QuestionIndex] = 'answer1'" :class="SelectedAnswer[QuestionIndex] == 'answer1' ?`selected` :``">{{ questions[QuestionIndex].answers[0] }}</label>
-                    <input class="answer" type="radio" value="answer1" name="answer" id="answer1" >
+                    <input  class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer1" name="answer" id="answer1" >
                 </div>
                 <div class="question">
                     <label for="answer2"  @click="SelectedAnswer[QuestionIndex] = 'answer2'" :class="SelectedAnswer[QuestionIndex] == 'answer2' ?`selected` :``">{{ questions[QuestionIndex].answers[1] }}</label>
-                    <input class="answer" type="radio" value="answer2" name="answer" id="answer2">
+                    <input class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer2" name="answer" id="answer2">
                 </div>
                 <div class="question">
                     <label for="answer3"  @click="SelectedAnswer[QuestionIndex] = 'answer3'" :class="SelectedAnswer[QuestionIndex] == 'answer3' ?`selected` :``">{{ questions[QuestionIndex].answers[2] }}</label>
-                    <input class="answer" type="radio" value="answer3" name="answer" id="answer3">
+                    <input class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer3" name="answer" id="answer3">
                 </div>
                 <div class="question">
                     <label for="answer4" @click="SelectedAnswer[QuestionIndex] = 'answer4'" :class="SelectedAnswer[QuestionIndex] == 'answer4' ?`selected` :``">{{ questions[QuestionIndex].answers[3] }}</label>
-                    <input class="answer" type="radio" value="answer4" name="answer" id="answer4" >
+                    <input class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer4" name="answer" id="answer4" >
                 </div>
             </div>
         </form>

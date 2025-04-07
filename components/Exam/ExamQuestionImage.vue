@@ -21,7 +21,7 @@
             questionNumber : 'السؤال الثانى',
             questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
             answers : [
-            '../../public/images/background.png',
+                '../../public/images/background.png',
                 '../../public/images/background.png',
                 '../../public/images/background.png',
                 '../../public/images/background.png',
