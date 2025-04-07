@@ -28,4 +28,6 @@ import blacknotes from '../../public/icons/blacknotes.vue'
 </template>
 
 
-<style scoped ></style>
+<style scoped >
+
+</style>
