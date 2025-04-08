@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     },
     usePrimeVue: true,
     components: {
-      include: ['Button', 'InputText', 'Tag', 'Terminal'] // List all components you need
+      include: ['Button', 'InputText', 'Tag', 'Terminal'] 
     }
   },
   css: [

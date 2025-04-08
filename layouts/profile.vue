@@ -1,0 +1,47 @@
+<template>
+    <div class="profile-layout">
+      <LayoutsHeader class="header-h" />
+  
+      <div class="profile-home-layout">
+        <ProfileSidebar class="sidebar-layout" />
+        <slot class="slot-layout"></slot>
+      </div>
+     
+      <LayoutsFooter />
+    </div>
+  </template>
+  
+  <script lang="ts" setup>
+    import ProfileSidebar from '../components/Profile/ProfileSidebar.vue'
+  </script>
+  
+  <style scoped lang="scss">
+.profile-layout{
+    display: flex;
+    flex-direction: column;
+  
+    .profile-home-layout{
+      margin-top: 50px;
+      width: 100%;
+      text-align: right;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 85% 15% ;
+  
+      .sidebar-layout{
+        margin-top: 10px;
+        margin-right: 10px;
+        order: 2;
+        grid-column: span 1;
+        margin-right: 20px;
+        height: 100%;
+      }
+  
+      .slot-layout{
+        order: 1;
+        grid-column: span 1;
+      }
+    }
+  
+  }
+  </style>
