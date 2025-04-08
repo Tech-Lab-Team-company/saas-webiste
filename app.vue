@@ -17,10 +17,9 @@ import Profile from "~/components/Profile/Profile.vue";
     <NuxtLayout>
 
 
-<<<<<<< HEAD
-=======
-      <Profile />
->>>>>>> f70f5c8a2626920c135071f1b52e3662c9a667d3
+ 
+
+      <!-- <Profile /> -->
       <!-- <Exam /> -->
       <!-- <CourseDetailsCourseExams /> -->
 
