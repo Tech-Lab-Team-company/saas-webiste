@@ -4,7 +4,7 @@ import LeftArrowIcon from "~/public/icons/LeftArrowIcon.vue";
 import MusicIcon from "~/public/icons/music.vue"; 
 const SelectedAnswer = ref<number[]>([]);
 const QuestionIndex = ref(0);
-// import answer from "@/assets/audio/answer.mp3";
+import answer from "@/assets/audio/answer.mp3";
 
 const questions = ref([
   {
