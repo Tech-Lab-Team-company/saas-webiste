@@ -1,10 +1,13 @@
 <script setup>
-import { ExamAudioPlayer } from '#components';
+
+
 
 </script>
 <template>
   <div class="blogs-page">
     <BlogsPageArticlesContainer />
+    <!-- <ProfileMyCourseCard /> -->
+
 
   </div>
 </template>
