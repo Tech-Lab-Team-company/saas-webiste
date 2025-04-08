@@ -6,12 +6,19 @@
 
     const selectedCommerce = ref();
     const selectedCategory = ref();
-    const cities = ref([
-        { name: 'New York', code: 'NY' },
-        { name: 'Rome', code: 'RM' },
-        { name: 'London', code: 'LDN' },
-        { name: 'Istanbul', code: 'IST' },
-        { name: 'Paris', code: 'PRS' }
+    const CommerceOptions = ref([
+        { name: 'New York' },
+        { name: 'Rome' },
+        { name: 'London' },
+        { name: 'Istanbul' },
+        { name: 'Paris' }
+    ]);
+    const CategoryOptions = ref([
+        { name: 'New York'},
+        { name: 'Rome' },
+        { name: 'London' },
+        { name: 'Istanbul' },
+        { name: 'Paris' }
     ]);
 </script>
 
@@ -115,7 +122,8 @@
 
                 <label>متعلق بتخصصك ( Commerce )</label>
       
-                    <div class="profile-multi  card flex justify-center">
+                    <div class="profile-multi profile-input-container  flex justify-center">
+                        <button>تعديل</button>
                         <MultiSelect 
                             v-model="selectedCommerce" 
                             display="chip" 
@@ -124,24 +132,28 @@
                             filter 
                             placeholder="Select Cities"
                             :maxSelectedLabels="3" 
-                            class="w-full md:w-80" />
+                            class="input" />
+
                 
-                </div>
+                 </div>
 
             </div>
             <div class="profile-info-container">
                 <label>المجالات الأكثر شهره</label>
      
-                    <div class="profile-multi card flex justify-center">
+                    <div class="profile-multi profile-input-container flex justify-center">
+                        <button>تعديل</button>
                         <MultiSelect    
                             v-model="selectedCategory" 
                             display="chip" 
-                            :options="cities" 
+                            :options="CategoryOptions" 
                             optionLabel="name" 
                             filter 
                             placeholder="Select Cities"
                             :maxSelectedLabels="3" 
-                            class="w-full md:w-80" />
+                            class="input" />
+
+                            
                   
                 </div>
             </div>
@@ -152,113 +164,6 @@
     </div>
 </template>
 
-<style scoped lang="scss">
-
-.profile-home{
-    background-color: #F6F6F6;
-    margin-left: auto;
-    margin-right: auto;
-    grid-column: span 5;
-    width: 95%;
-    border-radius: 10px;
-    padding-bottom: 30px;
-    margin-bottom: 20px;
-
-    .profile-home-text{
-        text-align: right;
-        padding: 20px 10px;
-
-        &.profile-home-text2{
-            margin-top: 30px;
-        }
-
-        p{
-            &:first-child{
-                font-size: 20px;
-                font-weight: 500;
-            }
-
-            &:last-child{
-                color: #6F777B;
-            }
-        }
-
-    }
-
-    .profile-text-hr{
-        border: none;
-        height: 2px;
-        border-radius: 5px;
-        margin: 4px 10px;
-        background-image:linear-gradient(to left , #FFB949 0% 20%,  #E6E6E6 60%    ) ;
-    }
-
-
-    .profile-home-information{
-        display: flex;
-        flex-direction: column;
-        padding: 10px 20px;
-        gap: 15px;
-
-        .profile-info-container{
-            margin-top: 10px;
-
-
-            label{
-                margin-right: 5px;
-            }
-
-            .profile-multi{
-                margin-left: auto;
-                text-align: right;
-                background-color: white;
-            }
-
-            .profile-input-container{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                input{
-                    margin-top: 5px;
-                    width: 90%;
-                    border: none;
-                    outline: none;
-                    border-radius: 10px;
-                    padding: 8px 10px;
-                    text-align: right;   
-                }
-
-                button{
-                    color:#FFB949 ;
-                    text-decoration: underline;
-                }
-
-            }
-    
-
-        }
-    }
-
-    .hrs{
-        margin-top: 25px;
-        .profile-first-hr{
-            border: none;
-            height: 3px;
-            border-radius: 5px;
-            margin: 4px 10px;
-            background-image:linear-gradient(to left , #FFB949 0% 20%,  #E6E6E6 60%    ) ;
-        }
-        .profile-second-hr{
-            border: none;
-            height: 2px;
-            border-radius: 5px;
-            margin: 4px 10px;
-            background-image:linear-gradient(to right , #FFB949 0% 20%,  #E6E6E6 60%    ) ;
-        }
-    }
-
-}
-
-</style>
+<style scoped lang="scss"></style>
 
 

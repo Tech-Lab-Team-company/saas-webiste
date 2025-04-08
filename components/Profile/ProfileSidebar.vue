@@ -75,10 +75,9 @@
     width: 250px;
     margin-left: auto;
     margin-right: auto;
-    // height: 800px;
     margin-bottom: 20px;
     grid-column: span 1;
-    margin-top: 60px;
+    margin-top: 40px;
     
     
     .person-data{

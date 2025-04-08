@@ -2,5 +2,6 @@
   <div>
     <HomeHomeStarting />
     <SharedCourseCard />
+
   </div>
 </template>
