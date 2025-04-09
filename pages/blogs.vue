@@ -5,7 +5,7 @@
 </script>
 <template>
   <div class="blogs-page">
-    <AuthLayoutAuthSidebar />
+   
     <BlogsPageArticlesContainer />
     <!-- <ProfileMyCourseCard /> -->
 

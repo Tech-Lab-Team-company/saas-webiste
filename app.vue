@@ -24,7 +24,7 @@ import Profile from "~/components/Profile/Profile.vue";
       <!-- <CourseDetailsCourseExams /> -->
 
 
-      <Exam />
+      <!-- <Exam /> -->
       <!-- <CourseDetailsCourseExams /> -->
 
       <!-- <CourseDetails /> -->
