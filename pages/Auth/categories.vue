@@ -10,6 +10,7 @@
 </script>
 
 <template>
+<RegisterEducationCategories/>
 
 </template>
 
