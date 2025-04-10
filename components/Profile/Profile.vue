@@ -7,7 +7,6 @@
     <div class="prfile-home">
        
             <ProfileHome />
-       
             <ProfileSidebar />
       
     </div>

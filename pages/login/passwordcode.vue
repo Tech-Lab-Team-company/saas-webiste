@@ -84,4 +84,7 @@ import { ref } from 'vue';
 </template>
              
 
-<style scoped></style>
+<style scoped>
+.login-image img{
+    width: 90%;
+}</style>
