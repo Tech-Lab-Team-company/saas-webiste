@@ -1,34 +1,55 @@
 <script setup lang="ts">
-import type OurVision from "~/types/our_vision";
+import Arrow from '~/public/icons/arrow.vue';
+import BgCircieIcon from '~/public/icons/BgCircieIcon.vue';
 
-const props = defineProps<{ ourVision: OurVision[] }>();
+
+
+
+
+
+
+
+
 </script>
 
 <template>
-  <section class="our-vision">
-    <h2 class="sub-section-title">
-      {{ $t("The_Heart_Behind") }} <span class="rakwa">Rakwa</span>
-    </h2>
-    <p class="text-center">
-      {{ $t("Driven_by_your_needs_inspired_by_your_trust") }}
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-      <div class="our-vision-card" v-for="item in ourVision" :key="item.id">
-        <div class="icon">
-          <NuxtImg
-            :src="item?.image"
-            alt="icon"
-            class="our-vision-card-icon"
-            format="webp"
-          />
-        </div>
-        <h3 class="our-vision-card-title">{{ item?.title }}</h3>
-        <p>
-          {{ item?.description }}
-        </p>
+  <div class="aboutus-vision-conatiner">
+    <div class="aboutus-vid-container">
+      <div class="aboutus-vid">
+        <video autoplay src="../../public/Videos/educationVideo.mp4"></video>
       </div>
+      <BgCircieIcon class="right-circle" />
+      <BgCircieIcon class="left-circle"/>
     </div>
-  </section>
+
+    <div class="aboutus-text-container">
+
+      <div class="aboutus-text" >
+        <div class="aboutus-text-header">
+          <h3>رسالتنا</h3>
+            <Arrow />
+        </div>
+        <p> نحن في tech lab نسعى إلى تقديم محتوى متميز وشيق ويمكّن المتعلمين من تحقيق أهدافهم وتطوير مهاراتهم.</p>
+      </div>
+      <div class="aboutus-text" >
+        <div class="aboutus-text-header">
+          <h3>مهمتنا</h3>
+            <Arrow />
+        </div>
+        <p class="secondary-text"> مهمتنا هي تقديم محتوى غني وموثوق يلهم الزوار ويساعدهم على تحقيق التميز في حياتهم الشخصية والمهنية..</p>
+      </div>
+      <div class="aboutus-text" >
+        <div class="aboutus-text-header">
+          <h3>رؤيتنا</h3>
+            <Arrow />
+        </div>
+        <p class="secondary-text"> رؤيتنا هي أن نكون المنصة الرائدة في توفير المعرفة والإلهام لتمكين الأفراد من تحقيق إمكاناتهم الكاملة..</p>
+      </div>
+
+    </div>
+
+
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

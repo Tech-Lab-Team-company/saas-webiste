@@ -121,8 +121,10 @@
         }
         .background-circle{
             position: absolute;
-            top: -65%;
+            top: -100px;
+            // background-color: red;
             z-index:1;
+            width: 250px;
             @media (max-width:800px) {
                display: none;
             }
