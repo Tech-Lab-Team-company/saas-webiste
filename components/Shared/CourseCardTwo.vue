@@ -3,6 +3,7 @@ import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import english from "@/assets/images/english.png";
 import user from "@/public/icons/user.vue";
+import Arrrow from "@/public/icons/Arrrow.vue";
 
 
 const cards = [
@@ -40,7 +41,7 @@ const splideOptions = {
   // speed: 1000,
   perPage: 3, 
   perMove: 1, 
-  gap: "20px",
+  gap: "5px",
   pagination: false,
   arrows: true,
   drag: false, 
@@ -66,6 +67,10 @@ const splideOptions = {
               </span>
               <span class="card-name">{{ card.name }}</span>
             </div>
+            <div class="card-extra-content">
+              <Arrrow/>
+              <p>ابدا الان</p>
+              </div>
           </div>
         </div>
       </SplideSlide>

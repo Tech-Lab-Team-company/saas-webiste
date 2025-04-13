@@ -35,7 +35,7 @@ const splideOptions = {
   // speed: 1000,
   perPage: 3, 
   perMove: 1, 
-  gap: "20px",
+  gap: "5px",
   pagination: false,
   arrows: true,
   drag: false, 
@@ -83,7 +83,14 @@ const splideOptions = {
 
 <style scoped>
 
+.card {
+  position: relative;
+  transition: transform 0.3s ease-in-out;
+}
 
+.card:hover {
+  transform: translateY(10px);  
+}
 
 </style>
 <style>

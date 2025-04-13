@@ -44,6 +44,8 @@
     justify-content: space-between;
     padding-bottom: 10px;
     width: 90%;
+  transition: transform 0.3s ease-in-out;
+
 
     img {
       width: 100%;
@@ -57,7 +59,7 @@
 
     .card-title {
       font-weight: 700;
-      font-size: 18px;
+      font-size: 20px;
       line-height: 30px;
       text-align: right;
       margin: 0;
@@ -118,7 +120,7 @@
     }
     .card-text1 {
       font-weight: 400;
-      font-size: 14px;
+      font-size: 16px;
       line-height: 150%;
       letter-spacing: 0%;
       text-align: right;
@@ -135,7 +137,7 @@
 
     .card-name {
       font-weight: 700;
-      font-size: 17px;
+      font-size: 18px;
       letter-spacing: 0%;
       text-align: right;
       font-family: "bold";
