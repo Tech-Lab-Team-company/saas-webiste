@@ -38,10 +38,10 @@ const items = ref([
                     <p class="not-send">اعادة ارسال الكود</p>
                     <p >لم تستلم الكود بعد؟</p>
                 </div>
-                <button class="login-btn pass-btn ">
+                <nuxt-link to="/auth/education"> <button class="login-btn pass-btn ">
                     <LeftArrowIconbtn class="left-icon" />
                     <p>تأكيد</p>
-                </button>
+                </button></nuxt-link>
             </div>
         
         </div>

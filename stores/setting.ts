@@ -1,3 +1,4 @@
+import { defineStore } from "pinia";
 import type WebsiteSetting from "~/types/setting";
 
 export const useSettingStore = defineStore("setting", {

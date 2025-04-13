@@ -54,10 +54,10 @@ import { ref } from "vue";
 
  
       <div class="btns btns-home">
-            <button class="login-btn" >  <NuxtLink to="/Auth/categories" 
-                >   اختر  فئاتك المفضله</NuxtLink>
+        <NuxtLink to="/Auth/categories" ><button class="login-btn" > 
+                 اختر  فئاتك المفضله
                 <LeftArrowIcon class="left-icon" />
-              </button>
+              </button></NuxtLink>
          
         </div>
     </div>

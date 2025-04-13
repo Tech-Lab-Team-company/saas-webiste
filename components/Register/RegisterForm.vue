@@ -9,6 +9,8 @@ import sms from "../../public/icons/sms.vue";
 import eyeone from "../../public/icons/eyeone.vue";
 import userEdit from "../../public/icons/userEdit.vue";
 import { ref } from "vue";
+import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
+import RegisterController from "~/features/RegisterFeature/presentation/controllers/register_controller";
 
 const showTermsDialog = ref(false);
 const isTermsAccepted = ref(false);       
@@ -18,6 +20,8 @@ const password = ref("");
 const confirmPassword = ref("");
 const passwordError = ref("");
 const confirmPasswordError = ref("");
+
+const router = useRouter();
 
 const validatePassword = () => {
   const passwordRegex = /^(?=.*[/*#@]).{8,}$/;
@@ -43,6 +47,25 @@ const toggleTermsDialog = (event: Event) => {
   isTermsAccepted.value = checkbox.checked;
   showTermsDialog.value = checkbox.checked; // الـ dialog يظهر فقط عند تحديد الـ checkbox
 };
+
+
+const FullName = ref("");
+const Email = ref("");
+const phoneNumber = ref("");
+const studentType = ref(0);
+const nationality = ref(0);
+const country = ref(0);
+const license_accept = ref(0);
+
+const CheckData = ()=>{
+  
+  // const registerParams = new RegisterParams(FullName.value , Email.value , phoneNumber.value  ,password.value , confirmPassword.value,studentType.value ,"+20",country.value,nationality.value);
+  const registerParams = new RegisterParams(FullName.value , Email.value , phoneNumber.value  ,password.value , confirmPassword.value,1 ,"+20",2,1)
+  const response =  RegisterController.getInstance().Register(registerParams,router);
+
+}
+
+
 </script>
 
 <template>
@@ -56,19 +79,19 @@ const toggleTermsDialog = (event: Event) => {
   
         <div class="inputs">
           <div class="login-input">
-            <input type="text" placeholder="الاسم بالكامل * " />
+            <input type="text" placeholder="الاسم بالكامل * " v-model="FullName"/>
             <userEdit class="login-call-icon" />
           </div>
           <div class="login-input">
-            <input type="email" placeholder="البريد الالكترونى * " />
+            <input type="email" placeholder="البريد الالكترونى * "  v-model="Email"/>
             <sms class="login-call-icon" />
           </div>
           <div class="login-input">
-            <input type="text" placeholder="رقم الهاتف" />
+            <input type="text" placeholder="رقم الهاتف" v-model="phoneNumber" />
             <callIcon class="login-call-icon" />
           </div>
           <div class="login-input">
-            <select class="student-select">
+            <select class="student-select" v-model="studentType">
               <option value="" disabled selected>نوع الطالب</option>
               <option value="student1">طالب</option>
               <option value="student2">طالب</option>
@@ -112,7 +135,7 @@ const toggleTermsDialog = (event: Event) => {
           </div>
   
           <div class="login-input">
-            <select class="natioal-select">
+            <select class="natioal-select" v-model="nationality">
               <option value="" disabled selected>الجنسيه</option>
               <option value="national1">عربي</option>
               <option value="national2">عربي</option>
@@ -125,7 +148,7 @@ const toggleTermsDialog = (event: Event) => {
               <MapIcon />
             </div>
             <div class="login-input">
-              <select class="city-select">
+              <select class="city-select" v-model="country">
                 <option value="" disabled selected>الدوله</option>
                 <option value="city1">مصر</option>
                 <option value="city2">مصر</option>
@@ -137,18 +160,25 @@ const toggleTermsDialog = (event: Event) => {
   
           <div class="remember-mee">
             <label for="rememberr">موافق على الشروط و الاحكام </label>
-            <input id="rememberr" type="checkbox" @change="toggleTermsDialog" />
+            <input id="rememberr" type="checkbox" @change="toggleTermsDialog" v-model="license_accept" />
           </div>
-          <div class="btns btns-home">
-            <button class="login-btn" >  <NuxtLink to="/auth/email" 
+          <!-- <NuxtLink to="/Auth/emailcode" @click="CheckData"> -->
+            <div class="btns btns-home" @click="CheckData">
+            <button class="login-btn" > 
+                التحقق من بريدك الإلكتروني  </button>
+              </div>
+          <!-- </NuxtLink> -->
+          <NuxtLink to="/Auth/email" ><div class="btns btns-home">
+            <button class="login-btn" > 
+                التحقق من بريدك الإلكتروني  </button>
+              </div>
+          </NuxtLink>
+         
+        <!-- <div class="btns btns-home">
+            <button class="login-btn" >  <NuxtLink to="/Auth/email" 
                 >التحقق من بريدك الإلكتروني</NuxtLink>  </button>
          
-        </div>
-        <div class="btns btns-home">
-            <button class="login-btn" >  <NuxtLink to="/auth/emailcode" 
-                >التحقق من بريدك الإلكتروني</NuxtLink>  </button>
-         
-        </div>
+        </div> -->
         </div>
       </div>
   
@@ -244,6 +274,17 @@ const toggleTermsDialog = (event: Event) => {
   direction: rtl;
   background: transparent;
   width: 320px;
+}
+
+@media(max-width: 767px) {
+  .city-select {
+    width: 200px;
+  }
+}
+@media(max-width: 500px) {
+  .city-select {
+    width: 120px;
+  }
 }
 
 select {

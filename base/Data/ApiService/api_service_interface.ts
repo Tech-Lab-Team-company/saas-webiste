@@ -54,7 +54,7 @@ export default abstract class ServicesInterface {
       // console.log(params)
       switch (type) {
         case CrudType.FormData:
-          // console.log(params?.toMap())
+          console.log("api",params?.toMap())
           response = await this.networkService.postFormData({
             url: url,
             data: params?.toMap() ?? {},

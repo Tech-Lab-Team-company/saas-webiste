@@ -44,15 +44,22 @@ export default class NetworkService {
     isAuth = false,
   }: PostParams): Promise<AxiosResponse> {
     const formData = new FormData();
-    // console.log(data)
+    // console.log(data , "new data")
     Object.entries(data).forEach(([key, value]) => {
         if (Array.isArray(value)) {
             value.forEach((item, index) => {
                 formData.append(`${key}[${index}]`, item as string | Blob);
             });
         }
+
+                        // console.log(`${key}[${index}]`, item as string | Blob)
+                        // console.log(`${key}${value}`, 'sss')
+
       formData.append(key, value as string | Blob);
     });
+
+    // console.log(formData, "form data")
+
 
     return this.axiosInstance.post(url, formData, {
       headers: {

@@ -10,7 +10,7 @@
     margin-right: 10px;
     height: 100vh;
 
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
          margin: 0;
          padding: 0;
     }
@@ -40,20 +40,22 @@
         padding: 0px 30px;
         // flex-wrap: wrap;
         @media (max-width: 800px) {
-            flex-direction: column;
+            flex-direction: column-reverse;
             align-items: center;
             justify-content: center;
+            text-align: justify;
         }
 
-        @media (max-width: 800px) {
+        @media (max-width: 1300px) {
             margin: 0;
             padding: 0;
+            width: 100%;
+            padding: 0px 10px;
        }
 
 
-        &.entered{
 
-           
+        &.entered{
             .auth-icon{
                 .icon-head{
                     fill: #0752AC;
@@ -67,7 +69,6 @@
         }
 
         &.active{
-
             .auth-text{
 
                 p{
@@ -102,6 +103,7 @@
 
         &:not(:last-child){
             .auth-text{
+    
                 &:not(:last-child){
 
                     &::after{
@@ -120,6 +122,9 @@
 
                     }
                     }
+
+
+                    
             }
         }
 
@@ -196,3 +201,4 @@
         font-size: 18px;
     }
 }
+
