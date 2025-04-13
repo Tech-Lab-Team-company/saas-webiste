@@ -23,7 +23,6 @@ export default class LoginController extends ControllerInterface<UserModel> {
     }
     return this.instance;
   }
-Listin
   async login(params: LoginParams, router: any) {
     // useLoaderStore().setLoadingWithDialog();
     try {
@@ -32,12 +31,6 @@ Listin
         await this.LoginUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        if (!this.state.value.data?.isVerified) {
-          EmailBuilder.Instance.setEmail(params.credential);
-
-          await router.push("/auth/verify-email");
-        } else {
-
           DialogSelector.instance.successDialog.openDialog({
             dialogName: "dialog",
             titleContent: "Login Success",
@@ -50,7 +43,7 @@ Listin
             console.log(this.state.value.data)
             userStore.setUser(this.state.value.data);
           }
-        }
+      
       } else {
         throw new Error(this.state.value.error?.title);
       }

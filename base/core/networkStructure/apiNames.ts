@@ -9,7 +9,8 @@ class ApiNames {
     return this._instance;
   }
 
-  public baseUrl = "https://panel.rakwausa.com/api/";
+  public baseUrl = "https://edu.techlabeg.com/api/website/";
+  
 
   //auth
   public login = "login";

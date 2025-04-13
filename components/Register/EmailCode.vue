@@ -61,13 +61,13 @@ import { ref } from "vue";
             <p class="not-send">اعادة ارسال الكود</p>
             <p>لم تستلم الكود بعد؟</p>
           </div>
-          <button
+          <!-- @click="router.push('/login/newpass')" -->
+          <nuxt-link to="/Auth/education"><button
             class="login-btn pass-btn"
-            @click="router.push('/login/newpass')"
-          >
+            >
             تأكيد
             <LeftArrowIcon class="left-icon" />
-          </button>
+          </button></nuxt-link>
         </div>
       </div>
     </div>

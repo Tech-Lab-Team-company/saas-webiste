@@ -16,8 +16,11 @@ class RegisterApiService extends ServicesInterface {
     return this.instance
   }
 
+  
   async applyService(params: Params): Promise<{ data: any; statusCode: number }> {
-    // console.log(CrudType.POST)
+    // console.log(ApiNames.Instance.register)
+    // console.log("raramss",params.toMap())
+
     return await super.call({
       url: ApiNames.Instance.register,
       type: CrudType.FormData,

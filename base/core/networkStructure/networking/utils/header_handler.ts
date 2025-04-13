@@ -1,3 +1,8 @@
+// import { useUserStore } from "~/stores/user";
+
+import { useUserStore } from "~/stores/user";
+
+
 class HeaderHandler {
   private static instance: HeaderHandler;
 
@@ -30,6 +35,7 @@ class HeaderHandler {
       headers['Accept-Language'] = savedLocale;
     }
     headers['Content-Type'] = 'application/json';
+    headers['web-domain'] = 'mrbackend';
     headers['Accept'] = 'application/json';
 
 

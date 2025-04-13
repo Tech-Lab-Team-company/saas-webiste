@@ -10,7 +10,7 @@
 </script>
 
 <template>
-<RegisterEmailCode/>
+    <RegisterEmailCode/>
 </template>
 
 <style scoped lang="scss">

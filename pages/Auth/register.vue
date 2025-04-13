@@ -10,7 +10,7 @@
 </script>
 
 <template>
-<RegisterForm/>
+    <RegisterForm/>
 </template>
 
 <style scoped lang="scss">
