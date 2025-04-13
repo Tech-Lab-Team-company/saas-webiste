@@ -1,168 +1,78 @@
-<!-- <script setup lang="ts">
-import LogoutController from "~/features/LogoutFeature/presentation/controllers/logout_controller";
-import Popover from "primevue/popover";
-import Accordion from "primevue/accordion";
-import AccordionPanel from "primevue/accordionpanel";
-import AccordionHeader from "primevue/accordionheader";
-import AccordionContent from "primevue/accordioncontent";
-import type Category from "~/types/categories";
-import { BASE_URL } from "~/base/persention/utils/constant";
-import FilterListingParamsBuilder from "~/features/ListingFeature/Presentation/Builder/filter_listing_builder";
-import { setDefaultImage } from "~/base/persention/utils/set_default_image";
-import wordSlice from "~/base/persention/utils/word_slice";
-
-const op = ref();
-
-const user = useUserStore();
-
-const router = useRouter();
-const showSubMenu = ref(false);
-
-const logoutController = LogoutController.getInstance();
-
-const logout = async () => {
-  await logoutController.Logout(router);
-};
-
-const toggle = (event: Event) => {
-  op.value.toggle(event);
-};
-
-const { data: categories } = await useAsyncData("categories", async () => {
-  const response = await $fetch<{
-    data: Category[];
-    message: string;
-    status: number;
-  }>(`${BASE_URL}/categories`, { method: "POST" });
-  return response.data; // Extract only the `data` part
-});
-
-const filterListingParamsBuilder = FilterListingParamsBuilder.Instance;
-const setCategory = (id: number) => {
-  const categoriesIds = [];
-  categoriesIds.push(id);
-  filterListingParamsBuilder.setCategoryID(categoriesIds);
-  navigateTo("/listing");
-};
-
-const setSubCategory = (id: number) => {
-  const subCategoriesIds = [];
-  subCategoriesIds.push(id);
-  filterListingParamsBuilder.setSubCategoryID(subCategoriesIds);
-  // console.log(id)
-  navigateTo("/listing");
-};
-
-const showChildrenStates = ref<{ [key: number]: boolean }>({});
-
-// Toggle the visibility of subcategories for a specific category
-const toggleSubCategory = (categoryId: number) => {
-  showChildrenStates.value = {};
-  showChildrenStates.value[categoryId] = !showChildrenStates.value[categoryId];
-  // showChildrenStates.value = {
-  //   ...showChildrenStates.value,
-  //   [categoryId]: !showChildrenStates.value[categoryId],
-  // };
-};
-</script> -->
-
-
-
-
 <script lang="ts" setup>
-  import Logo from '~/public/icons/Logo.vue'
+import Logo from "~/public/icons/Logo.vue";
+import { ref } from "vue";
+import { useRoute } from "vue-router";
 
-
-  import {ref} from 'vue'
-
-
+const route = useRoute();
 </script>
 
 <template>
   <header class="header">
-
     <div class="header-nav">
       <p class="header-title">👋 هل تريد معرفة المزيد عنا ! .. دعني اوضح لك</p>
     </div>
 
+    <nav class="header-container">
+      <div class="buttons">
+        <button class="btn btn-primary btn-create">انشاء حساب</button>
+        <button class="btn btn-secondary btn-secondary-create">
+          تسجيل الدخول
+        </button>
+      </div>
 
-
-    <nav class="header-container ">
-
-        <div class="buttons">
-          <button class="btn btn-primary btn-create ">
-            انشاء حساب
-          </button>
-          <button class="btn btn-secondary btn-secondary-create ">
-            تسجيل الدخول
-          </button>
-        </div>
-
-        <ul class="nav-links">     
-          <NuxtLink 
-            to="/main" 
-            class="nav-link">
-            <li >المدونه</li>
-          </NuxtLink>
-
-          <NuxtLink 
-            to="/questions" 
-            class="nav-link">
-            <li>بنك الاسئله</li>
-          </NuxtLink>
-   
-          <NuxtLink 
-            to="/courses" 
-            class="nav-link active">
-            <li class="active">الكورسات</li>
-          </NuxtLink>
-
-          <NuxtLink 
-            to="/aboutus" 
-            class="nav-link">
-            <li>نبذه عنا</li>
-          </NuxtLink>
-          <NuxtLink 
-            to="/main" 
-            class="nav-link">
-            <li>الرئيسية</li>
-          </NuxtLink>
-        </ul>
-
-        
-        <NuxtLink to="/" class="logo">
-          <Logo />
+      <ul class="nav-links">
+        <NuxtLink to="/blogscard" exactActiveClass="active" class="nav-link">
+          <li>المدونه</li>
         </NuxtLink>
-    
-    
+        <NuxtLink to="/questions" exactActiveClass="active" class="nav-link">
+          <li>بنك الاسئله</li>
+        </NuxtLink>
+        <NuxtLink to="/courses" exactActiveClass="active" class="nav-link">
+          <li >الكورسات</li>
+        </NuxtLink>
+        <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link">
+          <li >نبذه عنا</li>
+        </NuxtLink>
+        <NuxtLink to="/" exactActiveClass="active" class="nav-link">
+          <li >الرئيسيه</li>
+        </NuxtLink>
+      </ul>
+
+      <NuxtLink to="/"  class="logo">
+        <Logo />
+      </NuxtLink>
     </nav>
-
   </header>
-
-
-
 </template>
 
 <style scoped lang="scss">
-
-.btn-create{
+.btn-create {
   padding: 10px;
   color: white;
 }
 
-
-.btn-secondary-create{
+.btn-secondary-create {
   padding: 10px;
 }
 
-
-.header{
+.header {
   gap: 0;
-  padding:0;
+  padding: 0;
   margin: 0;
 }
-  
+
+li {
+  font-family: "bold";
+  font-weight: 800;
+  font-size: 22px;
+}
+
+li:hover {
+  color: #ffb949;
+  cursor: pointer;
+}
+
+.active {
+  color: #032855;
+}
 </style>
-
-
-
