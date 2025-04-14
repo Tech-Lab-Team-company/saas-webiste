@@ -45,12 +45,11 @@ const cards = [
   },
 ];
 const splideOptions = {
-  type: "slide",
   perPage: 3,
   gap: "3px",
   pagination: false,
   arrows: false,
-  drag: true,
+  drag: false,
   cloneStatus: true, 
   
 };
@@ -68,7 +67,7 @@ const splideOptions = {
 
       <Splide :options="splideOptions" class="splide-container" >
         <SplideSlide v-for="(card, index) in cards" :key="index">
-          <div class="card">
+          <NuxtLink :to="`/blogs/${card.id}`" class="card">
             <img :src="card.img" alt="Card image" class="course-image" />
             <div class="card-body">
               <div class="card-header">
@@ -83,7 +82,7 @@ const splideOptions = {
                 <P > {{ card.text2 }}</P>
               </div>
             </div>
-          </div>
+          </NuxtLink>
         </SplideSlide>
       </Splide>
     </div>

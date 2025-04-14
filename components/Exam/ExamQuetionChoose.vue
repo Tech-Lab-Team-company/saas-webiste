@@ -220,7 +220,10 @@
             }
     }
 }
-
+.question-choose label{
+    width: 330px !important;
+    height: 55px !important;
+}
 
 
 

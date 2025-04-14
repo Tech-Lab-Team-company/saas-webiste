@@ -36,9 +36,6 @@ const cards = [
 
 const splideOptions = {
   type: "loop", 
-  // autoplay: true,
-  // interval: 3000,
-  // speed: 1000,
   perPage: 3, 
   perMove: 1, 
   gap: "5px",
@@ -54,7 +51,7 @@ const splideOptions = {
 
     <Splide :options="splideOptions" class="splide-container">
       <SplideSlide v-for="(card, index) in cards" :key="index">
-        <div class="card" :style="{ backgroundImage: `url(${card.img})` }">
+        <NuxtLink :to="`/course/${card.id}`" class="card" :style="{ backgroundImage: `url(${card.img})` }">
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
@@ -72,13 +69,12 @@ const splideOptions = {
               <p>ابدا الان</p>
               </div>
           </div>
-        </div>
+        </NuxtLink>
       </SplideSlide>
     </Splide>
   </div>
   </div>
   
 </template>
-
 
 
