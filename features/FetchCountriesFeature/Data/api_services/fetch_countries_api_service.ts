@@ -17,10 +17,9 @@ class FetchCountriesApiService extends ServicesInterface {
   }
 
   async applyService(params: Params): Promise<{ data: any; statusCode: number }> {
-    console.log(CrudType.POST)
     return await super.call({
       url: ApiNames.Instance.countries,
-      type: CrudType.GET,
+      type: CrudType.POST,
       params: params,
     })
   }

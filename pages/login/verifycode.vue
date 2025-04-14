@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import LoginData from '~/components/Login/LoginData.vue';
+import CodeVerification from '~/components/Login/CodeVerification.vue';
+
 definePageMeta({
     layout: 'login' 
 });
@@ -8,7 +9,7 @@ definePageMeta({
 
 <template>
     <div>
-        <LoginData />
+        <CodeVerification />
     </div>
 </template>
 

@@ -66,7 +66,7 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
                 </div>
                 <div v-if="tab_value === 'content'">
                     <CourseDetailsTabsContentCourseContent
-                        @coursechanged="activetab=$event" />
+                            @coursechanged="activetab=$event" />
                 </div>
                 <div v-if="tab_value === 'urls'">
                     <CourseDetailsTabsContentCourseUrls />

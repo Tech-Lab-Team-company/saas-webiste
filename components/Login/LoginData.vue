@@ -1,0 +1,69 @@
+    
+<script lang="ts" setup>
+import LoginParams from '~/features/LoginFeature/Core/Params/login_params';
+import callIcon from '../../public/icons/callIcon.vue';
+import LockIcon from '../../public/icons/LockIcon.vue';
+import LoginController from '~/features/LoginFeature/presentation/controllers/login_controller';
+
+const router = useRouter();
+definePageMeta({
+    layout: 'login' 
+});
+
+
+const Credential = ref('');
+const LoginPassword = ref('');
+
+
+const LoginData = ()=>{
+    const loginParams = new LoginParams(Credential.value,LoginPassword.value);
+    const loginController =  LoginController.getInstance();
+    loginController.login(loginParams,router);
+}
+
+
+</script>
+
+
+<template>
+<div class="login-container">
+<div class="login-image">
+    <img src="../../public/images/login2.png" alt="login">
+</div>
+<div class="login-form">
+    <img class="background-circle" src="../../public/images/Component15.png" alt="">
+
+    <img src="../../public/images/logo.png" alt="">
+    <h3>مرحبا بك فى منصتنا التعليمية</h3>
+    <p>تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.</p>
+
+    <div class="inputs">
+        <div class="login-input">
+            <input type="text" placeholder="رقم الهاتف" v-model="Credential">
+            <callIcon class="login-call-icon"/>
+        </div>
+        <div class="login-input">
+            <input type="password" placeholder="كلمه المرور" v-model="LoginPassword">
+            <LockIcon class="login-call-icon"/>
+        </div>
+       
+        <div class="login-or">
+            <nuxt-link to="/login/resetpassword"><p>هل نسيت كلمه المرور..؟</p></nuxt-link>
+            <div class="remember-me">
+                <label for="remember">تذكرنى</label>
+                <input id="remember" type="checkbox" >
+            </div>
+        </div>
+
+        <div class="btns btns-home">
+            <button class="login-btn" @click="LoginData">تسجيل الدخول</button>
+        </div>
+    
+    </div>
+
+</div>
+</div>
+</template>
+
+
+<style scoped></style>                

@@ -4,8 +4,8 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import LoginUseCase from "~/features/LoginFeature/Domain/use_case/login_use_case";
 import { useUserStore } from "~/stores/user";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import LoginParams from "~/features/LoginFeature/Core/Params/login_params";
@@ -40,7 +40,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
           await router.push("/");
           const userStore = useUserStore();
           if (this.state.value.data) {
-            console.log(this.state.value.data)
+            
             userStore.setUser(this.state.value.data);
           }
       
