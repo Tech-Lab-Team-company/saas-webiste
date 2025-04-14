@@ -19,12 +19,12 @@ export default class ResetPasswordBuilder {
         return this;
     }
 
-    public get getEmail(): string | null {
+    public getEmail(): string | null {
         return this.email;
     }
 
     //build
     public build(): string | null {
-        return this.getEmail;
+        return this.getEmail();
     }
 }

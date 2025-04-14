@@ -17,7 +17,6 @@ class VerifyCodeApiService extends ServicesInterface {
   }
 
   async applyService(params: Params): Promise<{ data: any; statusCode: number }> {
-    console.log(CrudType.POST)
     return await super.call({
       url: ApiNames.Instance.VerifyCode,
       type: CrudType.POST,

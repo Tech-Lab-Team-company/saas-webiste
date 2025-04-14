@@ -1,36 +1,29 @@
     
 <script lang="ts" setup>
-import callIcon from '../../public/icons/callIcon.vue';
-import LockIcon from '../../public/icons/LockIcon.vue';
+
+import VerifyCodeParams from "~/features/VerifyCodeFeature/Core/Params/verfiy_code_params";
+import VerifyCodeController from "~/features/VerifyCodeFeature/presentation/controllers/verify_code_controller";
+import ResetPasswordBuilder from "~/features/ResetPasswordFeature/presentation/builders/reset_password_builder";
+
 const router = useRouter();
 
 definePageMeta({
     layout: 'login' 
 });
 
-const firstnumber = ref();
-const secondnumber = ref();
-const thirdnumber = ref();
-const fourthnumber = ref();
 
 
-
-const value = ref(null);
-const items = ref([
-    'ar',
-    'en',
-]);
-
-// const search = (event) => {
-//     let _items = [...Array(10).keys()];
-
-//     items.value = event.query ? [...Array(10).keys()].map((item) => event.query + '-' + item) : _items;
-// }      
-
+const OtpValue = ref("");
+    
 
 import { ref } from 'vue';
 
-
+const CheckCode = ()=>{
+  ResetPasswordBuilder.Instance.getEmail();
+  const varifyCode = new VerifyCodeParams(ResetPasswordBuilder.Instance.getEmail() || "", OtpValue.value ,"ResetPassword");
+  const verifyCodeUseCase = VerifyCodeController.getInstance();
+  verifyCodeUseCase.verifyCode(varifyCode , router);
+}
                     
 </script>
 
@@ -41,14 +34,7 @@ import { ref } from 'vue';
         <img src="../../public/images/forgetpass.png" alt="login">
     </div>
     <div class="login-form">
-        <div class="side card flex justify-center">
-            <AutoComplete 
-                v-model="value" 
-                dropdown 
-                :suggestions="items" 
-                class="select"
-                    />
-        </div>
+ 
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
         <img src="../../public/images/logo.png" alt="">
         <h3>نسيت كلمة المرور</h3>
@@ -59,7 +45,7 @@ import { ref } from 'vue';
 
             <div class="login-code">
                 <div class="card flex justify-center">
-                    <InputOtp v-model="value">
+                    <InputOtp v-model="OtpValue" :length=6 >
                         <template #default="{ attrs, events }">
                             <input type="text" v-bind="attrs" v-on="events" class="code-number-box" placeholder="0" />
                         </template>
@@ -74,7 +60,7 @@ import { ref } from 'vue';
                     <p class="not-send">اعادة ارسال الكود</p>
                     <p >لم تستلم الكود بعد؟</p>
                 </div>
-                <button class="login-btn pass-btn" @click="router.push('/login/newpass')">تأكيد</button>
+                <button class="login-btn pass-btn" @click="CheckCode">تأكيد</button>
             </div>
         
         </div>

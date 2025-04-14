@@ -16,15 +16,15 @@ class ApiNames {
   public login = "login";
   public register = "register";
   public logout = "logout";
-  public VerifyCode = "verify_email";
+  public VerifyCode = "check_code";
   public VerifyCodePassword = "verify_code";
   public updateProfileImage = "update_profile_image";
   public removeProfileImage = "remove_profile_image";
 
   //reset password
-  public forgotPassword = "reset_password";
+  public forgotPassword = "forgot_password";
   public resetPassword = "verify_code";
-  public setNewPassword = "set_password";
+  public setNewPassword = "reset_password";
 
   //user
   public profile = "profile";
@@ -42,7 +42,7 @@ class ApiNames {
   public homeBlogs = "home_blogs";
 
   //countries
-  public countries = "countries";
+  public countries = "fetch_countries";
 
   //cities
   public cities = "cities";

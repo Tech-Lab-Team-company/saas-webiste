@@ -1,16 +1,19 @@
 import type Params from "~/base/core/Params/params";
 
 export default class VerifyCodeParams implements Params {
+  public type: string ;
+  public phone: string;
   public code: string;
-  public email: string;
 
-  constructor(code: string, email: string) {
+  constructor( phone: string,code: string ,type:string) {
+    this.type = type;
+    this.phone = phone;
     this.code = code;
-    this.email = email;
   }
   toMap(): { [key: string]: any } {
     const data: { [key: string]: any } = {};
-    data["email"] = this.email;
+    data["type"] = this.type;
+    data["phone"] = this.phone;
     data["code"] = this.code;
     return data;
   }

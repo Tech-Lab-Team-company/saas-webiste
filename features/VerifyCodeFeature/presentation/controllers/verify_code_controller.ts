@@ -4,8 +4,8 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import VerifyCodeUseCase from "~/features/VerifyCodeFeature/Domain/use_case/verify_code_use_case";
 import { useUserStore } from "~/stores/user";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class VerifyCodeController extends ControllerInterface<UserModel> {
@@ -36,23 +36,36 @@ export default class VerifyCodeController extends ControllerInterface<UserModel>
           imageElement: successImage,
           messageContent: null,
         });
-        await router.push("/");
+        if(params.toMap().type == "ResetPassword"){
+          await router.push("/login/setnewpassword");
+        }
+        else{
+
+          await router.push("/Auth/education");
+        }
         const userStore = useUserStore();
         if (this.state.value.data) {
           // console.log(this.state.value.data)
           userStore.setUser(this.state.value.data);
         }
       } else {
+
         throw new Error(this.state.value.error?.title);
       }
       // useLoaderStore().endLoadingWithDialog();
     } catch (error: any) {
+
+      
       DialogSelector.instance.errorDialog.openDialog({
         dialogName: "dialog",
         titleContent: error,
         imageElement: errorImage,
         messageContent: null,
+
+
+
       });
+
     }
   }
 }

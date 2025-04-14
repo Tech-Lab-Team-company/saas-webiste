@@ -1,7 +1,12 @@
     
 <script lang="ts" setup>
 import callIcon from '../../public/icons/callIcon.vue';
-import LockIcon from '../../public/icons/LockIcon.vue';
+
+
+import SentCodeController from '~/features/ResetPasswordFeature/presentation/controllers/sent_code_controller';
+import SentCodeParams from '~/features/ResetPasswordFeature/Core/Params/sent_code_params';
+
+
 const router = useRouter();
 
 definePageMeta({
@@ -9,17 +14,19 @@ definePageMeta({
 });
 import { ref } from "vue";
 
-const value = ref(null);
-const items = ref([
-    'ar',
-    'en',
-]);
 
-const search = (event) => {
-    let _items = [...Array(10).keys()];
 
-    items.value = event.query ? [...Array(10).keys()].map((item) => event.query + '-' + item) : _items;
+const phoneNumber = ref("");
+
+
+
+
+const sendotp =()=>{
+    const restpassparams = new SentCodeParams(phoneNumber.value)
+    const sentCodeController = SentCodeController.getInstance();
+    sentCodeController.sentCode(restpassparams,router);
 }
+
 </script>
 
 
@@ -29,14 +36,7 @@ const search = (event) => {
         <img src="../../public/images/forgetpass.png" alt="login">
     </div>
     <div class="login-form">
-        <div class="side card flex justify-center">
-                    <AutoComplete 
-                        v-model="value" 
-                        dropdown 
-                        :suggestions="items" 
-                        class="select"
-                         />
-                </div>
+   
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
         <img src="../../public/images/logo.png" alt="">
         <h3>نسيت كلمة المرور</h3>
@@ -44,12 +44,13 @@ const search = (event) => {
 
         <div class="inputs inputs-pass forgit-pass">
             <div class="login-input">
-                <input type="text" placeholder="رقم الهاتف">
+                <input type="text" placeholder="رقم الهاتف" v-model="phoneNumber">
+                
                 <callIcon class="login-call-icon"/>
             </div>
          
-            <div class="btns btns-home">
-                <button class="login-btn" @click="router.push('/login/passwordcode')">ارسال الكود</button>
+            <div class="btns btns-home" >
+                <button @click="sendotp" class="login-btn">ارسال الكود</button>
             </div>
         </div>
 

@@ -34,7 +34,7 @@ import Profile from "~/components/Profile/Profile.vue";
 
       <!-- <homeStarting /> -->
       <NuxtPage />
-
+      <!-- <MainDialog /> -->
     </NuxtLayout>
   </div>
 </template>

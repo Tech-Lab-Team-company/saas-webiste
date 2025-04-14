@@ -11,6 +11,10 @@ import userEdit from "../../public/icons/userEdit.vue";
 import { ref } from "vue";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import RegisterController from "~/features/RegisterFeature/presentation/controllers/register_controller";
+import FetchCountriesParams from "~/features/FetchCountriesFeature/Core/Params/fetch_countries_params";
+import FetchCountriesController from "~/features/FetchCountriesFeature/presentation/controllers/fetch_countries_controller";
+import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_model";
+import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
 
 const showTermsDialog = ref(false);
 const isTermsAccepted = ref(false);       
@@ -59,17 +63,45 @@ const license_accept = ref(0);
 
 const CheckData = ()=>{
   
-  // const registerParams = new RegisterParams(FullName.value , Email.value , phoneNumber.value  ,password.value , confirmPassword.value,studentType.value ,"+20",country.value,nationality.value);
-  const registerParams = new RegisterParams(FullName.value , Email.value , phoneNumber.value  ,password.value , confirmPassword.value,1 ,"+20",2,1)
+  const registerParams = new RegisterParams(FullName.value , Email.value , phoneNumber.value  ,password.value , confirmPassword.value ,studentType.value ,"+20",country.value,nationality.value)
   const response =  RegisterController.getInstance().Register(registerParams,router);
 
 }
 
+const data = ref<CountryModel[]>([])
+const cities = ref<CountryModel[]>([]);
 
+const ftechData =async ()=>{
+  const countriesparams = new FetchCountriesParams(1,0) ;
+  const state = await FetchCountriesController.getInstance().fetchCountries(countriesparams);
+  data.value = state.value.data ?? [];
+
+  if (state.value.data) {
+    cities.value.push(...state.value.data);
+  }
+}
+
+onMounted(() => {
+  ftechData();
+});
+
+
+
+
+console.log(cities.value , "cities.value");
+
+watch(
+  ()=> data.value, 
+  (newValue) => {
+    data.value = newValue;
+  });
+  
+  
+  
 </script>
 
 <template>
-    <div class="login-container">
+    <div class="login-container auth-register-container">
       <div class="login-form">
         <h3>ادخل معلوماتك الشخصيه</h3>
         <p>
@@ -93,9 +125,8 @@ const CheckData = ()=>{
           <div class="login-input">
             <select class="student-select" v-model="studentType">
               <option value="" disabled selected>نوع الطالب</option>
-              <option value="student1">طالب</option>
-              <option value="student2">طالب</option>
-              <option value="student3">طالب</option>
+              <option :value="GenderEnum.male">ذكر</option>
+              <option :value="GenderEnum.female">انثى</option>
             </select>
             <student class="login-call-icon" />
           </div>
@@ -135,13 +166,11 @@ const CheckData = ()=>{
           </div>
   
           <div class="login-input">
-            <select class="natioal-select" v-model="nationality">
+           
+            <select class="natioal-select" v-model="nationality" >
               <option value="" disabled selected>الجنسيه</option>
-              <option value="national1">عربي</option>
-              <option value="national2">عربي</option>
-              <option value="national3">عربي</option>
+              <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.title }}</option>
             </select>
-            <national class="login-call-icon" />
           </div>
           <div class="login-input">
             <div class="icon-container">
@@ -150,9 +179,7 @@ const CheckData = ()=>{
             <div class="login-input">
               <select class="city-select" v-model="country">
                 <option value="" disabled selected>الدوله</option>
-                <option value="city1">مصر</option>
-                <option value="city2">مصر</option>
-                <option value="city3">مصر</option>
+                <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.title }}</option> 
               </select>
               <city class="login-call-icon" />
             </div>
@@ -168,11 +195,11 @@ const CheckData = ()=>{
                 التحقق من بريدك الإلكتروني  </button>
               </div>
           <!-- </NuxtLink> -->
-          <NuxtLink to="/Auth/email" ><div class="btns btns-home">
+          <!-- <NuxtLink to="/Auth/email" ><div class="btns btns-home">
             <button class="login-btn" > 
                 التحقق من بريدك الإلكتروني  </button>
               </div>
-          </NuxtLink>
+          </NuxtLink> -->
          
         <!-- <div class="btns btns-home">
             <button class="login-btn" >  <NuxtLink to="/Auth/email" 
@@ -199,6 +226,7 @@ const CheckData = ()=>{
   </template>
 
 <style scoped>
+
     
     
 .remember-mee {
@@ -370,3 +398,6 @@ input:focus {
   color: #333;
 }
 </style>
+
+
+

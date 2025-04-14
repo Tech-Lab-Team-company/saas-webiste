@@ -51,6 +51,7 @@ export default class RegisterParams implements Params {
       country_code: this.countryCode,
       country_id: this.countryId,
       nationality_id: this.NationalityId,
+      
     };
   }
 }
