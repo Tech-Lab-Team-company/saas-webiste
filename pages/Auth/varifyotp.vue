@@ -1,11 +1,16 @@
 <script setup lang="ts">
-    // const router = useRoute();
+    const route = useRoute();
+    console.log(route.path);
+
     definePageMeta({
         layout: 'auth' 
     });
+  
+
 </script>
 
 <template>
+    <RegisterEmailCode/>
 </template>
 
 <style scoped lang="scss">

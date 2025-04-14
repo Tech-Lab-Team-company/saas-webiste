@@ -2,10 +2,12 @@ import { ControllerInterface } from "~/base/persention/Controller/controller_int
 import SentCodeModel from "~/features/ResetPasswordFeature/Data/models/user_model";
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import SentCodeUseCase from "~/features/ResetPasswordFeature/Domain/use_case/sent_code_case";
-import errorImage from "~/assets/images/error.png";
+import errorImage from "~/public/images/error.png";
 import SentCodeParams from "~/features/ResetPasswordFeature/Core/Params/sent_code_params";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import ResetPasswordBuilder from "~/features/ResetPasswordFeature/presentation/builders/reset_password_builder";
+import successImage from "~/public/images/success-dialog.png";
+
 export default class SentCodeController extends ControllerInterface<SentCodeModel> {
   private static instance: SentCodeController;
   private constructor() {
@@ -27,8 +29,8 @@ export default class SentCodeController extends ControllerInterface<SentCodeMode
         await this.SentCodeUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        ResetPasswordBuilder.Instance.setEmail(params.email);
-        await router.replace("/auth/verify-code");
+        ResetPasswordBuilder.Instance.setEmail(params.phone);
+        await router.replace("/login/verifycode");
         // if (this.state.value.data?.email) {
         //   ResetPasswordBuilder.Instance.setEmail(this.state.value.data?.email);
         // }

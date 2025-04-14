@@ -2,9 +2,11 @@ import { ControllerInterface } from "~/base/persention/Controller/controller_int
 import SetNewPasswordModel from "~/features/ResetPasswordFeature/Data/models/user_model";
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import SetNewPasswordUseCase from "~/features/SetNewPasswordFeature/Domain/use_case/set_new_password_case";
-import errorImage from "~/assets/images/error.png";
+import errorImage from "~/public/images/error.png";
 import SetNewPasswordParams from "~/features/ResetPasswordFeature/Core/Params/sent_code_params";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
+import successImage from "~/public/images/Success.png";
+
 // import ResetPasswordBuilder from "~/features/ResetPasswordFeature/presentation/builders/reset_password_builder";
 export default class SetNewPasswordController extends ControllerInterface<SetNewPasswordModel> {
   private static instance: SetNewPasswordController;
@@ -27,8 +29,13 @@ export default class SetNewPasswordController extends ControllerInterface<SetNew
         await this.SetNewPasswordUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        // ResetPasswordBuilder.Instance.setEmail(params.email);
-        await router.replace("/auth/login");
+        DialogSelector.instance.successDialog.openDialog({
+          dialogName: "dialog",
+          titleContent: "Verify Code Success",
+          imageElement: successImage,
+          messageContent: null,
+        });
+        await router.replace("/login");
         // if (this.state.value.data?.email) {
         //   ResetPasswordBuilder.Instance.setEmail(this.state.value.data?.email);
         // }

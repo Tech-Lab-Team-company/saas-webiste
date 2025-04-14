@@ -32,10 +32,9 @@ import Profile from "~/components/Profile/Profile.vue";
       <!-- <NuxtPage /> -->
       <!-- <CourseCard /> -->
 
-
       <!-- <homeStarting /> -->
       <NuxtPage />
-
+      <!-- <MainDialog /> -->
     </NuxtLayout>
   </div>
 </template>

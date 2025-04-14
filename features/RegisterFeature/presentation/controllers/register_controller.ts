@@ -4,9 +4,9 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 // import type Params from "~/base/core/Params/params";
 import RegisterUseCase from "~/features/RegisterFeature/Domain/use_case/register_use_case";
 // import { useRouter } from "vue-router";
-import errorImage from "~/assets/images/error.png";
+import errorImage from "~/public/images/error.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
-// import successImage from "assets/images/success-dialog.png";
+import successImage from "~/public/images/success-dialog.png";
 // import { useUserStore } from "~/stores/user";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
@@ -20,7 +20,7 @@ export default class RegisterController extends ControllerInterface<UserModel> {
   }
   private RegisterUseCase = new RegisterUseCase();
 
-  static get Instance() {
+  static getInstance() {
     if (!this._instance) {
       this._instance = new RegisterController();
     }
@@ -30,20 +30,20 @@ export default class RegisterController extends ControllerInterface<UserModel> {
   async Register(params: RegisterParams, router: any) {
     // useLoaderStore().setLoadingWithDialog();
     try {
-      // console.log(params)
-      const dataState: DataState<UserModel> =
-        await this.RegisterUseCase.call(params);
+    
+      const dataState: DataState<UserModel> =await this.RegisterUseCase.call(params);
+  
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        // DialogSelector.instance.successDialog.openDialog({
-        //   dialogName: "dialog",
-        //   titleContent: "Login Success",
-        //   imageElement: successImage,
-        //   messageContent: null,
-        // });
-        EmailBuilder.Instance.setEmail(params.email);
+        DialogSelector.instance.successDialog.openDialog({
+          dialogName: "dialog",
+          titleContent: "Login Success",
+          imageElement: successImage,
+          messageContent: null,
+        });
+        EmailBuilder.Instance.setEmail(params.phone);
 
-        await router.push("/auth/verify-email");
+        await router.push("/Auth/varifyotp");
         // const userStore = useUserStore();
         // if (this.state.value.data) {
         //   console.log(this.state.value.data)
@@ -52,6 +52,7 @@ export default class RegisterController extends ControllerInterface<UserModel> {
 
         // useLoaderStore().endLoadingWithDialog();
       } else {
+        // console.log("Faild Log in")
         throw new Error(this.state.value.error?.title);
       }
       return this.state;

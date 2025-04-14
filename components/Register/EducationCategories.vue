@@ -78,10 +78,10 @@ const toggleSkill = (skill) => {
       <div class="login-container">
         <div class="login-form">
           <div class="btns btns-home">
-            <button class="login-btn">
-              <NuxtLink to="/Auth/categories"> ابدأ الان </NuxtLink>
+            <NuxtLink to="/Auth/categories"> <button class="login-btn">
+             ابدأ الان 
               <LeftArrowIcon class="left-icon" />
-            </button>
+            </button></NuxtLink>
           </div>
         </div>
       </div>
@@ -196,6 +196,16 @@ h4 span {
   width: 24px;
   height: 24px;
 }
+
+.btns-home .left-icon .left-arrow{
+    transition: all 1s ease-in-out;
+}
+.btns-home:hover .left-icon .left-arrow {
+    stroke: #032855;
+  }
+  
+
+
 .login-container {
   width: 100%;
   height: 10%;

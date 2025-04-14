@@ -16,6 +16,29 @@
     </div>
 </template>
 
-<style scoped ></style>
+<style scoped lang="scss" >
+
+.exams-timer-text{
+    @media (max-width:768px) {
+        width: 100%;
+    }
+    
+    .main-title{
+        @media (max-width:768px) {
+            width: 100%;
+        }
+        text-align: center;
+        
+    }
+
+    .second-title{
+        @media (max-width:768px) {
+            width: 100%;
+        }
+        text-align: center;
+    }
+}
+
+</style>
 
 

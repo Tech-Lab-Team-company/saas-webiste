@@ -1,4 +1,6 @@
 import type UserModel from "~/features/LoginFeature/Data/models/user_model";
+import {defineStore} from "pinia";
+
 
 
 export const useUserStore = defineStore('user', {

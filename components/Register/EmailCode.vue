@@ -2,6 +2,11 @@
 import callIcon from "../../public/icons/callIcon.vue";
 import LockIcon from "../../public/icons/LockIcon.vue";
 import LeftArrowIcon from "~/public/icons/LeftArrowIcon.vue";
+import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
+import { ref } from "vue";
+import VerifyCodeParams from "~/features/VerifyCodeFeature/Core/Params/verfiy_code_params";
+import VerifyCodeUseCase from "~/features/VerifyCodeFeature/Domain/use_case/verify_code_use_case";
+import VerifyCodeController from "~/features/VerifyCodeFeature/presentation/controllers/verify_code_controller";
 
 const router = useRouter();
 
@@ -13,11 +18,26 @@ const firstnumber = ref();
 const secondnumber = ref();
 const thirdnumber = ref();
 const fourthnumber = ref();
+const optvalue = ref("");
 
 const value = ref(null);
 const items = ref(["ar", "en"]);
 
-import { ref } from "vue";
+
+const CheckCode = ()=>{
+  EmailBuilder.Instance.getEmail();
+  console.log(EmailBuilder.Instance.getEmail());
+  console.log(optvalue.value);
+  const varifyCode = new VerifyCodeParams(EmailBuilder.Instance.getEmail() || "", optvalue.value , "AuthRegister");
+  const verifyCodeUseCase = VerifyCodeController.getInstance();
+  verifyCodeUseCase.verifyCode(varifyCode , router);
+}
+
+
+
+
+
+
 </script>
 
 <template>
@@ -42,7 +62,7 @@ import { ref } from "vue";
       <div class="inputs inputs-pass">
         <div class="login-code">
           <div class="card flex justify-center">
-            <InputOtp v-model="value">
+            <InputOtp v-model="optvalue" :length="6">
               <template #default="{ attrs, events }">
                 <input
                   type="text"
@@ -61,10 +81,11 @@ import { ref } from "vue";
             <p class="not-send">اعادة ارسال الكود</p>
             <p>لم تستلم الكود بعد؟</p>
           </div>
-          <button
+          <!-- @click="router.push('/login/newpass')" -->
+        <button
+            @click="CheckCode"
             class="login-btn pass-btn"
-            @click="router.push('/login/newpass')"
-          >
+            >
             تأكيد
             <LeftArrowIcon class="left-icon" />
           </button>

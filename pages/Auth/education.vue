@@ -10,7 +10,7 @@
 </script>
 
 <template>
-<RegisterEducationData/>
+    <RegisterEducationData/>
 </template>
 
 <style scoped lang="scss">

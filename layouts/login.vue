@@ -3,6 +3,7 @@
 <template>
     <div class="login-layout">
         <slot></slot>
+        <GlobalMainDialog />
     </div>
   </template>
   

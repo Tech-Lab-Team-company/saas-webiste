@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LoginData from '~/components/Login/LoginData.vue';
+import PasswordReset from '~/components/Login/PasswordReset.vue';
 definePageMeta({
     layout: 'login' 
 });
@@ -8,7 +8,7 @@ definePageMeta({
 
 <template>
     <div>
-        <LoginData />
+        <PasswordReset />
     </div>
 </template>
 

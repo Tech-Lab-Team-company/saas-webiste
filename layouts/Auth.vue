@@ -5,6 +5,7 @@
          <AuthSidebar class="auth-sidebar" />
           <div>
             <slot class="auth-sidebar-home"></slot>
+            <GlobalMainDialog />
           </div>
     </div>
   </template>

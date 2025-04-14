@@ -39,4 +39,17 @@
     </div>
 </template>
 
-<style scoped ></style>
+<style scoped lang="scss" >
+
+.card-container{
+    @media (max-width:768px) {
+        flex-direction: column;
+    }
+
+    .card-video{
+        @media (max-width:768px) {
+           width: 100%;
+        }
+    }
+}
+</style>

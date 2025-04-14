@@ -18,7 +18,7 @@
 
 
     const route = useRoute();
-    console.log(route.path)
+    // console.log(route.path)
 
   
 
@@ -42,7 +42,11 @@
         </div>
   
         <div class="auth-info-container" 
-            :class="route.path == '/Auth/mail' || route.path == '/Auth/stage' ||  route.path == '/Auth/success' ? 'entered' : ''">
+   
+            :class="[
+                route.path == '/Auth/register' || route.path == '/auth/register' ? 'active' : '',
+                route.path == '/Auth/varifyotp' || route.path == '/Auth/categories' ||  route.path == '/Auth/education' ? 'entered' : '',
+            ]">
 
             <div class="auth-text">
                 <p>معلوماتك الشخصيه</p>
@@ -53,8 +57,8 @@
         
         <div class="auth-info-container" 
             :class="[
-                route.path === '/Auth/mail' ? 'active' : '',
-                route.path === '/Auth/stage' || route.path === '/Auth/success' ? 'entered': ``,
+                route.path === '/Auth/varifyotp' ? 'active' : '',
+                route.path === '/Auth/education' || route.path === '/Auth/categories' ? 'entered' : '' ,
             ]"
         >
         
@@ -66,8 +70,8 @@
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === '/Auth/stage' ? 'active' : '',
-                route.path === '/Auth/success' ? 'entered': ``,
+                route.path === '/Auth/education' ? 'active' : '',
+                route.path === '/Auth/categories' ? 'entered' : '',
             ]">
             
             <div class="auth-text">
@@ -78,7 +82,7 @@
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === '/Auth/success' ? 'active' : '',
+                route.path === '/Auth/categories' ? 'active' : '',
             ]">
 
             <div class="auth-text">

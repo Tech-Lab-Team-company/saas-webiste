@@ -1,15 +1,15 @@
 import type Params  from "~/base/core/Params/params";
 
 export default class SentCodeParams implements Params {
-  public email: string;
+  public phone: string;
 
-  constructor(email: string) {
-    this.email = email;
+  constructor(phone: string) {
+    this.phone = phone;
   }
 
   toMap(): { [p: string]: any } {
     const data: { [p: string]: any } = {};
-    data["email"] = this.email;
+    data["phone"] = this.phone;
     return data;
   }
 }
