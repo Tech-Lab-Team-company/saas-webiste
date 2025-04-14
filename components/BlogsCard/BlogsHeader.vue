@@ -1,4 +1,5 @@
 <script setup>
+import { NuxtLink } from "#components";
 import Rectangle from "@/assets/images/Rectangle.png";
 import Rectangle2 from "@/assets/images/Rectangle2.png";
 import Rectangle3 from "@/assets/images/Rectangle3.png";
@@ -40,12 +41,11 @@ const cards = [
       "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
     date: "2023-10-01",
   },
-  
 ];
 </script>
 
 <template>
-  <div class="blogs-page-articles-cards" dir="rtl">
+  <NuxtLink :to="`/blogs/${id}`" class="blogs-page-articles-cards" dir="rtl">
     <div class="Blog" dir="rtl">
       <div class="cards-container">
         <div class="card" v-for="(card, index) in cards" :key="index">
@@ -66,7 +66,7 @@ const cards = [
         </div>
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <style scoped>

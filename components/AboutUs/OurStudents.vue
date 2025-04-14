@@ -58,4 +58,8 @@ const splideOptions = {
      
 </template>
 
-<style scoped></style>
+<style scoped>
+.card {
+    height: auto;
+}
+</style>

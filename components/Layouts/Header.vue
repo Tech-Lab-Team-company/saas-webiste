@@ -21,13 +21,13 @@ const route = useRoute();
       </div>
 
       <ul class="nav-links">
-        <NuxtLink to="/blogscard" exactActiveClass="active" class="nav-link">
+        <NuxtLink to="/blogs" exactActiveClass="active" class="nav-link">
           <li>المدونه</li>
         </NuxtLink>
         <NuxtLink to="/questions" exactActiveClass="active" class="nav-link">
           <li>بنك الاسئله</li>
         </NuxtLink>
-        <NuxtLink to="/courses" exactActiveClass="active" class="nav-link">
+        <NuxtLink to="/course" exactActiveClass="active" class="nav-link">
           <li >الكورسات</li>
         </NuxtLink>
         <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link">

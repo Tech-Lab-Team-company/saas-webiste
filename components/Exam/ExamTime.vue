@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
     import clockicon from '~/public/icons/clockicon.vue';
     import progressIcon from '~/public/icons/progressIcon.vue';
 
@@ -21,11 +21,10 @@
     </div>
 
     <div class="progress-bar">
-        <!-- <progressIcon class="progress-icon" /> -->
-         <!--  -->
+   
         <div class="active-bar" :style="`width:${questionIndex  * 10.5}%`"></div>
             <div class="dots">
-                <!-- {{ console.log(questionIndex) }} -->
+         
              <div class="dot" :class="questionIndex == 10 ? 'white' : ''"  ></div>
              <div class="dot" :class="questionIndex == 9 ? 'white' : ''"  ></div>
              <div class="dot" :class="questionIndex == 8 ? 'white' : ''"></div>
@@ -40,22 +39,102 @@
         </div>
     </div>
 
-    <!-- <ExamQuestionsText 
-        @SendAnswerIndex ="questionIndex = $event"/> -->
+     <ExamQuestionsText 
+        @SendAnswerIndex ="questionIndex = $event"/>
 
     <ExamQuestionsAudio 
         @SendAnswerIndex ="questionIndex = $event"/>
-    <!-- <ExamQuestionImage 
-    @SendAnswerIndex ="questionIndex = $event"/> -->
-<!-- 
+   <ExamQuestionImage 
+    @SendAnswerIndex ="questionIndex = $event"/> 
+
     <ExamQuetionChoose 
-        @SendAnswerIndex ="questionIndex = $event"/> -->
+        @SendAnswerIndex ="questionIndex = $event"/> 
 
         <ExamQuestionComplete 
         @SendAnswerIndex ="questionIndex = $event"/>
 
-</template>
+</template> -->
+<script setup lang="ts">
+import { ref } from 'vue'
 
+const questionIndex = ref<number | null>(null)
+const currentQuestionIndex = ref(0)
+
+const questions = [
+  { type: 'text' },
+  { type: 'audio' },
+  { type: 'image' },
+  { type: 'choose' },
+  { type: 'complete' }
+]
+
+const handleAnswer = (index: number) => {
+  questionIndex.value = index
+  if (currentQuestionIndex.value < questions.length - 1) {
+    currentQuestionIndex.value++
+  } else {
+    console.log('الامتحان انتهى')
+  }
+}
+const prevQuestion = () => {
+  if (currentQuestionIndex.value > 0) {
+    currentQuestionIndex.value--
+  }
+}
+const nextQuestion = () => {
+  if (currentQuestionIndex.value < questions.length - 1) {
+    currentQuestionIndex.value++
+  }
+}
+</script>
+
+
+<template>
+  <div>
+    <ExamQuestionsText
+      v-if="questions[currentQuestionIndex].type === 'text'"
+      @SendAnswerIndex="handleAnswer"
+    />
+
+    <ExamQuestionsAudio
+      v-if="questions[currentQuestionIndex].type === 'audio'"
+      @SendAnswerIndex="handleAnswer"
+    />
+
+    <ExamQuestionImage
+      v-if="questions[currentQuestionIndex].type === 'image'"
+      @SendAnswerIndex="handleAnswer"
+    />
+
+    <ExamQuetionChoose
+      v-if="questions[currentQuestionIndex].type === 'choose'"
+      @SendAnswerIndex="handleAnswer"
+    />
+
+    <ExamQuestionComplete
+      v-if="questions[currentQuestionIndex].type === 'complete'"
+      @SendAnswerIndex="handleAnswer"
+    />
+
+    <!-- <div class="mt-4 flex justify-between">
+      <button 
+  @click="prevQuestion"
+  :disabled="currentQuestionIndex === 0"
+  class="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+>
+  السابق
+</button>
+
+      <button 
+        @click="nextQuestion"
+        :disabled="currentQuestionIndex === questions.length - 1"
+        class="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+      >
+        التالي
+      </button>
+    </div> -->
+  </div>
+</template>
 
 <style scoped lang="scss">
 

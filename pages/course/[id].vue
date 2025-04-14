@@ -1,19 +1,9 @@
-<script setup>
-
-
-
-</script>
+<script setup></script>
 <template>
   <div class="blogs-page">
-   
-    <BlogsPageArticlesContainer />
+    <CourseDetailsCourseTabs/>
     <!-- <ProfileMyCourseCard /> -->
-
-
   </div>
 </template>
 
 <style scoped></style>
-
-
-

@@ -48,7 +48,7 @@ const splideOptions = {
       <h3 class="slider-heading">مراجعه اللغه العربيه</h3>
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(card, index) in cards" :key="index">
-          <div class="card">
+          <NuxtLink :to="`/course/${card.id}`" class="card">
             <div class="image-container">
               <img :src="card.img" alt="Card image" class="course-image" />
               <p class="overlay-text">1500 جنيه</p>
@@ -74,7 +74,7 @@ const splideOptions = {
                 <p class="card-text">{{ card.text }}</p>
               </div>
             </div>
-          </div>
+          </NuxtLink>
         </SplideSlide>
       </Splide>
     </div>

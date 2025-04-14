@@ -13,15 +13,23 @@
             text-align: right;
             p{
                 &:first-child{
+                    font-family: "regular";
                     font-weight: 400;
                     font-size: 16px;
+                    text-align: right;
+                    text-transform: capitalize;
+                    
              
     
                 }
                 &:last-child{
                     color: #8C8896;
+                    font-family: "regular";
                     font-weight: 400;
-                    font-size: 16px;
+                    font-size: 14px;
+                    text-align: right;
+                    text-transform: capitalize;
+                    
                  
                 }
             }
@@ -36,11 +44,17 @@
     
     }
     .card{
+        
        
         .card-body{
             p{
                 color: #6F777B;
                 text-align: right;
+                font-family: "regular";
+                font-weight: 400;
+                font-size: 16px;
+                text-align: right;
+                text-transform: capitalize
             }
         }
 

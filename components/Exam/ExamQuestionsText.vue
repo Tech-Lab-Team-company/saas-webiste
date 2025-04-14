@@ -122,9 +122,9 @@
             <p class="question-number">{{ questions[QuestionIndex].questionNumber }}</p>
             <img v-if="questions[QuestionIndex].img" :src="questions[QuestionIndex].img" alt="image">
             <!-- <img class="aduio-image" v-if="questions[QuestionIndex].aduio" src="../../public/images/Aduio.png" alt="image"> -->
-            <audio v-if="questions[QuestionIndex].aduio" controls >
+            <!-- <audio v-if="questions[QuestionIndex].aduio" controls >
                 <source src="../../public/Aduio/aduio.mp3" type="audio/mpeg">
-            </audio>
+            </audio> -->
             <p class="question-text"> {{ questions[QuestionIndex].questionText }}</p>
         </div>
         

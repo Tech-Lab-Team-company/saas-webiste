@@ -54,7 +54,7 @@ const splideOptions = {
 
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(card, index) in cards" :key="index">
-          <div class="card">
+          <NuxtLink :to="`/course/${card.id}`" class="card">
             <div class="image-wrapper">
               <img :src="card.img" alt="Card image" class="course-image" />
               <div class="card-overlay-content">
@@ -71,7 +71,7 @@ const splideOptions = {
                 <span class="card-name">{{ card.name }}</span>
               </div>
             </div>
-          </div>
+          </NuxtLink>
         </SplideSlide>
       </Splide>
     </div>

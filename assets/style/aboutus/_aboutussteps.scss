@@ -1,186 +1,214 @@
+.aboutus-steps-container {
+  margin-top: 45px;
+  padding-bottom: 50px;
+  overflow: hidden;
 
-.aboutus-steps-container{
-    margin-top: 45px;
+  .aboutus-steps-header {
+    h3 {
+      text-align: right;
+      padding-bottom: 10px;
+      font-family: "medium";
+      font-weight: 700;
+      font-size: 32px;
+    }
+
+    .abotus-hr {
+      border: none;
+      height: 2px;
+      background-image: linear-gradient(to left, #ffb949, #f6f6f6);
+    }
+  }
+
+  .aboutus-setps {
+    display: flex;
+    gap: 10px;
+    height: 100%;
+    margin-top: 30px;
     padding-bottom: 50px;
-    overflow: hidden;
-    
-    .aboutus-steps-header{
-        h3{
-            text-align: right;
-            padding-bottom: 10px;
-        }
+    justify-content: center;
+    position: relative;
 
-        .abotus-hr{
-            border: none;
-            height: 2px;
-            background-image: linear-gradient(to left ,#FFB949 ,#F6F6F6);
-        }
+    /* Initial hidden state */
+    .aboutus-circle-steps {
+      opacity: 0;
     }
 
-    .aboutus-setps{
-        display: flex;
-        gap: 10px;
-        height: 100%;
-        margin-top: 30px;
-        padding-bottom: 50px;
-        justify-content: center;
-        position: relative;
-        
-        /* Initial hidden state */
-        .aboutus-circle-steps {
-            opacity: 0;
-        }
-        
-        .aboutus-circle-steps-start {
-            opacity: 0;
-        }
-        
-        .aboutus-circle-steps-test {
-            opacity: 0;
-        }
-        
-        .aboutus-arrow {
-            opacity: 0;
-        }
-        
-        .first-square,
-        .second-square,
-        .third-square {
-            opacity: 0;
-        }
-
-        /* Animation definitions */
-        @keyframes slideInFromRight {
-            0% {
-                transform: translateX(100px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInFromLeft {
-            0% {
-                transform: translateX(-100px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInFromBottom {
-            0% {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* Active animations when visible */
-        &.animate {
-            .aboutus-circle-steps {
-                animation: slideInFromRight 0.8s ease-out forwards;
-            }
-            
-            .aboutus-circle-steps-start {
-                animation: slideInFromLeft 0.8s ease-out forwards;
-                animation-delay: 0.2s;
-            }
-            
-            .aboutus-circle-steps-test {
-                animation: slideInFromBottom 0.8s ease-out forwards;
-                animation-delay: 0.4s;
-            }
-            
-            .aboutus-arrow {
-                animation: fadeIn 1s ease-out forwards;
-                animation-delay: 0.6s;
-            }
-            
-            .first-square {
-                animation: slideInFromLeft 0.8s ease-out forwards;
-                animation-delay: 0.1s;
-            }
-            
-            .second-square {
-                animation: slideInFromRight 0.8s ease-out forwards;
-                animation-delay: 0.3s;
-            }
-            
-            .third-square {
-                animation: slideInFromLeft 0.8s ease-out forwards;
-                animation-delay: 0.5s;
-            }
-        }
-
-        .first-square{
-            position: absolute;
-            left: -40px;
-        }
-        .second-square{
-            position: absolute;
-            right: -40px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .third-square{
-            position: absolute;
-            left: -40px;
-            top: 100%;
-            transform: translateY(-100%);
-        }
-
-        .aboutus-circle-steps{
-            background-color: #FFB9490D;
-            width: 260px;
-            height: 260px;
-            border-radius: 50%;
-            text-align: center;
-            padding: 55px 45px 0 45px;
-            
-            &.aboutus-circle-steps-test{
-                background-color: #0328550D;
-            }
-            
-            &.aboutus-circle-steps-start{
-                background-color: #049DBF0D;
-            }
-        }
-
-        .aboutus-arrows{
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            align-items: center;
-            gap: 30px;
-
-            .aboutus-arrow{
-                width: 50%;
-            }
-        }
-
-        .left-stpes{
-            margin-top: auto;
-            margin-bottom: auto;
-        }
-
-        .right-steps{
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 80px;
-        }
+    .aboutus-circle-steps-start {
+      opacity: 0;
     }
+
+    .aboutus-circle-steps-test {
+      opacity: 0;
+    }
+
+    .aboutus-arrow {
+      opacity: 0;
+    }
+
+    .first-square,
+    .second-square,
+    .third-square {
+      opacity: 0;
+    }
+
+    /* Animation definitions */
+    @keyframes slideInFromRight {
+      0% {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      0% {
+        transform: translateX(-100px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInFromBottom {
+      0% {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* Active animations when visible */
+    &.animate {
+      .aboutus-circle-steps {
+        animation: slideInFromRight 0.8s ease-out forwards;
+      }
+
+      .aboutus-circle-steps-start {
+        animation: slideInFromLeft 0.8s ease-out forwards;
+        animation-delay: 0.2s;
+      }
+
+      .aboutus-circle-steps-test {
+        animation: slideInFromBottom 0.8s ease-out forwards;
+        animation-delay: 0.4s;
+      }
+
+      .aboutus-arrow {
+        animation: fadeIn 1s ease-out forwards;
+        animation-delay: 0.6s;
+      }
+
+      .first-square {
+        animation: slideInFromLeft 0.8s ease-out forwards;
+        animation-delay: 0.1s;
+      }
+
+      .second-square {
+        animation: slideInFromRight 0.8s ease-out forwards;
+        animation-delay: 0.3s;
+      }
+
+      .third-square {
+        animation: slideInFromLeft 0.8s ease-out forwards;
+        animation-delay: 0.5s;
+      }
+    }
+
+    .first-square {
+      position: absolute;
+      left: -40px;
+    }
+    .second-square {
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .third-square {
+      position: absolute;
+      left: -40px;
+      top: 100%;
+      transform: translateY(-100%);
+    }
+
+    .aboutus-circle-steps {
+      background-color: #ffb9490d;
+      width: 420px;
+      height: 350px;
+      border-radius: 50%;
+      text-align: center;
+      //   padding: 55px 45px 0 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      // align-items: center;
+
+      h4 {
+        text-align: right;
+        color: #000;
+        font-family: "bold";
+        font-weight: 800;
+        font-size: 23px;
+        width: 89%;
+      }
+
+      p {
+        text-align: right;
+        color: #6f777b;
+        font-family: "regular";
+        font-weight: 400;
+        font-size: 19px;
+        width: 89%;
+      }
+
+      &.aboutus-circle-steps-test {
+        background-color: #0328550d;
+      }
+
+      &.aboutus-circle-steps-start {
+        background-color: #049dbf0d;
+      }
+    }
+
+    .aboutus-arrows {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      gap: 30px;
+
+      .aboutus-arrow {
+        width: 70%;
+      }
+    }
+
+    .left-stpes {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    .right-steps {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 80px;
+    }
+  }
 }
