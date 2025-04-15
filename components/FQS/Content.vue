@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type Terms from "~/types/terms";
+import type Fqs from "~/types/fqs";
 import { baseUrl } from "~/constant/baseUrl";
 
-const { data: terms } = await useAsyncData("terms", async () => {
+const { data: fqs } = await useAsyncData("fqs", async () => {
   const response = await $fetch<{
-    data: Terms[];
+    data: Fqs[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_terms`, {
+  }>(`${baseUrl}/fetch_fqs`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
@@ -20,15 +20,15 @@ const { data: terms } = await useAsyncData("terms", async () => {
 </script>
 
 <template>
-  <section class="terms-and-conditions" dir="rtl">
+  <section class="fqs-and-conditions" dir="rtl">
     <div class="container">
-      <h1 class="title">الشروط و الأحكام</h1>
+      <h1 class="title"> الاسئلة الشائعة </h1>
       <hr />
 
-      <div v-if="terms">
-        <div v-for="term in terms" :key="term.id" class="paragraph">
-          <h2>{{ term.title }}</h2>
-          <p>{{ term.description }}</p>
+      <div v-if="fqs">
+        <div v-for="fqses in fqs" :key="fqses.id" class="paragraph">
+          <h2>{{ fqses.question }}</h2>
+          <p>{{ fqses.answer }}</p>
         </div>
       </div>
       <div v-else>
@@ -39,7 +39,7 @@ const { data: terms } = await useAsyncData("terms", async () => {
 </template>
 
 <style scoped>
-.terms-and-conditions {
+.fqs-and-conditions {
   padding: 40px 20px;
   /* background-color: #f9f9f9; */
   font-family: "regular", sans-serif;

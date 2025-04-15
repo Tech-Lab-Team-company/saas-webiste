@@ -9,8 +9,8 @@ class ApiNames {
     return this._instance;
   }
 
-  public baseUrl = "https://edu.techlabeg.com/api/website/";
-  
+  public baseUrl = "https://statistics.techlabeg.com/api/v1/";
+
 
   //auth
   public login = "login";
@@ -103,6 +103,15 @@ class ApiNames {
   public fetchChats = "fetch_all_chats";
   public fetchChatMessages = "fetch_chat_messages";
   public sendMessage = "send_message";
+
+  // terms
+  public fetch_terms = "fetch_terms";
+  
+  // privacy
+  public fetch_privacy = "fetch_privacy";
+
+  // fqs
+  public fetch_fqs = "fetch_fqs";
 }
 
 export { ApiNames };
