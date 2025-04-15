@@ -1,5 +1,5 @@
 import { ControllerInterface } from "~/base/persention/Controller/controller_interface";
-import UserModel from "~/features/RegisterFeature/Data/models/user_model";
+import UserModel from '~/features/LoginFeature/Data/models/user_model'
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 // import type Params from "~/base/core/Params/params";
 import RegisterUseCase from "~/features/RegisterFeature/Domain/use_case/register_use_case";
@@ -10,6 +10,7 @@ import successImage from "~/public/images/success-dialog.png";
 // import { useUserStore } from "~/stores/user";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
+import { useUserStore } from "~/stores/user";
 
 // import { useLoaderStore } from "~/stores/dialogs/loader";
 
@@ -42,6 +43,11 @@ export default class RegisterController extends ControllerInterface<UserModel> {
           messageContent: null,
         });
         EmailBuilder.Instance.setEmail(params.phone);
+        const userStore = useUserStore();
+        if (this.state.value.data) {
+          console.log(this.state.value.data);
+          userStore.setUser(this.state.value.data);
+        }
 
         await router.push("/Auth/varifyotp");
         // const userStore = useUserStore();
@@ -51,6 +57,7 @@ export default class RegisterController extends ControllerInterface<UserModel> {
         // }
 
         // useLoaderStore().endLoadingWithDialog();
+        
       } else {
         // console.log("Faild Log in")
         throw new Error(this.state.value.error?.title);

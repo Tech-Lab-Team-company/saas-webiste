@@ -7,10 +7,11 @@ export default class RegisterParams implements Params {
   public phone: string;///
   public password: string;//// 
   public confirmPassword: string;
-  public studentType: number;
+  public educationType: number;
   public countryCode: string;
   public countryId: number;
   public NationalityId: number;
+  public gender: number;
 
 
 
@@ -20,10 +21,11 @@ export default class RegisterParams implements Params {
     phone: string,
     password: string,
     confirmPassword: string,
-    studentType: number,
+    educationType: number,
     countryCode: string,
     countryId: number,
     NationalityId: number,
+    gender: number,
     
     
   ) {
@@ -32,10 +34,11 @@ export default class RegisterParams implements Params {
     this.phone = phone;
     this.password = password;
     this.confirmPassword = confirmPassword;
-    this.studentType = studentType;
+    this.educationType = educationType;
     this.countryCode = countryCode;
     this.countryId = countryId;
     this.NationalityId = NationalityId;
+    this.gender = gender;
 
 
   }
@@ -47,10 +50,11 @@ export default class RegisterParams implements Params {
       phone: this.phone,
       password: this.password,
       password_confirmation: this.confirmPassword,
-      category_id: this.studentType,
+      category_id: this.educationType,
       country_code: this.countryCode,
       country_id: this.countryId,
       nationality_id: this.NationalityId,
+      gender: this.gender,
       
     };
   }

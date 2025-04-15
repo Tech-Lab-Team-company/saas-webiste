@@ -22,6 +22,7 @@ class HeaderHandler {
   getHeader(isAuth = false): { [key: string]: string } {
     const headers: { [key: string]: string } = {};
     const userStore = this.userStore; // Initialize the store here
+    console.log('userStore', userStore.user);
 
     if (userStore?.user !== null) {
       const token: string | undefined = userStore?.user?.apiToken;
