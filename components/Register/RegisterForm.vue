@@ -15,6 +15,7 @@ import FetchCountriesParams from "~/features/FetchCountriesFeature/Core/Params/f
 import FetchCountriesController from "~/features/FetchCountriesFeature/presentation/controllers/fetch_countries_controller";
 import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_model";
 import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
+import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 
 const showTermsDialog = ref(false);
 const isTermsAccepted = ref(false);       
@@ -60,10 +61,22 @@ const studentType = ref(0);
 const nationality = ref(0);
 const country = ref(0);
 const license_accept = ref(0);
+const Education_Type =ref(0)
+
 
 const CheckData = ()=>{
   
-  const registerParams = new RegisterParams(FullName.value , Email.value , phoneNumber.value  ,password.value , confirmPassword.value ,studentType.value ,"+20",country.value,nationality.value)
+  const registerParams = new RegisterParams(FullName.value , 
+  Email.value , 
+  phoneNumber.value  ,
+  password.value , 
+  confirmPassword.value ,
+  Education_Type.value,
+  "+20",
+  country.value,
+  nationality.value,
+  studentType.value )
+
   const response =  RegisterController.getInstance().Register(registerParams,router);
 
 }
@@ -96,7 +109,21 @@ watch(
     data.value = newValue;
   });
   
-  
+
+  const validatePhoneNumber = (number: Event) => {
+    if (number.target) {
+        const PhoneNumberMatch = /^\d{11}$/;
+        if((number.target as HTMLInputElement).value.match(PhoneNumberMatch)){
+          phoneNumber.value =(number.target as HTMLInputElement).value ;
+        } 
+        else{
+          console.log("رقم الهاتف غير صحيح");
+        }
+    }
+
+  }
+
+
   
 </script>
 
@@ -119,14 +146,23 @@ watch(
             <sms class="login-call-icon" />
           </div>
           <div class="login-input">
-            <input type="text" placeholder="رقم الهاتف" v-model="phoneNumber" />
+            <input type="text" placeholder="رقم الهاتف"  @change="validatePhoneNumber"  />
             <callIcon class="login-call-icon" />
           </div>
           <div class="login-input">
-            <select class="student-select" v-model="studentType">
+            <select class="student-select" v-model="studentType" required>
               <option value="" disabled selected>نوع الطالب</option>
               <option :value="GenderEnum.male">ذكر</option>
               <option :value="GenderEnum.female">انثى</option>
+            </select>
+            <student class="login-call-icon" />
+          </div>
+          <div class="login-input">
+            <select class="student-select" v-model="Education_Type" required>
+              <option value="" disabled selected>نوع التعليم</option>
+              <option :value="StudentCategoryEnum.base">اساسى</option>
+              <option :value="StudentCategoryEnum.university">جامعى</option>
+              <option :value="StudentCategoryEnum.general">عام</option>
             </select>
             <student class="login-call-icon" />
           </div>
@@ -227,7 +263,6 @@ watch(
 
 <style scoped>
 
-    
     
 .remember-mee {
   display: flex;

@@ -25,6 +25,20 @@ class ApiNames {
   public forgotPassword = "forgot_password";
   public resetPassword = "verify_code";
   public setNewPassword = "reset_password";
+  
+  //Education Stages
+  public educationstages = "fetch_education_type";
+  public educationlevels = "fetch_stages";
+  
+  
+  //university
+  public university = "fetch_universities";
+  public colleges = "fetch_colleges";
+  public college_department = "fetch_college_departments";
+  public college_department_divisions = "fetch_college_department_divisions";
+  public submit_education_data = "store_education_data";
+
+
 
   //user
   public profile = "profile";

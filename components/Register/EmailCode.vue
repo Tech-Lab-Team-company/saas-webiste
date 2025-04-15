@@ -106,7 +106,10 @@ const CheckCode = ()=>{
   color: #0752ac !important;
   text-align: center;
 }
+.pass-forgit{
 
+  background-image: url(../../public//images/background.png);
+}
 .login-container .login-form .btns.btns-home button {
   display: flex;
   justify-content: space-between;
