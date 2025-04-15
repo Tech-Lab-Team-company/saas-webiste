@@ -1,5 +1,5 @@
 import type Params from '~/base/core/Params/params'
-import type UserModel from '~/features/RegisterFeature/Data/models/user_model'
+import UserModel from '~/features/LoginFeature/Data/models/user_model'
 import type UseCase from '~/base/Domain/UseCase/use_case'
 import type { DataState } from '~/base/core/networkStructure/Resources/dataState/data_state'
 import { RegisterRepo } from '~/features/RegisterFeature/Domain/repositories/register_repo'

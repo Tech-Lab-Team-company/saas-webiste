@@ -6,7 +6,7 @@
 
 .container{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     margin-left: auto;
     margin-right: auto;
@@ -27,12 +27,12 @@
         transition: all 0.3 linear;
 
         @keyframes fadein {
-                from{
-                    left: -700px;
-                }
-                to{
-                    left: 0px;
-                }
+            from{
+                left: -700px;
+            }
+            to{
+                left: 0px;
+            }
         }
 
         .background{

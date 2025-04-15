@@ -43,11 +43,11 @@ export default class VerifyCodeController extends ControllerInterface<UserModel>
 
           await router.push("/Auth/education");
         }
-        const userStore = useUserStore();
-        if (this.state.value.data) {
-          // console.log(this.state.value.data)
-          userStore.setUser(this.state.value.data);
-        }
+        // const userStore = useUserStore();
+        // if (this.state.value.data) {
+        //   // console.log(this.state.value.data)
+        //   userStore.setUser(this.state.value.data);
+        // }
       } else {
 
         throw new Error(this.state.value.error?.title);

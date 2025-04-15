@@ -11,7 +11,7 @@ export default class UserModel {
   public TeacherId: number;
   public UpdatedAt: string;
   public CreatedAt: string;
-  public Token: string;
+  public apiToken: string;
   public ImageLink: string;
   public CreatedAtFormat: string;
   public IsInfoComplete: number;
@@ -31,7 +31,7 @@ export default class UserModel {
     TeacherId: number,
     UpdatedAt: string,
     CreatedAt: string,
-    Token: string,
+    apiToken: string,
     ImageLink: string,
     CreatedAtFormat: string,
     IsInfoComplete: number,
@@ -52,7 +52,7 @@ export default class UserModel {
     this.TeacherId = TeacherId;
     this.UpdatedAt = UpdatedAt;
     this.CreatedAt = CreatedAt;
-    this.Token = Token;
+    this.apiToken = apiToken;
     this.ImageLink = ImageLink;
     this.CreatedAtFormat = CreatedAtFormat;
     this.IsInfoComplete = IsInfoComplete;
@@ -61,6 +61,7 @@ export default class UserModel {
 
   static fromMap(map: { [key: string]: any }): UserModel {
     return new UserModel(
+      map["id"],
       map["email"],
       map["phone"],
       map["name"],
@@ -72,13 +73,11 @@ export default class UserModel {
       map["teacher_id"],
       map["updated_at"],
       map["created_at"],
-      map["id"],
       map["token"],
       map["image_link"],
       map["created_at_format"],
       map["is_info_complete"],
       map["user_information"],
-
     );
   }
 }
