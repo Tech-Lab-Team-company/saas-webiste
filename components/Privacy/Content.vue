@@ -1,40 +1,46 @@
 <script setup lang="ts">
+import type Privacy from "~/types/privacy";
+import { baseUrl } from "~/constant/baseUrl";
+
+const { data: privacy } = await useAsyncData("privacy", async () => {
+  const response = await $fetch<{
+    data: Privacy[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_privacy`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+    },
+  });
+  console.log(response);
+
+  return response.data;
+});
 </script>
 
 <template>
-  <section class="terms-and-conditions" dir="rtl">
+  <section class="privacy-and-conditions" dir="rtl">
     <div class="container">
-      <h1 class="title"> سياسة الخصوصية</h1>
-      <hr>
+      <h1 class="title"> سياسه الخصوصيه </h1>
+      <hr />
 
-      <p class="paragraph">
-        مرحبًا بك في منصتنا. باستخدامك لهذا الموقع، فإنك توافق على الالتزام بالشروط والأحكام التالية. إذا لم تكن
-        توافق على أي من هذه الشروط، نرجو منك عدم استخدام الموقع.
-      </p>
-
-      <p class="paragraph">
-        يُسمح باستخدام هذا الموقع لأغراض قانونية فقط. يجب ألا تستخدم الموقع بأي طريقة قد تضر بالموقع أو تؤثر على
-        توفره أو إمكانية الوصول إليه.
-      </p>
-
-      <p class="paragraph">
-        جميع المحتويات والمواد المعروضة على الموقع (مثل النصوص، الصور، الشعارات، التصميمات) هي ملك خاص ولا يجوز نسخها
-        أو إعادة استخدامها بدون إذن مسبق.
-      </p>
-
-      <p class="paragraph">
-        نحتفظ بالحق في تعديل هذه الشروط في أي وقت. يُرجى مراجعة هذه الصفحة دوريًا للتأكد من علمك بأي تغييرات.
-      </p>
-
-      <p class="paragraph">
-        نحن نحترم خصوصيتك ونلتزم بحماية بياناتك. لمزيد من التفاصيل، يُرجى مراجعة صفحة سياسة الخصوصية.
-      </p>
+      <div v-if="privacy">
+        <div v-for="privite in privacy" :key="privite.id" class="paragraph">
+          <h2>{{ privite.title }}</h2>
+          <p>{{ privite.description }}</p>
+          
+        </div>
+      </div>
+      <div v-else>
+        <p>جاري تحميل الشروط...</p>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.terms-and-conditions {
+.privacy-and-conditions {
   padding: 40px 20px;
   /* background-color: #f9f9f9; */
   font-family: "regular", sans-serif;
@@ -43,7 +49,7 @@
 .container {
   max-width: 1500px;
   margin: 0 auto;
-  background: #F6F6F6;
+  background: #f6f6f6;
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -56,10 +62,9 @@
   text-align: right;
   color: #000;
   font-weight: 500;
-
 }
-hr{
-  border: 1px solid #FF931E;
+hr {
+  border: 1px solid #ff931e;
   margin: 20px 0;
 }
 

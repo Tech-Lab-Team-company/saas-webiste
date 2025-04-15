@@ -212,6 +212,7 @@ const cards = [
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 5px 1px;
 }
 
 .card-name {
@@ -230,7 +231,8 @@ const cards = [
   flex-direction: row-reverse;
   justify-content: space-between;
   align-items: center;
-  margin: 4px 0px;
+  padding: 2px 5px;
+
 }
 
 .card-extra-content p {

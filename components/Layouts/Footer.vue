@@ -43,7 +43,9 @@ import { NuxtLink } from "#components";
         <NuxtLink to="/terms">
           <p>شروط الاستخدام</p>
         </NuxtLink>
-        <p>الاسئله الشائعه</p>
+        <NuxtLink to="/fqs">
+          <p>الاسئله الشائعه</p>
+        </NuxtLink>
         <p>المدونه</p>
       </div>
     </div>
