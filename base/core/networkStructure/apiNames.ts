@@ -9,7 +9,7 @@ class ApiNames {
     return this._instance;
   }
 
-  public baseUrl = "https://statistics.techlabeg.com/api/v1/";
+  public baseUrl = "https://edu.techlabeg.com/api/website/";
 
 
   //auth
@@ -29,6 +29,10 @@ class ApiNames {
   //Education Stages
   public educationstages = "fetch_education_type";
   public educationlevels = "fetch_stages";
+  
+  
+  //Course Details
+  public courseDetails = "course_details";
   
   
   //university

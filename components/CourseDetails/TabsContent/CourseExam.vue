@@ -3,38 +3,31 @@ import Downarrow from '~/public/icons/downarrow.vue';
 import blacknotes from '~/public/icons/blacknotes.vue';
 import clockicon from '~/public/icons/clockicon.vue';
 import calendaricon from '~/public/icons/calendaricon.vue';
+import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 
-    const exams = ref([
-        {
-            title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-            date: '9 -5-2025',
-            time: 'من 2 م  الي  3م',
-            state:'not entered',
-            rate:0,
-        },
-        {
-            title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-            date: '9 -5-2025',
-            time: 'من 2 م  الي  3م',
-            state:'enterd',
-            rate:9,
-        },
-        {
-            title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-            date: '9 -5-2025',
-            time: 'من 2 م  الي  3م',
-            state:'enterd',
-            rate:0,
-        },
-    ])
+
+    const props = defineProps({
+        CourseData: {
+            type: Object as () => CourseDetailsModel | null,
+            default: null
+        }
+    });
+
+    const CardDetails = ref(props.CourseData);
+
+    watch(() => props.CourseData, (newValue) => {
+        CardDetails.value = newValue;
+    }, { immediate: true });
+        
+
 </script>
 
 <template>
-    <div class="course-exam-container" v-for="exam in exams" :key="exam.title">
+    <div class="course-exam-container" v-for="(exam , index) in CardDetails?.Exams" :key="index">
 
 
-        <div v-if="exam.state === 'enterd'" class="exam-rate">
-           <p class="rating" :class="exam.rate < 6 ? 'failed' : ''"> {{ exam.rate }} / 10</p>
+       <div v-if="!exam.isFinished" class="exam-rate">
+           <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
            <p class="details">اعرض تفاصيل الامتحان</p>
         </div>
 
@@ -45,22 +38,23 @@ import calendaricon from '~/public/icons/calendaricon.vue';
 
         <div class="course-exam-content">
             <div class="exam-title">
-                <p>{{ exam.title }}</p>
+                <p>({{ exam?.subject.title }})</p>
+                <span>{{ exam.title }}</span>
                 <blacknotes />
             </div>
 
-            <div class="exam-date-container">
+              <div class="exam-date-container">
                 <div class="exam-title exam-date">
                     <p>{{ exam.date }} </p>
                     <calendaricon class="exam-icon" />
                 </div>
                 <div class="exam-title exam-date">
-                    <p>{{ exam.time }} </p>
+                    <p>{{ String(exam.start_time).slice(11, 20) }} </p>
                     <clockicon class="exam-icon" />
                 </div>
             </div>
 
-        </div>
+        </div> 
 
      
     </div>

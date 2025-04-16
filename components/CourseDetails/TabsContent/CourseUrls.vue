@@ -1,5 +1,19 @@
 <script setup lang="ts">
 import discoverbtnIcon from '~/public/icons/discoverbtnIcon.vue';
+import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+const props = defineProps({
+  CourseData: {
+    type: Object as () => CourseDetailsModel | null,
+    default: null
+  }
+});
+
+const CardDetails = ref(props.CourseData);
+
+watch(() => props.CourseData, (newValue) => {
+    CardDetails.value = newValue;
+}, { immediate: true });
+    
 
 
     const urls = ref([
