@@ -1,1 +1,1 @@
-export const baseUrl = "https://statistics.techlabeg.com/api/v1"
+export const baseUrl = "https://edu.techlabeg.com/api/website";

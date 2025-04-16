@@ -8,9 +8,10 @@ const { data: terms } = await useAsyncData("terms", async () => {
     message: string;
     status: number;
   }>(`${baseUrl}/fetch_terms`, {
-    method: "POST",
+    method: "GET",
     headers: {
       "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
     },
   });
   console.log(response);
@@ -28,7 +29,7 @@ const { data: terms } = await useAsyncData("terms", async () => {
       <div v-if="terms">
         <div v-for="term in terms" :key="term.id" class="paragraph">
           <h2>{{ term.title }}</h2>
-          <p>{{ term.description }}</p>
+          <p>{{ term.id }}</p>
         </div>
       </div>
       <div v-else>
