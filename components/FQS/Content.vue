@@ -7,10 +7,11 @@ const { data: fqs } = await useAsyncData("fqs", async () => {
     data: Fqs[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_fqs`, {
-    method: "POST",
+  }>(`${baseUrl}/fetch_faqs`, {
+    method: "GET",
     headers: {
       "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
     },
   });
   console.log(response);

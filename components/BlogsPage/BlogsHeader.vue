@@ -1,103 +1,69 @@
-<script setup>
-import clock from "~/public/icons/clock.vue";
-import frame from "~/public/icons/frame.vue";
+<script setup lang="ts">
+import type BlogsDetails from "~/types/blogsdetails";
+import { baseUrl } from "~/constant/baseUrl";
 
-const cards = [
-  {
-    title: "رحلة نحو المعرفة والتفوق",
-  },
-];
+const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
+  try {
+    const response = await $fetch<{
+      data: BlogsDetails;
+      message: string;
+      status: number;
+    }>("https://edu.techlabeg.com/api/website/show_blog", {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain": "abouelezz.com",
+      },
+      body: { slug: useRoute().params.slug },
+    });
 
-const cards_one = [
-  {
-    add: " اضيف بواسطه",
-    name: "احمد حوام",
-    icon: frame,
-  },
-  {
-    add_one: "التاريخ",
-    date: "2025-12-1",
-    icon1: clock,
-  },
-];
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("فشل في جلب التدوينة:", err);
+    return null;
+  }
+});
+
 </script>
+
 
 <template>
   <div class="blogs-page-articles-cards" dir="rtl">
-    <div class="blogs-header">
-      <h2
-        class="sidebar-page-articles-card"
-        v-for="(card, index) in cards"
-        :key="index"
-      >
-        {{ card.title }}
-      </h2>
+    <!-- تكرار المدونات باستخدام v-for -->
+    <!-- لم يعد هناك تكرار لأن البيانات كائن واحد -->
+    <div class="blogs-header" v-if="blogdetails">
+      <h2 class="sidebar-page-articles-card">{{ blogdetails.title }}</h2>
       <hr />
       <div class="sidebar-page-articles-card-info">
         <div class="blogs-name">
           <div class="blog-name-icon">
-            <component
-              :is="item.icon"
-              class="sidebar-icon"
-              v-for="(item, index) in cards_one"
-              :key="index"
-            />
-            <p
-              class="sidebar-date"
-              v-for="(item, index) in cards_one"
-              :key="index"
-            >
-              {{ item.add }}
-            </p>
+            <!-- إذا كنت ترغب في إضافة أي أيقونات هنا، يمكنك فعل ذلك -->
+            <!-- <component :is="card.icon" class="sidebar-icon" /> -->
+            <!-- <p class="sidebar-date">{{ card.add }}</p> -->
+            <!-- <p class="sidebar-text">{{ card.name }}</p> -->
           </div>
-
-          <p
-            class="sidebar-text"
-            v-for="(item, index) in cards_one"
-            :key="index"
-          >
-            {{ item.name }}
-          </p>
         </div>
         <div class="blogs-name">
           <div class="blog-name-icon">
-            <component
-              :is="item.icon1"
-              class="sidebar-icon"
-              v-for="(item, index) in cards_one"
-              :key="index"
-            />
-            <p
-              class="sidebar-date"
-              v-for="(item, index) in cards_one"
-              :key="index"
-            >
-              {{ item.add_one }}
-            </p>
+            <!-- إذا كنت ترغب في إضافة المزيد من الأيقونات هنا -->
+            <!-- <component :is="card.icon1" class="sidebar-icon" /> -->
+            <!-- <p class="sidebar-date">{{ card.add_one }}</p> -->
           </div>
-
-          <p
-            class="sidebar-text"
-            v-for="(item, index) in cards_one"
-            :key="index"
-          >
-            {{ item.date }}
-          </p>
+          <p class="sidebar-text">{{ blogdetails.date }}</p>
         </div>
-        
       </div>
-  <BlogsPageBlogsImage />
-  <BlogsPageBlogsButton />
-  <BlogsPageBlogsButtonOne />
-  <BlogsPageBlogsIcon />
-
-
-
-
     </div>
-  </div>
 
+    <!-- الكومنتات مضافة هنا كما طلبت -->
+    <!-- <BlogsPageBlogsImage /> -->
+    <!-- <BlogsPageBlogsButton /> -->
+    <!-- <BlogsPageBlogsButtonOne /> -->
+    <!-- <BlogsPageBlogsIcon /> -->
+  </div>
 </template>
+
+
 
 <style scoped>
 .blogs-page-articles-cards {

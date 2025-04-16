@@ -1,72 +1,61 @@
-<script setup>
-import { NuxtLink } from "#components";
-import Rectangle from "@/assets/images/Rectangle.png";
-import Rectangle2 from "@/assets/images/Rectangle2.png";
-import Rectangle3 from "@/assets/images/Rectangle3.png";
+<script setup lang="ts">
+import type  BlogsCard  from "~/types/blogscard";
+import { baseUrl } from "~/constant/baseUrl";
 
-const cards = [
-  {
-    id: 1,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-  {
-    id: 2,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle2,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-  {
-    id: 3,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle3,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-  {
-    id: 4,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-];
+// Fetch blog data
+const { data: blogscard } = await useAsyncData("blogscard", async () => {
+  try {
+    const response = await $fetch<{
+      data: BlogsCard[];
+      message: string;
+      status: number;
+    }>(`${baseUrl}/fetch_blogs`, {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain":"mrbackend",
+      },
+    });
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Failed to fetch blogs:", err);
+    return [];
+  }
+});
 </script>
-
 <template>
-  <NuxtLink :to="`/blogs/${id}`" class="blogs-page-articles-cards" dir="rtl">
-    <div class="Blog" dir="rtl">
+  <div class="blogs-page-articles-cards" dir="rtl">
+    <div class="Blog">
       <div class="cards-container">
-        <div class="card" v-for="(card, index) in cards" :key="index">
-          <img :src="card.img" alt="Card image" class="course-image" />
+        <NuxtLink
+          v-for="(card, index) in blogscard"
+          :key="index"
+          :to="`/blogs/${card.slug}`"
+          class="card"
+        >
+        <img
+            :src="card.mail_image || ''"
+            :alt="card.attachments?.[0]?.alt || 'Default alt'"
+            class="course-image"
+          />
           <div class="card-body">
             <div class="card-header">
               <hr />
-              <h5 class="card-title">{{ card.title }}</h5>
+              <h5 class="card-title">{{ card.title || 'No Title' }}</h5>
               <div class="card-date">
                 <p>{{ card.date }}</p>
               </div>
             </div>
-            <p class="card-text">{{ card.text }}</p>
+            <p class="card-text">{{ card.description || 'No Description' }}</p>
             <div class="card-footer">
-              <p>{{ card.text2 }}</p>
+              <p>{{ card.subtitle || 'No Subtitle'  }}</p>
             </div>
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </div>
-  </NuxtLink>
+  </div>
 </template>
 
 <style scoped>
@@ -105,7 +94,7 @@ const cards = [
 .card img {
   width: 100%;
   height: 230px;
-  object-fit: cover;
+  /* object-fit: cover; */
   border: 1px solid #ccc;
 }
 
@@ -181,9 +170,27 @@ const cards = [
 }
 
 .course-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border: 1px solid #ccc;
+  /* width: 100%; */
+  /* height: 100%; */
+  /* object-fit: cover; */
+  /* border: 1px solid #ccc; */
 }
 </style>
+<!-- // const cards = [
+//   {
+//     title: "رحلة نحو المعرفة والتفوق",
+//   },
+// ];
+
+// const cards_one = [
+//   {
+//     add: " اضيف بواسطه",
+//     name: "احمد حوام",
+//     icon: frame,
+//   },
+//   {
+//     add_one: "التاريخ",
+//     date: "2025-12-1",
+//     icon1: clock,
+//   },
+// ]; -->

@@ -96,7 +96,7 @@ class ApiNames {
 
 
   public addClaim = "add_claim";
-  public addRate = "add_rate";
+  public    addRate = "add_rate";
   public contactUs = "contact_us";
 
   // chats
@@ -112,6 +112,11 @@ class ApiNames {
 
   // fqs
   public fetch_fqs = "fetch_fqs";
+
+  // blogs card
+  public fetch_blogs = "fetch_blogs";
+
+  public show_blog = "show_blog";
 }
 
 export { ApiNames };

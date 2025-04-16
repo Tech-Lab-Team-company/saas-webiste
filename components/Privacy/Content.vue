@@ -8,9 +8,10 @@ const { data: privacy } = await useAsyncData("privacy", async () => {
     message: string;
     status: number;
   }>(`${baseUrl}/fetch_privacy`, {
-    method: "POST",
+    method: "GET",
     headers: {
       "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
     },
   });
   console.log(response);
@@ -28,7 +29,7 @@ const { data: privacy } = await useAsyncData("privacy", async () => {
       <div v-if="privacy">
         <div v-for="privite in privacy" :key="privite.id" class="paragraph">
           <h2>{{ privite.title }}</h2>
-          <p>{{ privite.description }}</p>
+          <p>{{ privite.text }}</p>
           
         </div>
       </div>
@@ -68,7 +69,7 @@ hr {
   margin: 20px 0;
 }
 
-.paragraph {
+.paragraph  {
   font-size: 18px;
   line-height: 1;
   margin-bottom: 15px;
