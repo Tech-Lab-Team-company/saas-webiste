@@ -1,10 +1,25 @@
 <script setup lang="ts">
 
+import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+    const props = defineProps({
+    CourseData: {
+        type: Object as () => CourseDetailsModel | null,
+        default: null
+    }
+    });
+
+    const CardDetails = ref(props.CourseData);
+
+    watch(() => props.CourseData, (newValue) => {
+        CardDetails.value = newValue;
+    }, { immediate: true });
+
 </script>
 
 
 <template>
     <div class="course-video-container">
+        <!-- <video :src="CardDetails?.sessions[0].link"></video> -->
         <img src="../../public/images/vides.png" alt="video">
     </div>
 
