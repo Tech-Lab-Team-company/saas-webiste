@@ -3,6 +3,20 @@ import Downarrow from '~/public/icons/downarrow.vue';
 import blacknotes from '~/public/icons/blacknotes.vue';
 import clockicon from '~/public/icons/clockicon.vue';
 import calendaricon from '~/public/icons/calendaricon.vue';
+import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+const props = defineProps({
+  CourseData: {
+    type: Object as () => CourseDetailsModel | null,
+    default: null
+  }
+});
+
+const CardDetails = ref(props.CourseData);
+
+watch(() => props.CourseData, (newValue) => {
+    CardDetails.value = newValue;
+}, { immediate: true });
+    
 
     const homeworks = ref([
         {

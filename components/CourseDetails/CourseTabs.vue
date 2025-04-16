@@ -1,16 +1,47 @@
 <script setup lang="ts">    
     import RightDots from '~/public/icons/RightDots.vue';
     import { ref } from 'vue';
-import ContentIcon from '~/public/icons/contentIcon.vue';
-import examsicon from '~/public/icons/examsicon.vue';
-import exterinalurls from '~/public/icons/exterinalurls.vue';
-import wifiIcon from '~/public/icons/wifiIcon.vue';
-import homeworkicon from '~/public/icons/homeworkicon.vue';
+    import ContentIcon from '~/public/icons/contentIcon.vue';
+    import examsicon from '~/public/icons/examsicon.vue';
+    import exterinalurls from '~/public/icons/exterinalurls.vue';
+    import wifiIcon from '~/public/icons/wifiIcon.vue';
+    import homeworkicon from '~/public/icons/homeworkicon.vue';
+    import CourseDetailsParams from '~/features/FetchCourseDetails/Core/Params/course_details_params';
+    import CourseDetailsController from '~/features/FetchCourseDetails/presentation/controllers/course_details_controller';
+    import type CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 
     const value = ref('0');
-
+    const route = useRoute()
     const tab_value = ref('content');
     const activetab = ref(1);
+    // const id = ref<string>(<string>route.params.id)
+
+    const CardData = ref<CourseDetailsModel| null>(null);
+
+
+    const FetchCourseDetails = async ()=>{
+        const courseDetailsParams = new CourseDetailsParams("522");
+        const courseDetailsController = CourseDetailsController.getInstance();
+        const state = await courseDetailsController.FetchCourseDetails(courseDetailsParams);
+    
+        if(state.value.data){
+            CardData.value = state.value.data
+        }
+        
+        console.log(CardData.value)
+    }
+    
+    
+    onMounted(()=>{
+        FetchCourseDetails();
+    })
+
+
+
+
+
+
+  
 
 </script>
 
@@ -19,11 +50,17 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
     
 
     <div v-if="activetab==0">
-        <CourseDetailsCourseVideo />
+        <CourseDetailsCourseVideo 
+            :CourseData="CardData"
+        />
     </div>
 
     <div v-if="activetab!=0">
-       <CourseDetailsCourseCard />
+       <CourseDetailsCourseCard 
+       :CourseData="CardData"
+       />
+       
+       <!-- :CardDetails="CardData" -->
     </div>
 
     <div class="course-tabs">
@@ -62,20 +99,30 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
 
             <div class="tabs-content">
                 <div v-if="tab_value === 'homework'">
-                    <CourseDetailsTabsContentCourseHomework />
+                    <CourseDetailsTabsContentCourseHomework 
+                        :CourseData="CardData"
+                    />
                 </div>
                 <div v-if="tab_value === 'content'">
                     <CourseDetailsTabsContentCourseContent
-                            @coursechanged="activetab=$event" />
+                            @coursechanged="activetab=$event" 
+                            :CourseData="CardData"
+                            />
                 </div>
                 <div v-if="tab_value === 'urls'">
-                    <CourseDetailsTabsContentCourseUrls />
+                    <CourseDetailsTabsContentCourseUrls 
+                        :CourseData="CardData"
+                    />
                 </div>
                 <div v-if="tab_value === 'live'">
-                    <CourseDetailsTabsContentCourseLive />
+                    <CourseDetailsTabsContentCourseLive 
+                        :CourseData="CardData"
+                    />
                 </div>
                 <div v-if="tab_value === 'exams'">
-                    <CourseDetailsTabsContentCourseExam />
+                    <CourseDetailsTabsContentCourseExam 
+                        :CourseData="CardData"
+                    />
                 </div>
             </div>
 

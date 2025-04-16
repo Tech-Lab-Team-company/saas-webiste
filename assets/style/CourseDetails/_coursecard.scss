@@ -27,7 +27,8 @@
                 position: absolute;
                 left: 50%;
                 top: 100%;
-                transform: translateX(-50%);
+                transform: translate(-50% , -50%);
+
             }
 
             .card-text-subject-title{
@@ -127,8 +128,10 @@
         border-radius: 20px;
         height: 250px;
 
-        video{
-            
+        img{
+            width: 180px;
+            margin-left: auto;
+            margin-right: auto;
         }
     }
 
