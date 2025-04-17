@@ -1,54 +1,54 @@
-<script setup>
-import pic from "@/assets/images/pic.png";
+<script setup lang="ts">
+import type LatestArticles from "~/types/latestarticles";
+import { baseUrl } from "~/constant/baseUrl";
 
-const cards = [
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
+const { data: latestarticles } = await useAsyncData("latestarticles", async () => {
+  try {
+    const response = await $fetch<{
+      data: LatestArticles[];
+      message: string;
+      status: number;
+    }>("https://edu.techlabeg.com/api/dashboard/fetch_latest_blogs", {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain": "abouelezz.com",
+      },
+    });
 
-  },
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
- 
-  },
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
-
-  },
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
-
-  },
-];
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("فشل في جلب التدوينة:", err);
+    return null;
+  }
+});
 </script>
 
 <template>
-     <!-- sidebar -->
-     <div class="sidebar-articles" dir="rtl">
-          <h2 class="sidebar-title">آخر المقالات</h2>
-          <div
-            class="sidebar-page-articles-card"
-            v-for="(card, index) in cards"
-            :key="index"
-          >
-            <div class="sidebar-page-articles-card-img">
-              <img :src="card.img" :alt="card.text" />
-            </div>
-            <div class="sidebar-page-articles-card-info">
-              <p class="sidebar-date">{{ card.date }}</p>
-              <h3 class="sidebar-text">{{ card.text }}</h3>
-            </div>
-          </div>
-
-        </div>
-        <!-- end sidebar -->
+  <!-- sidebar -->
+  <div class="sidebar-articles" dir="rtl" v-if="latestarticles && latestarticles.length">
+    <h2 class="sidebar-title">آخر المقالات</h2>
+    <NuxtLink
+      :to="`/blogs/${article.slug}`"
+      class="sidebar-page-articles-card"
+      v-for="(article, index) in latestarticles.slice(0, 4)"
+      :key="index"
+    >
+      <div class="sidebar-page-articles-card-img">
+        <img
+            :src="article.mail_image || ''"
+            :alt="article.attachments?.[0]?.alt || 'Default alt'"
+            class="course-image"
+          />
+      </div>
+      <div class="sidebar-page-articles-card-info">
+        <p class="sidebar-date">{{ article.date }}</p>
+        <h3 class="sidebar-text">{{ article.title }}</h3>
+      </div>
+    </NuxtLink>
+  </div>
+  <!-- end sidebar -->
 </template>
 <style scoped>
 
@@ -67,12 +67,13 @@ const cards = [
   gap: 15px;
   margin-top: 20px;
 }
-
+.sidebar-page-articles-card-img{
+  width: 50%;
+}
 .sidebar-page-articles-card-img img {
-  width: 400px;
-  height: 100px;
+  width: 100%;
+  height: 80%;
   border-radius: 5px;
-  object-fit: cover;
 }
 .sidebar-date {
   font-family: "regular";
@@ -84,7 +85,7 @@ const cards = [
 .sidebar-text {
   font-family: "medium";
   font-weight: 400;
-  font-size: 16px;
+  font-size: 20px;
   text-align: right;
   color: #000000;
 }

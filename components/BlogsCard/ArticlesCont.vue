@@ -1,5 +1,5 @@
 <script setup>
-import { BlogsPageBlogsImage } from "#components";
+import { BlogsCardBlogsHashtag, BlogsPageBlogsImage } from "#components";
 import pic from "@/assets/images/pic.png";
 
 </script>
@@ -8,7 +8,7 @@ import pic from "@/assets/images/pic.png";
   <div class="blogs-page-articles">
     <div class="container">
       <div class="grid-container">
-        <BlogsCardBlogsHeader />
+        <BlogsCardBlogsHashtag />
         <BlogsPageSidebar />
 
       </div>

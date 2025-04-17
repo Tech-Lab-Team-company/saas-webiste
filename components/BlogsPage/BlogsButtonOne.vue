@@ -1,58 +1,51 @@
-<script setup>
-const cards = [
-  {
-    id: 1,
-    btn: "تعليم",
-  },
-  {
-    id: 2,
-    btn: "تصميم",
-  },
-  {
-    id: 3,
-    btn: "برمجه",
-  },
-  {
-    id: 4,
-    btn: "تصميم",
-  },
-  {
-    id: 5,
-    btn: "تعليم",
-  },
-  {
-    id: 6,
-    btn: "تصميم",
-  },
-  {
-    id: 7,
-    btn: "برمجه",
-  },
-  {
-    id: 8,
-    btn: "تصميم",
-  },
-];
+<script setup lang="ts">
+import type BlogsDetails from "~/types/blogsdetails";
+import { baseUrl } from "~/constant/baseUrl";
+
+const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
+  try {
+    const response = await $fetch<{
+      data: BlogsDetails;
+      message: string;
+      status: number;
+    }>("https://edu.techlabeg.com/api/website/show_blog", {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain": "abouelezz.com",
+      },
+      body: { slug: useRoute().params.slug },
+    });
+
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("فشل في جلب التدوينة:", err);
+    return null;
+  }
+});
 </script>
 
 <template>
   <!-- sidebarone -->
-  <div class="sidebarone-buttons" dir="rtl">
+  <div class="sidebarone-buttons" dir="rtl" v-if="blogdetails?.hashtags?.length">
     <div class="sidebarone-page-articles-buttons pt-lg">
       <h2 class="sidebarone-title">الموسوعة</h2>
       <div class="sidebarone-page-buttons gap-md pt-md">
         <button
-          v-for="(item, index) in cards"
-          :key="'btn-' + index"
+          v-for="tag in blogdetails.hashtags"
+          :key="'btn-' + tag.id"
           class="sidebarone-button"
         >
-          {{ item.btn }}
+          {{ tag.title }}
         </button>
       </div>
     </div>
   </div>
   <!-- end sidebarone -->
 </template>
+
+
 <style scoped>
 /* sidebarone-button style */
 .sidebarone-title {
