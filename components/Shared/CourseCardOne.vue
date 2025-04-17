@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 
@@ -6,6 +6,36 @@ import arabic from "@/assets/images/arabic.png";
 import arabic_two from "@/assets/images/arabic_two.png";
 import arabic_three from "@/assets/images/arabic_three.png";
 import user from "@/public/icons/user.vue";
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from "~/types/home_first_section";
+
+const { data: homesecondsection } = await useAsyncData("homesecondsection", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: 1,
+    },
+  });
+  console.log(response);
+
+  return response.data;
+});
+
+
+
+
+
+
+
+
 
 const cards = [
   {
@@ -45,6 +75,8 @@ const splideOptions = {
   arrows: true,
   drag: false,
 };
+
+
 </script>
 
 <template>

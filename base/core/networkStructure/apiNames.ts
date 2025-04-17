@@ -41,6 +41,10 @@ class ApiNames {
   public college_department = "fetch_college_departments";
   public college_department_divisions = "fetch_college_department_divisions";
   public submit_education_data = "store_education_data";
+  
+  // Exams
+  public examDetails = "fetch_exam_details";
+  public submit_question_answer = "submit_exam_question";
 
 
 
