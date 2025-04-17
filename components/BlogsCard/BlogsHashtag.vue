@@ -15,7 +15,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
         "Accept-Language": "ar",
         "web-domain":"mrbackend",
       },
-      body: { h: useRoute().params.hashtagId },
+      body: { hashtag: useRoute().params.hashtagId },
     });
     console.log(response);
     return response.data;

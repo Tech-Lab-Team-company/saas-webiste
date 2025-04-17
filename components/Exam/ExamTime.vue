@@ -1,8 +1,28 @@
-<!-- <script setup lang="ts">
-    import clockicon from '~/public/icons/clockicon.vue';
+<script setup lang="ts">
+    import ExamDetailsParams from '~/features/FetchExams/Core/Params/exam_details_params';
+import { QuestionTypeEnum } from '~/features/FetchExams/Core/questoin_type_enum';
+import type ExamDetailsModel from '~/features/FetchExams/Data/models/exam_details_model';
+import ExamDetailsController from '~/features/FetchExams/presentation/controllers/exam_details_controller';
+import clockicon from '~/public/icons/clockicon.vue';
     import progressIcon from '~/public/icons/progressIcon.vue';
 
     const questionIndex=ref(0);
+
+    const ExamDetails = ref<ExamDetailsModel | null>(null)
+    const FetchExamQuestions = async ()=>{
+        const ExamParams = new ExamDetailsParams("217");
+        const examDetailsController = ExamDetailsController.getInstance();
+        const state = await examDetailsController.FetchExamDetails(ExamParams);
+
+        if( state.value.data){
+            ExamDetails.value = state.value.data;
+        }
+
+    }
+
+    onMounted(()=>{
+        FetchExamQuestions();
+    })
 
 
 </script>
@@ -39,22 +59,35 @@
         </div>
     </div>
 
-     <ExamQuestionsText 
+    <!-- it shiuld be mcq  -->
+    <div v-if="ExamDetails?.examType == QuestionTypeEnum.true_false">
+      <ExamQuestionsText 
+        :QuestionDetails ="ExamDetails"
         @SendAnswerIndex ="questionIndex = $event"/>
+    </div>
 
-    <ExamQuestionsAudio 
-        @SendAnswerIndex ="questionIndex = $event"/>
-   <ExamQuestionImage 
-    @SendAnswerIndex ="questionIndex = $event"/> 
+    <!-- <div v-if="ExamDetails?.examType ==QuestionTypeEnum.mcq">
+      <ExamQuestionsAudio 
+      @SendAnswerIndex ="questionIndex = $event"/>
+    </div>
 
-    <ExamQuetionChoose 
-        @SendAnswerIndex ="questionIndex = $event"/> 
+    <div v-if="ExamDetails?.examType == QuestionTypeEnum.mcq">
+      <ExamQuestionImage 
+      @SendAnswerIndex ="questionIndex = $event"/> 
+    </div>
 
-        <ExamQuestionComplete 
-        @SendAnswerIndex ="questionIndex = $event"/>
+    <div v-if="ExamDetails?.examType == QuestionTypeEnum.mcq">
+      <ExamQuetionChoose 
+      @SendAnswerIndex ="questionIndex = $event"/> 
+    </div>
+    <div v-if="ExamDetails?.examType == QuestionTypeEnum.article">
+      <ExamQuestionComplete 
+      @SendAnswerIndex ="questionIndex = $event"/>
+    </div> -->
 
-</template> -->
-<script setup lang="ts">
+
+</template>
+<!-- <script setup lang="ts">
 import { ref } from 'vue'
 
 const questionIndex = ref<number | null>(null)
@@ -114,7 +147,7 @@ const nextQuestion = () => {
     <ExamQuestionComplete
       v-if="questions[currentQuestionIndex].type === 'complete'"
       @SendAnswerIndex="handleAnswer"
-    />
+    /> -->
 
     <!-- <div class="mt-4 flex justify-between">
       <button 
@@ -133,8 +166,8 @@ const nextQuestion = () => {
         التالي
       </button>
     </div> -->
-  </div>
-</template>
+  <!-- </div>
+</template> -->
 
 <style scoped lang="scss">
 

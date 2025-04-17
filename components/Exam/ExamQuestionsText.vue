@@ -1,87 +1,27 @@
 <script setup lang="ts">
     import RightArrowIcon from '~/public/icons/RightArrowIcon.vue';
     import LeftArrowIcon from '~/public/icons/LeftArrowIcon.vue';
+    import type ExamDetailsModel from '~/features/FetchExams/Data/models/exam_details_model';
+    import QuestionAnswerController from '~/features/SubmitQuestionAnswer/presentation/controllers/submit_question_answer_controller';
+    import QuestionAnswerParams from '~/features/SubmitQuestionAnswer/Core/Params/submit_question_answer_params';
 
     const SelectedAnswer = ref<string[]>([]);
     const QuestionIndex = ref(0);
 
-    const questions = ref([
-        {
-            questionNumber : 'السؤال الاول',
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-        {
-            questionNumber : 'السؤال الثانى',
-            img:'../../public/images/background.png' ,
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-        {
-            questionNumber : 'السؤال الثانى',
-            img:'../../public/images/background.png' ,
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-        {
-            questionNumber : 'السؤال الثانى',
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-        {
-            questionNumber : 'السؤال الثانى',
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-        {
-            questionNumber : 'السؤال الثانى',
-            aduio:'ad',
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-        {
-            questionNumber : 'السؤال الثانى',
-            aduio:'ad',
-            questionText : 'اي من الجمل التالية تحتوي على خبر انّ؟',
-            answers : [
-                '(1) انّ الطُلابَ مجتهدون',
-                '(2) انّ في الحديقةِ شجرةً',
-                '(3) انّ في الحديقةِ شجرةً',
-                '(4) انّ في الحديقةِ شجرةً',
-            ]
-        },
-    ])
+  
 
+    const props = defineProps({
+        QuestionDetails: {
+            type: Object as () => ExamDetailsModel | null,
+            default: null
+        }
+    });
+
+    const questionDetails = ref(props.QuestionDetails);
+
+    watch(() => props.QuestionDetails, (newValue) => {
+        questionDetails.value = newValue;
+    }, { immediate: true });
 
     const emit = defineEmits(['SendAnswerIndex'])
     const SendEmit =()=>{
@@ -89,19 +29,38 @@
     }
 
     const selected = ref([])
+ 
+
+    const sendData= async() =>{
+        console.log(selected.value[QuestionIndex.value]  )
+        const questionAnswerParams = new QuestionAnswerParams(
+            questionDetails?.value?.id , 
+            questionDetails?.value?.questions[QuestionIndex.value]?.id, 
+            selected.value[QuestionIndex.value]  
+        );
+        const questionAnswerController = QuestionAnswerController.getInstance()
+        const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams);
+    }
+
+    
+    
+    
     const IncreaseIndex = ()=>{
-        
+
+        sendData();
         if(selected.value[QuestionIndex.value] == undefined){
             return;
         }
 
-        else if(QuestionIndex.value < questions.value.length - 1){
+        else if(QuestionIndex.value < (questionDetails.value?.questions?.length ?? 0) - 1){
             QuestionIndex.value++
         }
 
+  
         SendEmit();
     }
-
+    
+    
     const DeacreseIndes =()=>{
         if(QuestionIndex.value > 0 ){
             if(QuestionIndex.value > -1 ){
@@ -112,40 +71,23 @@
         SendEmit();
     }
 
-
 </script>
 
 <template>
     <div class="question-container">
 
         <div class="question-title">
-            <p class="question-number">{{ questions[QuestionIndex].questionNumber }}</p>
-            <img v-if="questions[QuestionIndex].img" :src="questions[QuestionIndex].img" alt="image">
-            <!-- <img class="aduio-image" v-if="questions[QuestionIndex].aduio" src="../../public/images/Aduio.png" alt="image"> -->
-            <!-- <audio v-if="questions[QuestionIndex].aduio" controls >
-                <source src="../../public/Aduio/aduio.mp3" type="audio/mpeg">
-            </audio> -->
-            <p class="question-text"> {{ questions[QuestionIndex].questionText }}</p>
+            <p class="question-number">{{ `السؤال ${QuestionIndex +1}`}}</p>
+            
+            <img v-if="questionDetails?.questions[QuestionIndex].image" :src="questionDetails?.questions[QuestionIndex].image" alt="image">
+      
+            <p class="question-text" v-html="questionDetails?.questions[QuestionIndex].question"> </p>
         </div>
-        
         <form >
             <div class="questions">
-                <div class="question">
-                    
-                    <label for="answer1" @click="SelectedAnswer[QuestionIndex] = 'answer1'" :class="SelectedAnswer[QuestionIndex] == 'answer1' ?`selected` :``">{{ questions[QuestionIndex].answers[0] }}</label>
-                    <input  class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer1" name="answer" id="answer1" >
-                </div>
-                <div class="question">
-                    <label for="answer2"  @click="SelectedAnswer[QuestionIndex] = 'answer2'" :class="SelectedAnswer[QuestionIndex] == 'answer2' ?`selected` :``">{{ questions[QuestionIndex].answers[1] }}</label>
-                    <input class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer2" name="answer" id="answer2">
-                </div>
-                <div class="question">
-                    <label for="answer3"  @click="SelectedAnswer[QuestionIndex] = 'answer3'" :class="SelectedAnswer[QuestionIndex] == 'answer3' ?`selected` :``">{{ questions[QuestionIndex].answers[2] }}</label>
-                    <input class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer3" name="answer" id="answer3">
-                </div>
-                <div class="question">
-                    <label for="answer4" @click="SelectedAnswer[QuestionIndex] = 'answer4'" :class="SelectedAnswer[QuestionIndex] == 'answer4' ?`selected` :``">{{ questions[QuestionIndex].answers[3] }}</label>
-                    <input class="answer" v-model="selected[QuestionIndex]" type="radio" value="answer4" name="answer" id="answer4" >
+                <div class="question" v-for="(answer, index) in questionDetails?.questions[QuestionIndex].answers" :key="index">
+                    <label :for="`answer-${answer.id}`" @click="SelectedAnswer[QuestionIndex] = `${answer.id}`" :class="SelectedAnswer[QuestionIndex] == `${answer.id}` ?`selected` :``" v-html="answer?.answer"></label>
+                    <input  class="answer" v-model="selected[QuestionIndex]" type="radio" :value="answer.id" name="answer" :id="`answer-${answer.id}`" >
                 </div>
             </div>
         </form>

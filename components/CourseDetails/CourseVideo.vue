@@ -2,16 +2,25 @@
 
 import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
     const props = defineProps({
-    CourseData: {
-        type: Object as () => CourseDetailsModel | null,
-        default: null
-    }
+        CourseData: {
+            type: Object as () => CourseDetailsModel | null,
+            default: null
+        },
+        CourseVideoLink:{
+            type: String,
+            default: ''
+        }
     });
 
     const CardDetails = ref(props.CourseData);
+    const CourseVideoLink = ref(props.CourseVideoLink);
 
     watch(() => props.CourseData, (newValue) => {
         CardDetails.value = newValue;
+    }, { immediate: true });
+
+    watch(() => props.CourseVideoLink, (newValue) => {
+        CourseVideoLink.value = newValue;
     }, { immediate: true });
 
 </script>
@@ -20,9 +29,15 @@ import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course
 <template>
     <div class="course-video-container">
         <!-- <video :src="CardDetails?.sessions[0].link"></video> -->
-        <img src="../../public/images/vides.png" alt="video">
+        <!-- <img src="../../public/images/vides.png" alt="video"> -->
+         <!-- <video :src="CourseVideoLink"></video> -->
+         <video controls class="course-video" width="100%" height="80%">
+            <source :src="CourseVideoLink" type="video/mp4">
+            <source :src="CourseVideoLink" type="video/webm">
+            
+         </video>
+      
     </div>
-
     <div class="course-video-text">
         <p class="course-video-text-title">شرح اساسيات النحو</p>
         <hr />
