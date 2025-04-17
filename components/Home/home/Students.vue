@@ -3,22 +3,45 @@ import StagesTitle from './StagesTitle.vue'
 import { register } from 'swiper/element/bundle'
 import 'swiper/css'
 import banner from '../../Global/banner.vue'
+import type Terms from "~/types/terms";
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from '~/types/home_first_section';
 
 const containerRef = ref(null)
 
-// Register Swiper web component
-// onMounted(() => {
-//   register()
-// })
+
+const { data: homefirstsection } = await useAsyncData("homefirstsection", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[]; 
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body:{
+        type:4
+
+    }
+
+  });
+//   console.log(response);
+
+  return response.data;
+});
+
 </script>
 
 <template>
     <div class="stage-container">
         <div class="stages student-stages">
+            
             <StagesTitle 
                 :maintitle="`اوائل الطلبه`"  
-                :title="`احجز مكانك بين المتفوقين`"
-                :subtitle="`هنا نحتفل بإنجازات الطلاب المتفوقين الذين أثبتوا جدارتهم واجتهادهم  شاهد صور الأوائل ، واستلهم نجاحك القادم…`"
+                :title="homefirstsection[0]?.title"
+                :subtitle="homefirstsection[0]?.subtitle"
                 />
         </div>
     </div>
@@ -42,30 +65,9 @@ const containerRef = ref(null)
                 :free-mode-momentum="false"
 
             >
-                <swiper-slide>
-                    <img src="../../../public/images/person1.png" alt="student 1">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person2.png" alt="student 2">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person3.jpg" alt="student 3">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person4.jpg" alt="student 4">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person1.png" alt="student 1">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person2.png" alt="student 2">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person3.jpg" alt="student 3">
-                </swiper-slide>
-                <swiper-slide>
-                    <img src="../../../public/images/person4.jpg" alt="student 4">
-                </swiper-slide>
+            <swiper-slide v-for="item in 8" >
+                <img :src="homefirstsection[0]?.media[0].file" :alt="homefirstsection[0]?.media[0].alt">
+            </swiper-slide>
             </swiper-container>
         </ClientOnly>
     </div>

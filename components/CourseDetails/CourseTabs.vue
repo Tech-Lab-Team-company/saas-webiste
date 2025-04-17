@@ -13,7 +13,9 @@
     const value = ref('0');
     const route = useRoute()
     const tab_value = ref('content');
-    const activetab = ref(1);
+    const activetab = ref({});
+    const videoLink = ref('')
+    
     // const id = ref<string>(<string>route.params.id)
 
     const CardData = ref<CourseDetailsModel| null>(null);
@@ -38,6 +40,11 @@
 
 
 
+    const Data = (data: { activetabvalue: number , link:string })=>{
+        console.log(data)
+        activetab.value = data.activetabvalue;
+        videoLink.value= data.link;        
+    }
 
 
 
@@ -52,6 +59,7 @@
     <div v-if="activetab==0">
         <CourseDetailsCourseVideo 
             :CourseData="CardData"
+            :CourseVideoLink="videoLink"
         />
     </div>
 
@@ -105,7 +113,7 @@
                 </div>
                 <div v-if="tab_value === 'content'">
                     <CourseDetailsTabsContentCourseContent
-                            @coursechanged="activetab=$event" 
+                            @coursechanged="Data" 
                             :CourseData="CardData"
                             />
                 </div>
