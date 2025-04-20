@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 
@@ -7,6 +7,34 @@ import img2 from "@/assets/images/img2.png";
 import img3 from "@/assets/images/img3.png";
 import img4 from "@/assets/images/img4.png";
 import img5 from "@/assets/images/img5.png";
+
+
+
+
+
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from '~/types/home_first_section';
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+
+const { data: studentopinionssection } = await useAsyncData("studentopinionssection", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.StudentOpinions,
+    },
+  });
+
+  return response.data;
+});
+
 
 const cards = [
   {
@@ -68,8 +96,8 @@ const splideOptions = {
       </p>
 
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in cards" :key="index">
-          <img :src="card.img" :alt="card.alt" class="slider-image" />
+        <SplideSlide v-for="(card, index) in studentopinionssection[0].media" :key="index">
+          <img :src="card.file" :alt="card.alt" class="slider-image" />
         </SplideSlide>
       </Splide>
     </div>

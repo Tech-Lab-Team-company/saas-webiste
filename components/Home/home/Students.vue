@@ -6,6 +6,7 @@ import banner from '../../Global/banner.vue'
 import type Terms from "~/types/terms";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
+import { SectionTypeEnum } from './enum/section_type_enum';
 
 const containerRef = ref(null)
 
@@ -22,7 +23,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
       "web-domain":"abouelezz.com",
     },
     body:{
-        type:4
+        type:SectionTypeEnum.TopStudents
 
     }
 
@@ -40,8 +41,8 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
             
             <StagesTitle 
                 :maintitle="`اوائل الطلبه`"  
-                :title="homefirstsection[0]?.title"
-                :subtitle="homefirstsection[0]?.subtitle"
+                :title="homefirstsection?.[0]?.title"
+                :subtitle="homefirstsection?.[0]?.subtitle"
                 />
         </div>
     </div>
@@ -65,8 +66,11 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                 :free-mode-momentum="false"
 
             >
-            <swiper-slide v-for="item in 8" >
-                <img :src="homefirstsection[0]?.media[0].file" :alt="homefirstsection[0]?.media[0].alt">
+            <swiper-slide v-for="image in homefirstsection[0].media" >
+                <img :src="image.file" :alt="image.alt">
+            </swiper-slide>
+            <swiper-slide v-for="image in homefirstsection[0].media" >
+                <img :src="image.file" :alt="image.alt">
             </swiper-slide>
             </swiper-container>
         </ClientOnly>

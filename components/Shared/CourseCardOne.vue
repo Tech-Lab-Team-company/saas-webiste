@@ -8,6 +8,7 @@ import arabic_three from "@/assets/images/arabic_three.png";
 import user from "@/public/icons/user.vue";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
 const { data: homesecondsection } = await useAsyncData("homesecondsection", async () => {
   const response = await $fetch<{
@@ -21,7 +22,7 @@ const { data: homesecondsection } = await useAsyncData("homesecondsection", asyn
       "web-domain":"abouelezz.com",
     },
     body: {
-      type: 1,
+      type: SectionTypeEnum.Course,
     },
   });
   console.log(response);
@@ -82,26 +83,26 @@ const splideOptions = {
 <template>
   <div class="card-course-one">
     <div class="slider-wrapper">
-      <h3 class="slider-heading">مراجعة اللغة العربية</h3>
+      <h3 class="slider-heading">{{homesecondsection[0].title}}</h3>
 
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in cards" :key="index">
+        <SplideSlide v-for="(course, index) in homesecondsection[0].courses" :key="index">
           <NuxtLink :to="`/course/${card.id}`" class="card">
             <div class="image-wrapper">
-              <img :src="card.img" alt="Card image" class="course-image" />
+              <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
               <div class="card-overlay-content">
-                <p class="card-number">{{ card.number }}</p>
+                <p class="card-number">{{ course.course_price }}</p>
               </div>
             </div>
             <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-text">{{ card.text }}</p>
-              <div class="card-footer">
+              <h5 class="card-title">{{ course.title }}</h5>
+              <p class="card-text">{{ card.description }}</p>
+              <!-- <div class="card-footer">
                 <span class="card-icon flex">
                   <component :is="card.icon" />
                 </span>
                 <span class="card-name">{{ card.name }}</span>
-              </div>
+              </div> -->
             </div>
           </NuxtLink>
         </SplideSlide>
@@ -165,3 +166,32 @@ const splideOptions = {
 
 
 </style>
+<!-- 
+<div class="card-course-one">
+  <div class="slider-wrapper">
+    <h3 class="slider-heading">مراجعة اللغة العربية</h3>
+
+    <Splide :options="splideOptions" class="splide-container">
+      <SplideSlide v-for="(card, index) in cards" :key="index">
+        <NuxtLink :to="`/course/${card.id}`" class="card">
+          <div class="image-wrapper">
+            <img :src="card.img" alt="Card image" class="course-image" />
+            <div class="card-overlay-content">
+              <p class="card-number">{{ card.number }}</p>
+            </div>
+          </div>
+          <div class="card-body" dir="rtl">
+            <h5 class="card-title">{{ card.title }}</h5>
+            <p class="card-text">{{ card.text }}</p>
+            <div class="card-footer">
+              <span class="card-icon flex">
+                <component :is="card.icon" />
+              </span>
+              <span class="card-name">{{ card.name }}</span>
+            </div>
+          </div>
+        </NuxtLink>
+      </SplideSlide>
+    </Splide>
+  </div>
+</div> -->

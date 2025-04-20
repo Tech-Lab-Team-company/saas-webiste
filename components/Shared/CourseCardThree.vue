@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import book from "@/assets/images/book.png";
@@ -7,6 +7,34 @@ import microphone from "@/public/icons/microphone.vue";
 import user from "@/public/icons/user.vue";
 import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
+
+
+
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from "~/types/home_first_section";
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+
+const { data: homefourthsection } = await useAsyncData("homefourthsection", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.Course,
+    },
+  });
+
+  return response.data;
+});
+
+
+
 
 const cards = [
   {
@@ -45,7 +73,7 @@ const splideOptions = {
 <template>
   <div class="card-course-three">
     <div class="slider-wrapper" >
-      <h3 class="slider-heading">مراجعه اللغه العربيه</h3>
+      <h3 class="slider-heading"> {{ homefourthsection[0].title }} </h3>
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(card, index) in cards" :key="index">
           <NuxtLink :to="`/course/${card.id}`" class="card">
