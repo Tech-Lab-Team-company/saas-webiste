@@ -1,58 +1,50 @@
-<script setup>
-const cards = [
-  {
-    id: 1,
-    btn: "تعليم",
-  },
-  {
-    id: 2,
-    btn: "تصميم",
-  },
-  {
-    id: 3,
-    btn: "برمجه",
-  },
-  {
-    id: 4,
-    btn: "تصميم",
-  },
-  {
-    id: 5,
-    btn: "تعليم",
-  },
-  {
-    id: 6,
-    btn: "تصميم",
-  },
-  {
-    id: 7,
-    btn: "برمجه",
-  },
-  {
-    id: 8,
-    btn: "تصميم",
-  },
-];
-</script>
+<script setup lang="ts">
+import type  SidebarHashtag  from "~/types/sidebarhashtag";
+import { baseUrl } from "~/constant/baseUrl";
 
+// Fetch blog data
+const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () => {
+  try {
+    const response = await $fetch<{
+      data: SidebarHashtag[];
+      message: string;
+      status: number;
+    }>(`${baseUrl}/fetch_hashtags`, {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain":"abouelezz.com",
+      },
+    });
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Failed to fetch blogs:", err);
+    return [];
+  }
+});
+</script>
 <template>
   <!-- sidebar -->
   <div class="sidebar-buttons" dir="rtl">
     <div class="sidebar-page-articles-buttons pt-lg">
       <h2 class="sidebar-title">الموسوعة</h2>
       <div class="grid grid-cols-3 gap-md pt-md">
-        <button
-          v-for="(item, index) in cards"
+        <NuxtLink
+          v-for="(item, index) in sidebarhashtag"
           :key="'btn-' + index"
-          class="sidebar-button"
+          :to="`/blogs/hashtag/${item.id}`" 
         >
-          {{ item.btn }}
-        </button>
+          <button class="sidebar-button">
+            {{ item.title }}
+          </button>
+        </NuxtLink>
       </div>
     </div>
   </div>
   <!-- end sidebar -->
 </template>
+
 <style scoped>
 /* sidebar-button style */
 .sidebar-title {

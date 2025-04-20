@@ -4,7 +4,7 @@ import { baseUrl } from "~/constant/baseUrl";
 
 const { data: privacy } = await useAsyncData("privacy", async () => {
   const response = await $fetch<{
-    data: Privacy[];
+    data: Privacy;
     message: string;
     status: number;
   }>(`${baseUrl}/fetch_privacy`, {
@@ -27,9 +27,9 @@ const { data: privacy } = await useAsyncData("privacy", async () => {
       <hr />
 
       <div v-if="privacy">
-        <div v-for="privite in privacy" :key="privite.id" class="paragraph">
-          <h2>{{ privite.title }}</h2>
-          <p>{{ privite.text }}</p>
+        <div  class="paragraph">
+          <h2>{{ privacy.title }}</h2>
+          <p v-html="privacy.text"></p>
           
         </div>
       </div>

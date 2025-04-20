@@ -48,7 +48,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
           <div class="blog-name-icon">
             <!-- إذا كنت ترغب في إضافة المزيد من الأيقونات هنا -->
             <!-- <component :is="card.icon1" class="sidebar-icon" /> -->
-            <!-- <p class="sidebar-date">{{ card.add_one }}</p> -->
+            <p class="sidebar-date">التاريخ</p>
           </div>
           <p class="sidebar-text">{{ blogdetails.date }}</p>
         </div>
@@ -56,9 +56,9 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
     </div>
 
     <!-- الكومنتات مضافة هنا كما طلبت -->
-    <!-- <BlogsPageBlogsImage /> -->
+    <BlogsPageBlogsImage />
     <!-- <BlogsPageBlogsButton /> -->
-    <!-- <BlogsPageBlogsButtonOne /> -->
+    <BlogsPageBlogsButtonOne />
     <!-- <BlogsPageBlogsIcon /> -->
   </div>
 </template>
@@ -74,7 +74,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   margin: 5px 10px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   width: 95%;
 }
 .blogs-header {

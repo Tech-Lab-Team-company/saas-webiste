@@ -4,7 +4,7 @@ import { baseUrl } from "~/constant/baseUrl";
 
 const { data: terms } = await useAsyncData("terms", async () => {
   const response = await $fetch<{
-    data: Terms[];
+    data: Terms;
     message: string;
     status: number;
   }>(`${baseUrl}/fetch_terms`, {
@@ -27,9 +27,9 @@ const { data: terms } = await useAsyncData("terms", async () => {
       <hr />
 
       <div v-if="terms">
-        <div v-for="term in terms" :key="term.id" class="paragraph">
-          <h2>{{ term.title }}</h2>
-          <p>{{ term.id }}</p>
+        <div  class="paragraph">
+          <h2>{{ terms.title }}</h2>
+          <p v-html="terms.text"></p>
         </div>
       </div>
       <div v-else>

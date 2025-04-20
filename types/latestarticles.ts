@@ -1,14 +1,10 @@
-export default interface BlogsDetails {
+export default interface LatestArticles{
   id: number;
   slug: string | null;
   title: string;
   subtitle: string;
+  description: string;
   date: string;
-  hashtags: {
-    id: number;
-    title: string;
-    image: string | null;
-  }[];
   mail_image: string | null;  
   attachments: {
     id: number;
