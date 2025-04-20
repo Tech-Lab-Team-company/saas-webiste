@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import english from "@/assets/images/english.png";
@@ -43,15 +43,44 @@ const splideOptions = {
   arrows: true,
   drag: false, 
 };
+
+
+
+
+
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from "~/types/home_first_section";
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+const { data: homethirdsection } = await useAsyncData("homethirdsection", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.Course,
+    },
+  });
+
+  return response.data;
+});
+
+
+
 </script>
 <template>
   <div class="card-course-two">
     <div class="slider-wrapper flex" >
-    <h1 class="slider-heading">مراجعة اللغة الإنجليزية</h1>
+    <h1 class="slider-heading">{{homethirdsection[1].title  }}</h1>
 
     <Splide :options="splideOptions" class="splide-container">
       <SplideSlide v-for="(card, index) in cards" :key="index">
-        <NuxtLink :to="`/course/${card.id}`" class="card" :style="{ backgroundImage: `url(${card.img})` }">
+        <NuxtLink :to="`/course/${card.number}`" class="card" :style="{ backgroundImage: `url(${card.img})` }">
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
@@ -60,9 +89,9 @@ const splideOptions = {
             <p class="card-text">{{ card.text }}</p>
             <div class="card-footer">
               <span class="card-icon">
-                <component :is="card.icon" />
+                <!-- <component :is="card.icon" /> -->
               </span>
-              <span class="card-name">{{ card.name }}</span>
+              <!-- <span class="card-name">{{ card.name }}</span> -->
             </div>
             <div class="card-extra-content">
               <Arrrow/>

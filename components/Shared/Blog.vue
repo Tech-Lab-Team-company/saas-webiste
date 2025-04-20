@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 
@@ -54,15 +54,45 @@ const splideOptions = {
   
 };
 
+
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from '~/types/home_first_section';
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+// import { SectionTypeEnum } from '/enum/section_type_enum';
+
+
+
+const { data: Blogs } = await useAsyncData("Blogs", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[]; 
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body:{
+        type:SectionTypeEnum.Blog
+
+    }
+
+  });
+//   console.log(response);
+
+  return response.data;
+});
+
 </script>
 
 <template>
   <div class="Blog" dir="rtl">
     <div class="slider-wrapper pt-md">
-      <p class="slider-heading">المدونه</p>
-      <h3 class="slider-heading1">تعرف علي آخر أخبارنا</h3>
+      <p class="slider-heading">{{Blogs[0].title}}</p>
+      <h3 class="slider-heading1">{{ Blogs[0].subtitle }}</h3>
       <p class="slider-text">
-        قم بتطوير مهارة مهنية محددة من خلال سلسلة من الدورات التدريبية المترابطة
+        {{ Blogs[0].description }}
       </p>
 
       <Splide :options="splideOptions" class="splide-container" >
@@ -74,7 +104,7 @@ const splideOptions = {
                 <hr />
                 <h5 class="card-title">{{ card.title }}</h5>
                 <div class="card-date">
-                  <p>{{ card.date }}</p>
+                  <!-- <p>{{ card.date }}</p> -->
                 </div>
               </div>
               <p class="card-text">{{ card.text }}</p>

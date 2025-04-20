@@ -9,7 +9,7 @@ export default interface HomeFirstSection {
     order: number;
     style: number;
     type: number;
-    media: [];
+    media: MediaInterface[];
     courses: [];
     blogs: [];
     
