@@ -3,7 +3,7 @@
 import homeStarting from './components/Home/home/homestarting.vue'
 import CourseCard from "~/components/Shared/CourseCard.vue";
 import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
-import Profile from "~/components/Profile/Profile.vue";
+// import Profile from "~/components/Profile/Profile.vue";
 
 
 
