@@ -1,9 +1,23 @@
 <script lang="ts" setup>
 import Logo from "~/public/icons/Logo.vue";
-import { ref } from "vue";
 import { useRoute } from "vue-router";
-
+import { ref, onMounted } from "vue";
 const route = useRoute();
+const isLoggedIn = ref(false);
+
+onMounted(() => {
+  isLoggedIn.value = localStorage.getItem("auth") === "true";
+});
+
+const handleLogin = () => {
+  localStorage.setItem("auth", "true");
+  isLoggedIn.value = true;
+};
+
+const handleLogout = () => {
+  localStorage.removeItem("auth");
+  isLoggedIn.value = false;
+};
 </script>
 
 <template>
@@ -13,10 +27,23 @@ const route = useRoute();
     </div>
 
     <nav class="header-container">
-      <div class="buttons">
+      <div class="buttons" v-if="!isLoggedIn">
         <button class="btn btn-primary btn-create">انشاء حساب</button>
-        <button class="btn btn-secondary btn-secondary-create">
-          تسجيل الدخول
+        <NuxtLink to="/login">
+          <button
+            class="btn btn-secondary btn-secondary-create"
+            @click="handleLogin"
+          >
+            تسجيل الدخول
+          </button>
+        </NuxtLink>
+      </div>
+      <div class="buttons" v-else>
+        <button
+          class="btn btn-secondary btn-secondary-create"
+          @click="handleLogout"
+        >
+          تسجيل الخروج
         </button>
       </div>
 
@@ -28,17 +55,17 @@ const route = useRoute();
           <li>بنك الاسئله</li>
         </NuxtLink>
         <NuxtLink to="/course" exactActiveClass="active" class="nav-link">
-          <li >الكورسات</li>
+          <li>الكورسات</li>
         </NuxtLink>
         <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link">
-          <li >نبذه عنا</li>
+          <li>نبذه عنا</li>
         </NuxtLink>
         <NuxtLink to="/" exactActiveClass="active" class="nav-link">
-          <li >الرئيسيه</li>
+          <li>الرئيسيه</li>
         </NuxtLink>
       </ul>
 
-      <NuxtLink to="/"  class="logo">
+      <NuxtLink to="/" class="logo">
         <Logo />
       </NuxtLink>
     </nav>

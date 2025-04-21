@@ -12,6 +12,7 @@
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
     "@nuxt/devtools": "^2.3.2",
+    "@nuxt/http": "^0.6.4",
     "@nuxt/image": "^1.10.0",
     "@pinia/nuxt": "^0.11.0",
     "@primeuix/themes": "^1.0.3",

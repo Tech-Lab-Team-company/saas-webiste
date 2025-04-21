@@ -1,5 +1,12 @@
 <script setup lang="ts">
 
+<<<<<<< HEAD
+import homeStarting from './components/Home/home/homestarting.vue'
+import CourseCard from "~/components/Shared/CourseCard.vue";
+import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
+// import Profile from "~/components/Profile/Profile.vue";
+=======
+>>>>>>> 009bc6d2dd4711f936c472a97b64db3db7be26c6
 
 
 import { baseUrl } from "~/constant/baseUrl";

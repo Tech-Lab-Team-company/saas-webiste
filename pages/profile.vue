@@ -8,6 +8,7 @@ import ProfileSidebar from '~/components/Profile/ProfileSidebar.vue';
   <div class="profile-page">
 
     <ProfileMyCourseCard />
+    <Profile/>
 
 
   </div>
