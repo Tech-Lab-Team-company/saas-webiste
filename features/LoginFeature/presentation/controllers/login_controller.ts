@@ -37,11 +37,14 @@ export default class LoginController extends ControllerInterface<UserModel> {
             imageElement: successImage,
             messageContent: null,
           });
-          await router.push("/");
           const userStore = useUserStore();
           if (this.state.value.data) {
+            console.log(this.state.value.data);
             
-            userStore.setUser(this.state.value.data);
+            
+           await userStore.setUser(this.state.value.data);
+          await router.push("/");
+
           }
       
       } else {

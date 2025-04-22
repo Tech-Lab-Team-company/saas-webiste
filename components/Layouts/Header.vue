@@ -4,6 +4,16 @@ import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 const route = useRoute();
 const isLoggedIn = ref(false);
+// const uploadImage = async () => {
+//   if (!selectedImage.value) {
+//     errorMessage.value = "يرجى اختيار صورة.";
+//     return;
+//   }
+//   const paramsImg = new UpdateProfileImageParams(selectedImage.value);
+
+//   await UpdateProfileImageController.getInstance().updateProfileImage(
+//     paramsImg
+//   );
 
 onMounted(() => {
   isLoggedIn.value = localStorage.getItem("auth") === "true";

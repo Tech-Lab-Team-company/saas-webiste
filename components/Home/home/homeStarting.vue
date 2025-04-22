@@ -16,7 +16,7 @@ const swiper = useSwiper(containerRef);
 const { data: sliders, pending, error } = await useAsyncData('sliders', async () => {
   try {
     const response = await $fetch<{
-      data: SwiperHome[];  // استخدام النوع هنا
+      data: SwiperHome[];     
       message: string;
       status: number;
     }>(`${baseUrl}/fetch_sliders`, {
@@ -85,10 +85,13 @@ onUpdated(() => {
           <button class="next-btn" @click="swiper.next(); swiper_position = 'next';" :class="{ active: swiper_position === 'next' }"></button>
         </div>
       </ClientOnly>
+
       
       <EducationStages />
       <Students />
     </div>
+    <EducationStages />
+    <Students />
   </template>
   
 
