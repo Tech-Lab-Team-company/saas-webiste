@@ -1,14 +1,13 @@
 <script setup lang="ts">
 
-<<<<<<< HEAD
 import homeStarting from './components/Home/home/homestarting.vue'
 import CourseCard from "~/components/Shared/CourseCard.vue";
 import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
-=======
+
 // import homeStarting from './components/Home/home/homestarting.vue'
 // import CourseCard from "~/components/Shared/CourseCard.vue";
 // import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
->>>>>>> 3d33938c347cbb7eb341b5a2d5843a8db15b9e5a
+ 
 // import Profile from "~/components/Profile/Profile.vue";
 
 

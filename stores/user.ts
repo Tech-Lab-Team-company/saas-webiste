@@ -1,26 +1,25 @@
-import type UserModel from "~/features/LoginFeature/Data/models/user_model";
-import { defineStore } from "pinia";
-
-
+import { defineStore } from 'pinia'
+import type UserModel from "~/features/LoginFeature/Data/models/user_model"
 
 export const useUserStore = defineStore('user', {
-    state: () => ({
-        user: null as UserModel | null,
-        isAuth: false,
-    }),
-    getters: {
-        token: (state) => state.user?.apiToken ?? null, // Getter for token
+  state: () => ({
+    user: null as UserModel | null,
+    image: null as string | null,
+    isAuth: false,
+  }),
+  actions: {
+    setUser(data: UserModel) {
+      this.user = data;
+      this.isAuth = true;
     },
-    actions: {
-        setUser(data: UserModel) {
-            this.user = data;
-            this.isAuth = true;
-            // console.log(this.user)
-        },
-        logout() {
-            this.user = null;
-            this.isAuth = false;
-        },
+    setImage(img: string) {
+      this.image = img;
     },
-    persist: true,
+    logout() {
+      this.user = null;
+    //   this.image = null;
+      this.isAuth = false;
+    }
+  },
+  persist: true
 })
