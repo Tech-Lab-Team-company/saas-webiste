@@ -20,7 +20,7 @@ class UpdateProfileImageApiService extends ServicesInterface {
     console.log(CrudType.POST)
     return await super.call({
       url: ApiNames.Instance.updateProfileImage,
-      type: CrudType.POST,
+      type: CrudType.FormData,
       auth: true,
       params: params,
       showLoadingDialog: true,

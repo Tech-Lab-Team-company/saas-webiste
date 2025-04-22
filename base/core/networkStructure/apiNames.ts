@@ -23,8 +23,8 @@ class ApiNames {
 
   //reset password
   public forgotPassword = "forgot_password";
-  // public resetPassword = "verify_code";
-  public resetPassword = "change_password";
+  public resetPassword = "verify_code";
+  // public resetPassword = "change_password";
 
   public setNewPassword = "reset_password";
   

@@ -3,22 +3,19 @@ import Aura from '@primeuix/themes/aura';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxt/image', 'nuxt-swiper','@primevue/nuxt-module' ],
-  // imports: {
-  //   autoImport: true,
-  //   // dirs: ['stores'],
-  // },
+  modules: ['@nuxt/image', 'nuxt-swiper', '@primevue/nuxt-module', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt'],
+
   // , '@pinia/nuxt',
   primevue: {
     /* Options */
     options: {
-        theme: {
-            preset: Aura
-        }
+      theme: {
+        preset: Aura
+      }
     },
     usePrimeVue: true,
     components: {
-      include: ['Button', 'InputText', 'Tag', 'Terminal'] 
+      include: ['Button', 'InputText', 'Tag', 'Terminal']
     }
   },
   css: [

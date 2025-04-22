@@ -1,102 +1,141 @@
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import SettingsIcon from "~/public/icons/SettingsIcon.vue";
-import key from "~/public/icons/key.vue";
+import KeyIcon from "~/public/icons/key.vue";
 import QuestionBank from "~/public/icons/QuestionBank.vue";
 import Logout from "~/public/icons/Logout.vue";
 import CoursesNote from "~/public/icons/CoursesNote.vue";
 import EditImageIcon from "~/public/icons/EditImageIcon.vue";
-import type ProfileImage from "~/types/profileimage";
+import type { ProfileImage } from "~/types/profileimage";
+import UpdateProfileImageParams from "~/features/UpdateProfileImageFeature/Core/Params/update_profile_image_params";
+import UpdateProfileImageController from "~/features/UpdateProfileImageFeature/presentation/controllers/update_profile_image_controller";
 
-const SelectedOption = ref("");
+const selectedImage = ref<File | null>(null);
+const imagePreview = ref<string | null>(null);
+const errorMessage = ref<string | null>(null);
+const profileimage = ref<ProfileImage | null>(null);
+const SelectedOption = ref("profile");
 
-const UpdateSidebar = (OptionName: string) => {
-  switch (OptionName) {
-    case "profile":
-      SelectedOption.value = "profile";
-      break;
-    case "security":
-      SelectedOption.value = "security";
-      break;
-    case "courses":
-      SelectedOption.value = "courses";
-      break;
-    case "quetionsbank":
-      SelectedOption.value = "quetionsbank";
-      break;
-    case "logout":
-      SelectedOption.value = "logout";
-      break;
+onMounted(() => {
+  const storedImage = localStorage.getItem("profileImage");
+  if (storedImage) {
+    profileimage.value = JSON.parse(storedImage);
   }
+});
+
+const handleImageChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || !input.files[0]) {
+    errorMessage.value = "يرجى اختيار صورة.";
+    return;
+  }
+
+  const file = input.files[0];
+  const validTypes = ["image/jpeg", "image/png"];
+  const maxSize = 5 * 1024 * 1024;
+
+  if (!validTypes.includes(file.type)) {
+    errorMessage.value = "يرجى اختيار صورة JPEG أو PNG.";
+    return;
+  }
+  if (file.size > maxSize) {
+    errorMessage.value = "حجم الصورة يجب أن يكون أقل من 5MB.";
+    return;
+  }
+
+  selectedImage.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+  errorMessage.value = null;
+
+  profileimage.value = {
+    image: imagePreview.value,
+    name: "اسم المستخدم"
+  };
+
+  localStorage.setItem("profileImage", JSON.stringify(profileimage.value));
+
+  await uploadImage();      
 };
 
-const { data: profileimage } = await useAsyncData("profileimage", async () => {
-  const response = await $fetch<{
-    data: ProfileImage;
-    message: string;
-    status: number;
-  }>(`https://edu.techlabeg.com/api/website/update_profile_image`, {
-    method: "POST",
+const uploadImage = async () => {
+  if (!selectedImage.value) {
+    errorMessage.value = "يرجى اختيار صورة.";
+    return;
+  }
 
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain": "abouelezz.com",
-      "Authorization": `Bearer 52|8IWEVCzHBjhmBSHZEBXN7zhF2XtvXBj7HLWgYhls4f481cab`,
-      "content-type": "application/json",
+  const paramsImg = new UpdateProfileImageParams(selectedImage.value);
+  try {
+    await UpdateProfileImageController.getInstance().updateProfileImage(paramsImg);
+    
+    const storedImage = localStorage.getItem("profileImage");
+    if (storedImage) {
+      profileimage.value = JSON.parse(storedImage);
+    }
+    imagePreview.value = profileimage.value?.image || null;
 
-    },
-  });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    errorMessage.value = "فشل في رفع الصورة.";
+  }
 
-  console.log(response);
-  return response.data;
-  
-});
+  selectedImage.value = null;
+  errorMessage.value = null;
+};
 </script>
+
 
 <template>
   <div class="profile-sidebar-container">
     <div class="person-data">
-      <div
-        class="profile-image-container"
-        v-if="profileimage && profileimage.image"
-      >
-        <img :src="profileimage.image" class="course-image" />
-        <EditImageIcon class="edit-icon" />
+      <div class="profile-image-container">
+        <img :src="imagePreview || profileimage?.image || ''" class="course-image" />
+        <label for="profile-image-input">
+          <EditImageIcon class="edit-icon" />
+        </label>
+        <input
+          id="profile-image-input"
+          type="file"
+          accept="image/*"
+          @change="handleImageChange"
+          style="display: none"
+        />
       </div>
-
-      <p class="person-name" > {{ profileimage && profileimage.name }}</p>
+      <p class="person-name">{{ profileimage?.name }}</p>
       <p class="person-stage">طالب ثانوي</p>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
 
     <ul class="profile-options">
-      <!-- @click="$router.push('/dashboard/profile')" -->
       <li
         class="profile-option"
         @click="UpdateSidebar('profile')"
-        :class="SelectedOption == 'profile' ? `active` : ``"
+        :class="{ active: SelectedOption === 'profile' }"
       >
         <p>الملف الشخصي</p>
         <SettingsIcon class="profile-icon" />
       </li>
-      <li
+
+      <!-- <NuxtLink
+      :to=""
         class="profile-option"
         @click="UpdateSidebar('security')"
-        :class="SelectedOption == 'security' ? `active` : ``"
+        :class="{ active: SelectedOption === 'security' }"
       >
         <p>الامان</p>
-        <key class="profile-icon" />
-      </li>
+        <KeyIcon class="profile-icon" />
+      </NuxtLink> -->
       <li
         class="profile-option"
         @click="UpdateSidebar('courses')"
-        :class="SelectedOption == 'courses' ? `active` : ``"
+        :class="{ active: SelectedOption === 'courses' }"
       >
         <p>كورساتي</p>
         <CoursesNote class="profile-icon" />
       </li>
       <li
         class="profile-option"
-        @click="UpdateSidebar('quetionsbank')"
-        :class="SelectedOption == 'quetionsbank' ? `active` : ``"
+        @click="UpdateSidebar('questionsbank')"
+        :class="{ active: SelectedOption === 'questionsbank' }"
       >
         <p>بنك اسئلتي</p>
         <QuestionBank class="profile-icon" />
@@ -104,7 +143,7 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
       <li
         class="profile-option"
         @click="UpdateSidebar('logout')"
-        :class="SelectedOption == 'logout' ? `active` : ``"
+        :class="{ active: SelectedOption === 'logout' }"
       >
         <p>تسجيل الخروج</p>
         <Logout class="profile-icon" />
@@ -118,11 +157,8 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
   background-color: #f6f6f6;
   border-radius: 20px 20px 0 0;
   width: 250px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 20px;
+  margin: 40px auto 20px;
   grid-column: span 1;
-  margin-top: 40px;
 
   .person-data {
     display: flex;
@@ -132,22 +168,21 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
     transform: translateY(-60px);
     padding-bottom: 20px;
     border-bottom: 1px solid #d9d9d9;
+
     .profile-image-container {
       position: relative;
       img {
-        margin-left: auto;
-        margin-right: auto;
         width: 150px;
         height: 150px;
         border-radius: 50%;
         border: 10px solid white;
       }
-
       .edit-icon {
         width: 25px;
         position: absolute;
         top: 80%;
         left: 30px;
+        cursor: pointer;
       }
     }
 
@@ -157,6 +192,10 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
     }
     .person-stage {
       color: #6f777b;
+    }
+    .error-message {
+      color: red;
+      margin-top: 10px;
     }
   }
 
@@ -176,10 +215,8 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
       .profile-icon {
         width: 20px;
       }
-
-      p {
-      }
     }
   }
 }
 </style>
+
