@@ -16,6 +16,7 @@
    
 
     import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+    
     const props = defineProps({
     CourseData: {
         type: Object as () => CourseDetailsModel | null,
@@ -55,15 +56,16 @@
     const router = useRouter();
     const  activePanels = ref<number[]>([]); 
     const  SecondactivePanels = ref<number[]>([]); 
+    const  thirdactivePanels = ref<number[]>([]); 
     const activetab = ref(1)
 
     const emit = defineEmits(['coursechanged']);
 
-    const sendactivetab = (activetabvalue: number , link:string)=>{
+    const sendactivetab = (activetabvalue: number , link:string , title:string , description:string)=>{
         activetab.value = activetabvalue;
         if(activetabvalue == 0){
       
-            emit('coursechanged', {activetabvalue:activetabvalue, link:link});
+            emit('coursechanged', {activetabvalue:activetabvalue, link:link , title:title , description:description});
         }
         else{
            
@@ -101,17 +103,33 @@
                             :value="secondindex" 
                             class="course-class-panel" 
                             >
-                            <AccordionHeader class="course-class-header" @click="console.log(activeIndices)">  {{ lesson.title}}</AccordionHeader>
+                            <AccordionHeader class="course-class-header" >  {{ lesson.title}}</AccordionHeader>
                     
                             <hr class="course-class-hr" />
                             <AccordionContent class="course-class-body"  >
-                           
-                                <div class="course-body-details " v-for="(content , thirdindex) in contents" :key="thirdindex"  @click=" sendactivetab(thirdindex ,lesson.sessions[activeIndices].link)" >
+
+                                <Accordion value="0" class="course-class-container" v-model:activeIndex="activeIndices"  v-for="(session ,thirdindex) in lesson?.sessions" :key="thirdindex">
+                                    <AccordionPanel 
+                                        :class="{ 'active': SecondactivePanels.includes(thirdindex) }"
+                                        :value="thirdindex" 
+                                        class="course-class-panel" 
+                                        >
+                                        <AccordionHeader class="course-class-header course-sessions-header" >  {{ session.title}}</AccordionHeader>
                                 
-                                    <component :is="content.icon" />
-                                    <p >{{ content.content}} {{ lesson.title }}  </p>
-                                    <!-- sessions ??  -->
-                                </div>                
+                                        <!-- <hr class="course-class-hr" /> -->
+                                        <AccordionContent class="course-class-body course-sessions-body"  >
+                        
+                                            <div class="course-body-details " v-for="(content , thirdindex) in contents" :key="thirdindex"  @click=" sendactivetab(thirdindex ,session.link ,session.title ,session.text)" >
+                                                <component :is="content.icon" />
+                                                <p >{{ content.content}} {{ session.title }}  </p>
+                                            </div>                
+                                    
+                                        </AccordionContent>
+                                    </AccordionPanel>
+                                </Accordion>
+               
+                  
+                           
                             </AccordionContent>
                         </AccordionPanel>
                     </Accordion>
@@ -119,6 +137,8 @@
             </AccordionPanel>
         </Accordion>
     </template>
+
+ 
 
 
 <style lang="scss">

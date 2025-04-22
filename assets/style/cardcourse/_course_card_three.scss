@@ -76,19 +76,21 @@
     .image-container {
       position: relative;
       width: 100%;
-      padding: 0;
+      padding: 6px;
     }
     
     .course-image {
       width: 100%;
       height: 230px;
       object-fit: cover;
+      background-color: white;
+      border-radius: 10px;
     }
     
     .overlay-text {
       position: absolute;
       top: 15%;
-      left: 15%;
+      left: 20%;
       transform: translate(-50%, -50%);
       padding: 6px 15px;
       border-radius: 8px;
@@ -97,9 +99,11 @@
       border-radius: 20px;
       text-align: center;
       color: #032855;
-      font-weight: 500;
+      font-weight: 800;
       font-size: 14px;
       font-family: "regular";
+
+
     }
     .card-content {
       display: flex;

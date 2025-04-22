@@ -1,3 +1,5 @@
+import type BlogsCard from "./blogscard";
+import type CourseInterface from "./course_interface";
 import type MediaInterface from "./media";
 import type TitleInterface from "./title_intefrace";
 
@@ -10,19 +12,9 @@ export default interface HomeFirstSection {
     style: number;
     type: number;
     media: MediaInterface[];
-    courses: [];
-    blogs: [];
+    courses:CourseInterface[];
+    blogs:BlogsCard [];
     
 }
 
 
-// "id": 84,
-// "title": "ll",
-// "subtitle": "aaa",
-// "description": "aaa",
-// "order": 1,
-// "style": 1,
-// "type": 7,
-// "media": [],
-// "courses": [],
-// "blogs": []

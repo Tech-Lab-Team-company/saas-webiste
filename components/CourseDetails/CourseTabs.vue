@@ -14,7 +14,12 @@
     const route = useRoute()
     const tab_value = ref('content');
     const activetab = ref({});
-    const videoLink = ref('')
+    const videoLink = ref({
+        videoLink: "",
+        title: "",
+        description: ""
+    })
+
     
     // const id = ref<string>(<string>route.params.id)
 
@@ -22,7 +27,7 @@
 
 
     const FetchCourseDetails = async ()=>{
-        const courseDetailsParams = new CourseDetailsParams("522");
+        const courseDetailsParams = new CourseDetailsParams(route.params.id as string);
         const courseDetailsController = CourseDetailsController.getInstance();
         const state = await courseDetailsController.FetchCourseDetails(courseDetailsParams);
     
@@ -40,10 +45,12 @@
 
 
 
-    const Data = (data: { activetabvalue: number , link:string })=>{
+    const Data = (data: { activetabvalue: number , link:string ,title:string , description:string})=>{
         console.log(data)
         activetab.value = data.activetabvalue;
-        videoLink.value= data.link;        
+        videoLink.value.videoLink= data.link;        
+        videoLink.value.title= data.title;        
+        videoLink.value.description= data.description;        
     }
 
 

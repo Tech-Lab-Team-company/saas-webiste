@@ -6,32 +6,32 @@ import user from "@/public/icons/user.vue";
 import Arrrow from "@/public/icons/Arrrow.vue";
 
 
-const cards = [
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-];
+// const cards = [
+//   {
+//     title: "كورس المحاسبة الإدارية",
+//     text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
+//     img: english,
+//     icon: user,
+//     number: "1500 جنيه",
+//     name: "أحمد حوام",
+//   },
+//   {
+//     title: "كورس المحاسبة الإدارية",
+//     text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
+//     img: english,
+//     icon: user,
+//     number: "1500 جنيه",
+//     name: "أحمد حوام",
+//   },
+//   {
+//     title: "كورس المحاسبة الإدارية",
+//     text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
+//     img: english,
+//     icon: user,
+//     number: "1500 جنيه",
+//     name: "أحمد حوام",
+//   },
+// ];
 
 
 const splideOptions = {
@@ -47,28 +47,20 @@ const splideOptions = {
 
 
 
-
-import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
-const { data: homethirdsection } = await useAsyncData("homethirdsection", async () => {
-  const response = await $fetch<{
-    data: HomeFirstSection[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
-    method: "POST",
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
-    },
-    body: {
-      type: SectionTypeEnum.Course,
-    },
-  });
 
-  return response.data;
+const props = defineProps({
+  HomeSecondSection: {
+    type: Object as () => HomeFirstSection | null,
+    default: null
+}
 });
+
+const HomesecondSection = ref(props.HomeSecondSection);
+
+watch(() => props.HomeSecondSection, (newValue) => {
+  HomesecondSection.value = newValue;
+}, { immediate: true });
 
 
 
@@ -76,22 +68,22 @@ const { data: homethirdsection } = await useAsyncData("homethirdsection", async 
 <template>
   <div class="card-course-two">
     <div class="slider-wrapper flex" >
-    <h1 class="slider-heading">{{homethirdsection[1].title  }}</h1>
+    <h1 class="slider-heading">{{HomesecondSection?.title  }}</h1>
 
     <Splide :options="splideOptions" class="splide-container">
-      <SplideSlide v-for="(card, index) in cards" :key="index">
-        <NuxtLink :to="`/course/${card.number}`" class="card" :style="{ backgroundImage: `url(${card.img})` }">
+      <SplideSlide v-for="(course, index) in HomesecondSection?.courses" :key="index">
+        <NuxtLink :to="`/course/${course.id}`" class="card"  :style="{ backgroundImage: `url(${course.image.img})` }" >
           <div class="card-body" dir="rtl">
             <div class="card-header">
-              <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-number">{{ card.number }}</p>
+              <h5 class="card-title">{{ course.title }}</h5>
+              <p class="card-number">{{ course.course_price }} جنيه</p>
             </div>
-            <p class="card-text">{{ card.text }}</p>
+            <div class="card-text" v-html="course.description"></div>
             <div class="card-footer">
               <span class="card-icon">
-                <!-- <component :is="card.icon" /> -->
+                <img :src="course.teacher.image.img" :alt="course.teacher.image.alt" class="teacher-image" />
               </span>
-              <!-- <span class="card-name">{{ card.name }}</span> -->
+              <span class="card-name">{{ course.teacher.name }}</span>
             </div>
             <div class="card-extra-content">
               <Arrrow/>
@@ -107,3 +99,13 @@ const { data: homethirdsection } = await useAsyncData("homethirdsection", async 
 </template>
 
 
+<style scoped>
+
+.card-course-two{
+  background-color: #FFFCF9;
+}
+.card-course-two .card{
+  background-position: center;
+}
+
+</style>
