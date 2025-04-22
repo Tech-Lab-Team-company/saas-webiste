@@ -12,3 +12,4 @@ export default interface BlogsCard {
       alt: string;
     }[];
   }
+

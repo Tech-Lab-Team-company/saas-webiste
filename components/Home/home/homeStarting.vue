@@ -85,6 +85,10 @@ onUpdated(() => {
           <button class="next-btn" @click="swiper.next(); swiper_position = 'next';" :class="{ active: swiper_position === 'next' }"></button>
         </div>
       </ClientOnly>
+
+      
+      <EducationStages />
+      <Students />
     </div>
     <EducationStages />
     <Students />

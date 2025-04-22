@@ -32,7 +32,7 @@ const { data: studentopinionssection } = await useAsyncData("studentopinionssect
     },
   });
 
-  return response.data;
+  return response.data[0];
 });
 
 
@@ -96,7 +96,7 @@ const splideOptions = {
       </p>
 
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in studentopinionssection[0].media" :key="index">
+        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
           <img :src="card.file" :alt="card.alt" class="slider-image" />
         </SplideSlide>
       </Splide>

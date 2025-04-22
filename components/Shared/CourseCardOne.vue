@@ -83,20 +83,20 @@ const splideOptions = {
 <template>
   <div class="card-course-one">
     <div class="slider-wrapper">
-      <!-- <h3 class="slider-heading">{{homesecondsection[0].title}}</h3> -->
+      <h3 class="slider-heading">{{homesecondsection[0].title}}</h3>
 
-      <!-- <Splide :options="splideOptions" class="splide-container"> -->
-        <!-- <SplideSlide v-for="(course, index) in homesecondsection[0].courses" :key="index"> -->
-          <!-- <NuxtLink :to="`/course/${card.id}`" class="card"> -->
-            <!-- <div class="image-wrapper">
+      <Splide :options="splideOptions" class="splide-container">
+        <SplideSlide v-for="(course, index) in homesecondsection[0].courses" :key="index">
+          <NuxtLink :to="`/course/${card.id}`" class="card">
+            <div class="image-wrapper">
               <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
               <div class="card-overlay-content">
-                <p class="card-number">{{ course.course_price }}</p> -->
+                <p class="card-number">{{ course.course_price }}</p>
               </div>
             </div>
             <div class="card-body" dir="rtl">
-              <!-- <h5 class="card-title">{{ course.title }}</h5> -->
-              <!-- <p class="card-text">{{ card.description }}</p> -->
+              <h5 class="card-title">{{ course.title }}</h5>
+              <p class="card-text">{{ card.description }}</p>
               <!-- <div class="card-footer">
                 <span class="card-icon flex">
                   <component :is="card.icon" />
@@ -104,11 +104,11 @@ const splideOptions = {
                 <span class="card-name">{{ card.name }}</span>
               </div> -->
             </div>
-          <!-- </NuxtLink> -->
-        <!-- </SplideSlide> -->
-      <!-- </Splide> -->
-    <!-- </div> -->
-  <!-- </div> -->
+          </NuxtLink>
+        </SplideSlide>
+      </Splide>
+    </div>
+  </div>
 </template>
 
 <style scoped>

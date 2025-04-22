@@ -28,9 +28,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
     }
 
   });
-//   console.log(response);
-
-  return response.data;
+  return response.data[0];
 });
 
 </script>
@@ -41,8 +39,8 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
             
             <StagesTitle 
                 :maintitle="`اوائل الطلبه`"  
-                :title="homefirstsection?.[0]?.title"
-                :subtitle="homefirstsection?.[0]?.subtitle"
+                :title="homefirstsection?.title"
+                :subtitle="homefirstsection?.subtitle"
                 />
         </div>
     </div>
@@ -66,10 +64,10 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                 :free-mode-momentum="false"
 
             >
-            <swiper-slide v-for="image in homefirstsection[0].media" >
+            <swiper-slide v-for="image in homefirstsection?.media" >
                 <img :src="image.file" :alt="image.alt">
             </swiper-slide>
-            <swiper-slide v-for="image in homefirstsection[0].media" >
+            <swiper-slide v-for="image in homefirstsection?.media" >
                 <img :src="image.file" :alt="image.alt">
             </swiper-slide>
             </swiper-container>

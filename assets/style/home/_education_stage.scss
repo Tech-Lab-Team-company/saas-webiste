@@ -2,6 +2,7 @@
 
 .stage-container{
     position: relative;
+    background-color: white;
 
 
     &.stage-container-dots{
@@ -36,6 +37,7 @@
         font-family: "medium";
         font-weight: 700;
         font-size: 18px;
+        background-color: white;
 
         &.stages-dot{
             padding-top:60px ;
