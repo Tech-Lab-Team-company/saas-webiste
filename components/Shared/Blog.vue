@@ -62,7 +62,7 @@ import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
 
 
-const { data: Blogs } = await useAsyncData("Blogs", async () => {
+const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   const response = await $fetch<{
     data: HomeFirstSection[]; 
     message: string;
@@ -75,13 +75,12 @@ const { data: Blogs } = await useAsyncData("Blogs", async () => {
     },
     body:{
         type:SectionTypeEnum.Blog
-
     }
 
   });
 //   console.log(response);
 
-  return response.data;
+  return response.data[0];
 });
 
 </script>
@@ -89,27 +88,27 @@ const { data: Blogs } = await useAsyncData("Blogs", async () => {
 <template>
   <div class="Blog" dir="rtl">
     <div class="slider-wrapper pt-md">
-      <p class="slider-heading">{{Blogs[0].title}}</p>
-      <h3 class="slider-heading1">{{ Blogs[0].subtitle }}</h3>
+      <p class="slider-heading">{{Blogs?.title}}</p>
+      <h3 class="slider-heading1">{{ Blogs?.subtitle }}</h3>
       <p class="slider-text">
-        {{ Blogs[0].description }}
+        {{ Blogs?.description }}
       </p>
 
       <Splide :options="splideOptions" class="splide-container" >
-        <SplideSlide v-for="(card, index) in cards" :key="index">
-          <NuxtLink :to="`/blogs/${card.id}`" class="card">
-            <img :src="card.img" alt="Card image" class="course-image" />
+        <SplideSlide v-for="(blog, index) in Blogs?.blogs" :key="index">
+          <NuxtLink :to="`/blogs/${blog.id}`" class="card">
+            <img :src="blog.mail_image" alt="Card image" class="course-image" />
             <div class="card-body">
               <div class="card-header">
                 <hr />
-                <h5 class="card-title">{{ card.title }}</h5>
+                <h5 class="card-title">{{ blog.title }}</h5>
                 <div class="card-date">
-                  <!-- <p>{{ card.date }}</p> -->
+                  <p>{{ blog.date }}</p>
                 </div>
               </div>
-              <p class="card-text">{{ card.text }}</p>
+              <p class="card-text">{{ blog.description }}</p>
               <div class="card-footer">
-                <P > {{ card.text2 }}</P>
+                <P > {{ blog.subtitle }}</P>
               </div>
             </div>
           </NuxtLink>
@@ -118,6 +117,9 @@ const { data: Blogs } = await useAsyncData("Blogs", async () => {
     </div>
   </div>
 </template>
+
+
+
 <style scoped>
 /* heading */
 .card {

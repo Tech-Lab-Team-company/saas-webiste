@@ -6,67 +6,57 @@ import arabic from "@/assets/images/arabic.png";
 import arabic_two from "@/assets/images/arabic_two.png";
 import arabic_three from "@/assets/images/arabic_three.png";
 import user from "@/public/icons/user.vue";
-import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-const { data: homesecondsection } = await useAsyncData("homesecondsection", async () => {
-  const response = await $fetch<{
-    data: HomeFirstSection[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
-    method: "POST",
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
-    },
-    body: {
-      type: SectionTypeEnum.Course,
-    },
-  });
-  console.log(response);
 
-  return response.data;
+
+
+const props = defineProps({
+  HomeSections: {
+    type: Object as () => HomeFirstSection | null,
+    default: null
+}
 });
 
+const HomefirstSection = ref(props.HomeSections);
+
+watch(() => props.HomeSections, (newValue) => {
+  HomefirstSection.value = newValue;
+}, { immediate: true });
 
 
 
 
 
-
-
-
-const cards = [
-  {
-    id: 1,
-    title: "كورس مراجعة النحو مادة اللغة العربية",
-    text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية من الأساسيات إلى الاحتراف.",
-    img: arabic,
-    icon: user,
-    name: "أحمد حوام",
-    number: "1500 جنيه",
-  },
-  {
-    id: 2,
-    title: "كورس مراجعة النحو مادة اللغة العربية",
-    text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية من الأساسيات إلى الاحتراف.",
-    img: arabic_two,
-    icon: user,
-    name: "أحمد حوام",
-    number: "1500 جنيه",
-  },
-  {
-    id: 3,
-    title: "كورس مراجعة النحو مادة اللغة العربية",
-    text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية من الأساسيات إلى الاحتراف.",
-    img: arabic_three,
-    icon: user,
-    name: "أحمد حوام",
-    number: "1500 جنيه",
-  },
-];
+// const cards = [
+//   {
+//     id: 1,
+//     title: "كورس مراجعة النحو مادة اللغة العربية",
+//     text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية من الأساسيات إلى الاحتراف.",
+//     img: arabic,
+//     icon: user,
+//     name: "أحمد حوام",
+//     number: "1500 جنيه",
+//   },
+//   {
+//     id: 2,
+//     title: "كورس مراجعة النحو مادة اللغة العربية",
+//     text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية من الأساسيات إلى الاحتراف.",
+//     img: arabic_two,
+//     icon: user,
+//     name: "أحمد حوام",
+//     number: "1500 جنيه",
+//   },
+//   {
+//     id: 3,
+//     title: "كورس مراجعة النحو مادة اللغة العربية",
+//     text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية من الأساسيات إلى الاحتراف.",
+//     img: arabic_three,
+//     icon: user,
+//     name: "أحمد حوام",
+//     number: "1500 جنيه",
+//   },
+// ];
 const splideOptions = {
   type: "loop",
   perPage: 3,
@@ -83,26 +73,26 @@ const splideOptions = {
 <template>
   <div class="card-course-one">
     <div class="slider-wrapper">
-      <h3 class="slider-heading">{{homesecondsection[0].title}}</h3>
+      <h3 class="slider-heading">{{HomefirstSection?.title}}</h3>
 
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(course, index) in homesecondsection[0].courses" :key="index">
-          <NuxtLink :to="`/course/${card.id}`" class="card">
+        <SplideSlide v-for="(course, index) in HomefirstSection?.courses" :key="index">
+          <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-wrapper">
-              <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
+              <img :src="course?.image?.img" :alt="course?.image?.alt" class="course-image" />
               <div class="card-overlay-content">
-                <p class="card-number">{{ course.course_price }}</p>
+                <p class="card-number">{{ course?.course_price }} جنيه</p>
               </div>
             </div>
             <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ course.title }}</h5>
-              <p class="card-text">{{ card.description }}</p>
-              <!-- <div class="card-footer">
+              <h5 class="card-title">{{ course?.title }}</h5>
+              <div class="card-text" v-html="course?.description"></div>
+              <div class="card-footer">
                 <span class="card-icon flex">
-                  <component :is="card.icon" />
+                  <img :src="course?.teacher?.image?.img" :alt="course?.teacher?.image?.alt" class="teacher-image" />
                 </span>
-                <span class="card-name">{{ card.name }}</span>
-              </div> -->
+                <span class="card-name">{{ course.teacher.name }}</span>
+              </div>
             </div>
           </NuxtLink>
         </SplideSlide>
@@ -165,7 +155,16 @@ const splideOptions = {
 }
 
 
+.teacher-image{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 5px;
+
+}
+
 </style>
+
 <!-- 
 <div class="card-course-one">
   <div class="slider-wrapper">

@@ -45,10 +45,18 @@
     padding-bottom: 10px;
     width: 90%;
 
+    .image-wrapper{
+      padding:10px;
+    }
+
     img {
-      width: 100%;
-      height: 230px;
-      object-fit: cover;
+
+      &.course-image{
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
     }
 
     .card-body {

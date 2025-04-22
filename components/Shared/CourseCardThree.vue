@@ -10,29 +10,22 @@ import video1 from "~/public/icons/video1.vue";
 
 
 
-import { baseUrl } from "~/constant/baseUrl";
+
+
 import type HomeFirstSection from "~/types/home_first_section";
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-const { data: homefourthsection } = await useAsyncData("homefourthsection", async () => {
-  const response = await $fetch<{
-    data: HomeFirstSection[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
-    method: "POST",
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
-    },
-    body: {
-      type: SectionTypeEnum.Course,
-    },
-  });
-
-  return response.data;
+const props = defineProps({
+  HomeThirdSection: {
+    type: Object as () => HomeFirstSection | null,
+    default: null
+}
 });
 
+const HomethirdSection = ref(props.HomeThirdSection);
+
+watch(() => props.HomeThirdSection, (newValue) => {
+  HomethirdSection.value = newValue;
+}, { immediate: true });
 
 
 
@@ -73,33 +66,35 @@ const splideOptions = {
 <template>
   <div class="card-course-three">
     <div class="slider-wrapper" >
-      <h3 class="slider-heading"> {{ homefourthsection[0].title }} </h3>
+      <h3 class="slider-heading"> {{ HomethirdSection?.title }} </h3>
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in cards" :key="index">
-          <NuxtLink :to="`/course/${card.id}`" class="card">
+        <SplideSlide v-for="(course, index) in HomethirdSection?.courses" :key="index">
+          <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-container">
-              <img :src="card.img" alt="Card image" class="course-image" />
-              <p class="overlay-text">1500 جنيه</p>
+              <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
+              <p class="overlay-text">{{ course.course_price }} جنيه</p>
             </div>
 
             <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ card.title }}</h5>
+              <h5 class="card-title">{{ course.title }}</h5>
               <div class="card-content">
                 <p class="card-text1">
                   <video1 />
-                  20 ملف ورقي
+                  {{ course.course_videos }} فيديو
                 </p>
                 <p class="card-text1">
                   <note />
-                  20 ملف ورقي
+                  {{ course.course_docs }} ملف ورقي
                 </p>
                 <p class="card-text1">
                   <microphone />
-                  20 ملف ورقي
+                  {{ course.course_records }} ملف صوتى
                 </p>
               </div>
               <div class="card-footer">
-                <p class="card-text">{{ card.text }}</p>
+                <!-- {{ console.log(course.description) }}  -->
+                  <!-- {{ course.description }} -->
+                <div class="card-text" v-html="course?.description" ></div>
               </div>
             </div>
           </NuxtLink>
@@ -110,6 +105,13 @@ const splideOptions = {
 </template>
 
 <style scoped>
+
+.card-course-three .card{
+  background-color: #F1F1F1;
+}
+
+
+
 
 .card {
   position: relative;

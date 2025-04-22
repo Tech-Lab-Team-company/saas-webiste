@@ -28,6 +28,27 @@ onMounted(() => {
     }
   };
 });
+
+
+
+
+import type TitleInterface from '~/types/title_intefrace';
+
+
+  const props = defineProps({
+  AboutusSteps: {
+      type: Object as () => TitleInterface[] | null,
+      default: null
+  }
+  });
+
+  const Aboutussteps = ref(props.AboutusSteps);
+
+  watch(() => props.AboutusSteps, (newValue) => {
+    Aboutussteps.value = newValue;
+  }, { immediate: true });
+
+
 </script>
 
 <template>
@@ -39,10 +60,14 @@ onMounted(() => {
 
         <div class="aboutus-setps" ref="stepsContainer" :class="{ 'animate': isVisible }">
             <div class="left-stpes">
-                <div class="aboutus-circle-steps aboutus-circle-steps-start">
+                <!-- <div class="aboutus-circle-steps aboutus-circle-steps-start">
                     <h4>2- ابدأ التعلّم وتابِع تقدّمك</h4>
                     <p>شاهد الدروس، حل التمارين، وراجع كل خطوة بتعملها من خلال صفحة كورساتي الخاصة. 
                 اختبر نفسك في بنك الأسئلة 📚</p>
+                </div> -->
+                <div class="aboutus-circle-steps aboutus-circle-steps-start">
+                    <h4>{{ Aboutussteps[0]?.title }}</h4>
+                    <p>{{ Aboutussteps[0].subtitle}}</p>
                 </div>
             </div>
             <div class="aboutus-arrows">
@@ -50,14 +75,22 @@ onMounted(() => {
                 <BottomDashedIcon class="aboutus-arrow" />
             </div>
             <div class="right-steps">
-                <div class="aboutus-circle-steps">
+                <!-- <div class="aboutus-circle-steps">
                     <h4>1- اختار الكورسات اللي تهمك</h4>
                     <p>تصفّح مجموعة كبيرة من الدورات التعليمية في مختلف التخصصات، واختار اللي يناسب مستواك واهتماماتك.
                         ابدأ التعلّم وتابِع تقدّمك</p>
+                </div> -->
+                <div class="aboutus-circle-steps">
+                    <h4>{{ Aboutussteps[0]?.title }}</h4>
+                    <p>{{Aboutussteps[0].subtitle }}</p>
                 </div>
-                <div class="aboutus-circle-steps aboutus-circle-steps-test ">
+                <!-- <div class="aboutus-circle-steps aboutus-circle-steps-test ">
                     <h4>3- اختبر نفسك في بنك الأسئلة</h4>
                     <p>ادخل على بنك الأسئلة وتدرّب على أسئلة متنوعة حسب المادة أو المهارة، علشان تثبت معلوماتك. ✍️</p>
+                </div> -->
+                <div class="aboutus-circle-steps aboutus-circle-steps-test ">
+                    <h4>{{ Aboutussteps[0]?.title }}</h4>
+                    <p>{{Aboutussteps[0].subtitle }}</p>
                 </div>
             </div>
 

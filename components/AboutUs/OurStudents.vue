@@ -3,16 +3,25 @@ import person1 from "@/public/images/person1.png";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import QuoteIcone from "~/public/icons/quoteIcone.vue";
-const cards = [
-  {
-    id: 1,
-    name: "احمد حوام السيد",
-    img: person1,
-    stage: "طالب جامعى",
-    Openion: "منصه رائعه ومفيدة جدا وبتساعدنا علي التدريب من خلال تجرلتنا لامتحانات فعليه",
-  },
+import { baseUrl } from "~/constant/baseUrl";
+import type { StudentsOpinionInterface } from "~/types/student_opinions";
 
-];
+const { data: StudentOpinons } = await useAsyncData("StudentOpinons", async () => {
+  const response = await $fetch<{
+    data: StudentsOpinionInterface[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/data`, {
+    method: "GET",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+ 
+  });
+  return response.data;
+});
+
 const splideOptions = {
   type: "loop", 
   perPage: 3, 
@@ -22,6 +31,24 @@ const splideOptions = {
   arrows: true,
   drag: false, 
 };
+
+
+
+// const cards = [
+//   {
+//     id: 1,
+//     name: "احمد حوام السيد",
+//     img: person1,
+//     stage: "طالب جامعى",
+//     Openion: "منصه رائعه ومفيدة جدا وبتساعدنا علي التدريب من خلال تجرلتنا لامتحانات فعليه",
+//   },
+
+// ];
+
+
+
+
+
 
 </script>
 
@@ -36,18 +63,18 @@ const splideOptions = {
         <div class="card-course-three">
             <div class="slider-wrapper" >
             <Splide :options="splideOptions" class="splide-container">
-                <SplideSlide v-for="(card, index) in cards" :key="index" >
+                <SplideSlide v-for="(opinion, index) in StudentOpinons" :key="index" >
                     <QuoteIcone class="quote-icon" />
                 <div class="card">
                     <div class="card-head">
                         <div class="card-head-info">
-                            <p>{{ card.name }}</p>
-                            <p>{{ card.stage }}</p>
+                            <p>{{ opinion.name }}</p>
+                            <p>{{ opinion.type }}</p>
                         </div>
-                        <img :src="card.img" alt="person">
+                        <img :src="opinion.img" alt="person">
                     </div>
                     <div class="card-body" dir="rtl">
-                        <p>{{ card.Openion }}</p>
+                        <p>{{ opinion.description }}</p>
                     </div>
                 </div>
                 </SplideSlide>
