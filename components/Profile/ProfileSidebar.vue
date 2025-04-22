@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import SettingsIcon from "~/public/icons/SettingsIcon.vue";
-import KeyIcon from "~/public/icons/key.vue";
-import QuestionBank from "~/public/icons/QuestionBank.vue";
-import Logout from "~/public/icons/Logout.vue";
-import CoursesNote from "~/public/icons/CoursesNote.vue";
+import { useUserStore } from "~/stores/user";
 import EditImageIcon from "~/public/icons/EditImageIcon.vue";
 import type { ProfileImage } from "~/types/profileimage";
 import UpdateProfileImageParams from "~/features/UpdateProfileImageFeature/Core/Params/update_profile_image_params";
@@ -14,32 +10,21 @@ const selectedImage = ref<File | null>(null);
 const imagePreview = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
 const profileimage = ref<ProfileImage | null>(null);
-const SelectedOption = ref("profile");
+const userStore = useUserStore();
 
 onMounted(() => {
-  const storedImage = localStorage.getItem("profileImage");
-  if (storedImage) {
-    profileimage.value = JSON.parse(storedImage);
+  if (userStore.image) {
+    imagePreview.value = userStore.image;
   }
 });
 
 const handleImageChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
-  if (!input.files || !input.files[0]) {
-    errorMessage.value = "يرجى اختيار صورة.";
-    return;
-  }
+  if (!input.files || !input.files[0]) return;
 
   const file = input.files[0];
-  const validTypes = ["image/jpeg", "image/png"];
-  const maxSize = 5 * 1024 * 1024;
-
-  if (!validTypes.includes(file.type)) {
-    errorMessage.value = "يرجى اختيار صورة JPEG أو PNG.";
-    return;
-  }
-  if (file.size > maxSize) {
-    errorMessage.value = "حجم الصورة يجب أن يكون أقل من 5MB.";
+  if (!["image/jpeg", "image/png"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    errorMessage.value = "يرجى اختيار صورة JPEG أو PNG بحجم أقل من 5MB.";
     return;
   }
 
@@ -47,48 +32,31 @@ const handleImageChange = async (event: Event) => {
   imagePreview.value = URL.createObjectURL(file);
   errorMessage.value = null;
 
-  profileimage.value = {
-    image: imagePreview.value,
-    name: "اسم المستخدم"
-  };
+  // تحديث في الستيت
+  userStore.setImage(imagePreview.value);
 
-  localStorage.setItem("profileImage", JSON.stringify(profileimage.value));
-
-  await uploadImage();      
+  await uploadImage();
 };
 
 const uploadImage = async () => {
-  if (!selectedImage.value) {
-    errorMessage.value = "يرجى اختيار صورة.";
-    return;
-  }
+  if (!selectedImage.value) return;
 
   const paramsImg = new UpdateProfileImageParams(selectedImage.value);
   try {
     await UpdateProfileImageController.getInstance().updateProfileImage(paramsImg);
-    
-    const storedImage = localStorage.getItem("profileImage");
-    if (storedImage) {
-      profileimage.value = JSON.parse(storedImage);
-    }
-    imagePreview.value = profileimage.value?.image || null;
-
   } catch (error) {
-    console.error("Error uploading image:", error);
+    console.error("خطأ في رفع الصورة:", error); // أضف دي
     errorMessage.value = "فشل في رفع الصورة.";
   }
-
-  selectedImage.value = null;
-  errorMessage.value = null;
 };
-</script>
 
+</script>
 
 <template>
   <div class="profile-sidebar-container">
     <div class="person-data">
       <div class="profile-image-container">
-        <img :src="imagePreview || profileimage?.image || ''" class="course-image" />
+        <img :src="imagePreview || ''" class="course-image" />
         <label for="profile-image-input">
           <EditImageIcon class="edit-icon" />
         </label>

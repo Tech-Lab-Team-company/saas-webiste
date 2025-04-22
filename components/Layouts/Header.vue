@@ -1,35 +1,36 @@
 <script lang="ts" setup>
-import Logo from "~/public/icons/Logo.vue";
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
-const route = useRoute();
+import { useUserStore } from "~/stores/user";
+
 const isLoggedIn = ref(false);
-// const uploadImage = async () => {
-//   if (!selectedImage.value) {
-//     errorMessage.value = "يرجى اختيار صورة.";
-//     return;
-//   }
-//   const paramsImg = new UpdateProfileImageParams(selectedImage.value);
-
-//   await UpdateProfileImageController.getInstance().updateProfileImage(
-//     paramsImg
-//   );
-
+const userStore = useUserStore();
 onMounted(() => {
   isLoggedIn.value = localStorage.getItem("auth") === "true";
-});
 
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    userStore.setUser(JSON.parse(storedUser));
+  }
+
+  const savedImage = localStorage.getItem("profileImage");
+  if (savedImage) {
+    userStore.setImage(savedImage);
+  }
+});
 const handleLogin = () => {
   localStorage.setItem("auth", "true");
   isLoggedIn.value = true;
 };
 
 const handleLogout = () => {
-  localStorage.removeItem("auth");
-  isLoggedIn.value = false;
+  localStorage.removeItem("auth");          
+  localStorage.removeItem("profileImage");
+  localStorage.removeItem("user");          
+  userStore.logout();                     
+  isLoggedIn.value = false;              
 };
 </script>
-
 <template>
   <header class="header">
     <div class="header-nav">
@@ -40,39 +41,31 @@ const handleLogout = () => {
       <div class="buttons" v-if="!isLoggedIn">
         <button class="btn btn-primary btn-create">انشاء حساب</button>
         <NuxtLink to="/login">
-          <button
-            class="btn btn-secondary btn-secondary-create"
-            @click="handleLogin"
-          >
+          <button class="btn btn-secondary btn-secondary-create" @click="handleLogin">
             تسجيل الدخول
           </button>
         </NuxtLink>
       </div>
+
+      <!-- بعد تسجيل الدخول -->
       <div class="buttons" v-else>
-        <button
-          class="btn btn-secondary btn-secondary-create"
-          @click="handleLogout"
-        >
+        <NuxtLink to="/profile" class="user-info" v-if="userStore.user">
+          <img :src="userStore.image || ''" alt="User Image" class="user-avatar" />
+          <span class="user-name">{{ userStore.user.name }}</span>
+        </NuxtLink>
+
+        <button class="btn btn-secondary btn-secondary-create" @click="handleLogout">
           تسجيل الخروج
         </button>
       </div>
 
+      <!-- روابط التنقل -->
       <ul class="nav-links">
-        <NuxtLink to="/blogs" exactActiveClass="active" class="nav-link">
-          <li>المدونه</li>
-        </NuxtLink>
-        <NuxtLink to="/questions" exactActiveClass="active" class="nav-link">
-          <li>بنك الاسئله</li>
-        </NuxtLink>
-        <NuxtLink to="/course" exactActiveClass="active" class="nav-link">
-          <li>الكورسات</li>
-        </NuxtLink>
-        <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link">
-          <li>نبذه عنا</li>
-        </NuxtLink>
-        <NuxtLink to="/" exactActiveClass="active" class="nav-link">
-          <li>الرئيسيه</li>
-        </NuxtLink>
+        <NuxtLink to="/blogs" exactActiveClass="active" class="nav-link"><li>المدونه</li></NuxtLink>
+        <NuxtLink to="/questions" exactActiveClass="active" class="nav-link"><li>بنك الاسئله</li></NuxtLink>
+        <NuxtLink to="/course" exactActiveClass="active" class="nav-link"><li>الكورسات</li></NuxtLink>
+        <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link"><li>نبذه عنا</li></NuxtLink>
+        <NuxtLink to="/" exactActiveClass="active" class="nav-link"><li>الرئيسيه</li></NuxtLink>
       </ul>
 
       <NuxtLink to="/" class="logo">
@@ -111,5 +104,26 @@ li:hover {
 
 .active {
   color: #032855;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 15px;
+  text-decoration: none;
+
+  .user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .user-name {
+    color: #032855;
+    font-weight: bold;
+    font-size: 16px;
+  }
 }
 </style>
