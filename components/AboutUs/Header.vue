@@ -20,16 +20,45 @@ onMounted(() => {
     observer.observe(headerRef.value);
   }
 });
+
+const props = defineProps({
+  title: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
+});
+
+
+
+
+
+
+const HeaderTitle = ref(props.title);
+const HeaderDesciption = ref(props.description);
+
+
+watch(() => props.title, (newValue) => {
+  HeaderTitle.value = newValue;
+}, { immediate: true });
+
+watch(() => props.description, (newValue) => {
+  HeaderDesciption.value = newValue;
+}, { immediate: true });
+
+
+
 </script>
 
 <template>
     <div class="aboutus-header" ref="headerRef">
         <div class="header-title">
-            <h3 :class="{ 'animate': isVisible }">نحن منصة تعليمية مبتكرة نسعى إلى تقديم تجربة تعلُّم <span>تفاعلية وممتعة</span></h3>
+            <h3 :class="{ 'animate': isVisible }">{{ HeaderTitle }}</h3>
         </div>
         <div class="header-description-container">
             <div class="header-description">
-                <p :class="{ 'animate': isVisible }">نوفر محتوى تعليمي متميز، تدريبات تفاعلية، واختبارات ذكية تساعد الطلاب على الفهم، التكرار، والتفوّق. رؤيتنا هي بناء جيل واعٍ، واثق، ومحب للمعرفة… خطوة بخطوة نحو النجاح</p>
+                <p :class="{ 'animate': isVisible }">{{ HeaderDesciption }}</p>
             </div>
             <img 
                 src="../../public/images/handbg.png" 

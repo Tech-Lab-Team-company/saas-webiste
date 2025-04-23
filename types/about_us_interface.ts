@@ -1,12 +1,27 @@
-import type AboutUsVisionInterface from "./about_us_vision_interface";
-import type StatisticsInterface from "./statistics_interface";
-import type TitleInterface from "./title_intefrace";
+import type ChildrenInterface from "./children_interface";
+import type CourseInterface from "./course_interface";
+import type MediaInterface from "./media";
 
 
 export default interface AboutUsInterface {
-    statistics:StatisticsInterface;
-    vision:AboutUsVisionInterface;
-    stages:TitleInterface[]    
+    id: number;
+    title: string;
+    subtitle:string ;
+    description: string;
+    order: number;
+    style: number;
+    type: number;
+    icon: string;
+    media: MediaInterface[]; 
+    courses: CourseInterface[];    
+    blogs:[]
+    children:ChildrenInterface[]
 }
+
+
+
+
+
+
 
 

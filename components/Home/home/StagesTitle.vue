@@ -38,7 +38,7 @@ watch(
 </script>
 
 <template>
-        <div >
+        <div class="stages-container" >
             <p v-if="MainTitle" class="stages-main-title">{{ MainTitle }}</p>
             <p v-if="Title" class="stage-title">{{ Title }}</p>
             <p v-if="SubTitle" class="stages-subtitle">{{ SubTitle }}</p>  

@@ -1,11 +1,13 @@
 .course-video-container{
     // width: 95%;
+    display: flex;
+    justify-content: center;
     margin-left: auto;
     margin-right: auto;
     margin-top: 15px;
     padding: 0 25px;
     transition: all 0.3s ease-in-out;
-    img{
+    iframe{
         margin-left: auto;
         margin-right: auto;
     }
