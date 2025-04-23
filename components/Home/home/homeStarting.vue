@@ -90,8 +90,7 @@ onUpdated(() => {
       <EducationStages />
       <Students />
     </div>
-    <EducationStages />
-    <Students />
+
   </template>
   
 
