@@ -2,9 +2,11 @@
 import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "~/stores/user";
-
+import { useRouter } from "vue-router";
 const isLoggedIn = ref(false);
-const userStore = useUserStore();
+const userStore = useUserStore()
+const router = useRouter();
+
 onMounted(() => {
   isLoggedIn.value = localStorage.getItem("auth") === "true";
 
@@ -25,10 +27,12 @@ const handleLogin = () => {
 
 const handleLogout = () => {
   localStorage.removeItem("auth");          
-  localStorage.removeItem("profileImage");
+  // localStorage.removeItem("profileImage");
   localStorage.removeItem("user");          
   userStore.logout();                     
-  isLoggedIn.value = false;              
+  isLoggedIn.value = false; 
+  router.push("/");
+
 };
 </script>
 <template>

@@ -6,7 +6,7 @@
 <template>
   <div class="course-page">
    
-    <CourseCoursecontainer />
+    <CourseAllCourse />
  
 
 
