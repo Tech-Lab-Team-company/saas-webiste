@@ -3,6 +3,9 @@ import BottomDashedIcon from '~/public/icons/BottomDashedIcon.vue';
 import SquareIcon from '~/public/icons/squareIcon.vue';
 import TopDashedArrow from '~/public/icons/TopDashedArrow.vue';
 import { ref, onMounted } from 'vue';
+import { DashboradbaseUrl } from "~/constant/baseUrl";
+import type AboutUsInterface from '~/types/about_us_interface';
+import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
 
 const stepsContainer = ref<HTMLElement | null>(null);
 const isVisible = ref(false);
@@ -31,22 +34,25 @@ onMounted(() => {
 
 
 
-
-import type TitleInterface from '~/types/title_intefrace';
-
-
-  const props = defineProps({
-  AboutusSteps: {
-      type: Object as () => TitleInterface[] | null,
-      default: null
-  }
+const { data: aboutusSteps } = await useAsyncData("AboutSteps", async () => {
+  const response = await $fetch<{
+    data: AboutUsInterface[];
+    message: string;
+    status: number;
+  }>(`${DashboradbaseUrl}/fetch_website_sections`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type:SectionTypeEnum.AboutSteps, 
+    },
+ 
   });
+  return response?.data[0];
+});
 
-  const Aboutussteps = ref(props.AboutusSteps);
-
-  watch(() => props.AboutusSteps, (newValue) => {
-    Aboutussteps.value = newValue;
-  }, { immediate: true });
 
 
 </script>
@@ -54,20 +60,16 @@ import type TitleInterface from '~/types/title_intefrace';
 <template>
     <div class="aboutus-steps-container">
         <div class="aboutus-steps-header">
-            <h3>خطوات بسيطة لإدارة منهجك التعليمي</h3>
+            <h3>{{ aboutusSteps?.title }}</h3>
             <hr class="abotus-hr">
         </div>
 
         <div class="aboutus-setps" ref="stepsContainer" :class="{ 'animate': isVisible }">
             <div class="left-stpes">
-                <!-- <div class="aboutus-circle-steps aboutus-circle-steps-start">
-                    <h4>2- ابدأ التعلّم وتابِع تقدّمك</h4>
-                    <p>شاهد الدروس، حل التمارين، وراجع كل خطوة بتعملها من خلال صفحة كورساتي الخاصة. 
-                اختبر نفسك في بنك الأسئلة 📚</p>
-                </div> -->
+        
                 <div class="aboutus-circle-steps aboutus-circle-steps-start">
-                    <h4>{{ Aboutussteps[0]?.title }}</h4>
-                    <p>{{ Aboutussteps[0].subtitle}}</p>
+                    <h4>{{ aboutusSteps?.children?.[0]?.title }}</h4>
+                    <p>{{ aboutusSteps?.children?.[0]?.subtitle}}</p>
                 </div>
             </div>
             <div class="aboutus-arrows">
@@ -75,22 +77,16 @@ import type TitleInterface from '~/types/title_intefrace';
                 <BottomDashedIcon class="aboutus-arrow" />
             </div>
             <div class="right-steps">
-                <!-- <div class="aboutus-circle-steps">
-                    <h4>1- اختار الكورسات اللي تهمك</h4>
-                    <p>تصفّح مجموعة كبيرة من الدورات التعليمية في مختلف التخصصات، واختار اللي يناسب مستواك واهتماماتك.
-                        ابدأ التعلّم وتابِع تقدّمك</p>
-                </div> -->
+      
                 <div class="aboutus-circle-steps">
-                    <h4>{{ Aboutussteps[0]?.title }}</h4>
-                    <p>{{Aboutussteps[0].subtitle }}</p>
+                  <h4>{{ aboutusSteps?.children?.[1]?.title }}</h4>                    
+                  <p>{{ aboutusSteps?.children?.[1]?.subtitle}}</p>
                 </div>
-                <!-- <div class="aboutus-circle-steps aboutus-circle-steps-test ">
-                    <h4>3- اختبر نفسك في بنك الأسئلة</h4>
-                    <p>ادخل على بنك الأسئلة وتدرّب على أسئلة متنوعة حسب المادة أو المهارة، علشان تثبت معلوماتك. ✍️</p>
-                </div> -->
+      
                 <div class="aboutus-circle-steps aboutus-circle-steps-test ">
-                    <h4>{{ Aboutussteps[0]?.title }}</h4>
-                    <p>{{Aboutussteps[0].subtitle }}</p>
+                  <h4>{{ aboutusSteps?.children?.[2]?.title}}</h4>
+                  <p>{{ aboutusSteps?.children?.[2]?.subtitle}}</p>
+
                 </div>
             </div>
 
