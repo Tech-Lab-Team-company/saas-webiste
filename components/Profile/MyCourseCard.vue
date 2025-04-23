@@ -95,7 +95,7 @@ const cards = [
 </script>
 
 <template>
-  <div class="card-course-item">
+  <div class="profile-home">
     <div class="slider-wrapper">
       <div class="cards-container">
         <div class="card" v-for="(card, index) in cards" :key="index">
@@ -159,8 +159,11 @@ const cards = [
 .cards-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  width: 50%;
+  width: 90%;
   gap: 10px;
+  width: 90%;
+  justify-items: center;
+  align-items: center;
 }
 
 .card {
@@ -270,9 +273,8 @@ const cards = [
   display: flex;
   align-items: center;
   gap: 10px;
-  border-top: 1px solid #C2C2C2;
+  border-top: 1px solid #c2c2c2;
   padding: 10px 0;
-
 }
 .card-name {
   font-weight: 700;
@@ -287,7 +289,6 @@ const cards = [
   align-items: center;
   gap: 10px;
   width: 100%;
-
 }
 
 .progress-bar {

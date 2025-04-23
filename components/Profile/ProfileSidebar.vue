@@ -1,16 +1,42 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+
 import { useUserStore } from "~/stores/user";
 import EditImageIcon from "~/public/icons/EditImageIcon.vue";
 import type { ProfileImage } from "~/types/profileimage";
 import UpdateProfileImageParams from "~/features/UpdateProfileImageFeature/Core/Params/update_profile_image_params";
 import UpdateProfileImageController from "~/features/UpdateProfileImageFeature/presentation/controllers/update_profile_image_controller";
-
 const selectedImage = ref<File | null>(null);
 const imagePreview = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
 const profileimage = ref<ProfileImage | null>(null);
 const userStore = useUserStore();
+const isLoggedIn = ref(false);
+
+const router = useRouter();
+
+onMounted(() => {
+  isLoggedIn.value = localStorage.getItem("auth") === "true";
+
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    userStore.setUser(JSON.parse(storedUser));
+  }
+
+  const savedImage = localStorage.getItem("profileImage");
+  if (savedImage) {
+    userStore.setImage(savedImage);
+  }
+});
+
+const handleLogout = () => {
+  localStorage.removeItem("auth");
+  localStorage.removeItem("user");
+  userStore.logout();
+  isLoggedIn.value = false;
+  router.push("/");
+};
 
 onMounted(() => {
   if (userStore.image) {
@@ -23,7 +49,10 @@ const handleImageChange = async (event: Event) => {
   if (!input.files || !input.files[0]) return;
 
   const file = input.files[0];
-  if (!["image/jpeg", "image/png"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+  if (
+    !["image/jpeg", "image/png"].includes(file.type) ||
+    file.size > 5 * 1024 * 1024
+  ) {
     errorMessage.value = "يرجى اختيار صورة JPEG أو PNG بحجم أقل من 5MB.";
     return;
   }
@@ -32,7 +61,6 @@ const handleImageChange = async (event: Event) => {
   imagePreview.value = URL.createObjectURL(file);
   errorMessage.value = null;
 
-  // تحديث في الستيت
   userStore.setImage(imagePreview.value);
 
   await uploadImage();
@@ -43,13 +71,14 @@ const uploadImage = async () => {
 
   const paramsImg = new UpdateProfileImageParams(selectedImage.value);
   try {
-    await UpdateProfileImageController.getInstance().updateProfileImage(paramsImg);
+    await UpdateProfileImageController.getInstance().updateProfileImage(
+      paramsImg
+    );
   } catch (error) {
-    console.error("خطأ في رفع الصورة:", error); // أضف دي
+    console.error("خطأ في رفع الصورة:", error);
     errorMessage.value = "فشل في رفع الصورة.";
   }
 };
-
 </script>
 
 <template>
@@ -68,41 +97,47 @@ const uploadImage = async () => {
           style="display: none"
         />
       </div>
-      <p class="person-name">{{ profileimage?.name }}</p>
+      <p class="person-name">{{ userStore.user.name }}</p>
       <p class="person-stage">طالب ثانوي</p>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
 
     <ul class="profile-options">
-      <li
+      <NuxtLink
+        to="/profile"
+        exactActiveClass="active"
         class="profile-option"
         @click="UpdateSidebar('profile')"
         :class="{ active: SelectedOption === 'profile' }"
       >
         <p>الملف الشخصي</p>
         <SettingsIcon class="profile-icon" />
-      </li>
+      </NuxtLink>
 
-      <!-- <NuxtLink
-      :to=""
+      <NuxtLink
+        to="/login/setnewpassword"
+        exactActiveClass="active"
         class="profile-option"
         @click="UpdateSidebar('security')"
         :class="{ active: SelectedOption === 'security' }"
       >
         <p>الامان</p>
         <KeyIcon class="profile-icon" />
-      </NuxtLink> -->
-      <li
+      </NuxtLink>
+      <NuxtLink
+        exactActiveClass="active"
+        to="/profilecourse"
         class="profile-option"
-        @click="UpdateSidebar('courses')"
+        @NuxtLinkck="UpdateSidebar('courses')"
         :class="{ active: SelectedOption === 'courses' }"
       >
         <p>كورساتي</p>
         <CoursesNote class="profile-icon" />
-      </li>
+      </NuxtLink>
       <li
         class="profile-option"
         @click="UpdateSidebar('questionsbank')"
+        exactActiveClass="active"
         :class="{ active: SelectedOption === 'questionsbank' }"
       >
         <p>بنك اسئلتي</p>
@@ -110,7 +145,8 @@ const uploadImage = async () => {
       </li>
       <li
         class="profile-option"
-        @click="UpdateSidebar('logout')"
+        @click="handleLogout"
+        exactActiveClass="active"
         :class="{ active: SelectedOption === 'logout' }"
       >
         <p>تسجيل الخروج</p>
@@ -187,4 +223,3 @@ const uploadImage = async () => {
   }
 }
 </style>
-

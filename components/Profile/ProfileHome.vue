@@ -2,6 +2,9 @@
 // import { ref } from "vue";
 // import MultiSelect from "primevue/multiselect";
 import { useUserStore } from "~/stores/user";
+import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
+
+const studentCategory = ref(0);
 
 const userStore = useUserStore();
 
@@ -24,16 +27,23 @@ const CategoryOptions = ref([
 const email = ref("");
 const name = ref("");
 const phone = ref("");
-
+const university_title = ref("");
+const college_title = ref("");
+const university_education_type_title = ref("");
+const division_title = ref("");
+const department_title = ref("");
 onMounted(() => {
-  console.log("User store data: ", userStore);     
+  console.log("User store data: ", userStore);
   if (userStore.user) {
     email.value = userStore?.user?.email;
     name.value = userStore?.user?.name;
     phone.value = userStore?.user?.phone;
-
-
-
+    university_title.value = userStore?.user?.userInfo?.university_title;
+    college_title.value = userStore?.user?.userInfo?.college_title;
+    university_education_type_title.value =
+      userStore?.user?.userInfo?.university_education_type_title;
+    division_title.value = userStore?.user?.userInfo?.division_title;
+    department_title.value = userStore?.user?.userInfo?.department_title;
   } else {
     console.log("User data is not available.");
   }
@@ -48,7 +58,6 @@ onMounted(() => {
         هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين
         الآخرين
       </p>
-
     </div>
     <hr class="profile-text-hr" />
 
@@ -57,31 +66,21 @@ onMounted(() => {
         <label>الاسم بالكامل</label>
         <div class="profile-input-container">
           <button>تعديل</button>
-          <input
-            type="text"
-            class="input"
-            placeholder=" "
-            v-model="name"
-
-          />
+          <input type="text" class="input" placeholder=" " v-model="name" />
         </div>
       </div>
       <div class="profile-info-container">
         <label>البريد الالكتروني</label>
         <div class="profile-input-container">
           <button>تعديل</button>
-          <input type="text" class="input" placeholder=""
-          v-model="email"
-          />
+          <input type="text" class="input" placeholder="" v-model="email" />
         </div>
       </div>
       <div class="profile-info-container">
         <label>رقم الهاتف </label>
         <div class="profile-input-container">
           <button>تعديل</button>
-          <input type="text" class="input" placeholder=""
-          v-model="phone"
-         />
+          <input type="text" class="input" placeholder="" v-model="phone" />
         </div>
       </div>
     </div>
@@ -103,23 +102,39 @@ onMounted(() => {
     <div class="profile-home-information">
       <div class="profile-info-container">
         <label>نوع التعليم</label>
-        <div class="profile-input-container">
-          <button>تعديل</button>
-          <input type="text" class="input" placeholder="عام" />
+
+        <div class="profile-multi profile-input-container flex justify-center">
+          <select v-model="studentCategory" class="custom-select input">
+            <option value="" disabled selected>نوع التعليم</option>
+            <option :value="StudentCategoryEnum.base">أساسي</option>
+            <option :value="StudentCategoryEnum.university">جامعي</option>
+            <option :value="StudentCategoryEnum.general">عام</option>
+          </select>
         </div>
       </div>
+
       <div class="profile-info-container">
         <label>مرحله التعليم</label>
         <div class="profile-input-container">
           <button>تعديل</button>
-          <input type="text" class="input" placeholder="المرحله الجامعيه" />
+          <input
+            type="text"
+            class="input"
+            placeholder=" "
+            v-model="university_education_type_title"
+          />
         </div>
       </div>
       <div class="profile-info-container">
         <label>جامعه </label>
         <div class="profile-input-container">
           <button>تعديل</button>
-          <input type="text" class="input" placeholder="جامعه المنصورة" />
+          <input
+            type="text"
+            class="input"
+            placeholder=""
+            v-model="university_title"
+          />
         </div>
       </div>
       <div class="profile-info-container">
@@ -129,7 +144,20 @@ onMounted(() => {
           <input
             type="text"
             class="input"
-            placeholder="كليه الحاسبات ونظم المعلومات"
+            placeholder=""
+            v-model="college_title"
+          />
+        </div>
+      </div>
+      <div class="profile-info-container">
+        <label>القسم </label>
+        <div class="profile-input-container">
+          <button>تعديل</button>
+          <input
+            type="text"
+            class="input"
+            placeholder=""
+            v-model="department_title"
           />
         </div>
       </div>
@@ -137,7 +165,12 @@ onMounted(() => {
         <label>الفرقه </label>
         <div class="profile-input-container">
           <button>تعديل</button>
-          <input type="text" class="input" placeholder="الرابعه" />
+          <input
+            type="text"
+            class="input"
+            placeholder=""
+            v-model="division_title"
+          />
         </div>
       </div>
     </div>
@@ -147,7 +180,7 @@ onMounted(() => {
       <hr class="profile-second-hr" />
     </div>
 
-    <div class="profile-home-text profile-home-text2">
+    <!-- <div class="profile-home-text profile-home-text2">
       <p>المجالات المهتم بيها</p>
       <p>
         هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين
@@ -191,7 +224,7 @@ onMounted(() => {
           />
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

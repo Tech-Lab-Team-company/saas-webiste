@@ -1,3 +1,5 @@
+import  UserInfo from "./user_info";
+
 export default class UserModel {
   public id: number;
   public name: string; // Use 'string' instead of 'String'
@@ -17,6 +19,7 @@ export default class UserModel {
   public youtube?: string;
   public linkedin?: string;
   public whatsapp?: string;
+  public userInfo?:UserInfo
 
 
   constructor(
@@ -38,6 +41,7 @@ export default class UserModel {
     youtube?: string,
     linkedin?: string,
     whatsapp?: string,
+    userInfo?: UserInfo
   ) {
     this.id = id;
     this.name = name;
@@ -57,6 +61,7 @@ export default class UserModel {
     this.youtube = youtube;
     this.linkedin = linkedin;
     this.whatsapp = whatsapp;
+    this.userInfo = userInfo;
   }
 
   static fromMap(map: { [key: string]: any }): UserModel {
@@ -79,6 +84,7 @@ export default class UserModel {
       map["youtube"],
       map["linkedin"],
       map["whatsapp"],
+      map["user_info"] ? UserInfo.fromMap(map["user_info"]) : undefined
     );
   }
 }

@@ -7,9 +7,12 @@ import ProfileSidebar from '~/components/Profile/ProfileSidebar.vue';
 <template>
   <div class="profile-page">
 
-    <!-- <ProfileMyCourseCard /> -->
-    <Profile/>
+    <ProfileMyCourseContainer />
+
 
 
   </div>
 </template>
+<style>
+
+</style>

@@ -57,11 +57,9 @@ const cards = [
 </script>
 
 <template>
-  <HomeHomeEducationStages />
+  <!-- <HomeHomeEducationStages /> -->
   <div class="card-course">
-    <div>
-      <p class="cards-heading">(6)جميع الكورسات</p>
-    </div>
+    
     <div class="cards-wrapper">
       <div class="cards-grid">
         <NuxtLink

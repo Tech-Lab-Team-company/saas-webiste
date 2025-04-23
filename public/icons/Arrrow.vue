@@ -1,4 +1,5 @@
 <template>
+
     
 <svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect x="-0.5" y="0.5" width="28" height="28" rx="5.5" transform="matrix(-1 0 0 1 28 0)" stroke="white" stroke-opacity="0.4"/>

@@ -19,7 +19,8 @@ export const useUserStore = defineStore('user', {
       this.user = null;
     //   this.image = null;
       this.isAuth = false;
-    }
+    },
+  
   },
   persist: true
 })
