@@ -3,23 +3,33 @@ import person1 from "@/public/images/person1.png";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import QuoteIcone from "~/public/icons/quoteIcone.vue";
-import { baseUrl } from "~/constant/baseUrl";
+import { baseUrl,DashboradbaseUrl } from "~/constant/baseUrl";
 import type { StudentsOpinionInterface } from "~/types/student_opinions";
 
-const { data: StudentOpinons } = await useAsyncData("StudentOpinons", async () => {
+import type AboutUsInterface from '~/types/about_us_interface';
+import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
+
+
+const { data: aboutusOpinions } = await useAsyncData("AboutOpinions", async () => {
   const response = await $fetch<{
-    data: StudentsOpinionInterface[];
+    data: AboutUsInterface[];
     message: string;
     status: number;
-  }>(`${baseUrl}/data`, {
-    method: "GET",
+  }>(`${DashboradbaseUrl}/fetch_website_sections`, {
+    method: "POST",
     headers: {
       "Accept-Language": "ar",
       "web-domain":"abouelezz.com",
     },
+    body: {
+      type:SectionTypeEnum.Opinions, 
+    },
  
   });
-  return response.data;
+  console.log(response.data);
+
+
+  return response?.data[0];
 });
 
 const splideOptions = {
@@ -32,46 +42,28 @@ const splideOptions = {
   drag: false, 
 };
 
-
-
-// const cards = [
-//   {
-//     id: 1,
-//     name: "احمد حوام السيد",
-//     img: person1,
-//     stage: "طالب جامعى",
-//     Openion: "منصه رائعه ومفيدة جدا وبتساعدنا علي التدريب من خلال تجرلتنا لامتحانات فعليه",
-//   },
-
-// ];
-
-
-
-
-
-
 </script>
 
 <template>
     <div class="aboutus-student-container">
       <div class="aboutus-steps-container">
             <div class="aboutus-steps-header">
-                <h3>اراء الطلبه في منصتنا</h3>
+                <h3>{{ aboutusOpinions?.title }}</h3>
                 <hr class="abotus-hr">
             </div>
         </div>
         <div class="card-course-three">
             <div class="slider-wrapper" >
             <Splide :options="splideOptions" class="splide-container">
-                <SplideSlide v-for="(opinion, index) in StudentOpinons" :key="index" >
+                <SplideSlide v-for="(opinion, index) in aboutusOpinions?.children" :key="index" >
                     <QuoteIcone class="quote-icon" />
                 <div class="card">
                     <div class="card-head">
                         <div class="card-head-info">
-                            <p>{{ opinion.name }}</p>
-                            <p>{{ opinion.type }}</p>
+                            <p>{{ opinion.title }}</p>
+                            <p>{{ opinion.subtitle }}</p>
                         </div>
-                        <img :src="opinion.img" alt="person">
+                        <img :src="opinion.icon" alt="person">
                     </div>
                     <div class="card-body" dir="rtl">
                         <p>{{ opinion.description }}</p>

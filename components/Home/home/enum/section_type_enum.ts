@@ -7,4 +7,11 @@ export enum SectionTypeEnum {
     StudentOpinions = 6,
     Stages = 7,
     AboutUs = 8,
+    AboutStatistics = 9,
+    AboutVision = 10,
+    AboutSteps = 11,
+    Opinions = 12,
 }
+
+
+

@@ -1,24 +1,31 @@
 <script setup lang="ts">
 import AbouusSteps from '~/components/AboutUs/AbouusSteps.vue';
-import { baseUrl } from "~/constant/baseUrl";
 import type AboutUsInterface from '~/types/about_us_interface';
+import { baseUrl, DashboradbaseUrl } from "~/constant/baseUrl";
+import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
 
-const { data: AboutUsSections } = await useAsyncData("AboutUsSections", async () => {
+
+const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async () => {
   const response = await $fetch<{
-    data: AboutUsInterface;
+    data: AboutUsInterface[];
     message: string;
     status: number;
-  }>(`${baseUrl}/data`, {
-    method: "GET",
+    
+  }>(`${DashboradbaseUrl}/fetch_website_sections`, {
+    method: "POST",
     headers: {
       "Accept-Language": "ar",
       "web-domain":"abouelezz.com",
     },
+    body: {
+      type:SectionTypeEnum.AboutStatistics, 
+    },
  
   });
-  console.log(response);
+  console.log(response.data);
 
-  return response.data;
+
+  return response.data[0];
 });
 
 
@@ -27,18 +34,18 @@ const { data: AboutUsSections } = await useAsyncData("AboutUsSections", async ()
 <template>
     <div class="aboutus-container">
         <div class="aboutus">
-            <AboutUsHeader />
+          {{ console.log(aboutusstatistics , "aboutusstatistics") }}
+            <AboutUsHeader 
+            :title="aboutusstatistics?.title"
+            :description="aboutusstatistics?.subtitle"
+            />
             <div class="about-us-statistics">
                 <AboutUsCourseStatistics
-                    :AboutusStatistics="AboutUsSections?.statistics"  
+                    :sections="aboutusstatistics?.children"
                  />
             </div>
-            <AboutUsOurVision
-                :AboutusVision="AboutUsSections?.vision"        
-            />
-            <AbouusSteps 
-                :AboutusSteps="AboutUsSections?.stages" 
-            />
+           <AboutUsOurVision/>
+           <AbouusSteps />
             <AboutUsOurStudents />
         </div>
     </div>

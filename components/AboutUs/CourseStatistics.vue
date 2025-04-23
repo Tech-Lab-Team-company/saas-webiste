@@ -1,58 +1,36 @@
 <script setup lang="ts">
-import CentersIcons from '~/public/icons/CentersIcons.vue';
-import LikeIcon from '~/public/icons/LikeIcon.vue';
-import ProfileIcon from '~/public/icons/ProfileIcon.vue';
-import StatisticsIcon from '~/public/icons/statisticsIcon.vue';
-import type StatisticsInterface from '~/types/statistics_interface';
+import type ChildrenInterface from '~/types/children_interface';
+
 
 const props = defineProps({
-AboutusStatistics: {
-    type: Object as () => StatisticsInterface | null,
-    default: null
-}
+  sections: {
+    type: Array as PropType<ChildrenInterface[]>,
+  },
+
 });
 
-const Aboutusstatistics = ref(props.AboutusStatistics);
+const Sections = ref(props.sections);
 
-watch(() => props.AboutusStatistics, (newValue) => {
-    Aboutusstatistics.value = newValue;
+
+watch(() => props.sections, (newValue) => {
+  Sections.value = newValue;
 }, { immediate: true });
+
+
+
 
 
 </script>
 
 <template>
     <div class="course-statistics-container">
-    
-        <div class="course-statistics">
+        <div class="course-statistics" v-for="(section, index) in Sections" :key="index">
             <div class="statistics">
-                <p>{{ Aboutusstatistics?.total_rateing }}</p>
-                <p>إجمالي التقييمات</p> 
+                <p>{{section?.subtitle  }}</p>
+                <p>{{ section?.title }}</p> 
             </div>
-            <LikeIcon class="statistics-icon" />
-        </div>
-        <div class="course-statistics">
-            <div class="statistics">
-                <p>{{ Aboutusstatistics?.centers_number }}</p>
-                <p>سناتر تعليمية</p>
-            </div>
-            <CentersIcons class="statistics-icon" />
-        </div>
-        <div class="course-statistics">
-            <div class="statistics">
-                <p>{{ Aboutusstatistics?.teacher_number }}</p>
-                <p>مدرس لدينا</p>
-            </div>
-            <ProfileIcon class="statistics-icon"  />
-        </div>
-
-        <div class="course-statistics">
-            <div class="statistics">
-                <p>{{ Aboutusstatistics?.strat_year }}</p>
-                <p>انطلاقنا</p>
-            </div>
-            <StatisticsIcon class="statistics-icon" />
-        </div>
+            <img :src="section?.icon" alt="icon1" class="statistics-icon" />
+        </div> 
     </div>
 </template>
 
