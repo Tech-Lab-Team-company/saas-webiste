@@ -87,9 +87,10 @@ onUpdated(() => {
       </ClientOnly>
 
       
-      <EducationStages />
-      <Students />
+     
     </div>
+    <EducationStages />
+    <Students />
 
   </template>
   
