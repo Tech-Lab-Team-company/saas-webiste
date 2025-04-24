@@ -127,6 +127,11 @@ class ApiNames {
   public fetch_blogs = "fetch_blogs";
 
   public show_blog = "show_blog";
+  
+  
+  //Courses
+  public fetch_courses = "fetch_courses";
+
 }
 
 export { ApiNames };
