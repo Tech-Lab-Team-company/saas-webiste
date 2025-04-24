@@ -13,6 +13,7 @@
     "@cloudinary/url-gen": "^1.21.0",
     "@cloudinary/vue": "^1.13.1",
     "@googlemaps/js-api-loader": "^1.16.8",
+    "@justinribeiro/lite-youtube": "^1.7.1",
     "@nuxt/devtools": "^2.3.2",
     "@nuxt/http": "^0.6.4",
     "@nuxt/image": "^1.10.0",
@@ -20,16 +21,17 @@
     "@primeuix/themes": "^1.0.3",
     "@primevue/forms": "^4.3.3",
     "@splidejs/vue-splide": "^0.6.12",
-    "@vidstack/player": "^1.6.0",
-    "@vidstack/player-react": "^1.6.0",
+    "@twicpics/components": "^0.33.0",
     "@vimeo/player": "^2.26.0",
     "axios": "^1.8.4",
     "nuxt": "^3.16.1",
     "nuxt-swiper": "^2.0.0",
     "pinia-plugin-persistedstate": "^4.2.0",
+    "plyr": "^3.7.8",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.3",
     "swiper": "^11.2.6",
+    "video.js": "^8.22.0",
     "vite-plugin-vue-tracer": "^0.1.3",
     "vite-tsconfig-paths": "^5.1.4",
     "vue": "^3.5.13",
@@ -40,7 +42,6 @@
   "devDependencies": {
     "@primevue/nuxt-module": "^4.3.3",
     "sass": "^1.86.0",
-    "sass-loader": "^16.0.5",
-    "vidstack": "^1.12.13"
+    "sass-loader": "^16.0.5"
   }
 }

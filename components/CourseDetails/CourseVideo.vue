@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import VimeoPlayer from '../VimeoPlayer/VimeoPlayer.vue';
 
-
-    const props = defineProps({
+   const props = defineProps({
         CourseVideoLink:{
             type: Object as () => {
                 videoLink:string,
@@ -34,31 +32,23 @@ import VimeoPlayer from '../VimeoPlayer/VimeoPlayer.vue';
 
 
 
-
-
-
+    
+    const playVideo = ref(false)
 </script>
+  
 
+
+  
 
 <template>
-   <div class="course-video-container">
+   <div class="course-video-container  " >
        <iframe
         width="560"
         height="315"
         :src="CourseVideoLink?.videoLink"
         frameborder="0"
         allowfullscreen
-    ></iframe>
-        <!-- <div>
-            <VimeoPlayer video-id="https://youtu.be/HmMiRMRVDY4" :options="{ width: '100%', height: 500 }" />
-        </div> -->
-        <!-- <VidStack -->
-            <!-- src="youtube/HmMiRMRVDY4" -->
-            <!-- /> -->
-            <!-- title="VidStack YouTube Demo" -->
-            <!-- poster="https://files.vidstack.io/sprite-fight/poster.webp" -->
-
-            
+        ></iframe>
     </div>
       
 
@@ -69,10 +59,9 @@ import VimeoPlayer from '../VimeoPlayer/VimeoPlayer.vue';
         </div>
 
 </template>
+  
+<style scoped>
 
-<style scoped ></style>
-
-
-
+</style>
 
 

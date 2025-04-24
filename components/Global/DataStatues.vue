@@ -53,7 +53,7 @@ defineProps({
       </div>
       <div v-else>
         <div class="text-center">
-          <p class="text-danger">{{ $t("error") }}</p>
+          <p class="text-danger">{{ ("error") }}</p>
         </div>
       </div>
     </div>
