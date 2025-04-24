@@ -8,7 +8,7 @@
     &.stage-container-dots{
         @media (min-width:470px) {
             
-            height: 270px;
+            height: auto;
         }
     }
     
@@ -33,7 +33,7 @@
         justify-content: center; 
         width: 100%;
         z-index: 50;
-        margin-top: 20px;
+        margin-top: 80px;
         font-family: "medium";
         font-weight: 700;
         font-size: 18px;

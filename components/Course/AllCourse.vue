@@ -60,6 +60,8 @@ const selectedToggle = ref("one");
   background-color: transparent;
   width: 43px;
   height: 43px;
+ 
+
 
   &.active {
     background-color: #ffb949;
@@ -76,7 +78,7 @@ const selectedToggle = ref("one");
   align-items: center;
   margin-bottom: 20px;
   padding: 0 20px;
-  width: 90%;
+  // width: 90%;
 }
 
 .cards-heading {
@@ -94,6 +96,6 @@ const selectedToggle = ref("one");
   color: #222;
   font-weight: 400;
   font-family: "regular";
-  padding: 0 160px;
+  // padding: 0 160px;
 }
 </style>
