@@ -114,7 +114,7 @@ const cards = [
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  width: 80%;
+  // width: 80%;
 }
 
 .card {
@@ -176,7 +176,7 @@ const cards = [
 
 .card-title {
   font-weight: 700;
-  font-size: 22px;
+  font-size: 21px;
   line-height: 100%;
   letter-spacing: 0%;
   text-align: right;
@@ -187,13 +187,16 @@ const cards = [
 
 .card-number {
   background: #ffb949;
-  width: 100px;
+  // width: 100px;
   border-radius: 20px;
   text-align: center;
   padding: 4px 5px;
   font-weight: 500;
   font-size: 14px;
   font-family: "regular";
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-text {
@@ -209,7 +212,6 @@ const cards = [
 .card-footer {
   display: flex;
   align-items: center;
-  gap: 1rem;
   padding: 5px 1px;
 }
 
