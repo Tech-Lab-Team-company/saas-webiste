@@ -3,6 +3,7 @@ import { useRoute } from "vue-router";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "~/stores/user";
 import { useRouter } from "vue-router";
+import Logo from "~/public/icons/Logo.vue"
 const isLoggedIn = ref(false);
 const userStore = useUserStore()
 const router = useRouter();

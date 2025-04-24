@@ -1,140 +1,169 @@
-<script setup>
+<script setup lang="ts">
 import arabic_three from "@/assets/images/arabic_three.png";
 import note_one from "@/public/icons/note_one.vue";
 import note_two from "@/public/icons/note_two.vue";
 import user from "@/public/icons/user.vue";
+import CoursesParams from "~/features/FetchCourses/Core/Params/courses_params";
+import CoursesModel from "~/features/FetchCourses/Data/models/courses_model";
+import CoursesController from "~/features/FetchCourses/presentation/controllers/courses_controller";
 
-const cards = [
-  {
-    id: 1,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 70,
-    name: "أحمد حوام",
-    icon: user,
-  },
-  {
-    id: 2,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 50,
-    name: "أحمد حوام",
-    icon: user,
-  },
-  {
-    id: 3,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 90,
-    name: "أحمد حوام",
-    icon: user,
-  },
-  {
-    id: 4,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 30,
-    name: "أحمد حوام",
-    icon: user,
-  },
-  {
-    id: 5,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 85,
-    name: "أحمد حوام",
+// const cards = [
+//   {
+//     id: 1,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 70,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 2,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 50,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 3,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 90,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 4,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 30,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 5,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 85,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 6,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 60,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 7,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 45,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 8,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 75,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+//   {
+//     id: 9,
+//     title: "كورس مراجعه النحو مادة اللغه العربيه",
+//     img: arabic_three,
+//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
+//     progress: 20,
+//     name: "أحمد حوام",
+//     icon: user,
+//   },
+// ];
 
-    icon: user,
-  },
-  {
-    id: 6,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 60,
-    name: "أحمد حوام",
 
-    icon: user,
-  },
-  {
-    id: 7,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 45,
-    name: "أحمد حوام",
 
-    icon: user,
-  },
-  {
-    id: 8,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 75,
-    name: "أحمد حوام",
+const courseParams = new CoursesParams("2");
+const coursesController = CoursesController.getInstance();
+const state = await coursesController.FetchCourses(courseParams);
 
-    icon: user,
-  },
-  {
-    id: 9,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: arabic_three,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    progress: 20,
-    name: "أحمد حوام",
 
-    icon: user,
+watch(
+  () => coursesController.state.value,
+  (newValue) => {
+    state.value = newValue;
   },
-];
+  { deep: true },)
+
 </script>
 
 <template>
-  <div class="profile-home">
+  <GlobalDataStatues :status="state">
+  <template #initial>
+    loader
+  </template>
+  <template #loader>
+    loader
+  </template>
+  <template #success>
+    <div class="profile-home">
     <div class="slider-wrapper">
       <div class="cards-container">
-        <div class="card" v-for="(card, index) in cards" :key="index">
+        <div class="card" v-for="(course, index) in state.data" :key="index">
           <div class="image-container">
-            <img :src="card.img" alt="Card image" class="course-image" />
-            <p class="overlay-text">لغه العربيه</p>
+            <img :src="course.img" alt="Card image" class="course-image" />
+            
+            <p class="overlay-text">{{ course.subject.title }}</p>
           </div>
           <div class="card-body" dir="rtl">
-            <h5 class="card-title">{{ card.title }}</h5>
+            <h5 class="card-title">{{ course.title }}</h5>
             <div class="card-content">
-              <p class="card-text">{{ card.text }}</p>
+              <p class="card-text">{{ course.subtitle }}</p>
             </div>
             <div class="card-one_footer">
               <div class="card-text1">
-                <p class="card-text1"><note_one />20 فيديو</p>
-                <p class="card-text1"><note_two />20 ملف ورقي</p>
+                <p class="card-text1"><note_one />{{ course.videos_number }} فيديو</p>
+                <p class="card-text1"><note_two />{{ course.docs_number }} ملف ورقي</p>
               </div>
               <div class="progress-container">
                 <div class="progress-bar">
                   <div
                     class="progress"
-                    :style="{ width: card.progress + '%' }"
+                    :style="{ width: course.progress + '%' }"
                   ></div>
                 </div>
-                <span class="progress-percentage">{{ card.progress }}%</span>
+                <span class="progress-percentage">{{ course.progress }}%</span>
               </div>
             </div>
             <div class="card-footer">
               <span class="card-icon flex">
-                <component :is="card.icon" />
+                <!-- <component :is="card.icon" /> -->
+                 <img :src="course.teacher.image.image" :alt="course.teacher.image.alt">
               </span>
-              <span class="card-name">{{ card.name }}</span>
+              <span class="card-name">{{course.teacher.name }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  </template>
+
+</GlobalDataStatues>
+
+ 
 </template>
+
 
 <style scoped>
 .slider-wrapper {
@@ -347,3 +376,10 @@ const cards = [
 @import "swiper/css";
 @import "swiper/css/navigation";
 </style>
+
+
+
+
+
+
+
