@@ -1,27 +1,46 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
-
 import toggleone from "~/public/icons/toggleone.vue";
 import toggletwo from "~/public/icons/toggletwo.vue";
+import type HomeFirstSection from "~/types/home_first_section";
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+import { baseUrl } from "~/constant/baseUrl";
 
-const selectedToggle = ref("one"); 
+const { data: HomeSections } = useAsyncData("HomeSectionss", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain": "abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.Course,
+    },
+  });
+
+  return response.data;
+});
+
+const selectedToggle = ref("one");
 </script>
-
 <template>
-  <div class="aa">
-    <HomeHomeEducationStages />
 
+  <div class="aa">
     <div class="header-toggle">
-      <p class="cards-heading">(6)جميع الكورسات</p>
+      <p class="cards-heading">(6) جميع الكورسات</p>
       <div class="toggle">
         <div
-          :class="['toggle-icon', selectedToggle === 'two' ? 'active' : '']"
+          :class="['toggle-icon', { active: selectedToggle === 'two' }]"
           @click="selectedToggle = 'two'"
         >
           <toggletwo />
         </div>
         <div
-          :class="['toggle-icon', selectedToggle === 'one' ? 'active' : '']"
+          :class="['toggle-icon', { active: selectedToggle === 'one' }]"
           @click="selectedToggle = 'one'"
         >
           <toggleone />
@@ -29,46 +48,20 @@ const selectedToggle = ref("one");
       </div>
     </div>
 
-    <!-- عرض الكارد حسب الاختيار -->
     <div v-if="selectedToggle === 'two'">
-      <CourseAllCourseOne />
+      <CourseAllCourseOne :HomeSections="HomeSections" />
     </div>
     <div v-else>
-      <CourseAllCourseTwo />
+      <CourseAllCourseTwo :HomeSections="HomeSections" />
     </div>
   </div>
+  <HomeHomeEducationStages />
+
 </template>
 
 <style scoped lang="scss">
-.stages-container {
-  background-color: #f6f6f6;
-}
-.stage-container .stages {
-  background-color: #f6f6f6 !important;
-}
 .aa {
   background-color: #f6f6f6 !important;
-}
-.toggle-icon {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  background-color: transparent;
-  width: 43px;
-  height: 43px;
- 
-
-
-  &.active {
-    background-color: #ffb949;
-    border: 2px solid #ffb949;
-    width: 43px;
-  height: 43px;
-  }
 }
 
 .header-toggle {
@@ -78,7 +71,7 @@ const selectedToggle = ref("one");
   align-items: center;
   margin-bottom: 20px;
   padding: 0 20px;
-  // width: 90%;
+  width: 100%;
 }
 
 .cards-heading {
@@ -96,6 +89,30 @@ const selectedToggle = ref("one");
   color: #222;
   font-weight: 400;
   font-family: "regular";
-  // padding: 0 160px;
+}
+
+.toggle-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: transparent;
+  width: 43px;
+  height: 43px;
+
+  &.active {
+    background-color: #ffb949;
+    border: 2px solid #ffb949;
+    width: 43px;
+    height: 43px;
+  }
+}
+
+.stages-container,
+.stage-container .stages {
+  background-color: #f6f6f6 !important;
 }
 </style>

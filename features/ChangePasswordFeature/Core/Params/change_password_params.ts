@@ -1,4 +1,4 @@
-import type Params  from "~/base/core/Params/params";
+import type Params from "~/base/core/Params/params";
 
 export default class ChangePasswordParams implements Params {
   public currentPassword: string;
@@ -12,7 +12,7 @@ export default class ChangePasswordParams implements Params {
   }
   toMap(): { [key: string]: any } {
     const data: { [key: string]: any } = {};
-    data["current_password"] = this.currentPassword;
+    data["old_password"] = this.currentPassword;
     data["new_password"] = this.newPassword;
     data["new_password_confirmation"] = this.newPasswordConfirmation;
     return data;

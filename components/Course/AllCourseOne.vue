@@ -1,85 +1,40 @@
-<script setup>
-import english from "@/assets/images/english.png";
-import user from "@/public/icons/user.vue";
-import Arrrow from "@/public/icons/Arrrow.vue";
-import { HomeHomeEducationStages, NuxtLink } from "#components";
-
-const cards = [
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "كورس المحاسبة الإدارية",
-    text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-];
+<script setup lang="ts">
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from "~/types/home_first_section";
+const props = defineProps<{
+  HomeSections: HomeFirstSection[];
+}>();
 </script>
-
 <template>
-  <!-- <HomeHomeEducationStages /> -->
   <div class="card-course">
-    
-    <div class="cards-wrapper">
+    <div
+      class="cards-wrapper"
+      v-for="section in props.HomeSections"
+      :key="section.id"
+    >
       <div class="cards-grid">
         <NuxtLink
+          v-for="card in section.courses"
+          :key="card.id"
           :to="`/course/${card.id}`"
-          v-for="(card, index) in cards"
-          :key="index"
           class="card"
-          :style="{ backgroundImage: `url(${card.img})` }"
+          :style="{ backgroundImage: `url(${card.image.img})` }"
         >
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-number">{{ card.number }}</p>
+              <p class="card-number">{{ card.course_price }}</p>
             </div>
-            <p class="card-text">{{ card.text }}</p>
+            <p class="card-text">{{ card.description }}</p>
             <div class="card-footer">
               <span class="card-icon">
-                <component :is="card.icon" />
+                <img
+                  :src="card.teacher.image.img"
+                  :alt="card.teacher.image.alt"
+                  class="teacher-image"
+                />
               </span>
-              <span class="card-name">{{ card.name }}</span>
+              <span class="card-name">{{ card.teacher.name }}</span>
             </div>
             <div class="card-extra-content">
               <Arrrow />
@@ -94,7 +49,7 @@ const cards = [
 
 <style scoped lang="scss">
 .cards-wrapper {
-  display: flex;
+  // display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -114,7 +69,7 @@ const cards = [
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  // width: 80%;
+  width: 80%;
 }
 
 .card {
@@ -131,6 +86,8 @@ const cards = [
   background-repeat: no-repeat;
   background-size: cover;
   transition: transform 0.3s ease;
+  background-size: cover;
+  background-position: center;
 }
 .card:hover {
   transform: translateY(-4px);
@@ -232,7 +189,6 @@ const cards = [
   justify-content: space-between;
   align-items: center;
   padding: 2px 5px;
-
 }
 
 .card-extra-content p {
