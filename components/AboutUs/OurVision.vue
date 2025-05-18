@@ -22,7 +22,8 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
     },
  
   });
-  return response?.data[0];
+  console.log(response.data[response.data.length - 1] , "resesesese");
+  return response?.data[response.data.length - 1];
 });
 
 
@@ -37,7 +38,7 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
            <iframe
                 width="100%"
                 height="100%"
-                :src="aboutusVision?.icon"
+                :src="aboutusVision?.media?.[0]?.file"
                 frameborder="0"
                 allowfullscreen
                 ></iframe>

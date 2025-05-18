@@ -23,12 +23,12 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
       "web-domain":"abouelezz.com",
     },
     body:{
-        type:SectionTypeEnum.TopStudents
+        type:SectionTypeEnum.Media
 
     }
 
   });
-  return response.data[0];
+  return response.data[response.data.length - 1];
 });
 
 </script>

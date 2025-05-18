@@ -9,46 +9,35 @@ import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
 
 
-
-
-
+import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-const props = defineProps({
-  HomeThirdSection: {
-    type: Object as () => HomeFirstSection | null,
-    default: null
-}
+
+
+const { data: HomeSections } = await useAsyncData("HomeSections", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.Course,
+    },
+  });
+
+
+   const filteredData = response.data.filter(section => section.style === 3);
+    return filteredData.length > 0 ? filteredData[filteredData.length -1] : null;
 });
 
-const HomethirdSection = ref(props.HomeThirdSection);
-
-watch(() => props.HomeThirdSection, (newValue) => {
-  HomethirdSection.value = newValue;
-}, { immediate: true });
 
 
-
-const cards = [
-  {
-    id: 1,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: book,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-  },
-  {
-    id: 2,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: book,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-  },
-  {
-    id: 3,
-    title: "كورس مراجعه النحو مادة اللغه العربيه",
-    img: book,
-    text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-  },
-];
 const splideOptions = {
   type: "loop", 
   // autoplay: true,
@@ -66,9 +55,10 @@ const splideOptions = {
 <template>
   <div class="card-course-three">
     <div class="slider-wrapper" >
-      <h3 class="slider-heading"> {{ HomethirdSection?.title }} </h3>
+      {{ console.log(HomeSections, "HomeSections3333333") }}
+      <h3 class="slider-heading"> {{ HomeSections?.title }} </h3>
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(course, index) in HomethirdSection?.courses" :key="index">
+        <SplideSlide v-for="(course, index) in HomeSections?.courses" :key="index">
           <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-container">
               <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
