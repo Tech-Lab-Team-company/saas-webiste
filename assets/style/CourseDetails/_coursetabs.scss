@@ -4,6 +4,7 @@
     background-color: #F6F6F6;
     margin-top: 20px;
     margin-bottom: 20px;
+    overflow: hidden;
 
 
     .right-dots{
@@ -12,13 +13,16 @@
         top: 10px;
         height: 200px;
         transform: scaleX(-1);
+        z-index: 2;
     }
-
+    
     .left-dots{
         position: absolute;
-        right: -100px;
+        right: 0;
+        transform: translateX(25%);
         top: 10px;
         height: 200px;
+        z-index: 2;
     }
 
 
@@ -38,6 +42,8 @@
             display: flex;
             justify-content: center;
             gap: 20px;
+            position: relative;
+            z-index: 10;
             
             .tab-title{
                 display: flex;
@@ -65,4 +71,139 @@
         }
     }
 
+}
+
+
+
+.course-tabs {
+    width: 100%;
+    position: relative;
+    background-color: #F6F6F6;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.right-dots {
+    position: absolute;
+    left: -100px;
+    top: 10px;
+    height: 200px;
+    transform: scaleX(-1);
+    z-index: 2;
+    display: none; /* Hide on small screens */
+}
+
+.left-dots {
+    position: absolute;
+    right: 0;
+    transform: translateX(25%);
+    top: 10px;
+    height: 200px;
+    z-index: 2;
+    display: none; /* Hide on small screens */
+}
+
+.tabs-container {
+    width: 100%;
+    padding-top: 25px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+hr {
+    width: 90%; /* More responsive width */
+    border-color: #FFB9494D;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tabs-header {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap; /* Allow tabs to wrap on small screens */
+    justify-content: center;
+    gap: 10px; /* Reduced gap for small screens */
+    position: relative;
+    z-index: 10;
+    padding: 0 15px; /* Add padding for small screens */
+}
+
+.tab-title {
+    display: flex;
+    flex-direction: column; /* Stack icon and text vertically on small screens */
+    align-items: center;
+    gap: 5px; /* Reduced gap */
+    padding: 10px 5px; /* Adjusted padding */
+    cursor: pointer;
+    min-width: 60px; /* Minimum width for tabs */
+    font-size: 14px; /* Smaller font for mobile */
+}
+
+.tab-title.active-tab {
+    border-bottom: 2px solid #FF931E;
+}
+
+.tabs-content {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding: 20px 15px; /* Adjusted padding */
+}
+
+/* Responsive adjustments */
+@media (min-width: 576px) {
+    .tab-title {
+        flex-direction: row; /* Back to horizontal layout */
+        font-size: 16px;
+        padding: 10px;
+        min-width: 80px;
+    }
+    
+    .tabs-header {
+        gap: 15px;
+        padding: 0 20px;
+    }
+}
+
+@media (min-width: 768px) {
+    .right-dots,
+    .left-dots {
+        display: block; /* Show decorative elements */
+    }
+    
+    .tabs-header {
+        gap: 20px;
+        padding: 0;
+    }
+    
+    hr {
+        width: 80%;
+    }
+    
+    .tab-title {
+        font-size: 16px;
+        min-width: 100px;
+    }
+}
+
+@media (min-width: 992px) {
+    hr {
+        width: 70%;
+    }
+    
+    .tab-title {
+        font-size: 18px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .tabs-container {
+        padding-top: 30px;
+    }
+    
+    .tab-title {
+        padding: 10px 15px;
+    }
 }

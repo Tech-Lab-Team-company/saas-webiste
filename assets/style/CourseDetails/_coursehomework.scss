@@ -11,6 +11,14 @@
     justify-content: space-between;
     padding: 10px;
     border-radius: 10px;
+
+    @media(max-width: 768px){
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+
+    }
     
 
     .btns{
@@ -41,6 +49,11 @@
         justify-content: end;
         gap: 6px;
         width: 40%;
+        @media(max-width: 768px){
+            width: 100%;
+            align-items: center;
+
+        }
 
         .homework-title{
             display: flex;
