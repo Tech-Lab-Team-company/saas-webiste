@@ -1,8 +1,9 @@
 <script setup lang="ts" >
+import homeStarting from '~/components/Home/home/homeStarting.vue';
 </script>
 <template>
   <div>
-    <HomeHomeStarting />
+    <homeStarting />
     <SharedCourseCard />
   </div>
 </template>

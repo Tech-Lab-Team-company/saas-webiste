@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import BackgoundCircle from '~/public/icons/BackgoundCircle.vue';
-import { ref, onUpdated } from 'vue';
+import { ref, onMounted } from 'vue';
 import EducationStages from './EducationStages.vue';
 import Students from './Students.vue';
 import { baseUrl } from '~/constant/baseUrl';
-import type { SwiperHome } from '~/types/swiperhome';  // استيراد النوع
+import type { SwiperHome } from '~/types/swiperhome';
+import { register } from 'swiper/element/bundle'; // For web components
 
-const containerRef = ref(null);
+const containerRef = ref<HTMLElement | null>(null);
 const swiper_position = ref('next');
 
-// Swiper control
-const swiper = useSwiper(containerRef);
+// Register Swiper web components
+onMounted(() => {
+  register();
+});
 
 // Fetch slider data
 const { data: sliders, pending, error } = await useAsyncData('sliders', async () => {
   try {
     const response = await $fetch<{
-      data: SwiperHome[];     
+      data: SwiperHome[];
       message: string;
       status: number;
     }>(`${baseUrl}/fetch_sliders`, {
@@ -25,6 +28,9 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
         'Accept-Language': 'ar',
         'web-domain': 'abouelezz.com',
       },
+      body: {
+        type: 3,
+      },
     });
     return response.data;
   } catch (err) {
@@ -32,17 +38,13 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
     return [];
   }
 });
-
-// Log containerRef updates for debugging
-onUpdated(() => {
-  console.log('containerRef.value:', containerRef.value);
-});
 </script>
 
 
 <template>
     <div class="main-container">
       <ClientOnly>
+        {{ console.log(sliders, "sliders") }}
         <!-- Loading state -->
         <div v-if="pending" class="loading">جاري التحميل...</div>
         <!-- Error state -->
