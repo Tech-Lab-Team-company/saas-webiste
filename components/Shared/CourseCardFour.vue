@@ -130,6 +130,7 @@ const splideOptions = {
   color: #737e8a;
   font-family: "regular";
   margin-bottom: 10px;
+  text-align: center;
 }
 
 .splide-container {
