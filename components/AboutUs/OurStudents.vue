@@ -29,7 +29,7 @@ const { data: aboutusOpinions } = await useAsyncData("AboutOpinions", async () =
   console.log(response.data);
 
 
-  return response?.data[0];
+  return response?.data[response.data.length - 1];
 });
 
 const splideOptions = {

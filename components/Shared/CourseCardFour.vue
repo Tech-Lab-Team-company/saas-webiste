@@ -32,7 +32,7 @@ const { data: studentopinionssection } = await useAsyncData("studentopinionssect
     },
   });
 
-  return response.data[0];
+  return response.data[response.data.length - 1];
 });
 
 

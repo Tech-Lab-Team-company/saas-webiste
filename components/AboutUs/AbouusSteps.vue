@@ -50,7 +50,8 @@ const { data: aboutusSteps } = await useAsyncData("AboutSteps", async () => {
     },
  
   });
-  return response?.data[0];
+  return response?.data[response.data.length - 1];
+  
 });
 
 
@@ -68,6 +69,7 @@ const { data: aboutusSteps } = await useAsyncData("AboutSteps", async () => {
             <div class="left-stpes">
         
                 <div class="aboutus-circle-steps aboutus-circle-steps-start">
+                  
                     <h4>{{ aboutusSteps?.children?.[0]?.title }}</h4>
                     <p>{{ aboutusSteps?.children?.[0]?.subtitle}}</p>
                 </div>

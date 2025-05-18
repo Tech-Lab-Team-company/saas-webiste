@@ -6,32 +6,34 @@ import user from "@/public/icons/user.vue";
 import Arrrow from "@/public/icons/Arrrow.vue";
 
 
-// const cards = [
-//   {
-//     title: "كورس المحاسبة الإدارية",
-//     text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-//     img: english,
-//     icon: user,
-//     number: "1500 جنيه",
-//     name: "أحمد حوام",
-//   },
-//   {
-//     title: "كورس المحاسبة الإدارية",
-//     text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-//     img: english,
-//     icon: user,
-//     number: "1500 جنيه",
-//     name: "أحمد حوام",
-//   },
-//   {
-//     title: "كورس المحاسبة الإدارية",
-//     text: "تعلم كيفية اتخاذ القرارات المالية الذكية وتحليل البيانات لتحسين أداء الأعمال",
-//     img: english,
-//     icon: user,
-//     number: "1500 جنيه",
-//     name: "أحمد حوام",
-//   },
-// ];
+
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from "~/types/home_first_section";
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+
+
+
+const { data: HomeSections } = await useAsyncData("HomeSections", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.Course,
+    },
+  });
+
+
+   const filteredData = response.data.filter(section => section.style === 2);
+    return filteredData.length > 0 ? filteredData[filteredData.length -1] : null;
+});
+
 
 
 const splideOptions = {
@@ -47,31 +49,16 @@ const splideOptions = {
 
 
 
-import type HomeFirstSection from "~/types/home_first_section";
-
-const props = defineProps({
-  HomeSecondSection: {
-    type: Object as () => HomeFirstSection | null,
-    default: null
-}
-});
-
-const HomesecondSection = ref(props.HomeSecondSection);
-
-watch(() => props.HomeSecondSection, (newValue) => {
-  HomesecondSection.value = newValue;
-}, { immediate: true });
-
-
 
 </script>
 <template>
   <div class="card-course-two">
     <div class="slider-wrapper flex" >
-    <h1 class="slider-heading">{{HomesecondSection?.title  }}</h1>
+    <h1 class="slider-heading">{{HomeSections?.title  }}</h1>
+      {{ console.log(HomeSections, "HomeSections22222222222") }}
 
     <Splide :options="splideOptions" class="splide-container">
-      <SplideSlide v-for="(course, index) in HomesecondSection?.courses" :key="index">
+      <SplideSlide v-for="(course, index) in HomeSections?.courses" :key="index">
         <NuxtLink :to="`/course/${course.id}`" class="card"  :style="{ backgroundImage: `url(${course.image.img})` }" >
           <div class="card-body" dir="rtl">
             <div class="card-header">

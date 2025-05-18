@@ -25,7 +25,7 @@ const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async 
   console.log(response.data);
 
 
-  return response.data[0];
+  return response.data[response.data.length - 1];
 });
 
 
@@ -46,7 +46,7 @@ const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async 
             </div>
            <AboutUsOurVision/>
            <AbouusSteps />
-            <AboutUsOurStudents />
+            <!-- <AboutUsOurStudents /> -->
         </div>
     </div>
 </template>
