@@ -55,6 +55,7 @@ class ApiNames {
   public updateProfile = "update_profile";
   public updatePassword = "change_password";
 
+
   // home
   public categories = "categories";
   public subCategories = "fetch_sub_category";

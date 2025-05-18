@@ -115,7 +115,7 @@ const uploadImage = async () => {
       </NuxtLink>
 
       <NuxtLink
-        to="/login/setnewpassword"
+        to="/passwordupdate"
         exactActiveClass="active"
         class="profile-option"
         @click="UpdateSidebar('security')"
