@@ -62,6 +62,7 @@ const selectedToggle = ref("one");
 <style scoped lang="scss">
 .aa {
   background-color: #f6f6f6 !important;
+  width: 100%;
 }
 
 .header-toggle {

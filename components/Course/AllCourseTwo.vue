@@ -78,10 +78,23 @@ const props = defineProps<{
 
 
 <style scoped lang="scss">
+.card-course-twoo{
+  width:100%;
+}
 .card {
   display: flex;
   border-radius: 15px;
   background: white;
+}
+
+@media(max-width: 768px) {
+  .card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+  }
+
 }
 
 .card-inner {

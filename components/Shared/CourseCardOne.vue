@@ -106,7 +106,7 @@ const splideOptions = {
 <style scoped>
 .card-course-one {
   width: 100%;
-  max-width: 1400px;
+  /* max-width: 1400px; */
   margin: 0 auto;
   padding: 0 1rem;
   position: relative;
@@ -126,7 +126,7 @@ const splideOptions = {
 }
 
 .splide-container {
-  width: 100%;
+  width: 88%;
   padding: 0 2.5rem; /* Add padding for arrows */
 }
 

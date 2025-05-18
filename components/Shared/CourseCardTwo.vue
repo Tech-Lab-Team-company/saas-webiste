@@ -108,7 +108,7 @@ const splideOptions = {
 .card-course-two {
   background-color: #FFFCF9;
   width: 100%;
-  max-width: 1400px;
+  /* max-width: 1400px; */
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -134,7 +134,7 @@ const splideOptions = {
 }
 
 .splide-container {
-  width: 100%;
+  width: 88%;
   height: 100%;
   padding: 0 3rem 30px;
 }
