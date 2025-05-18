@@ -1,55 +1,42 @@
-<script setup>
-import english from "@/assets/images/english.png";
-import user from "@/public/icons/user.vue";
+<script setup lang="ts">
 import Arrroww from "@/public/icons/Arrroww.vue";
-import { HomeHomeEducationStages, NuxtLink } from "#components";
-
 import microphone from "@/public/icons/microphone.vue";
 import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
-const cards = [
-  {
-    title: "  كورس مراجعه النحو مادة اللغه العربيه",
-    text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-  {
-    title: "  كورس مراجعه النحو مادة اللغه العربيه",
-    text: "انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-    img: english,
-    icon: user,
-    number: "1500 جنيه",
-    name: "أحمد حوام",
-  },
-];
+import type HomeFirstSection from "~/types/home_first_section";
+
+const props = defineProps<{
+  HomeSections: HomeFirstSection[];
+}>();
 </script>
 
 <template>
-  <!-- <HomeHomeEducationStages /> -->
   <div class="card-course-twoo">
-    <div class="cards-wrapper">
+    <div
+      class="cards-wrapper"
+      v-for="section in props.HomeSections"
+      :key="section.id"
+    >
       <div class="cards-grid">
         <NuxtLink
+          v-for="card in section.courses"
+          :key="card.id"
           :to="`/course/${card.id}`"
-          v-for="(card, index) in cards"
-          :key="index"
           class="card"
         >
           <div class="card-inner" dir="rtl">
             <div class="image-container">
-            <img :src="card.img" alt="course image" class="card-image" />
-
+    
+              <img :src="card.image.img || ''" alt="course image" class="card-image" />
             </div>
 
             <div class="card-body">
               <div class="card-header">
                 <h5 class="card-title">{{ card.title }}</h5>
-         
               </div>
-              <p class="card-text">{{ card.text }}</p>
+
+              <p class="card-text">{{ card.description }}</p>
+
               <div class="card-content">
                 <p class="card-text1">
                   <video1 />
@@ -64,13 +51,17 @@ const cards = [
                   ملف صوتى
                 </p>
               </div>
+
               <div class="card-footer">
                 <span class="card-icon">
-                  <component :is="card.icon" class="icoon"/>
-                <span class="card-name">{{ card.name }}</span>
-
+                  <img
+                  :src="card.teacher.image.img"
+                  :alt="card.teacher.image.alt"
+                  class="teacher-image"
+                />
+                  <span class="card-name">{{ card.teacher.name }}</span>
                 </span>
-                <p class="card-number">{{ card.number }}</p>
+                <p class="card-number">{{ card.course_price }}</p>
               </div>
 
               <div class="card-extra-content">
@@ -84,6 +75,7 @@ const cards = [
     </div>
   </div>
 </template>
+
 
 <style scoped lang="scss">
 .card {
@@ -112,7 +104,6 @@ const cards = [
   width: 100%;
   height: 95%;
 }
-
 
 .cards-wrapper {
   display: flex;
@@ -148,7 +139,6 @@ const cards = [
   justify-content: flex-end;
   background-repeat: no-repeat;
   background-size: cover;
-
 }
 
 .card-body {
@@ -190,7 +180,7 @@ const cards = [
 }
 
 .card-text {
-  color: #656B78;
+  color: #656b78;
   font-weight: 400;
   font-size: 16px;
   text-align: right;
@@ -248,7 +238,7 @@ const cards = [
   // margin-top: 10px;
 }
 .card-text1 {
-  color: #737E8A;
+  color: #737e8a;
   font-weight: 400;
   font-size: 16px;
   text-align: right;
@@ -257,12 +247,8 @@ const cards = [
   gap: 5px;
 }
 .card-icon {
-
-display: flex;
-align-items: center;
-gap: 8px;
- 
-
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-
 </style>
