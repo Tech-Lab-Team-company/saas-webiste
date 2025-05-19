@@ -17,7 +17,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
       body: { slug: useRoute().params.slug },
     });
 
-    console.log(response);
+    console.log(response.data , "bolgs card contetnt");
     return response.data;
   } catch (err) {
     console.error("فشل في جلب التدوينة:", err);
@@ -40,8 +40,8 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
           <div class="blog-name-icon">
             <!-- إذا كنت ترغب في إضافة أي أيقونات هنا، يمكنك فعل ذلك -->
             <!-- <component :is="card.icon" class="sidebar-icon" /> -->
-            <!-- <p class="sidebar-date">{{ card.add }}</p> -->
-            <!-- <p class="sidebar-text">{{ card.name }}</p> -->
+            <p class="sidebar-date">اضيف بواسطة</p>
+            <p class="sidebar-text">{{ blogdetails.subtitle }}</p>
           </div>
         </div>
         <div class="blogs-name">
@@ -55,6 +55,13 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
       </div>
     </div>
 
+    <div class="blogs-image-banner">
+      <img :src="blogdetails?.attachments?.[0]?.file" alt="">
+    </div>
+    <div>
+      <p class="blogs-description" v-html="blogdetails?.subtitle"></p>
+    </div>
+
     <!-- الكومنتات مضافة هنا كما طلبت -->
     <BlogsPageBlogsImage />
     <!-- <BlogsPageBlogsButton /> -->
@@ -66,6 +73,33 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
 
 <style scoped>
+.sidebar-date{
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.blogs-description{
+  margin-top: 20px;
+}
+.sidebar-text{
+  font-size: 16px;
+
+}
+
+.blogs-image-banner{
+  width: 100%;
+  /* height: 300px;
+  border-radius: 18px;
+  overflow: hidden;
+  margin: 10px 0; */
+}
+.blogs-image-banner img{
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-height: 550px;
+}
 .blogs-page-articles-cards {
   border-radius: 18px;
   height: auto;
@@ -90,9 +124,12 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   margin: 10px 0;
 }
 .sidebar-page-articles-card-info {
-  display: grid;
+  /* display: grid;
   align-items: center;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 3fr; */
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 .blogs-name {
   display: flex;

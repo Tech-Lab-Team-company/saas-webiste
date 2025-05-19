@@ -6,41 +6,55 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-const { data: HomeSections } = await useAsyncData("SecondHomeSections", async () => {
-  const response = await $fetch<{
-    data: HomeFirstSection[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
-    method: "POST",
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
-    },
-    body: {
-      type: SectionTypeEnum.Course,
-    },
-  });
+// const { data: HomeSections } = await useAsyncData("SecondHomeSections", async () => {
+//   const response = await $fetch<{
+//     data: HomeFirstSection[];
+//     message: string;
+//     status: number;
+//   }>(`${baseUrl}/fetch_home_website_section`, {
+//     method: "POST",
+//     headers: {
+//       "Accept-Language": "ar",
+//       "web-domain":"abouelezz.com",
+//     },
+//     body: {
+//       type: SectionTypeEnum.Course,
+//     },
+//   });
 
-  // const filteredData = response.data.filter(section => section.style === 2);
-  // return filteredData.length > 0 ? filteredData[filteredData.length -1] : null;
+//   // const filteredData = response.data.filter(section => section.style === 2);
+//   // return filteredData.length > 0 ? filteredData[filteredData.length -1] : null;
 
-  const filteredSections = response.data.filter(section => section.style === 2);
+//   const filteredSections = response.data.filter(section => section.style === 2);
   
-  if (filteredSections.length > 0) {
-    // Then filter courses within those sections that also have style 1
-    const sectionWithFilteredCourses = {
-      ...filteredSections[filteredSections.length - 1],
-      courses: filteredSections[filteredSections.length - 1].courses
-    };
-    console.log(sectionWithFilteredCourses, "filteredDataOne");
-    return sectionWithFilteredCourses;
-  }
+//   if (filteredSections.length > 0) {
+//     // Then filter courses within those sections that also have style 1
+//     const sectionWithFilteredCourses = {
+//       ...filteredSections[filteredSections.length - 1],
+//       courses: filteredSections[filteredSections.length - 1].courses
+//     };
+//     console.log(sectionWithFilteredCourses, "filteredDataOne");
+//     return sectionWithFilteredCourses;
+//   }
   
   
-  return null;
+//   return null;
 
-});
+// });
+
+const props = defineProps<{
+  HomeSections: {};
+}>();
+
+const homesection = ref(props.HomeSections)
+
+watch(
+  ()=>props.HomeSections,
+  (newValue) => {
+    homesection.value = newValue; 
+  },
+  { immediate: true }
+)
 
 const splideOptions = {
   type: "loop",
@@ -76,9 +90,9 @@ const splideOptions = {
 <template>
   <div class="card-course-two">
     <div class="slider-wrapper">
-      <h1 class="slider-heading">{{ HomeSections?.title }}</h1>
+      <h1 class="slider-heading">{{ homesection?.title }}</h1>
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(course, index) in HomeSections?.courses" :key="index">
+        <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
           <NuxtLink :to="`/course/${course.id}`" class="card" :style="{ backgroundImage: `url(${course.image.img})` }">
             <div class="card-body" dir="rtl">
               <div class="card-header">

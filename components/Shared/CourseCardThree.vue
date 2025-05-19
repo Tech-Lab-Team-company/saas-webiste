@@ -8,25 +8,6 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-const { data: HomeSections } = await useAsyncData("ThirdHomeSections", async () => {
-  const response = await $fetch<{
-    data: HomeFirstSection[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
-    method: "POST",
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
-    },
-    body: {
-      type: SectionTypeEnum.Course,
-    },
-  });
-
-  const filteredData = response.data.filter(section => section.style === 3);
-  return filteredData.length > 0 ? filteredData[filteredData.length -1] : null;
-});
 
 const splideOptions = {
   type: "loop",
@@ -57,14 +38,31 @@ const splideOptions = {
     }
   }
 };
+
+
+const props = defineProps<{
+  HomeSections: {};
+}>();
+
+const homesection = ref(props.HomeSections)
+
+watch(
+  ()=>props.HomeSections,
+  (newValue) => {
+    homesection.value = newValue; 
+  },
+  { immediate: true }
+)
+
 </script>
 
 <template>
   <div class="card-course-three">
     <div class="slider-wrapper">
-      <h3 class="slider-heading">{{ HomeSections?.title }}</h3>
+      {{ console.log(homesection, "homesection3") }}
+      <h3 class="slider-heading">{{ homesection?.title }}</h3>
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(course, index) in HomeSections?.courses" :key="index">
+        <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
           <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-container">
               <img :src="course.image.img" :alt="course.image.alt" class="course-image" />

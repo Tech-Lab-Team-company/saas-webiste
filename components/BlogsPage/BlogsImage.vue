@@ -8,7 +8,7 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
       data: BlogsImage;
       message: string;
       status: number;
-    }>("https://edu.techlabeg.com/api/website/show_blog", {
+    }>("https://edu.techlabeg.com/api/website/fetch_blogs", {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
@@ -17,7 +17,7 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
       body: { slug: useRoute().params.slug },
     });
 
-    console.log(response);
+    console.log(response , "blogs cardss");
     return response.data;
   } catch (err) {
     console.error("فشل في جلب التدوينة:", err);
@@ -33,12 +33,13 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
     <div class="image">
       <div class="blogs-page-image-cards">
         <div
-          class="blogs-page-image-card"
-          v-for="(card, index) in blogdetails.attachments"
-          :key="index"
+        class="blogs-page-image-card"
+        v-for="(card, index) in blogdetails.attachments"
+        :key="index"
         >
+        <!-- {{ console.log(card , "blogs cards") }} -->
         <img
-            :src="blogdetails.mail_image || ''"
+            :src="blogdetails.attachments?.[0]?.file || ''"
             :alt="blogdetails.attachments?.[0]?.alt || 'Default alt'"
             class="course-image"
           />

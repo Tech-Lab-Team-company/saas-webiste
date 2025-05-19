@@ -5,27 +5,64 @@ import toggletwo from "~/public/icons/toggletwo.vue";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import { baseUrl } from "~/constant/baseUrl";
+import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 
-const { data: HomeSections } = useAsyncData("HomeSectionss", async () => {
+// const { data: HomeSections } = useAsyncData("HomeSectionss", async () => {
+//   const response = await $fetch<{
+//     data: HomeFirstSection[];
+//     message: string;
+//     status: number;
+//   }>(`${baseUrl}/fetch_home_website_section`, {
+//     method: "POST",
+//     headers: {
+//       "Accept-Language": "ar",
+//       "web-domain": "abouelezz.com",
+//     },
+//     body: {
+//       type: SectionTypeEnum.Course,
+//     },
+//   });
+
+//   return response.data;
+// });
+
+
+
+const { data: CoursesFilter } = useAsyncData("CoursesFilter", async () => {
   const response = await $fetch<{
-    data: HomeFirstSection[];
+    data: CoursesFilterModel[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
+  }>(`${baseUrl}/filter_courses`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
       "web-domain": "abouelezz.com",
     },
     body: {
-      type: SectionTypeEnum.Course,
+
+      // CategoryId: number,
+      // Type: 1,
+      // EduicationType: number,
+      // StageId: number |null,
+      // YearId: number |null,
+      // SubjectId: number |null,
+      // UniversityId: number,
+      // CollegeId: number,
+      // DepartmentId: number,
+      // DivisionId: number,
+      // UniversitySubjectId: number,
     },
   });
-
+ 
   return response.data;
 });
 
-const selectedToggle = ref("one");
+const props = defineProps(['showUniversities' , 'showStages'])
+
+
+
+const selectedToggle = ref("two");
 </script>
 <template>
 
@@ -48,11 +85,12 @@ const selectedToggle = ref("one");
       </div>
     </div>
 
+    {{  console.log(CoursesFilter , "response.data")  }}
     <div v-if="selectedToggle === 'two'">
-      <CourseAllCourseOne :HomeSections="HomeSections" />
+      <CourseAllCourseOne :HomeSections="CoursesFilter" />
     </div>
     <div v-else>
-      <CourseAllCourseTwo :HomeSections="HomeSections" />
+      <CourseAllCourseTwo :HomeSections="CoursesFilter" />
     </div>
   </div>
   <HomeHomeEducationStages />

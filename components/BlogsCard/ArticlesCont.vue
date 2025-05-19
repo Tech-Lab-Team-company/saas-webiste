@@ -23,4 +23,12 @@ import pic from "@/assets/images/pic.png";
   gap: 20px;
   margin: 5px 40px;
 }
+
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    margin: 5px 0;
+  }
+  
+}
 </style>

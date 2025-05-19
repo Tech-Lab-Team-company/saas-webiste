@@ -72,7 +72,7 @@ const cards = [
   gap: 10px;
 }
 .sidebar-button {
-  width: 100px;
+  width: 85px;
   height: 45px;
   border-radius: 5px;
   padding: 10px;

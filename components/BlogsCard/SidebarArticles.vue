@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import pic from "@/assets/images/pic.png";
 
 const cards = [
@@ -38,6 +38,7 @@ const cards = [
             v-for="(card, index) in cards"
             :key="index"
           >
+          {{ console.log(card, "Sidebarcard") }}
             <div class="sidebar-page-articles-card-img">
               <img :src="card.img" :alt="card.text" />
             </div>

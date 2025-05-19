@@ -5,41 +5,41 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () => {
-  const response = await $fetch<{
-    data: HomeFirstSection[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
-    method: "POST",
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
-    },
-    body: {
-      type: SectionTypeEnum.Course,
-    },
-  });
+// const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () => {
+//   const response = await $fetch<{
+//     data: HomeFirstSection[];
+//     message: string;
+//     status: number;
+//   }>(`${baseUrl}/fetch_home_website_section`, {
+//     method: "POST",
+//     headers: {
+//       "Accept-Language": "ar",
+//       "web-domain":"abouelezz.com",
+//     },
+//     body: {
+//       type: SectionTypeEnum.Course,
+//     },
+//   });
 
-  // const filteredData = response.data.filter(section => section.style === 1);
-  // console.log(filteredData , "filteredDataOne");
-  // return filteredData.length > 0 ? filteredData[filteredData.length -1] : null;
 
-    const filteredSections = response.data.filter(section => section.style === 1);
+//   const filteredSections = response.data.filter(section => section.style === 1);
   
-  if (filteredSections.length > 0) {
-    // Then filter courses within those sections that also have style 1
-    const sectionWithFilteredCourses = {
-      ...filteredSections[filteredSections.length - 1],
-      courses: filteredSections[filteredSections.length - 1].courses
-    };
-    console.log(sectionWithFilteredCourses, "filteredDataOne");
-    return sectionWithFilteredCourses;
-  }
-
+//   // const allCourses = filteredSections.flatMap(section => section.courses);
   
-  return null;
-});
+//   // console.log(allCourses, "All Courses");
+  
+
+//   return filteredSections;
+  
+
+// });
+
+const props = defineProps<{
+  HomeSections: {};
+}>();
+
+const homesection = ref(props.HomeSections)
+
 
 const splideOptions = {
   type: "loop",
@@ -70,14 +70,23 @@ const splideOptions = {
     }
   }
 };
+
+watch(
+  ()=>props.HomeSections,
+  (newValue) => {
+    homesection.value = newValue; 
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="card-course-one">
     <div class="slider-wrapper">
-      <h3 class="slider-heading">{{HomeSections?.title}}</h3>
+      {{ console.log(HomeSections, "HomeSections") }}
+      <h3 class="slider-heading">{{homesection?.title}}</h3>
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(course, index) in HomeSections?.courses" :key="index">
+        <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
           <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-wrapper">
               <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
@@ -170,6 +179,7 @@ const splideOptions = {
   width: 100%;
   padding-top: 56.25%; /* 16:9 Aspect Ratio */
   overflow: hidden;
+  min-height: 200px;
 }
 
 .course-image {

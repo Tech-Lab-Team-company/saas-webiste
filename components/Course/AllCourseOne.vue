@@ -1,40 +1,39 @@
 <script setup lang="ts">
 import { baseUrl } from "~/constant/baseUrl";
-import type HomeFirstSection from "~/types/home_first_section";
+import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 const props = defineProps<{
-  HomeSections: HomeFirstSection[];
+  HomeSections: CoursesFilterModel[];
 }>();
 </script>
 <template>
+  <!-- <pre>{{ props.HomeSections }}</pre> -->
   <div class="card-course">
     <div
       class="cards-wrapper"
-      v-for="section in props.HomeSections"
-      :key="section.id"
     >
       <div class="cards-grid">
         <NuxtLink
-          v-for="card in section.courses"
+          v-for="card in props.HomeSections"
           :key="card.id"
           :to="`/course/${card.id}`"
           class="card"
-          :style="{ backgroundImage: `url(${card.image.img})` }"
+          :style="{ backgroundImage: `url(${card?.image?.[0]?.file})` }"
         >
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
               <p class="card-number">{{ card.course_price }}</p>
             </div>
-            <p class="card-text">{{ card.description }}</p>
+            <p class="card-text" v-html="card.description"></p>
             <div class="card-footer">
               <span class="card-icon">
                 <img
-                  :src="card.teacher.image.img"
-                  :alt="card.teacher.image.alt"
+                  :src="card.teacher?.image?.img"
+                  :alt="card.teacher?.image?.alt"
                   class="teacher-image"
                 />
               </span>
-              <span class="card-name">{{ card.teacher.name }}</span>
+              <span class="card-name">{{ card.teacher?.name }}</span>
             </div>
             <div class="card-extra-content">
               <Arrrow />

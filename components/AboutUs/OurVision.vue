@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import Arrow from '~/public/icons/arrow.vue';
+
+import Arrow from '@/public/icons/arrow.vue';
 import BgCircieIcon from '~/public/icons/BgCircieIcon.vue';
 import {DashboradbaseUrl } from "~/constant/baseUrl";
 import type AboutUsInterface from '~/types/about_us_interface';
@@ -22,7 +23,7 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
     },
  
   });
-  console.log(response.data[response.data.length - 1] , "resesesese");
+  // console.log(response.data[response.data.length - 1] , "resesesese");
   return response?.data[response.data.length - 1];
 });
 
@@ -35,20 +36,23 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
   <div class="aboutus-vision-conatiner">
       <div class="aboutus-vid-container">
         <div class="aboutus-vid">
-           <iframe
+           <video
                 width="100%"
                 height="100%"
                 :src="aboutusVision?.media?.[0]?.file"
                 frameborder="0"
                 allowfullscreen
-                ></iframe>
+                loop
+                autoplay
+       
+              ></video>
         </div>
         <BgCircieIcon class="right-circle" />
         <BgCircieIcon class="left-circle"/>
       </div>
 
       <div class="aboutus-text-container">
-    
+
         <div class="aboutus-text" v-for="(vision, index) in aboutusVision?.children" :key="index">
           <div class="aboutus-text-header">
             <h3>{{ vision.title }}</h3>
@@ -62,4 +66,4 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped></style>

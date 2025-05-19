@@ -15,7 +15,7 @@
 /* sidebar style */
 .sidebar {
   border-radius: 18px;
-  width: 450px;
+  /* width: 450px; */
   height: auto;
   padding: 24px;
   background: #f6f6f6;

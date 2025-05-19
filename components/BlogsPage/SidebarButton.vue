@@ -23,13 +23,16 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
     return [];
   }
 });
+
+
+
 </script>
 <template>
   <!-- sidebar -->
   <div class="sidebar-buttons" dir="rtl">
     <div class="sidebar-page-articles-buttons pt-lg">
       <h2 class="sidebar-title">الموسوعة</h2>
-      <div class="grid grid-cols-3 gap-md pt-md">
+      <div class="grid grid-cols-3 gap-md pt-md hashtags-container">
         <NuxtLink
           v-for="(item, index) in sidebarhashtag"
           :key="'btn-' + index"
@@ -64,7 +67,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
   gap: 10px;
 }
 .sidebar-button {
-  width: 100px;
+  width: 85px;
   height: 45px;
   border-radius: 5px;
   padding: 10px;
@@ -75,6 +78,12 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
   font-size: 19px;
   text-align: center;
   color: #605b6c;
+}
+
+.hashtags-container{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 /* end sidebar-button style */
 </style>

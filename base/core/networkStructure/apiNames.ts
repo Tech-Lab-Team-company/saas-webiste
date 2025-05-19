@@ -128,6 +128,9 @@ class ApiNames {
   public fetch_blogs = "fetch_blogs";
 
   public show_blog = "show_blog";
+
+  public CoursesFilter = this.baseUrl + "filter_courses";
+
   
   
   //Courses
