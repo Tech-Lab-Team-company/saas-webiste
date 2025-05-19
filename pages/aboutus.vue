@@ -3,6 +3,7 @@ import AbouusSteps from '~/components/AboutUs/AbouusSteps.vue';
 import type AboutUsInterface from '~/types/about_us_interface';
 import { baseUrl, DashboradbaseUrl } from "~/constant/baseUrl";
 import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
+import CourseCardFour from '~/components/Shared/CourseCardFour.vue';
 
 
 const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async () => {
@@ -46,6 +47,7 @@ const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async 
             </div>
            <AboutUsOurVision/>
            <AbouusSteps />
+           <CourseCardFour />
             <!-- <AboutUsOurStudents /> -->
         </div>
     </div>

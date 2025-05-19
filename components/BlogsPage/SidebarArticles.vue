@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type LatestArticles from "~/types/latestarticles";
 import { baseUrl } from "~/constant/baseUrl";
+import pic from "@/assets/images/pic.png";
 
 const { data: latestarticles } = await useAsyncData("latestarticles", async () => {
   try {
@@ -23,6 +24,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
     return null;
   }
 });
+
 </script>
 
 <template>
@@ -37,14 +39,14 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
     >
       <div class="sidebar-page-articles-card-img">
         <img
-            :src="article.mail_image || ''"
+            :src="article.attachments?.[0]?.file || ''"
             :alt="article.attachments?.[0]?.alt || 'Default alt'"
             class="course-image"
           />
       </div>
       <div class="sidebar-page-articles-card-info">
         <p class="sidebar-date">{{ article.date }}</p>
-        <h3 class="sidebar-text">{{ article.title }}</h3>
+        <h3 class="sidebar-text">{{ article.description }}</h3>
       </div>
     </NuxtLink>
   </div>
@@ -71,7 +73,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
   width: 50%;
 }
 .sidebar-page-articles-card-img img {
-  width: 100%;
+  min-width: 100%;
   height: 80%;
   border-radius: 5px;
 }
@@ -85,7 +87,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
 .sidebar-text {
   font-family: "medium";
   font-weight: 400;
-  font-size: 20px;
+  font-size: 14px;
   text-align: right;
   color: #000000;
 }

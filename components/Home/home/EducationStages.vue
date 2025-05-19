@@ -80,6 +80,25 @@ const fetchUniversities = async (typeId: number) => {
   });
   universities.value = response.data;
 };
+
+
+const emit =defineEmits(['UpdateDate'])
+const CategryId = ref<number>()
+const SendData = ()=>{
+  emit('UpdateDate',{
+    CategryId:CategryId.value,
+
+
+  })
+}
+
+watch(
+  ()=>CategryId.value,
+  (newValue) => {
+    SendData()
+  }
+)
+
 </script>
 
 <template>
@@ -98,13 +117,13 @@ const fetchUniversities = async (typeId: number) => {
       <div class="stages-buttons flex flex-row gap-4 justify-start mt-4">
         <button
           class="btn btn-secondary btn-stages"
-          @click="showStages = !showStages; showUniversities = false"
+          @click="showStages = !showStages; showUniversities = false; CategryId=1"
         >
           تعليم اساسي
         </button>
         <button 
           class="btn btn-secondary btn-stages"
-          @click="showUniversities = !showUniversities; showStages = false"
+          @click="showUniversities = !showUniversities; showStages = false ;CategryId=2"
         >
           تعليم جامعي
         </button>
@@ -143,16 +162,18 @@ const fetchUniversities = async (typeId: number) => {
             class="btn btn-secondary btn-stages btn-stages-education"
             @click="fetchUniversities(type.id)"
           >
-            {{ type.title }}
-          </button>
-        </template>
-
-        <template v-if="universities">
-          <button
-            v-for="university in universities"
-            :key="`university-${university.id}`"
-            class="btn btn-secondary btn-stages btn-stages-education"
-          >
+          {{ console.log(type.title , "type.title") }}
+          {{ type.title }}
+        </button>
+      </template>
+      
+      <template v-if="universities">
+        <button
+        v-for="university in universities"
+        :key="`university-${university.id}`"
+        class="btn btn-secondary btn-stages btn-stages-education"
+        >
+        {{ console.log(university.title , "university.title") }}
             {{ university.title }}
           </button>
         </template>

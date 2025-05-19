@@ -19,7 +19,7 @@ import pic from "@/assets/images/pic.png";
 <style scoped>
 .grid-container {
   display: grid;
-  grid-template-columns: 4fr 1fr;
+  grid-template-columns: 3fr 1fr;
   gap: 20px;
   margin: 5px 40px;
 }

@@ -13,10 +13,10 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain":"mrbackend",
+        "web-domain":"abouelezz.com",
       },
     });
-    console.log(response);
+    console.log(response , "ALL BOLGS");
     return response.data;
   } catch (err) {
     console.error("Failed to fetch blogs:", err);
@@ -35,7 +35,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
           class="card"
         >
         <img
-            :src="card.mail_image || ''"
+            :src="card.attachments?.[0]?.file || ''"
             :alt="card.attachments?.[0]?.alt || 'Default alt'"
             class="course-image"
           />
@@ -73,6 +73,16 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   width: 100%;
+  /* justify-content: center;
+  align-items: center;
+  align-content: center; */
+  justify-items: center;
+    justify-items: center;
+  gap: 40px;
+  width: 85%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .card {
@@ -85,6 +95,9 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   justify-content: space-between;
   padding-bottom: 10px;
   transition: transform 0.3s ease-in-out;
+  /* max-width: 350px; */
+  width: 100%;
+  
 }
 
 .card:hover {

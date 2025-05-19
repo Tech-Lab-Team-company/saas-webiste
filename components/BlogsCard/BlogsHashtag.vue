@@ -13,11 +13,11 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain":"mrbackend",
+        "web-domain":"abouelezz.com",
       },
       body: { hashtag: useRoute().params.hashtagId },
     });
-    console.log(response);
+    console.log(response , "Resopnseeee");
     return response.data;
   } catch (err) {
     console.error("Failed to fetch blogs:", err);
@@ -35,8 +35,9 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
           :to="`/blogs/${card.slug}`"
           class="card"
         >
+        {{ console.log(blogscard , "blogs cards") }}
         <img
-            :src="card.mail_image || ''"
+            :src="card.attachments?.[0]?.file || ''"
             :alt="card.attachments?.[0]?.alt || 'Default alt'"
             class="course-image"
           />
@@ -70,9 +71,13 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 }
 
 .cards-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* display: grid;
+  grid-template-columns: repeat(2, 1fr); */
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+  justify-content: center;
+  gap: 60px;
   width: 100%;
 }
 
@@ -86,8 +91,14 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   justify-content: space-between;
   padding-bottom: 10px;
   transition: transform 0.3s ease-in-out;
+  width: 40%;
 }
 
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+  }
+}
 .card:hover {
   transform: translateY(10px);
 }

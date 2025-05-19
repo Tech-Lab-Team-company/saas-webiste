@@ -151,7 +151,7 @@
     .aboutus-circle-steps {
       background-color: #ffb9490d;
       width: 420px;
-      height: 350px;
+      height: 420px;
       border-radius: 50%;
       text-align: center;
       //   padding: 55px 45px 0 45px;
@@ -167,6 +167,7 @@
         font-weight: 800;
         font-size: 23px;
         width: 89%;
+        text-align: center;
       }
 
       p {
@@ -176,6 +177,7 @@
         font-weight: 400;
         font-size: 19px;
         width: 89%;
+        text-align: center;
       }
 
       &.aboutus-circle-steps-test {
