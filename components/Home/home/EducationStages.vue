@@ -5,9 +5,10 @@ import LeftDots from "~/public/icons/LeftDots.vue";
 import StagesTitle from "./StagesTitle.vue";
 import type Stages from "~/types/stages";
 import type Universitiey from "~/types/universitey";
-
 import { baseUrl } from "~/constant/baseUrl";
+import { useFiltersStore } from '~/stores/courses_filter';
 
+const filtersStore = useFiltersStore();
 const showStages = ref(false);
 const showUniversities = ref(false);
 
@@ -65,6 +66,12 @@ const { data:universitiey } = await useAsyncData("universitiey", async () => {
   return response.data;
 });
 
+
+
+
+
+const SelectedEducationTypeId = ref(filtersStore.SelectedEductionType)
+
 const fetchUniversities = async (typeId: number) => {
   const response = await $fetch<{
     data: Universitiey[];
@@ -78,19 +85,105 @@ const fetchUniversities = async (typeId: number) => {
       "web-domain": "abouelezz.com",
     },
   });
+  SelectedEducationTypeId.value = typeId;
   universities.value = response.data;
+  SendData();
 };
 
 
-const emit =defineEmits(['UpdateDate'])
-const CategryId = ref<number>()
-const SendData = ()=>{
-  emit('UpdateDate',{
-    CategryId:CategryId.value,
+
+const Colleges = ref<Universitiey[]>([]);
+const SelectedUniversity = ref(filtersStore.SelectedUniversity)
+const fetchColleges = async (typeId: number) => {
+  const response = await $fetch<{
+    data: Universitiey[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_colleges`, {
+    method: "POST",
+    body: { university_id: typeId },
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain": "abouelezz.com",
+    },
+  });
+  SelectedUniversity.value = typeId;
+  Colleges.value = response.data;
+  SendData();
+};
 
 
-  })
+const SelectedCollege = ref(filtersStore.SelectedCollege)
+const CollegesDepartments = ref<Universitiey[]>([]);
+const fetchCollegeDepartment = async (typeId: number) => {
+  const response = await $fetch<{
+    data: Universitiey[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_college_departments`, {
+    method: "POST",
+    body: { college_id: typeId },
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain": "abouelezz.com",
+    },
+  });
+  SelectedCollege.value = typeId;
+  CollegesDepartments.value = response.data;
+  SendData();
+};
+
+
+const SelectedCollegeDepartment = ref(filtersStore.SelectedCollegeDepartment)
+const CollegesDepartmentsDivisions = ref<Universitiey[]>([]);
+const fetchCollegeDepartmentDivision = async (typeId: number) => {
+  const response = await $fetch<{
+    data: Universitiey[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_college_department_divisions`, {
+    method: "POST",
+    body: { department_id: typeId },
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain": "abouelezz.com",
+    },
+  });
+  SelectedCollegeDepartment.value = typeId;
+  CollegesDepartmentsDivisions.value = response.data;
+  SendData();
+};
+
+
+const SelectedCollegeDepartmentDivision = ref(filtersStore.SelectedCollegeDepartmentDivision)
+const Subjects = ref<Universitiey[]>([]);
+const fetchSubjects = async (typeId: number) => {
+  const response = await $fetch<{
+    data: Universitiey[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_subjects`, {
+    method: "POST",
+    body: { category_id: CategryId.value },
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain": "abouelezz.com",
+    },
+  });
+  SelectedCollegeDepartmentDivision.value = typeId;
+  Subjects.value = response.data;
+  SendData();
+};
+
+
+const SelectedSubject = ref(filtersStore.SelectedSubject)
+const SelectSubject = (typeId: number)=>{
+    SelectedSubject.value = typeId
+    SendData();
 }
+
+const CategryId = ref(filtersStore.CategryId)
+
 
 watch(
   ()=>CategryId.value,
@@ -98,6 +191,21 @@ watch(
     SendData()
   }
 )
+
+const SendData = () => {
+  filtersStore.updateFilters({
+    CategryId: CategryId.value,
+    SelectedEductionType: SelectedEducationTypeId.value,
+    SelectedUniversity: SelectedUniversity.value,
+    SelectedCollege: SelectedCollege.value,
+    SelectedCollegeDepartment: SelectedCollegeDepartment.value,
+    SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
+    SelectedSubject: SelectedSubject.value
+  });
+};
+
+
+
 
 </script>
 
@@ -162,7 +270,6 @@ watch(
             class="btn btn-secondary btn-stages btn-stages-education"
             @click="fetchUniversities(type.id)"
           >
-          {{ console.log(type.title , "type.title") }}
           {{ type.title }}
         </button>
       </template>
@@ -172,12 +279,72 @@ watch(
         v-for="university in universities"
         :key="`university-${university.id}`"
         class="btn btn-secondary btn-stages btn-stages-education"
+        @click="fetchColleges(university.id)"
         >
-        {{ console.log(university.title , "university.title") }}
             {{ university.title }}
           </button>
         </template>
       </div>
+
+
+
+      <div v-if="showUniversities" class="stages-buttons mt-4 flex flex-wrap gap-3">
+        <template v-if="Colleges">
+          <button
+            v-for="type in Colleges"
+            :key="`type-${type.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education"
+            @click="fetchCollegeDepartment(type.id)"
+          >
+          {{ type.title }}
+        </button>
+      </template>
+      
+      <template v-if="CollegesDepartments">
+        <button
+        v-for="type in CollegesDepartments"
+        :key="`university-${type.id}`"
+        class="btn btn-secondary btn-stages btn-stages-education"
+        @click="fetchCollegeDepartmentDivision(type.id)"
+        >
+            {{ type.title }}
+          </button>
+        </template>
+      </div>
+
+
+      <div v-if="showUniversities" class="stages-buttons mt-4 flex flex-wrap gap-3">
+        <template v-if="CollegesDepartmentsDivisions">
+          <button
+            v-for="type in CollegesDepartmentsDivisions"
+            :key="`type-${type.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education"
+            @click="fetchSubjects(type.id)"
+          >
+          {{ type.title }}
+        </button>
+      </template>
+      
+      <template v-if="Subjects">
+       <Nuxt-link  to="/course">
+         <button
+        v-for="type in Subjects"
+        :key="`university-${type.id}`"
+        class="btn btn-secondary btn-stages btn-stages-education"
+        @click="SelectSubject(type.id)"
+        >
+            {{ type.title }}
+          </button>
+        </Nuxt-link>
+        </template>
+      </div>
+
+
+
+
+
+
+
     </div>
   </div>
 </template>

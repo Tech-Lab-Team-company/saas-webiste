@@ -2,67 +2,76 @@
 import { ref } from "vue";
 import toggleone from "~/public/icons/toggleone.vue";
 import toggletwo from "~/public/icons/toggletwo.vue";
-import type HomeFirstSection from "~/types/home_first_section";
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import { baseUrl } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
+import { useFiltersStore } from '~/stores/courses_filter';
 
-// const { data: HomeSections } = useAsyncData("HomeSectionss", async () => {
-//   const response = await $fetch<{
-//     data: HomeFirstSection[];
-//     message: string;
-//     status: number;
-//   }>(`${baseUrl}/fetch_home_website_section`, {
-//     method: "POST",
-//     headers: {
-//       "Accept-Language": "ar",
-//       "web-domain": "abouelezz.com",
-//     },
-//     body: {
-//       type: SectionTypeEnum.Course,
-//     },
-//   });
+const filtersStore = useFiltersStore();
 
-//   return response.data;
-// });
+const CategoryId = ref(filtersStore.CategryId);
+const EduicationType = ref(filtersStore.SelectedEductionType);
+const UniversityId =  ref(filtersStore.SelectedUniversity);
+const CollegeId =   ref(filtersStore.SelectedCollege);
+const DepartmentId = ref(filtersStore.SelectedCollegeDepartment);
+const DivisionId = ref(filtersStore.SelectedCollegeDepartmentDivision);
+const SubjectId =   ref(filtersStore.SelectedSubject);
 
 
-
-const { data: CoursesFilter } = useAsyncData("CoursesFilter", async () => {
+const CoursesFilter = ref<CoursesFilterModel[]>([]);
+const fetchCourses = async () => {
   const response = await $fetch<{
     data: CoursesFilterModel[];
     message: string;
     status: number;
   }>(`${baseUrl}/filter_courses`, {
     method: "POST",
+    body: { 
+        category_id: CategoryId.value,
+        type: 1,
+        education_type_id: EduicationType.value,
+        stage_id: null,
+        year_id: null,
+        subject_id:null ,
+        university_id: UniversityId.value,
+        college_id: CollegeId.value,
+        department_id: DepartmentId.value,
+        division_id: DivisionId.value,
+        university_subject_id: SubjectId.value,
+    },
     headers: {
       "Accept-Language": "ar",
       "web-domain": "abouelezz.com",
     },
-    body: {
-
-      // CategoryId: number,
-      // Type: 1,
-      // EduicationType: number,
-      // StageId: number |null,
-      // YearId: number |null,
-      // SubjectId: number |null,
-      // UniversityId: number,
-      // CollegeId: number,
-      // DepartmentId: number,
-      // DivisionId: number,
-      // UniversitySubjectId: number,
-    },
   });
- 
-  return response.data;
+
+  CoursesFilter.value = response.data;
+
+};
+
+const CourseFilterData = (data)=>{
+  console.log(data , "filter data")
+  CategoryId.value = data.CategryId
+  EduicationType.value = data.SelectedEductionType
+  UniversityId.value = data.SelectedUniversity
+  CollegeId.value = data.SelectedCollege
+  DepartmentId.value = data.SelectedCollegeDepartment
+  DivisionId.value = data.SelectedCollegeDepartmentDivision
+  SubjectId.value = data.SelectedSubject
+  fetchCourses();
+}
+
+onMounted(() => {
+  fetchCourses();
 });
+
+
+
 
 const props = defineProps(['showUniversities' , 'showStages'])
 
 
 
-const selectedToggle = ref("two");
+const selectedToggle = ref();
 </script>
 <template>
 
@@ -85,15 +94,16 @@ const selectedToggle = ref("two");
       </div>
     </div>
 
-    {{  console.log(CoursesFilter , "response.data")  }}
+    <!-- {{  console.log(CoursesFilter , "response.data")  }} -->
     <div v-if="selectedToggle === 'two'">
-      <CourseAllCourseOne :HomeSections="CoursesFilter" />
+      <CourseAllCourseOne :HomeSections="CoursesFilter " />
     </div>
     <div v-else>
       <CourseAllCourseTwo :HomeSections="CoursesFilter" />
     </div>
   </div>
-  <HomeHomeEducationStages />
+  <HomeHomeEducationStages 
+  />
 
 </template>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
-    // import Accordion from 'primevue/accordion';
-    // import AccordionPanel from 'primevue/accordionpanel';
-    // import AccordionHeader from 'primevue/accordionheader';
-    // import AccordionContent from 'primevue/accordioncontent';
+    import Accordion from 'primevue/accordion';
+    import AccordionPanel from 'primevue/accordionpanel';
+    import AccordionHeader from 'primevue/accordionheader';
+    import AccordionContent from 'primevue/accordioncontent';
 
     // import Accordion from 'primevue/accordion';
     // import AccordionPanel from 'primevue/accordionpanel';
@@ -16,10 +16,11 @@
    
 
     import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
     
     const props = defineProps({
     CourseData: {
-        type: Object as () => CourseDetailsModel | null,
+        type: Object as () => UnitsModel | null,
         default: null
     }
     });
@@ -74,8 +75,6 @@
     
     }
 
-  
-
 
 
     const activeIndices = ref<number[]>([]);
@@ -88,14 +87,16 @@
 
 
     <Accordion value="0" class="course-content-container">
+        
         <AccordionPanel 
-            :class="{ 'active': activePanels.includes(index) }"
-            :value="index" 
-            class="course-content-panel" 
-            v-for="(unit ,index) in CardDetails?.units" 
-            :key="index" 
-            >
-            <AccordionHeader class="course-content-header " >{{ unit.title }}</AccordionHeader>
+        :value="index" 
+        class="course-content-panel" 
+        v-for="(unit ,index) in CardDetails" 
+        :key="index" 
+        :class="{ 'active': activePanels.includes(index) }"
+        >
+        {{ console.log(unit , " unit Contett") }}
+            <AccordionHeader class="course-content-header " >{{ unit?.title }}</AccordionHeader>
             <AccordionContent class="course-content-body" >
                     <Accordion value="0" class="course-class-container" v-model:activeIndex="activeIndices"  v-for="(lesson ,secondindex) in unit.lessons" :key="secondindex">
                         <AccordionPanel 
@@ -119,9 +120,13 @@
                                         <!-- <hr class="course-class-hr" /> -->
                                         <AccordionContent class="course-class-body course-sessions-body"  >
                         
-                                            <div class="course-body-details " v-for="(content , thirdindex) in contents" :key="thirdindex"  @click=" sendactivetab(thirdindex ,session.link ,session.title ,session.text)" >
+                                            <!-- <div class="course-body-details " v-for="(content , thirdindex) in contents" :key="thirdindex"  @click=" sendactivetab(thirdindex ,session.link ,session.title ,session.text)" >
                                                 <component :is="content.icon" />
                                                 <p >{{ content.content}} {{ session.title }}  </p>
+                                            </div>                 -->
+                                            <div class="course-body-details "  :key="thirdindex"  @click=" sendactivetab(thirdindex ,session.link ,session.title ,session.text)" >
+                                                <component :is="contents[0]?.icon" />
+                                                <p >{{ contents[0]?.content}} {{ session.title }}  </p>
                                             </div>                
                                     
                                         </AccordionContent>
@@ -145,3 +150,9 @@
 
 
 </style>
+<!-- font-family: Zain;
+font-weight: 700;
+font-size: 24px;
+line-height: 100%;
+letter-spacing: 0%;
+text-align: right; -->

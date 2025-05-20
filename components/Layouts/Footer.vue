@@ -55,10 +55,10 @@ import { NuxtLink } from "#components";
       </div>
 
       <div class="col-data-details">
-        <p>الرئيسيه</p>
-        <p>كورساتي</p>
-        <p>من نحن</p>
-        <p>تواصل معنا</p>
+        <Nuxt-link to="/"> <p>الرئيسيه</p></Nuxt-link>
+        <Nuxt-link to="/course"><p>كورساتي</p></Nuxt-link>
+        <Nuxt-link to="/aboutus"><p>من نحن</p></Nuxt-link>
+        <Nuxt-link to="/blogs"><p>تواصل معنا</p></Nuxt-link>
       </div>
     </div>
 

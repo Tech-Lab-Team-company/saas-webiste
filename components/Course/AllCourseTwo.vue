@@ -13,13 +13,11 @@ const props = defineProps<{
 <template>
   <div class="card-course-twoo">
     <div
-      class="cards-wrapper"
-      v-for="section in props.HomeSections"
-      :key="section.id"
+
     >
       <div class="cards-grid">
         <NuxtLink
-          v-for="card in section.courses"
+          v-for="card in HomeSections"
           :key="card.id"
           :to="`/course/${card.id}`"
           class="card"
@@ -139,6 +137,8 @@ const props = defineProps<{
   display: grid;
   gap: 20px;
   width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .card {

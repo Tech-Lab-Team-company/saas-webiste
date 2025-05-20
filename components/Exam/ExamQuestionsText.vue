@@ -7,6 +7,7 @@
 
     const SelectedAnswer = ref<string[]>([]);
     const QuestionIndex = ref(0);
+    const Answer= ref()
 
   
 
@@ -23,6 +24,8 @@
         questionDetails.value = newValue;
     }, { immediate: true });
 
+
+
     const emit = defineEmits(['SendAnswerIndex'])
     const SendEmit =()=>{
         emit('SendAnswerIndex', QuestionIndex.value)
@@ -30,12 +33,14 @@
 
     const selected = ref([])
  
+    const router = useRouter()
+    console.log(Answer.value , "Answer")
 
     const sendData= async() =>{
         console.log(selected.value[QuestionIndex.value]  )
         const questionAnswerParams = new QuestionAnswerParams(
-            questionDetails?.value?.id , 
-            questionDetails?.value?.questions[QuestionIndex.value]?.id, 
+            Number(router.currentRoute.value.params.exam) , 
+            Number(questionDetails?.value?.questions[QuestionIndex.value]?.id), 
             selected.value[QuestionIndex.value]  
         );
         const questionAnswerController = QuestionAnswerController.getInstance()
@@ -58,6 +63,20 @@
 
   
         SendEmit();
+    }
+    
+    const EndExam = ()=>{
+
+        sendData();
+        if(selected.value[QuestionIndex.value] == undefined){
+            return;
+        }
+
+        else if(QuestionIndex.value < (questionDetails.value?.questions?.length ?? 0) - 1){
+            QuestionIndex.value++
+        }
+        SendEmit();
+        router.push(`/course/${router.currentRoute.value.params.id}`)
     }
     
     
@@ -92,11 +111,11 @@
             </div>
         </form>
 
-        <div class="next-btn" v-if="QuestionIndex == 0">
+        <div class="next-btn" v-if="QuestionIndex == 0 && QuestionIndex !=  questionDetails?.questions.length -1">
             <button @click="IncreaseIndex">التالي </button>
         </div>
-
-        <div class="btns" v-if="QuestionIndex > 0">
+        
+        <div class="btns" v-if="QuestionIndex > 0 && QuestionIndex < questionDetails?.questions.length -1 ">
             <button @click="DeacreseIndes">
                 <LeftArrowIcon />
                 السابق 
@@ -105,6 +124,9 @@
                 التالي 
                 <RightArrowIcon />
             </button>
+        </div>
+        <div class="next-btn" v-if="QuestionIndex ==  questionDetails?.questions.length -1">
+            <button @click="EndExam" >إنهاء الامتحان </button>
         </div>
     </div>
 </template>

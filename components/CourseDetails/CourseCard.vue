@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
     import Dashedicon from '~/public/icons/dashedicon.vue';
+import PaymentDialog from './PaymentDialog.vue';
 
 
 
@@ -44,9 +45,10 @@ watch(() => props.CourseData, (newValue) => {
                 </div>
             </div>
 
-            <div class="btns">
+            <!-- <div class="btns">
                 <button>شراء الكورس</button>
-            </div>
+            </div> -->
+            <PaymentDialog />
 
         </div>
 
