@@ -1,10 +1,10 @@
 import type Params from "~/base/core/Params/params";
 
 export default class ExamDetailsParams implements Params {
-  public ExamId: string;
+  public ExamId: number;
 
   constructor(
-    ExamId: string,
+    ExamId: number,
     
   ) {
     this.ExamId = ExamId;

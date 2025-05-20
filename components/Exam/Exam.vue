@@ -6,7 +6,6 @@
     <div class="Exam-contariner">
         <ExamHeader />
         <ExamTime />
-        <!-- <ExamQuestionsText /> -->
     </div>
 </template>
 

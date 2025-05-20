@@ -51,10 +51,8 @@ export default abstract class ServicesInterface {
       // TODO : Fire Loader
     }
     try {
-      // console.log(params)
       switch (type) {
         case CrudType.FormData:
-          console.log("api",params?.toMap())
           response = await this.networkService.postFormData({
             url: url,
             data: params?.toMap() ?? {},

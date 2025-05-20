@@ -2,13 +2,6 @@
 import blacknotes from '../../public/icons/blacknotes.vue'
 
 
-// const props = defineProps({
-//     title:{
-//         type: String,
-//         default: 'امتحان علي اساسيات النحو (لغه عربيه)'
-//     }
-// })
-
 </script>
 
 <template>

@@ -8,9 +8,12 @@ import clockicon from '~/public/icons/clockicon.vue';
 
     const questionIndex=ref(0);
 
+    const router = useRouter();
+    
+
     const ExamDetails = ref<ExamDetailsModel | null>(null)
     const FetchExamQuestions = async ()=>{
-        const ExamParams = new ExamDetailsParams("217");
+        const ExamParams = new ExamDetailsParams(Number(router.currentRoute.value.params.exam));
         const examDetailsController = ExamDetailsController.getInstance();
         const state = await examDetailsController.FetchExamDetails(ExamParams);
 
@@ -42,30 +45,20 @@ import clockicon from '~/public/icons/clockicon.vue';
 
     <div class="progress-bar">
    
-        <div class="active-bar" :style="`width:${questionIndex  * 10.5}%`"></div>
+        <div class="active-bar" :style="`width:${(questionIndex + 1) * (100 / Number(ExamDetails?.questions.length))}%`"></div>
             <div class="dots">
-         
-             <div class="dot" :class="questionIndex == 10 ? 'white' : ''"  ></div>
-             <div class="dot" :class="questionIndex == 9 ? 'white' : ''"  ></div>
-             <div class="dot" :class="questionIndex == 8 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 7 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 6 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 5 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 4 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 3 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 2 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 1 ? 'white' : ''"></div>
-             <div class="dot" :class="questionIndex == 0 ? 'white' : ''"></div>
+             <div v-for="dot in ExamDetails?.questions.length" class="dot" :class="questionIndex == dot ? 'white' : ''"></div>
         </div>
     </div>
 
-    <!-- it shiuld be mcq  -->
-    <div v-if="ExamDetails?.examType == QuestionTypeEnum.true_false">
+    
+    <div>
       <ExamQuestionsText 
-        :QuestionDetails ="ExamDetails"
-        @SendAnswerIndex ="questionIndex = $event"/>
+      :QuestionDetails ="ExamDetails"
+      @SendAnswerIndex ="questionIndex = $event"/>
     </div>
-
+    
+    <!-- v-if="ExamDetails?.examType == QuestionTypeEnum.true_false" -->
     <!-- <div v-if="ExamDetails?.examType ==QuestionTypeEnum.mcq">
       <ExamQuestionsAudio 
       @SendAnswerIndex ="questionIndex = $event"/>
@@ -87,87 +80,6 @@ import clockicon from '~/public/icons/clockicon.vue';
 
 
 </template>
-<!-- <script setup lang="ts">
-import { ref } from 'vue'
-
-const questionIndex = ref<number | null>(null)
-const currentQuestionIndex = ref(0)
-
-const questions = [
-  { type: 'text' },
-  { type: 'audio' },
-  { type: 'image' },
-  { type: 'choose' },
-  { type: 'complete' }
-]
-
-const handleAnswer = (index: number) => {
-  questionIndex.value = index
-  if (currentQuestionIndex.value < questions.length - 1) {
-    currentQuestionIndex.value++
-  } else {
-    console.log('الامتحان انتهى')
-  }
-}
-const prevQuestion = () => {
-  if (currentQuestionIndex.value > 0) {
-    currentQuestionIndex.value--
-  }
-}
-const nextQuestion = () => {
-  if (currentQuestionIndex.value < questions.length - 1) {
-    currentQuestionIndex.value++
-  }
-}
-</script>
-
-
-<template>
-  <div>
-    <ExamQuestionsText
-      v-if="questions[currentQuestionIndex].type === 'text'"
-      @SendAnswerIndex="handleAnswer"
-    />
-
-    <ExamQuestionsAudio
-      v-if="questions[currentQuestionIndex].type === 'audio'"
-      @SendAnswerIndex="handleAnswer"
-    />
-
-    <ExamQuestionImage
-      v-if="questions[currentQuestionIndex].type === 'image'"
-      @SendAnswerIndex="handleAnswer"
-    />
-
-    <ExamQuetionChoose
-      v-if="questions[currentQuestionIndex].type === 'choose'"
-      @SendAnswerIndex="handleAnswer"
-    />
-
-    <ExamQuestionComplete
-      v-if="questions[currentQuestionIndex].type === 'complete'"
-      @SendAnswerIndex="handleAnswer"
-    /> -->
-
-    <!-- <div class="mt-4 flex justify-between">
-      <button 
-  @click="prevQuestion"
-  :disabled="currentQuestionIndex === 0"
-  class="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
->
-  السابق
-</button>
-
-      <button 
-        @click="nextQuestion"
-        :disabled="currentQuestionIndex === questions.length - 1"
-        class="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
-      >
-        التالي
-      </button>
-    </div> -->
-  <!-- </div>
-</template> -->
 
 <style scoped lang="scss">
 
@@ -225,8 +137,9 @@ const nextQuestion = () => {
         position: absolute;
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        // justify-content: space-between;
         padding: 0 5px;
+        justify-content: space-between;
 
        
         
@@ -236,11 +149,16 @@ const nextQuestion = () => {
             border-radius: 50%;
             background-color: black;
             z-index: 10;
+
+            &:last-child{
+
+              background-color: white !important;
+            }
     
 
-            &.white{
-            background-color: white !important;
-         }
+        //     &.white{
+        //     background-color: white !important;
+        //  }
         
         
 

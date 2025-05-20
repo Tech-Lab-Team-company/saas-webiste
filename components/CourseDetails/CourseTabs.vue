@@ -32,6 +32,7 @@
         const state = await courseDetailsController.FetchCourseDetails(courseDetailsParams);
     
         if(state.value.data){
+            console.log(state.value.data , "Course Details") 
             CardData.value = state.value.data
         }
         
@@ -121,12 +122,12 @@
                 <div v-if="tab_value === 'content'">
                     <CourseDetailsTabsContentCourseContent
                             @coursechanged="Data" 
-                            :CourseData="CardData"
+                            :CourseData="CardData?.units"
                             />
                 </div>
                 <div v-if="tab_value === 'urls'">
                     <CourseDetailsTabsContentCourseUrls 
-                        :CourseData="CardData"
+                        :CourseData="CardData?.ExternalLinks"
                     />
                 </div>
                 <div v-if="tab_value === 'live'">
@@ -136,7 +137,7 @@
                 </div>
                 <div v-if="tab_value === 'exams'">
                     <CourseDetailsTabsContentCourseExam 
-                        :CourseData="CardData"
+                        :CourseData="CardData?.Exams"
                     />
                 </div>
             </div>

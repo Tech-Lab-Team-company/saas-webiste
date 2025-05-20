@@ -4,11 +4,12 @@ import blacknotes from '~/public/icons/blacknotes.vue';
 import clockicon from '~/public/icons/clockicon.vue';
 import calendaricon from '~/public/icons/calendaricon.vue';
 import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+import type ExamsModel from '~/features/FetchCourseDetails/Data/models/exam_model';
 
 
     const props = defineProps({
         CourseData: {
-            type: Object as () => CourseDetailsModel | null,
+            type: Object as () => ExamsModel | null,
             default: null
         }
     });
@@ -19,21 +20,27 @@ import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course
         CardDetails.value = newValue;
     }, { immediate: true });
         
+    const router = useRouter();
+    console.log(router.currentRoute.value.params.id)
 
 </script>
 
 <template>
-    <div class="course-exam-container" v-for="(exam , index) in CardDetails?.Exams" :key="index">
+
+    {{ console.log(CardDetails , "EXAMS") }}
+    <div class="course-exam-container" v-for="(exam , index) in CardDetails" :key="index">
 
 
-       <div v-if="!exam.isFinished" class="exam-rate">
-           <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
-           <p class="details">اعرض تفاصيل الامتحان</p>
-        </div>
-
-        <div class="btns" v-else="" >
-            <button>ابدأ الامتحان</button>
-        </div>
+        <Nuxt-link :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`"> 
+            <div class="btns" v-if="!exam.isFinished" >
+                <button>ابدأ الامتحان</button>
+            </div>
+        </Nuxt-link>
+        
+        <div v-if="exam.isFinished" class="exam-rate">
+            <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
+            <p class="details">اعرض تفاصيل الامتحان</p>
+         </div>
 
 
         <div class="course-exam-content">
@@ -52,7 +59,7 @@ import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course
                     <p>{{ String(exam.start_time).slice(11, 20) }} </p>
                     <clockicon class="exam-icon" />
                 </div>
-            </div>
+            </div> 
 
         </div> 
 

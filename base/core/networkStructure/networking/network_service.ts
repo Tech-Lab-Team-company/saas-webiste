@@ -58,7 +58,9 @@ export default class NetworkService {
       formData.append(key, value as string | Blob);
     });
 
-    // console.log(formData, "form data")
+    // console.log(data, "form data")
+
+              // console.log("api",params?.toMap())
 
 
     return this.axiosInstance.post(url, formData, {

@@ -10,6 +10,7 @@ class ApiNames {
   }
 
   public baseUrl = "https://edu.techlabeg.com/api/website/";
+  
 
 
   //auth
@@ -130,6 +131,8 @@ class ApiNames {
   public show_blog = "show_blog";
 
   public CoursesFilter = this.baseUrl + "filter_courses";
+
+  public CoursesPayment = this.baseUrl + "join_course";
 
   
   

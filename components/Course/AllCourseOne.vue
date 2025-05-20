@@ -69,6 +69,8 @@ const props = defineProps<{
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 80%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .card {
