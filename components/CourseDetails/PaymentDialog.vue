@@ -12,6 +12,9 @@ const title = ref('');
 const subtitle = ref('');
 const descriptoin = ref('');
 const router =useRouter()
+const props =defineProps(['status'])
+const status = ref(props.status)
+
 console.log(router.currentRoute.value.params.id)
 
 
@@ -31,17 +34,26 @@ console.log(router.currentRoute.value.params.id)
         visible.value = false;
     }
 
+    watch(
+        () => props.status,
+        (newValue) => {
+            status.value = newValue;
+        })
+
 </script>
 
 <template>
     <div class="edit-dialog-container">
-            <div class="btns" @click="visible = true">
-                <button>شراء الكورس</button>
+            <div class="btns" >
+                <button @click="visible = true" v-if="status == 0">شراء الكورس</button>
+                <button @click="visible = false" v-if="status == 1" disabled>فى انتظار قبول الطلب</button>
+                <button @click="visible = false" v-if="status == 2" disabled>تم الشراء</button>
+                <button @click="visible = false" v-if="status == 4" disabled>تم رفض الطلب</button>
             </div>
             <Dialog v-model:visible="visible" class="dialog"  :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <AddMedia
                     class="add-media"
-                    :index="0"
+                    :index="1"
                         @update:images="updateFiles"
                     />
                     <button @click="AddPayment" class=" btn-buy">شراء</button>

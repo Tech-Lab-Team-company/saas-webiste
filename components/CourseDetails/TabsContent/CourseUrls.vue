@@ -15,30 +15,6 @@ watch(() => props.CourseData, (newValue) => {
 }, { immediate: true });
     
 
-
-    // const urls = ref([
-    //     {
-    //         title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-    //         description: 'اضغط للوصول لصفحتك التعليميه  واحصل علي المعرفه التي تريدها',
-
-    //     },
-    //     {
-    //         title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-    //         description: 'اضغط للوصول لصفحتك التعليميه  واحصل علي المعرفه التي تريدها',
-
-    //     },
-    //     {
-    //         title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-    //         description: 'اضغط للوصول لصفحتك التعليميه  واحصل علي المعرفه التي تريدها',
-
-    //     },
-    //     {
-    //         title: 'امتحان علي اساسيات النحو (لغه عربيه)',
-    //         description: 'اضغط للوصول لصفحتك التعليميه  واحصل علي المعرفه التي تريدها',
-
-    //     },
- 
-    // ])
 </script>
 
 <template>
@@ -46,13 +22,12 @@ watch(() => props.CourseData, (newValue) => {
     <div class="course-url-container" v-for="(url , index) in CardDetails" :key="index">
 
         <div class="btns" >
-            <!-- anchor -->
-             <a :src="url?.link" ></a>
+             <a :href="url?.link" target="_blank">
             <button>
                 <discoverbtnIcon />
                 استكشف الان
             </button>
-            
+            </a>
         </div>
 
 

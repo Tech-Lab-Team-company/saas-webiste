@@ -9,13 +9,21 @@ const props = defineProps({
   CourseData: {
     type: Object as () => CourseDetailsModel | null,
     default: null
+  },
+  status:{
+    type:Number,
+    default:0
   }
 });
 
 const CardDetails = ref(props.CourseData);
+const status = ref(props.status);
 
 watch(() => props.CourseData, (newValue) => {
     CardDetails.value = newValue;
+}, { immediate: true });
+watch(() => props.status, (newValue) => {
+    status.value = newValue;
 }, { immediate: true });
     
 </script>
@@ -45,10 +53,10 @@ watch(() => props.CourseData, (newValue) => {
                 </div>
             </div>
 
-            <!-- <div class="btns">
-                <button>شراء الكورس</button>
-            </div> -->
-            <PaymentDialog />
+
+            <PaymentDialog 
+            :status="status"
+            />
 
         </div>
 

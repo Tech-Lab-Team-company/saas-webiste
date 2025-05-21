@@ -1,86 +1,162 @@
-
-.course-homework-container{
-    margin-top: 40px;
-    display: flex;
-    width: 100%;
-    align-items: center;
-    border: 1px solid black;
+.homework-card{
     width: 70%;
     margin-left: auto;
     margin-right: auto;
-    justify-content: space-between;
-    padding: 10px;
-    border-radius: 10px;
+    font-family: "regular";
 
-    @media(max-width: 768px){
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
 
-    }
-    
+    .panels{
+        margin-top: 10px;
+        background-color: transparent;
+        
+        
 
-    .btns{
-        button{
-            background-color: #FFB949;
-            color:white;
-            padding: 10px;
+      
+            &.p-accordionpanel-active{
+
+                .p-accordionheader{
+                    border: none;
+                }
+
+            }
+        
+
+        .p-accordionheader {
+            background-color: transparent;
+            border: 1px solid black;
             border-radius: 10px;
-        }
-    }
-
-    .homework-rate{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-
-        .details{
-            text-decoration: underline;
-            cursor: pointer;
-            padding-left: 20px;
+            color: black;
         }
 
-    }
-    .course-homework-content{
-        display: flex;
-        flex-direction: column;
-        justify-content: end;
-        gap: 6px;
-        width: 40%;
-        @media(max-width: 768px){
-            width: 100%;
-            align-items: center;
-
-        }
-
-        .homework-title{
+        .panel-header{
             display: flex;
-            align-items: center;
-            justify-content: end;
-            gap: 10px;
-            font-size: 20px;
+                flex-direction: row-reverse;
 
-            &.homework-date{
-                color: #6F777B;
-                font-size: 12px;
-                gap:5px;
 
-                .homework-icon{
-                    width: 13px;
+            .panel-header-container{
+
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+
+                .homework-title{
+                    text-align: end;
+                }
+
+                .homework-content{
+                    display: flex;
+                    gap: 20px;
+                    justify-content: center;
+                    .homework-date{
+                        display: flex;
+                        align-items: center;
+                        font-size: 13px;
+                        gap: 5px;
+                        
+                        .clock-icon{
+                            width: 13px;
+                        }
+                    }
                 }
             }
-        }
+            }
 
-        .homework-date-container{
-        
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            
-            margin-right: 5px;
-            
-        }
+            .p-accordioncontent{
+                border-radius: 10px;
+                margin-top: 10px;
+            }
+
+            .homework-attachments{
+                display: flex;
+                gap: 5px;
+                justify-content: center;
+                overflow: hidden;
+                font-family: "regular";
+                img{
+                    width: 150px;
+                    border-radius: 10px;
+                    padding-top: 20px;
+
+                }
+            }
+
+            .homework-content-container{
+                padding: 10px;
+                width: 100%;
+                text-align: end;
+                display: flex;
+                flex-direction: column;
+                font-family: "regular";
+
+                .homework-content-title{
+                    padding: 5px;
+                    // border-bottom: 1px solid #DDE1E6;
+                    font-family: "medium";
+                }
+
+                .homework-content-subtitle{
+                    padding: 5px;
+                    border-bottom: 1px solid #DDE1E6;
+                    font-family: "regular";
+                }
+            }
+
+            .homework-hr{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                .homework-right-hr{
+                    width: 100%;
+                    border: none;
+                    height: 2px;
+                    background-image: linear-gradient(to left, #FFB949 , #FFFFFF );
+                }
+                .homework-left-hr{
+                    width: 100%;
+                    border: none;
+                    height: 2px;
+                    background-image: linear-gradient(to right, #FFB949 , #FFFFFF );
+                }
+            }
+            .homework-upload{
+                padding: 10px;
+                .homework-upload-title{
+                    text-align: end;
+                    font-family: "medium";
+                }
+
+                .add-media{
+                    margin-top: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    background-color: transparent;
+                }
+                .notes-input{
+                    border-radius: 10px;
+                    border: 1px solid #DDE1E6;
+                    padding: 10px;
+                    margin-top: 10px;
+                    text-align: right;
+                    &:focus{
+                        border-color: #DDE1E6;
+                        outline-color: #DDE1E6;
+                    }
+                }
+            }
+
+            .btn-container{
+                width: 100%;
+                display: flex;
+                justify-content: flex-start;
+                .submit-image{
+                    background-color: #FFB949;
+                    color: white;
+                    width: 40%;
+                    padding: 10px;
+                    font-size: 16px;
+                    border-radius: 10px;
+                }
+            }
     }
 }

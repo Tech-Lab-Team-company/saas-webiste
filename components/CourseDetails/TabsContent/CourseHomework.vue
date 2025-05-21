@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import Downarrow from '~/public/icons/downarrow.vue';
-import blacknotes from '~/public/icons/blacknotes.vue';
+
+import Accordion from 'primevue/accordion';
+    import AccordionPanel from 'primevue/accordionpanel';
+    import AccordionHeader from 'primevue/accordionheader';
+    import AccordionContent from 'primevue/accordioncontent';
+
 import clockicon from '~/public/icons/clockicon.vue';
-import calendaricon from '~/public/icons/calendaricon.vue';
-import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+import AddMedia from '~/components/helper/AddMedia.vue';
+import Image from 'primevue/image';
+import SubmitHomeWorkParams from '~/features/HomeWorkSubmit/Core/Params/submit_homework_params';
+import SubmitHomeworkController from '~/features/HomeWorkSubmit/presentation/controllers/submit_homework_controller';
+import  AttachmentModel from '~/features/FetchCourseDetails/Data/models/attachment_model';
+
 const props = defineProps({
   CourseData: {
-    type: Object as () => CourseDetailsModel | null,
+    type: Object as () => [] | null,
     default: null
   }
 });
@@ -18,52 +26,108 @@ watch(() => props.CourseData, (newValue) => {
 }, { immediate: true });
     
 
-    const homeworks = ref([
-        {
-            title: 'واجب النحو والبلاغه',
-            date: '9 -5-2025',
-            subject:'لغة عربية',
-        },
-        {
-            title: 'واجب النحو والبلاغه',
-            date: '9 -5-2025',
-            subject:'لغة عربية',
-        },
-        {
-            title: 'واجب النحو والبلاغه',
-            date: '9 -5-2025',
-            subject:'لغة عربية',
-        },
-    ])
+     const activeIndices = ref<number[]>([]);
+        const  activePanels = ref<number[]>([]); 
+    const  SecondactivePanels = ref<number[]>([]); 
+    const  thirdactivePanels = ref<number[]>([]); 
+    const activetab = ref(1)
+
+
+    const image = ref<AttachmentModel[] | null>(null)
+
+    const updateFiles = async (files: File[]) => {
+       image.value = files.map((file) => new AttachmentModel(1 , "" , image.value))
+    };
+
+  
+    const notes = ref('');
+
+    const SubmitHomeWork = async (HomeworkId:number)=>{
+        const submithomeworkParams = new SubmitHomeWorkParams(HomeworkId,notes.value ,image.value);
+        const submitHomeworkController = SubmitHomeworkController.getInstance();
+        const state = await submitHomeworkController.SubmitHomeWork(submithomeworkParams)
+    }
+
+    onMounted(
+        ()=>{
+            console.log("welcome")
+        }
+    )
+
+    const text = ref('text')
 </script>
 
+
+  
 <template>
-    <div class="course-homework-container" v-for="homework in homeworks" :key="homework.title">
-
-
-        <div  class="homework-rate">
-           <p class="details">اعرض تفاصيل الامتحان</p>
-        </div>
-
-        <div class="course-homework-content">
-            <div class="homework-title">
-                <p>{{ homework.title }}</p>
-            </div>
-
-            <div class="homework-date-container">
-                <div class="homework-title homework-date">
-                    <p>{{ homework.date }} </p>
-                    <calendaricon class="homework-icon" />
-                </div>
-                <div class="homework-title homework-date">
-                    <p>{{ homework.subject }} </p>
-                </div>
-            </div>
-
-        </div>
-
+    <div class="homework-card">
+        {{ console.log(CardDetails , "before") }}
+        <Accordion value="0" >
+            <template #collapseicon>
+                <p class="collapse-text">اعرض تفاصيل الواجب</p>
+            </template>
+            <template #expandicon>
+                <p class="collapse-text">اعرض تفاصيل الواجب</p>
+            </template>
+            {{ console.log(CardDetails , "after") }}
+            <AccordionPanel expandIcon="title" class="panels" :value="index" v-for="(homework , index) in CardDetails" :key="index">
+                <AccordionHeader class="panel-header">
      
+                    <div class="panel-header-container">
+
+                        <p class="homework-title">{{ homework?.title }}</p>
+                        
+                        <div class="homework-content">
+                            <div class="homework-date">
+                                <p>{{ homework?.start_time }}</p>
+                                <clockicon class="clock-icon" />
+                            </div>
+                            <p>{{ homework?.description }}</p>
+                        </div>
+                    </div>
+
+                </AccordionHeader>
+                <AccordionContent>
+                    <div class="homework-attachments">
+                        <Image v-for="image in homework?.attachments" :src="image.file" :alt="image.alt" width="250" preview />
+
+                    </div>
+                    <div class="homework-content-container">
+                        <p class="homework-content-title">{{ homework?.title  }}</p>
+                        <p class="homework-content-subtitle">{{ homework?.text  }}</p>
+                    </div>
+                    <div class="homework-hr">
+                        <hr class="homework-right-hr"/>
+                        <hr class="homework-left-hr"/>
+                    </div>
+                    <div class="homework-upload">
+                        <p class="homework-upload-title">ارفق صوره الاجابه</p>
+                        <AddMedia 
+                            class="add-media"
+                            :index="1"
+                            @update:images="updateFiles"
+                        />
+                        <input type="text" class="notes-input" placeholder="ملاحظات" v-model="notes">
+                    </div>
+                    <div class="btn-container">
+                        <button class="submit-image" @click="SubmitHomeWork(homework?.id)">ارفق الصوره</button>
+                    </div>
+                </AccordionContent>
+            </AccordionPanel>
+        </Accordion>
     </div>
 </template>
 
-<style scoped ></style>
+
+        
+
+
+<style scoped lang="scss">
+.collapse-text{
+    text-decoration: underline;
+}
+</style>
+
+
+        
+

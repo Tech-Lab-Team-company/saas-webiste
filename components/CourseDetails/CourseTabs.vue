@@ -74,6 +74,7 @@
     <div v-if="activetab!=0">
        <CourseDetailsCourseCard 
        :CourseData="CardData"
+       :status="CardData?.allow_status"
        />
        
        <!-- :CardDetails="CardData" -->
@@ -116,7 +117,7 @@
             <div class="tabs-content">
                 <div v-if="tab_value === 'homework'">
                     <CourseDetailsTabsContentCourseHomework 
-                        :CourseData="CardData"
+                        :CourseData="CardData?.Homeworks"
                     />
                 </div>
                 <div v-if="tab_value === 'content'">
@@ -132,7 +133,7 @@
                 </div>
                 <div v-if="tab_value === 'live'">
                     <CourseDetailsTabsContentCourseLive 
-                        :CourseData="CardData"
+                        :CourseData="CardData?.Lives"
                     />
                 </div>
                 <div v-if="tab_value === 'exams'">

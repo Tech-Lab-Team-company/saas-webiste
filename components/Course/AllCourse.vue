@@ -103,6 +103,7 @@ const selectedToggle = ref();
     </div>
   </div>
   <HomeHomeEducationStages 
+  @UpdateData="CourseFilterData"
   />
 
 </template>

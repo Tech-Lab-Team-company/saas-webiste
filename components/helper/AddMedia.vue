@@ -3,7 +3,7 @@ import { ref, defineProps, defineEmits, computed, watch } from "vue";
 import PdfIcon from "@/public/icons/AddImage.vue";
 import WordIcon from "@/public/icons/AddImage.vue";
 import ExcelIcon from "@/public/icons/AddImage.vue";
-import AddImage from "@/public/icons/AddImage.vue";
+import MediaIcon from "~/public/icons/mediaIcon.vue";
 
 // const props = defineProps<{ initialImages?: string[]; index?: number; label?: string }>()
 const props = defineProps({
@@ -105,8 +105,8 @@ function removeImage(index: number) {
     <!-- Upload Button -->
     <div class="input-image">
       <label :for="`images${index}`" class="input-label-images">
-        <AddImage />
-
+        <AddImage v-if="props.index == 0" />
+        <MediaIcon v-if="props.index == 1" />
         <span>
             أرفق صورة لا يتجاوز حجمها 3.5 ميجابايت.
         </span>
@@ -172,6 +172,9 @@ function removeImage(index: number) {
 <style scoped lang=scss>
 
 .multi-image-uploader {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
     .input-image{
   display: flex;
   flex-direction: column;
@@ -198,6 +201,7 @@ function removeImage(index: number) {
     transition: all var(--transition-sm) ease-in-out;
     width: 100%;
     height: 100%;
+    background-color: transparent;
     span {
       font-family: "regular", sans-serif;
       color: rgba(87, 107, 116, 1);
