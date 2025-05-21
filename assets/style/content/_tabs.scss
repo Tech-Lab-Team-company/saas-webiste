@@ -10,6 +10,8 @@
     @media screen and (max-width: 768px) {
       flex-wrap: wrap;
     }
+    position: relative;
+    z-index: 20;
     button {
       display: flex;
       align-items: center;

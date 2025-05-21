@@ -4,6 +4,7 @@ import type TitleModel from "~/base/core/Models/title_model";
 import type TeacherModel from "./teacher_model";
 import type UnitsModel from "./units_model";
 import type ExamsModel from "./exam_model";
+import type HomeWorkModel from "./homework_model";
 
 export default class CourseDetailsModel {
   public id: number;
@@ -17,10 +18,11 @@ export default class CourseDetailsModel {
   public StageType:number;
   public ExternalLinks: [];
   public Lives: [];
-  public Homeworks: [];
+  public Homeworks: HomeWorkModel[];
   public Sessions: [];
   public Lessons: [];
   public units: UnitsModel[];
+  public allow_status: number;
 
 
 
@@ -36,10 +38,11 @@ export default class CourseDetailsModel {
     StageType: number,
     ExternalLinks: [],
     Lives: [],
-    Homeworks: [],
+    Homeworks: HomeWorkModel[],
     Sessions: [],
     Lessons: [],
     units: UnitsModel[],
+    allow_status: number,
 
   ) {
     this.id = id;
@@ -57,6 +60,7 @@ export default class CourseDetailsModel {
     this.Sessions = Sessions;
     this.Lessons = Lessons;
     this.units = units;
+    this.allow_status = allow_status;
  
   }
 
@@ -78,6 +82,7 @@ export default class CourseDetailsModel {
       map["sessions"],
       map["lessons"],
       map["units"],
+      map["allow_status"],
     );
   }
 }

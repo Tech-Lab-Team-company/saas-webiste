@@ -69,6 +69,8 @@
             margin-right: auto;
             text-align: center;
             padding-bottom: 30px;
+            position: relative;
+    z-index: 20;
           
             
         }
@@ -153,6 +155,8 @@ hr {
     margin-right: auto;
     text-align: center;
     padding: 20px 15px; /* Adjusted padding */
+    position: relative;
+    z-index: 20;
 }
 
 /* Responsive adjustments */

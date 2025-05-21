@@ -191,6 +191,7 @@ watch(
     SendData()
   }
 )
+const emit = defineEmits(['UpdateData'])
 
 const SendData = () => {
   filtersStore.updateFilters({
@@ -202,6 +203,16 @@ const SendData = () => {
     SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
     SelectedSubject: SelectedSubject.value
   });
+
+  emit('UpdateData' ,{
+        CategryId: CategryId.value,
+    SelectedEductionType: SelectedEducationTypeId.value,
+    SelectedUniversity: SelectedUniversity.value,
+    SelectedCollege: SelectedCollege.value,
+    SelectedCollegeDepartment: SelectedCollegeDepartment.value,
+    SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
+    SelectedSubject: SelectedSubject.value
+  })
 };
 
 
@@ -325,7 +336,7 @@ const SendData = () => {
         </button>
       </template>
       
-      <template v-if="Subjects">
+      <template class="subjects-btns" v-if="Subjects">
        <Nuxt-link  to="/course">
          <button
         v-for="type in Subjects"
@@ -349,4 +360,9 @@ const SendData = () => {
   </div>
 </template>
 
-<style setup lang="scss"></style>
+<style setup lang="scss">
+.subjects-btns{
+  display: flex;
+  align-items: center;
+}
+</style>

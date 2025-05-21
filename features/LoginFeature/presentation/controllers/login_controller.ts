@@ -52,6 +52,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
       }
       // useLoaderStore().endLoadingWithDialog();
     } catch (error: any) {
+      console.log('log in error' ,  error)
       DialogSelector.instance.errorDialog.openDialog({
         dialogName: "dialog",
         titleContent: error,

@@ -1,31 +1,31 @@
 import { ControllerInterface } from '@/base/persention/Controller/controller_interface'
 import type { DataState } from '@/base/core/networkStructure/Resources/dataState/data_state'
 import type Params from '@/base/core/Params/params'
-import type CoursePaymentModel from '../../Data/models/course_payment_model';
-import CoursesPaymentUseCase from '../../Domain/use_case/courses_payment_use_case';
 import DialogSelector from '~/base/persention/Dialogs/dialog_selector';
 import successImage from '~/public/images/success-dialog.png';
 import errorImage from '~/public/images/error.png';
+import type SubmitHomeWorkModel from '../../Data/models/submit_homework_model';
+import SubmitHomeworkUseCase from '../../Domain/use_case/submit_homework_use_case';
 
-export default class CoursesPaymentController extends ControllerInterface<CoursePaymentModel> {
-  private static instance: CoursesPaymentController
+export default class SubmitHomeworkController extends ControllerInterface<SubmitHomeWorkModel> {
+  private static instance: SubmitHomeworkController
   private constructor() {
     super()
   }
-  private coursesPaymentUseCase = new CoursesPaymentUseCase()
+  private submitHomeworkUseCase = new SubmitHomeworkUseCase()
 
   static getInstance() {
     if (!this.instance) {
-      this.instance = new CoursesPaymentController()
+      this.instance = new SubmitHomeworkController()
     }
     return this.instance
   }
 
-  async CoursesPayment(params: Params) {
+  async SubmitHomeWork(params: Params) {
     // useLoaderStore().setLoadingWithDialog();
     // console.log(params, "params")
     try {
-      const dataState: DataState<CoursePaymentModel> = await this.coursesPaymentUseCase.call(params)
+      const dataState: DataState<SubmitHomeWorkModel> = await this.submitHomeworkUseCase.call(params)
       this.setState(dataState)
       if (this.isDataSuccess()) {
         console.log("before success")

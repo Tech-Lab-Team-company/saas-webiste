@@ -87,6 +87,9 @@ export default abstract class ServicesInterface {
           case 400:
             console.error(`BadRequestException >> ${message}`);
             throw new BadRequestException(message);
+          case 401:
+            console.error(`UnAuthorizedException >> ${message}`);
+            throw new UnAuthorizedException(message);
           case 403:
             console.error(`ForbiddenException >> ${statusCode}`);
             throw new ForbiddenException("Forbidden");

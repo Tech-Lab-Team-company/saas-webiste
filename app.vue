@@ -10,6 +10,8 @@
 import { baseUrl } from "~/constant/baseUrl";
 import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
+import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
+import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 
 const { data: webstatus } = await useAsyncData("webstatus", async () => {
   const response = await $fetch<{
@@ -40,6 +42,8 @@ const { data: webstatus } = await useAsyncData("webstatus", async () => {
   <div>
     <NuxtLayout>
       <NuxtPage />
+      <MainDialog />
+      <LoaderDialog />
     </NuxtLayout>
   </div>
 </template>
