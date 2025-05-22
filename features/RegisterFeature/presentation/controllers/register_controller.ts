@@ -6,7 +6,6 @@ import RegisterUseCase from "~/features/RegisterFeature/Domain/use_case/register
 // import { useRouter } from "vue-router";
 import errorImage from "~/public/images/error.png";
 import successImage from "~/public/images/success-dialog.png";
-import successImage from "~/public/images/success-dialog.png";
 // import { useUserStore } from "~/stores/user";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
