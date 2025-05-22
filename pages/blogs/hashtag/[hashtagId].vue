@@ -1,7 +1,7 @@
 <script setup></script>
 <template>
   <div class="blogs-page">
-    <BlogsCardArticlesCont />
+    <BlogsCardArticlesContainer />
     <!-- <ProfileMyCourseCard /> -->
   </div>
 </template>

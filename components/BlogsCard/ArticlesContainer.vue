@@ -1,6 +1,29 @@
-<script setup>
-import { BlogsPageBlogsImage } from "#components";
-import pic from "@/assets/images/pic.png";
+<script setup lang="ts">
+
+import type  SidebarHashtag  from "~/types/sidebarhashtag";
+
+import { baseUrl } from "~/constant/baseUrl";
+// Fetch blog data
+const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () => {
+  try {
+    const response = await $fetch<{
+      data: SidebarHashtag[];
+      message: string;
+      status: number;
+    }>(`${baseUrl}/fetch_hashtags`, {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain":"abouelezz.com",
+      },
+    });
+    console.log(response);
+    return response.data;
+  } catch (err) {
+    console.error("Failed to fetch blogs:", err);
+    return [];
+  }
+});
 
 </script>
 
@@ -8,8 +31,11 @@ import pic from "@/assets/images/pic.png";
   <div class="blogs-page-articles">
     <div class="container">
       <div class="grid-container">
-        <BlogsCardBlogsHeader />
-        <BlogsPageSidebar />
+        <BlogsCardBlogsHeader 
+        />
+        <BlogsPageSidebar 
+        :hashtags="sidebarhashtag"
+        />
 
       </div>
     </div>

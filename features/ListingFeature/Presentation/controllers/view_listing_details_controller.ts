@@ -3,8 +3,8 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import ViewListingDetailsUseCase from "~/features/ListingFeature/Domain/use_case/view_listing_details_use_case";
 // import { useUserStore } from "~/stores/user";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import type ViewListingDetailsModel from "~/features/ListingFeature/Data/models/view_listing_details_model";
 

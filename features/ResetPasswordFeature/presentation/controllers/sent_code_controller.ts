@@ -3,10 +3,11 @@ import SentCodeModel from "~/features/ResetPasswordFeature/Data/models/user_mode
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import SentCodeUseCase from "~/features/ResetPasswordFeature/Domain/use_case/sent_code_case";
 import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import SentCodeParams from "~/features/ResetPasswordFeature/Core/Params/sent_code_params";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import ResetPasswordBuilder from "~/features/ResetPasswordFeature/presentation/builders/reset_password_builder";
-import successImage from "~/public/images/success-dialog.png";
+
 
 export default class SentCodeController extends ControllerInterface<SentCodeModel> {
   private static instance: SentCodeController;

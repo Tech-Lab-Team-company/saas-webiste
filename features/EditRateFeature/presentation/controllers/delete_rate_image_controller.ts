@@ -3,8 +3,8 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import DeleteRateImageUseCase from "~/features/EditRateFeature/Domain/use_case/delete_rate_image_use_case";
 // import { useUserStore } from "~/stores/user";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import type RateDetailsModel from "~/features/EditRateFeature/Data/models/comment_model";
 

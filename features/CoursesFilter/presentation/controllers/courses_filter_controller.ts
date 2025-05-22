@@ -1,8 +1,8 @@
 import { ControllerInterface } from '@/base/persention/Controller/controller_interface'
 import type { DataState } from '@/base/core/networkStructure/Resources/dataState/data_state'
 import type Params from '@/base/core/Params/params'
-import successImage from "@/assets/images/success-dialog.png";
-import errorImage from "@/assets/images/error.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from '@/base/persention/Dialogs/dialog_selector';
 import CoursesFilterModel from '../../Data/models/courses_filter_model';
 import CoursesFilterUseCase from '../../Domain/use_case/courses_filter_use_case';
@@ -45,12 +45,12 @@ export default class CoursesFilterController extends ControllerInterface<Courses
         // });
       }
     } catch (error: any) {
-    //   DialogSelector.instance.failedDialog.openDialog({
-    //     dialogName: "dialog",
-    //     titleContent: this.state.value.error?.title,
-    //     imageElement: errorImage,
-    //     messageContent: null,
-    //   });
+      // DialogSelector.instance.failedDialog.openDialog({
+      //   dialogName: "dialog",
+      //   titleContent: this.state.value.error?.title,
+      //   imageElement: errorImage,
+      //   messageContent: null,
+      // });
     }
 
     super.handleResponseDialogs()

@@ -105,8 +105,8 @@ function removeImage(index: number) {
     <!-- Upload Button -->
     <div class="input-image">
       <label :for="`images${index}`" class="input-label-images">
-        <AddImage v-if="props.index == 0" />
-        <MediaIcon v-if="props.index == 1" />
+        <!-- <AddImage v-if="props.index == 0" /> -->
+        <MediaIcon  />
         <span>
             أرفق صورة لا يتجاوز حجمها 3.5 ميجابايت.
         </span>
@@ -241,8 +241,9 @@ function removeImage(index: number) {
 
     .image-item {
       position: relative;
-      width: calc(85 / var(--base-height) * 100vh);
-      height: calc(70 / var(--base-height) * 100vh);
+      // width: calc(40 / var(--base-height) * 100vh);
+      width: 20%;
+      height: calc(30 / var(--base-height) * 100vh);
       border-radius: var(--radius-sm);
       overflow: hidden;
       padding: var(--space-md);

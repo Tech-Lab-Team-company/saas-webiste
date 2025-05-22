@@ -1,6 +1,7 @@
 import { ControllerInterface } from "~/base/persention/Controller/controller_interface";
 import type Params from "~/base/core/Params/params";
-import errorImage from "~/assets/images/error.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import type { SearchFilterStrategy } from "~/features/ListingFeature/Presentation/strategies/strategy_interface";
 

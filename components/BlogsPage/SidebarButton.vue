@@ -1,29 +1,21 @@
 <script setup lang="ts">
-import type  SidebarHashtag  from "~/types/sidebarhashtag";
-import { baseUrl } from "~/constant/baseUrl";
+import type SidebarHashtag from '~/types/sidebarhashtag';
 
-// Fetch blog data
-const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () => {
-  try {
-    const response = await $fetch<{
-      data: SidebarHashtag[];
-      message: string;
-      status: number;
-    }>(`${baseUrl}/fetch_hashtags`, {
-      method: "POST",
-      headers: {
-        "Accept-Language": "ar",
-        "web-domain":"abouelezz.com",
-      },
-    });
-    console.log(response);
-    return response.data;
-  } catch (err) {
-    console.error("Failed to fetch blogs:", err);
-    return [];
-  }
-});
 
+const props = defineProps<{
+  hashtags: SidebarHashtag[]; 
+}>();
+
+const HashtagsContetnt = ref<SidebarHashtag[]>(props.hashtags);
+
+
+watch(
+  () => props.hashtags,
+  (newValue) => {
+    HashtagsContetnt.value = newValue;
+  },
+  { deep: true }
+);
 
 
 </script>
@@ -34,7 +26,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
       <h2 class="sidebar-title">الموسوعة</h2>
       <div class="grid grid-cols-3 gap-md pt-md hashtags-container">
         <NuxtLink
-          v-for="(item, index) in sidebarhashtag"
+          v-for="(item, index) in HashtagsContetnt"
           :key="'btn-' + index"
           :to="`/blogs/hashtag/${item.id}`" 
         >

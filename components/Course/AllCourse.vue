@@ -74,6 +74,7 @@ const props = defineProps(['showUniversities' , 'showStages'])
 const selectedToggle = ref();
 </script>
 <template>
+  
 
   <div class="aa">
     <div class="header-toggle">
@@ -104,14 +105,24 @@ const selectedToggle = ref();
   </div>
   <HomeHomeEducationStages 
   @UpdateData="CourseFilterData"
+  class="stages"
   />
 
 </template>
 
 <style scoped lang="scss">
+.stages{
+  background-color: #f6f6f6 !important;
+padding-bottom: 20px;
+margin-top:20px
+  
+}
 .aa {
   background-color: #f6f6f6 !important;
   width: 100%;
+      margin-bottom: 24px;
+    padding-bottom: 20px;
+  // margin-top: 30px;
 }
 
 .header-toggle {

@@ -7,6 +7,27 @@ import video1 from "~/public/icons/video1.vue";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+import SquareIcon from "~/public/icons/squareIcon.vue";
+
+
+const { data: GraduationParty } = await useAsyncData("GraduationParty", async () => {
+  const response = await $fetch<{
+    data: HomeFirstSection[];
+    message: string;
+    status: number;
+  }>(`${baseUrl}/fetch_home_website_section`, {
+    method: "POST",
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain":"abouelezz.com",
+    },
+    body: {
+      type: SectionTypeEnum.GraduationParty,
+    },
+  });
+
+  return response.data[response.data.length - 1];
+});
 
 
 const splideOptions = {
@@ -40,62 +61,51 @@ const splideOptions = {
 };
 
 
-const props = defineProps<{
-  HomeSections: {};
-}>();
-
-const homesection = ref(props.HomeSections)
-
-watch(
-  ()=>props.HomeSections,
-  (newValue) => {
-    homesection.value = newValue; 
-  },
-  { immediate: true }
-)
-
 </script>
 
 <template>
   <div class="card-course-three">
     <div class="slider-wrapper">
-      <h3 class="slider-heading">{{ homesection?.title }}</h3>
+      <h3 class="slider-heading">{{ GraduationParty?.title }}</h3>
+      <p class="description-text">{{ GraduationParty?.description }}</p>
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
-          <NuxtLink :to="`/course/${course.id}`" class="card">
-            <div class="image-container">
-              <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
-              <p class="overlay-text">{{ course.course_price }} جنيه</p>
+        <SplideSlide v-for="(image, index) in GraduationParty?.media" :key="index">
+            {{ console.log(image , "image") }}
+            <div class="image-container card">
+              <img :src="image?.file" :alt="image.alt" class="course-image" />
             </div>
-
-            <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ course.title }}</h5>
-              <div class="card-content">
-                <p class="card-text1">
-                  <video1 />
-                  {{ course.course_videos }} فيديو
-                </p>
-                <p class="card-text1">
-                  <note />
-                  {{ course.course_docs }} ملف ورقي
-                </p>
-                <p class="card-text1">
-                  <microphone />
-                  {{ course.course_records }} ملف صوتى
-                </p>
-              </div>
-              <div class="card-footer">
-                <div class="card-text" v-html="course?.description"></div>
-              </div>
-            </div>
-          </NuxtLink>
+         
+            
+            
         </SplideSlide>
-      </Splide>
-    </div>
+    </Splide>
+</div>
+    <SquareIcon class="dots-icons-one"/>
+    <SquareIcon class="dots-icons-two"/>
   </div>
 </template>
 
 <style scoped>
+
+.dots-icons-one{
+    position: absolute;
+     top: 100%;
+    transform: translateY(-80%);
+    left: 4%;
+    z-index: -1;
+}
+.dots-icons-two{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-80%);
+    right: 4%;
+    z-index: -1;
+}
+.description-text{
+    margin: 0;
+    padding-bottom: 10px;
+    color: #909DAD;
+}
 .card-course-three {
   width: 100%;
   /* max-width: 1400px; */
@@ -116,7 +126,7 @@ watch(
   font-size: 35px;
   color: #222;
   text-align: center;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   font-weight: 800;
   line-height: 200%;
   letter-spacing: 0%;
@@ -276,7 +286,7 @@ watch(
 @media (max-width: 992px) {
   .slider-heading {
     font-size: 28px;
-    margin-bottom: 15px;
+    /* margin-bottom: 15px; */
   }
   
   .card-title {
@@ -297,7 +307,7 @@ watch(
 
 @media (max-width: 768px) {
   .slider-heading {
-    font-size: 24px;
+    /* font-size: 24px; */
   }
   
   .splide-container {
@@ -327,7 +337,7 @@ watch(
 @media (max-width: 576px) {
   .slider-heading {
     font-size: 20px;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
   }
   
   .splide-container {

@@ -41,7 +41,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
             <!-- إذا كنت ترغب في إضافة أي أيقونات هنا، يمكنك فعل ذلك -->
             <!-- <component :is="card.icon" class="sidebar-icon" /> -->
             <p class="sidebar-date">اضيف بواسطة</p>
-            <p class="sidebar-text">{{ blogdetails.subtitle }}</p>
+            <p class="sidebar-text" v-html="blogdetails.subtitle"></p>
           </div>
         </div>
         <div class="blogs-name">

@@ -1,5 +1,22 @@
-<script setup>
+<script setup lang="ts">
 
+import type SidebarHashtag from '~/types/sidebarhashtag';
+
+
+const props = defineProps<{
+  hashtags: SidebarHashtag[]; 
+}>();
+
+const HashtagsContetnt = ref<SidebarHashtag[]>(props.hashtags);
+
+
+watch(
+  () => props.hashtags,
+  (newValue) => {
+    HashtagsContetnt.value = newValue;
+  },
+  { deep: true }
+);
 
 </script>
 
@@ -7,7 +24,9 @@
   <!-- sidebar -->
   <div class="sidebar" dir="rtl">
     <BlogsPageSidebarArticles />
-    <BlogsPageSidebarButton />
+    <BlogsPageSidebarButton 
+    :hashtags="HashtagsContetnt ?? []"
+    />
   </div>
   <!-- end sidebar -->
 </template>

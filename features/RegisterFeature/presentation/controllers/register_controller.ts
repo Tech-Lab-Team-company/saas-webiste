@@ -5,7 +5,7 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import RegisterUseCase from "~/features/RegisterFeature/Domain/use_case/register_use_case";
 // import { useRouter } from "vue-router";
 import errorImage from "~/public/images/error.png";
-import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
+import successImage from "~/public/images/success-dialog.png";
 import successImage from "~/public/images/success-dialog.png";
 // import { useUserStore } from "~/stores/user";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";

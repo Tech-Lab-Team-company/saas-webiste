@@ -5,34 +5,7 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
-// const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () => {
-//   const response = await $fetch<{
-//     data: HomeFirstSection[];
-//     message: string;
-//     status: number;
-//   }>(`${baseUrl}/fetch_home_website_section`, {
-//     method: "POST",
-//     headers: {
-//       "Accept-Language": "ar",
-//       "web-domain":"abouelezz.com",
-//     },
-//     body: {
-//       type: SectionTypeEnum.Course,
-//     },
-//   });
 
-
-//   const filteredSections = response.data.filter(section => section.style === 1);
-  
-//   // const allCourses = filteredSections.flatMap(section => section.courses);
-  
-//   // console.log(allCourses, "All Courses");
-  
-
-//   return filteredSections;
-  
-
-// });
 
 const props = defineProps<{
   HomeSections: {};
@@ -83,7 +56,6 @@ watch(
 <template>
   <div class="card-course-one">
     <div class="slider-wrapper">
-      {{ console.log(HomeSections, "HomeSections") }}
       <h3 class="slider-heading">{{homesection?.title}}</h3>
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">

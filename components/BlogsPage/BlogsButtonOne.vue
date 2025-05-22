@@ -32,13 +32,18 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
     <div class="sidebarone-page-articles-buttons pt-lg">
       <h2 class="sidebarone-title">الموسوعة</h2>
       <div class="sidebarone-page-buttons gap-md pt-md">
-        <button
-          v-for="tag in blogdetails.hashtags"
-          :key="'btn-' + tag.id"
-          class="sidebarone-button"
+        <Nuxt-link 
+        v-for="tag in blogdetails.hashtags"
+        :key="'btn-' + tag.id"
+        class="sidebarone-button"
+        :to="`/blogs/hashtag/${tag.id}`" 
         >
+        
+          <button
+          >
           {{ tag.title }}
         </button>
+      </Nuxt-link>
       </div>
     </div>
   </div>

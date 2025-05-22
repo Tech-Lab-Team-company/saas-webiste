@@ -4,8 +4,8 @@ import type Params from '@/base/core/Params/params'
 import type CoursePaymentModel from '../../Data/models/course_payment_model';
 import CoursesPaymentUseCase from '../../Domain/use_case/courses_payment_use_case';
 import DialogSelector from '~/base/persention/Dialogs/dialog_selector';
-import successImage from '~/public/images/success-dialog.png';
-import errorImage from '~/public/images/error.png';
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 
 export default class CoursesPaymentController extends ControllerInterface<CoursePaymentModel> {
   private static instance: CoursesPaymentController

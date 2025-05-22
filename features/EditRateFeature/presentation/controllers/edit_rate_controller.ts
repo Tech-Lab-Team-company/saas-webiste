@@ -3,8 +3,8 @@ import CommentModel from "~/features/EditRateFeature/Data/models/comment_model";
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
 import EditRateUseCase from "~/features/EditRateFeature/Domain/use_case/edit_rate_use_case";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/rate-success.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class EditRateController extends ControllerInterface<CommentModel> {

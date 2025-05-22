@@ -25,6 +25,7 @@
 <template>
     <div class="second-banner">
     
+       
         <ClientOnly class="container" >
             <swiper-container 
                 ref="containerRef"

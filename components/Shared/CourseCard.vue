@@ -35,6 +35,7 @@ const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () 
 
 <template>
   <div >
+    <SharedGarduationPartySection />
     
     <SharedCourseCardOne 
       v-for="(section , index) in HomeSections?.FirstSectionFilter"

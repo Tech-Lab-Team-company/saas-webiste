@@ -44,7 +44,6 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
 <template>
     <div class="main-container">
       <ClientOnly>
-        {{ console.log(sliders, "sliders") }}
         <!-- Loading state -->
         <div v-if="pending" class="loading">جاري التحميل...</div>
         <!-- Error state -->
@@ -62,13 +61,15 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
                   <p class="main-title">{{ slide.title }}</p>
                   <p class="sub-title">{{ slide.subtitle }}</p>
                 </div>
-                <button class="btn btn-primary">ابــــدأ الآن</button>
+                <!-- <button class="btn btn-primary">ابــــدأ الآن</button> -->
               </div>
             </div>
             <div v-else class="vid-container">
               <div class="video">
                 <div class="layer"></div>
-                <video autoplay muted :src="slide.media.img"></video>
+                <video autoplay muted loop >
+                  <source :src="slide.media.img" type="video/mp4">
+                </video>
               </div>
               <div class="vid-details">
                 <div class="vid-title">
