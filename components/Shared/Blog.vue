@@ -1,64 +1,21 @@
 <script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
+import { baseUrl } from "~/constant/baseUrl";
+import type HomeFirstSection from '~/types/home_first_section';
+import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+import StagesTitle from '../Home/home/StagesTitle.vue'
 
-import Rectangle from "@/assets/images/Rectangle.png";
-import Rectangle2 from "@/assets/images/Rectangle2.png";
-import Rectangle3 from "@/assets/images/Rectangle3.png";
-
-const cards = [
-  {
-    id: 1,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-  {
-    id: 2,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle2,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-  {
-    id: 3,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle3,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-  {
-    id: 3,
-    title: "رحلة نحو المعرفة والتفوق",
-    text: "مدونتك التعليمية – نافذتك إلى عالم المعرفة",
-    img: Rectangle3,
-    text2:
-      "رحلة التعلم لا تتوقف أبدًا! هنا ستجد مقالات تعليمية ملهمة، نصائح دراسية فعالة، وأحدث الاستراتيجيات لمساعدتك على تحقيق التفوق الأكاديمي. استكشف موضوعات متنوعة، اكتسب مهارات جديدة، واستعد لكل تحدٍ تعليمي بثقة",
-    date: "2023-10-01",
-  },
-];
 const splideOptions = {
   perPage: 3,
   gap: "3px",
   pagination: false,
-  arrows: false,
-  drag: false,
+   perMove: 1,
+  arrows: true,
+  drag: true,
   cloneStatus: true, 
-  
+  range:false,
 };
-
-
-import { baseUrl } from "~/constant/baseUrl";
-import type HomeFirstSection from '~/types/home_first_section';
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
-// import { SectionTypeEnum } from '/enum/section_type_enum';
 
 
 
@@ -78,9 +35,9 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
     }
 
   });
-//   console.log(response);
 
-  return response.data[0];
+  console.log(response.data , "response.data")
+  return response.data[response.data.length - 1];
 });
 
 </script>
@@ -88,16 +45,22 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
 <template>
   <div class="Blog" dir="rtl">
     <div class="slider-wrapper pt-md">
-      <p class="slider-heading">{{Blogs?.title}}</p>
-      <h3 class="slider-heading1">{{ Blogs?.subtitle }}</h3>
-      <p class="slider-text">
-        {{ Blogs?.description }}
-      </p>
+
+      <div class="stage-container">
+        <div class="stages student-stages">
+
+          <StagesTitle 
+          :maintitle="`المدونه`"  
+          :title="Blogs?.title"
+          :subtitle="Blogs?.subtitle"
+          />
+        </div>
+      </div>
 
       <Splide :options="splideOptions" class="splide-container" >
         <SplideSlide v-for="(blog, index) in Blogs?.blogs" :key="index">
-          <NuxtLink :to="`/blogs/${blog.id}`" class="card">
-            <img :src="blog.mail_image" alt="Card image" class="course-image" />
+          <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
+            <img :src="blog.attachments[0].file" alt="Card image" class="course-image" />
             <div class="card-body">
               <div class="card-header">
                 <hr />
@@ -108,7 +71,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
               </div>
               <p class="card-text">{{ blog.description }}</p>
               <div class="card-footer">
-                <P > {{ blog.subtitle }}</P>
+                <P v-html="blog.subtitle"> </P>
               </div>
             </div>
           </NuxtLink>

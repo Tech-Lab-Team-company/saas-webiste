@@ -70,7 +70,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
   margin-top: 20px;
 }
 .sidebar-page-articles-card-img{
-  width: 50%;
+  width: 30%;
 }
 .sidebar-page-articles-card-img img {
   min-width: 100%;

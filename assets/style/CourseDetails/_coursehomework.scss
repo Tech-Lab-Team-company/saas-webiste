@@ -8,10 +8,7 @@
     .panels{
         margin-top: 10px;
         background-color: transparent;
-        
-        
-
-      
+    
             &.p-accordionpanel-active{
 
                 .p-accordionheader{
@@ -19,6 +16,19 @@
                 }
 
             }
+
+
+            // .p-accordionpanel:first-child > .p-accordionheader
+            &:first-child {
+                &>.p-accordionheader{
+                    border: none;
+                }
+            }
+
+
+
+
+
         
 
         .p-accordionheader {

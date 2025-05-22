@@ -4,8 +4,8 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import UpdateProfileUseCase from "~/features/UpdateProfileFeature/Domain/use_case/update_profile_use_case";
 import { useUserStore } from "~/stores/user";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class UpdateProfileController extends ControllerInterface<UserModel> {

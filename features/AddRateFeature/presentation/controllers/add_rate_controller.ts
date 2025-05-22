@@ -3,8 +3,8 @@ import CommentModel from "~/features/AddRateFeature/Data/models/comment_model";
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
 import AddRateUseCase from "~/features/AddRateFeature/Domain/use_case/add_rate_use_case";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/rate-success.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class AddRateController extends ControllerInterface<CommentModel> {

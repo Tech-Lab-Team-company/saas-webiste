@@ -2,6 +2,8 @@
 import type  BlogsCard  from "~/types/blogscard";
 import { baseUrl } from "~/constant/baseUrl";
 
+const router = useRouter();
+
 // Fetch blog data
 const { data: blogscard } = await useAsyncData("blogscard", async () => {
   try {
@@ -15,6 +17,9 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
         "Accept-Language": "ar",
         "web-domain":"abouelezz.com",
       },
+      body:{
+        hashtag_id:router.currentRoute.value.params.hashtagId,
+      }
     });
     console.log(response , "ALL BOLGS");
     return response.data;
@@ -49,7 +54,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
             </div>
             <p class="card-text">{{ card.description || 'No Description' }}</p>
             <div class="card-footer">
-              <p>{{ card.subtitle || 'No Subtitle'  }}</p>
+              <p v-html="card.subtitle"></p>
             </div>
           </div>
         </NuxtLink>
@@ -76,13 +81,12 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   /* justify-content: center;
   align-items: center;
   align-content: center; */
-  justify-items: center;
-    justify-items: center;
+  /* justify-items: center; */
   gap: 40px;
   width: 85%;
   height: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  /* margin-left: auto;
+  margin-right: auto; */
 }
 
 .card {

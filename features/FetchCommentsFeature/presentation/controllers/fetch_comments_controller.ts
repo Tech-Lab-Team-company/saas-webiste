@@ -3,8 +3,8 @@ import CommentModel from "~/features/FetchCommentsFeature/Data/models/comment_mo
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
 import FetchCommentsUseCase from "~/features/FetchCommentsFeature/Domain/use_case/fetch_comments_use_case";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class FetchCommentsController extends ControllerInterface<CommentModel> {

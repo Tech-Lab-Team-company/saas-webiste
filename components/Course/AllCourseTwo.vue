@@ -33,7 +33,7 @@ const props = defineProps<{
                 <h5 class="card-title">{{ card.title }}</h5>
               </div>
 
-              <p class="card-text">{{ card.description }}</p>
+              <p class="card-text" v-html="card.description"></p>
 
               <div class="card-content">
                 <p class="card-text1">

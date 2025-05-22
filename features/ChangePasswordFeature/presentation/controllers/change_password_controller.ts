@@ -3,8 +3,8 @@ import UserModel from "~/features/ChangePasswordFeature/Data/models/user_model";
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
 import ChangePasswordUseCase from "~/features/ChangePasswordFeature/Domain/use_case/change_password_use_case";
-// import errorImage from "~/assets/images/error.png";
-// import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class ChangePasswordController extends ControllerInterface<UserModel> {

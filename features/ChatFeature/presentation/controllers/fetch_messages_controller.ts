@@ -3,6 +3,9 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import FetchMessagesUseCase from "~/features/ChatFeature/Domain/use_case/fetch_messages_use_case";
 import type ChatUsersModel from "../../Data/models/chat_users_model";
+import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 
 export default class FetchMessagesController extends ControllerInterface<ChatUsersModel[]> {
   private static instance: FetchMessagesController;
@@ -34,12 +37,12 @@ export default class FetchMessagesController extends ControllerInterface<ChatUse
       }
       // useLoaderStore().endLoadingWithDialog();
     } catch (error: any) {
-      // DialogSelector.instance.errorDialog.openDialog({
-      //   dialogName: "dialog",
-      //   titleContent: error,
-      //   imageElement: errorImage,
-      //   messageContent: null,
-      // });
+      DialogSelector.instance.errorDialog.openDialog({
+        dialogName: "dialog",
+        titleContent: error,
+        imageElement: errorImage,
+        messageContent: null,
+      });
       console.log(error);
     }
   }

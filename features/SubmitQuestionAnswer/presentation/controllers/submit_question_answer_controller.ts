@@ -1,8 +1,8 @@
 import { ControllerInterface } from "~/base/persention/Controller/controller_interface";
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
-import errorImage from "~/assets/images/Rectangle.png";
-import successImage from "~/assets/images/Rectangle2.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 // import type UserModel from "../../Data/models/education_stages_model";
 import QuestionAnswerUseCase from "../../Domain/use_case/submit_question_answer_use_case";
@@ -41,12 +41,12 @@ export default class QuestionAnswerController extends ControllerInterface<Questi
         throw new Error(this.state.value.error?.title);
       }
     } catch (error: any) {
-      DialogSelector.instance.errorDialog.openDialog({
-        dialogName: "dialog",
-        titleContent: error,
-        imageElement: errorImage,
-        messageContent: null,
-      });
+      // DialogSelector.instance.errorDialog.openDialog({
+      //   dialogName: "dialog",
+      //   titleContent: error,
+      //   imageElement: errorImage,
+      //   messageContent: null,
+      // });
       return this.state;
     }
     return this.state;

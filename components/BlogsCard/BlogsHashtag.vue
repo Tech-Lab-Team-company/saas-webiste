@@ -15,7 +15,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
         "Accept-Language": "ar",
         "web-domain":"abouelezz.com",
       },
-      body: { hashtag: useRoute().params.hashtagId },
+      body: { hashtag_id: useRoute().params.hashtagId },
     });
     console.log(response , "Resopnseeee");
     return response.data;

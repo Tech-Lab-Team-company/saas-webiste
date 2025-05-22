@@ -31,13 +31,14 @@ import type ExamsModel from '~/features/FetchCourseDetails/Data/models/exam_mode
     <div class="course-exam-container" v-for="(exam , index) in CardDetails" :key="index">
 
 
-        <Nuxt-link :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`"> 
-            <div class="btns" v-if="!exam.isFinished" >
+
+        <!-- <Nuxt-link  v-if="!(exam?.is_finished)" :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`">  -->
+        <Nuxt-link  v-if="!(exam?.is_finished)" :to="`/course/timer?id=${exam.id}`"> 
+            <div class="btns" >
                 <button>ابدأ الامتحان</button>
             </div>
         </Nuxt-link>
-        
-        <div v-if="exam.isFinished" class="exam-rate">
+        <div v-else-if="exam?.is_finished" class="exam-rate">
             <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
             <p class="details">اعرض تفاصيل الامتحان</p>
          </div>

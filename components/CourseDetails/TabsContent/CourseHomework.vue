@@ -33,10 +33,11 @@ watch(() => props.CourseData, (newValue) => {
     const activetab = ref(1)
 
 
-    const image = ref<AttachmentModel[] | null>(null)
+    const image = ref<File | null>(null)
 
     const updateFiles = async (files: File[]) => {
-       image.value = files.map((file) => new AttachmentModel(1 , "" , image.value))
+    //    image.value = files.map((file) => new File(image.value,""))
+        image.value = files[0]
     };
 
   
@@ -104,7 +105,7 @@ watch(() => props.CourseData, (newValue) => {
                         <p class="homework-upload-title">ارفق صوره الاجابه</p>
                         <AddMedia 
                             class="add-media"
-                            :index="1"
+                            :index="index"
                             @update:images="updateFiles"
                         />
                         <input type="text" class="notes-input" placeholder="ملاحظات" v-model="notes">

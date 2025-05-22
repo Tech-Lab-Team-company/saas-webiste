@@ -20,7 +20,7 @@ console.log(router.currentRoute.value.params.id)
 
     const Image = ref<File | null>(null)
 
-    const updateFiles = async (files: File) => {
+    const updateFiles = async (files: File[]) => {
         Image.value = files[0];
     };
 
@@ -46,14 +46,14 @@ console.log(router.currentRoute.value.params.id)
     <div class="edit-dialog-container">
             <div class="btns" >
                 <button @click="visible = true" v-if="status == 0">شراء الكورس</button>
-                <button @click="visible = false" v-if="status == 1" disabled>فى انتظار قبول الطلب</button>
-                <button @click="visible = false" v-if="status == 2" disabled>تم الشراء</button>
-                <button @click="visible = false" v-if="status == 4" disabled>تم رفض الطلب</button>
+                <button @click="visible = false" v-if="status == 1" disabled class="btn-disabled">فى انتظار قبول الطلب</button>
+                <button @click="visible = false" v-if="status == 2" disabled class="btn-disabled">تم الشراء</button>
+                <button @click="visible = false" v-if="status == 4" disabled class="btn-disabled">تم رفض الطلب</button>
             </div>
             <Dialog v-model:visible="visible" class="dialog"  :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <AddMedia
                     class="add-media"
-                    :index="1"
+                    :index="0"
                         @update:images="updateFiles"
                     />
                     <button @click="AddPayment" class=" btn-buy">شراء</button>
@@ -85,7 +85,19 @@ console.log(router.currentRoute.value.params.id)
         color: white;
         background-color: #FFB949;
      }
-}
+
+    }
+
+    .edit-dialog-container{
+        .btns{
+            button{
+                &.btn-disabled{
+                    background-color: gainsboro;
+                    }
+            }
+        }
+    }
+    
 
 
 </style>

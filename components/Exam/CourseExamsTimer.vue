@@ -1,11 +1,20 @@
 <script setup lang="ts">
+// /course/${router.currentRoute.value.params.id}/${exam.id}
+const router = useRouter();
+const route = useRoute()
+const examId = route.query.id
+
+setTimeout(() => {
+    router.push(`/course/${router.currentRoute.value.params.id}/${examId}`)
+} , 10000)
+
 
 </script>
 
 <template>
     <div class="exams-timer-container">
         <div class="timer-container">
-            <img src="../../public//images/timer.gif" alt="timer">
+            <img src="../../public/images/timer.gif" alt="timer">
         </div>
 
         <div class="exams-timer-text">

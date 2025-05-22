@@ -33,3 +33,6 @@ export default class SubmitHomeWorkParams implements Params {
     return data;
   }
 }
+
+
+//  if(this.image.length > 0){data["media"] = this.image.map(image => image.toMap());}

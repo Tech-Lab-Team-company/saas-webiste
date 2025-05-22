@@ -4,8 +4,8 @@ import type { DataState } from "~/base/core/networkStructure/Resources/dataState
 import type Params from "~/base/core/Params/params";
 import VerifyCodePasswordUseCase from "~/features/VerifyCodePasswordFeature/Domain/use_case/verify_code_password_use_case";
 import VerifyCodeParams from "~/features/VerifyCodeFeature/Core/Params/verfiy_code_params";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 

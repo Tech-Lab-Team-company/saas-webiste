@@ -2,8 +2,8 @@ import { ControllerInterface } from '@/base/persention/Controller/controller_int
 import type { DataState } from '@/base/core/networkStructure/Resources/dataState/data_state'
 import type Params from '@/base/core/Params/params'
 import DialogSelector from '~/base/persention/Dialogs/dialog_selector';
-import successImage from '~/public/images/success-dialog.png';
-import errorImage from '~/public/images/error.png';
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import type SubmitHomeWorkModel from '../../Data/models/submit_homework_model';
 import SubmitHomeworkUseCase from '../../Domain/use_case/submit_homework_use_case';
 

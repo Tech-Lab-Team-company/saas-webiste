@@ -3,8 +3,8 @@ import UserModel from "~/features/RemoveProfileImageFeature/Data/models/user_mod
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import RemoveProfileImageUseCase from "~/features/RemoveProfileImageFeature/Domain/use_case/remove_profile_image_use_case";
 import { useUserStore } from "~/stores/user";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 export default class RemoveProfileImageController extends ControllerInterface<UserModel> {

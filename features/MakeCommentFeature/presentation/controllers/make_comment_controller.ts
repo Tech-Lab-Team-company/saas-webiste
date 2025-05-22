@@ -3,8 +3,8 @@ import CommentModel from "~/features/MakeCommentFeature/Data/models/comment_mode
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
 import MakeCommentUseCase from "~/features/MakeCommentFeature/Domain/use_case/make_comment_use_case";
-import errorImage from "~/assets/images/error.png";
-import successImage from "~/assets/images/success-dialog.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import FetchCommentsController from "~/features/FetchCommentsFeature/presentation/controllers/fetch_comments_controller";
 import MakeCommentParams from "~/features/MakeCommentFeature/Core/Params/make_comment_params";

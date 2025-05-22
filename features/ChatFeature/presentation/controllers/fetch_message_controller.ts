@@ -2,7 +2,8 @@ import { ControllerInterface } from "~/base/persention/Controller/controller_int
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
 import type Params from "~/base/core/Params/params";
 import FetchMessageUseCase from "~/features/ChatFeature/Domain/use_case/fetch_message_use_case";
-import errorImage from "~/assets/images/error.png";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import MessageModel from "../../Data/models/message_model";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 export default class FetchMessageController extends ControllerInterface<MessageModel[]> {
