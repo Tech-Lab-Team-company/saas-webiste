@@ -34,7 +34,7 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
     data: ProfileImage;
     message: string;
     status: number;
-  }>(`https://edu.techlabeg.com/api/website/update_profile_image`, {
+  }>(`https://saas.crazyidea.online/api/website/update_profile_image`, {
     method: "POST",
 
     headers: {

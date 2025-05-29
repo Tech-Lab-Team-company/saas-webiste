@@ -9,7 +9,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
       data: LatestArticles[];
       message: string;
       status: number;
-    }>("https://edu.techlabeg.com/api/dashboard/fetch_latest_blogs", {
+    }>("https://saas.crazyidea.online/api/dashboard/fetch_latest_blogs", {
       method: "POST",
       headers: {
         "Accept-Language": "ar",

@@ -9,7 +9,7 @@ class ApiNames {
     return this._instance;
   }
 
-  public baseUrl = "https://edu.techlabeg.com/api/website/";
+  public baseUrl = "https://saas.crazyidea.online/api/website/";
   
 
 

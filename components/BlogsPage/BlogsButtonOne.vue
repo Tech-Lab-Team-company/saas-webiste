@@ -8,7 +8,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
       data: BlogsDetails;
       message: string;
       status: number;
-    }>("https://edu.techlabeg.com/api/website/show_blog", {
+    }>("https://saas.crazyidea.online/api/website/show_blog", {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
