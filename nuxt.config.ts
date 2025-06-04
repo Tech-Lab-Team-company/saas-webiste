@@ -9,7 +9,12 @@ export default defineNuxtConfig({
     /* Options */
     options: {
       theme: {
-        preset: Aura
+        preset: Aura,
+          options: {
+            prefix: 'p',
+            darkModeSelector: false,
+            cssLayer: false
+        }
       }
     },
     usePrimeVue: true,
