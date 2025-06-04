@@ -43,10 +43,12 @@ import { NuxtLink } from "#components";
         <NuxtLink to="/terms">
           <p>شروط الاستخدام</p>
         </NuxtLink>
-        <NuxtLink to="/fqs">
+        <NuxtLink to="/blogs">
           <p>الاسئله الشائعه</p>
         </NuxtLink>
-        <p>المدونه</p>
+        <NuxtLink to="/fqs">
+          <p>المدونه</p>
+        </NuxtLink>
       </div>
     </div>
     <div class="col">
@@ -70,12 +72,12 @@ import { NuxtLink } from "#components";
           الاستعداد لأي اختبار ..ذاكر كورساتك ، اختبر مستواك ، حسّن مهاراتك، وكن
           مستعدًا للنجاح!
         </p>
-        <div class="col-icons">
-          <FcaebookIcon />
-          <instagramIcon />
-          <linkedInIcon />
-          <twitterIcon />
-        </div>
+<!--        <div class="col-icons">-->
+<!--          <FcaebookIcon />-->
+<!--          <instagramIcon />-->
+<!--          <linkedInIcon />-->
+<!--          <twitterIcon />-->
+<!--        </div>-->
       </div>
     </div>
 
