@@ -26,7 +26,7 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
       method: 'POST',
       headers: {
         'Accept-Language': 'ar',
-        'web-domain': 'abouelezz.com',
+        'web-domain': 'hrarabians.com',
       },
       body: {
         type: 3,

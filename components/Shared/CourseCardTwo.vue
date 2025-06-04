@@ -15,7 +15,7 @@ import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 //     method: "POST",
 //     headers: {
 //       "Accept-Language": "ar",
-//       "web-domain":"abouelezz.com",
+//       "web-domain":"hrarabians.com",
 //     },
 //     body: {
 //       type: SectionTypeEnum.Course,

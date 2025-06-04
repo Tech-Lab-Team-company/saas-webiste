@@ -11,7 +11,7 @@ const { data: privacy } = await useAsyncData("privacy", async () => {
     method: "GET",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
+      "web-domain":"hrarabians.com",
     },
   });
   console.log(response);

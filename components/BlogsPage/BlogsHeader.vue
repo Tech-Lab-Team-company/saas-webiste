@@ -12,7 +12,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": "abouelezz.com",
+        "web-domain": "hrarabians.com",
       },
       body: { slug: useRoute().params.slug },
     });

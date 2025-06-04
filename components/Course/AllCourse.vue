@@ -40,7 +40,7 @@ const fetchCourses = async () => {
     },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "abouelezz.com",
+      "web-domain": "hrarabians.com",
     },
   });
 

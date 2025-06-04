@@ -13,7 +13,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": "abouelezz.com",
+        "web-domain": "hrarabians.com",
       },
     });
 

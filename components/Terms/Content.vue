@@ -11,7 +11,7 @@ const { data: terms } = await useAsyncData("terms", async () => {
     method: "GET",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
+      "web-domain":"hrarabians.com",
     },
   });
   console.log(response);

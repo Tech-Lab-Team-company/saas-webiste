@@ -28,7 +28,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"abouelezz.com",
+      "web-domain":"hrarabians.com",
     },
     body:{
         type:SectionTypeEnum.Blog

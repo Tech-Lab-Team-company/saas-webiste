@@ -21,7 +21,7 @@ const { data: webstatus } = await useAsyncData("webstatus", async () => {
   }>(`${baseUrl}/fetch_web_status`, {
     method: "GET",
     headers: {
-      "web-domain":"abouelezz.com",
+      "web-domain":"hrarabians.com",
     },
 
     });

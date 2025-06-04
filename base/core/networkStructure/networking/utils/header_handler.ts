@@ -35,7 +35,7 @@ class HeaderHandler {
       headers['Accept-Language'] = savedLocale;
     }
     headers['Content-Type'] = 'application/json';
-    headers['web-domain'] = 'abouelezz.com';
+    headers['web-domain'] = 'hrarabians.com';
     headers['Accept'] = 'application/json';
 
 
