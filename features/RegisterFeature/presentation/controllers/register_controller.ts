@@ -10,6 +10,7 @@ import successImage from "~/public/images/success-dialog.png";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import { useUserStore } from "~/stores/user";
+import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 
 // import { useLoaderStore } from "~/stores/dialogs/loader";
 
@@ -46,9 +47,10 @@ export default class RegisterController extends ControllerInterface<UserModel> {
         if (this.state.value.data) {
           console.log(this.state.value.data);
           userStore.setUser(this.state.value.data);
+          router.push("/auth/varifyotp");
         }
 
-        await router.push("/Auth/varifyotp");
+        await router.push("/auth/varifyotp");
         // const userStore = useUserStore();
         // if (this.state.value.data) {
         //   console.log(this.state.value.data)

@@ -2,7 +2,7 @@
 
 import Arrow from '@/public/icons/arrow.vue';
 import BgCircieIcon from '~/public/icons/BgCircieIcon.vue';
-import {DashboradbaseUrl } from "~/constant/baseUrl";
+import {DashboradbaseUrl ,baseUrl} from "~/constant/baseUrl";
 import type AboutUsInterface from '~/types/about_us_interface';
 import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
 
@@ -12,7 +12,7 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
     data: AboutUsInterface[];
     message: string;
     status: number;
-  }>(`${DashboradbaseUrl}/fetch_website_sections`, {
+  }>(`${baseUrl}/fetch_website_sections`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
