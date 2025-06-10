@@ -28,12 +28,12 @@ const { data: webstatus } = await useAsyncData("webstatus", async () => {
 
   const UserSettingStore = useSettingStore();
   UserSettingStore.setSetting(response.data);
-  console.log(response.data);
-
-
   return response.data;
 });
 
+// onMounted(() => {
+//   cons
+// })
 
 
 </script>
@@ -41,6 +41,7 @@ const { data: webstatus } = await useAsyncData("webstatus", async () => {
 <template>
   <div>
     <NuxtLayout>
+    
       <NuxtPage />
       <MainDialog />
       <LoaderDialog />

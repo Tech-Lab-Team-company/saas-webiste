@@ -7,6 +7,9 @@ import instagramIcon from "~/public/icons/instagramIcon.vue";
 import linkedInIcon from "~/public/icons/linkedInIcon.vue";
 import twitterIcon from "~/public/icons/twitterIcon.vue";
 import { NuxtLink } from "#components";
+
+const settingStore = useSettingStore();
+const setting = computed(() => settingStore.setting);
 </script>
 
 <template>
@@ -65,7 +68,9 @@ import { NuxtLink } from "#components";
     </div>
 
     <div class="col">
-      <Logo class="col-logo" />
+ 
+        <NuxtImg :src="setting?.image?.img" :alt="setting?.image?.alt" format="webp"  class="col-logo" />
+
       <div class="col-data-details">
         <p>
           منصة شاملة تضم كورساتك و آلاف الأسئلة والتدريبات لمساعدتك على

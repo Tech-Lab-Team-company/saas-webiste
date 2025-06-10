@@ -35,6 +35,12 @@ const handleLogout = () => {
   router.push("/");
 
 };
+
+
+
+const settingStore = useSettingStore();
+const setting = computed(() => settingStore.setting);
+
 </script>
 <template>
   <header class="header">
@@ -74,7 +80,8 @@ const handleLogout = () => {
       </ul>
 
       <NuxtLink to="/" class="logo">
-        <Logo />
+        <!-- <Logo /> -->
+        <NuxtImg :src="setting?.image?.img" :alt="setting?.image?.alt" format="webp" />
       </NuxtLink>
     </nav>
   </header>
