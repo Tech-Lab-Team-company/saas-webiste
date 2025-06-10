@@ -15,7 +15,7 @@ const { data: aboutusOpinions } = await useAsyncData("AboutOpinions", async () =
     data: AboutUsInterface[];
     message: string;
     status: number;
-  }>(`${DashboradbaseUrl}/fetch_website_sections`, {
+  }>(`${baseUrl}/fetch_website_sections`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",

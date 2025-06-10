@@ -12,7 +12,7 @@ const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async 
     message: string;
     status: number;
     
-  }>(`${DashboradbaseUrl}/fetch_website_sections`, {
+  }>(`${baseUrl}/fetch_website_sections`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
