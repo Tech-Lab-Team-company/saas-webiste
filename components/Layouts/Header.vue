@@ -81,6 +81,7 @@ const setting = computed(() => settingStore.setting);
 
       <NuxtLink to="/" class="logo">
         <!-- <Logo /> -->
+         {{ console.log(setting , "setting") }}
         <NuxtImg :src="setting?.image?.img" :alt="setting?.image?.alt" format="webp" />
       </NuxtLink>
     </nav>
