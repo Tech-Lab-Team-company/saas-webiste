@@ -27,6 +27,7 @@ export default class SubmitEducationDataController extends ControllerInterface<U
   }
 
   async SubmitEducationData(params: Params) {
+    console.log("dataaaaaaaaaaaaaaaa")
     const router = useRouter();
     // useLoaderStore().setLoadingWithDialog();
     try {
