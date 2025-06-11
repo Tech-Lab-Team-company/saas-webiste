@@ -102,7 +102,7 @@ onMounted(() => {
 
 
 
-console.log(cities.value , "cities.value");
+// console.log(cities.value , "cities.value");
 
 watch(
   ()=> data.value, 
@@ -111,18 +111,18 @@ watch(
   });
   
 
-  const validatePhoneNumber = (number: Event) => {
-    if (number.target) {
-        const PhoneNumberMatch = /^\d{11}$/;
-        if((number.target as HTMLInputElement).value.match(PhoneNumberMatch)){
-          phoneNumber.value =(number.target as HTMLInputElement).value ;
-        } 
-        else{
-          console.log("رقم الهاتف غير صحيح");
-        }
-    }
-
-  }
+  // const validatePhoneNumber = (number: Event) => {
+  //   if (number.target) {
+  //       const PhoneNumberMatch = /^\d{11}$/;
+  //       if((number.target as HTMLInputElement).value.match(PhoneNumberMatch)){
+  //         phoneNumber.value =(number.target as HTMLInputElement).value ;
+  //       }
+  //       else{
+  //         console.log("رقم الهاتف غير صحيح");
+  //       }
+  //   }
+  //
+  // }
 
 
   
@@ -143,11 +143,11 @@ watch(
             <userEdit class="login-call-icon" />
           </div>
           <div class="login-input">
-            <input type="email" placeholder="البريد الالكترونى * "  v-model="Email"/>
+            <input type="email" placeholder="البريد الالكترونى * " v-model="Email"/>
             <sms class="login-call-icon" />
           </div>
           <div class="login-input">
-            <input type="text" placeholder="رقم الهاتف"  @change="validatePhoneNumber"  />
+            <input type="tel"  placeholder="رقم الهاتف" v-model="phoneNumber"  />
             <callIcon class="login-call-icon" />
           </div>
           <div class="login-input">

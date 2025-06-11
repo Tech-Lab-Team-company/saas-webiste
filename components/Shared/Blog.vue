@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { Splide, SplideSlide } from "@splidejs/vue-splide";
+import {Splide, SplideSlide} from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
-import { baseUrl } from "~/constant/baseUrl";
+import {baseUrl} from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+import {SectionTypeEnum} from "../Home/home/enum/section_type_enum";
 import StagesTitle from '../Home/home/StagesTitle.vue'
 
 const splideOptions = {
   perPage: 3,
   gap: "3px",
   pagination: false,
-   perMove: 1,
+  perMove: 1,
   arrows: true,
   drag: true,
-  cloneStatus: true, 
-  range:false,
+  cloneStatus: true,
+  range: false,
 };
 
 
 const BlogsData = ref<HomeFirstSection[] | null>(null)
 
-const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
+const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
   const response = await $fetch<{
-    data: HomeFirstSection[]; 
+    data: HomeFirstSection[];
     message: string;
     status: number;
   }>(`${baseUrl}/fetch_blogs`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.com",
+      "web-domain": "hrarabians.com",
     },
     // body:{
     //     type:SectionTypeEnum.Blog
@@ -37,8 +37,8 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
 
   });
 
-  console.log(response.data , "response.data inside blogs")
-  
+  console.log(response.data, "response.data inside blogs")
+
   return response.data;
 });
 
@@ -51,41 +51,42 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
       <div class="stage-container">
         <div class="stages student-stages">
 
-          <StagesTitle 
-          :maintitle="`المدونه`"  
-          :title="Blogs?.title"
-          :subtitle="Blogs?.subtitle"
+          <StagesTitle
+              :maintitle="`المدونه`"
+              :title="Blogs?.title"
+              :subtitle="Blogs?.subtitle"
           />
         </div>
       </div>
 
-      <Splide :options="splideOptions" class="splide-container" >
+      <Splide :options="splideOptions" class="splide-container">
         <!-- {{ console.log(Blogs) }} -->
         <SplideSlide v-for="(blog, index) in Blogs" :key="index">
-          
-           <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
-            <img :src="blog.attachments[0].file" alt="Card image" class="course-image" />
+
+          <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
+            <img :src="blog.attachments[0].file" alt="Card image" class="course-image"/>
             <div class="card-body">
               <div class="card-header">
-                <hr />
-                <h5 class="card-title">{{ blog.title }}</h5>
-                <div class="card-date">
-                  <p>{{ blog.date }}</p>
+                <hr/>
+                <div class="flex">
+                  <h5 class="card-title" v-html="blog.title"></h5>
+                  <div class="card-date">
+                    <p>{{ blog.date }}</p>
+                  </div>
                 </div>
               </div>
-              <p class="card-text">{{ blog.description }}</p>
+              <p class="card-text" v-html="blog.description"></p>
               <div class="card-footer">
-                <P v-html="blog.subtitle"> </P>
+                <P v-html="blog.subtitle"></P>
               </div>
             </div>
           </NuxtLink>
-          
+
         </SplideSlide>
       </Splide>
     </div>
   </div>
 </template>
-
 
 
 <style scoped>
@@ -96,26 +97,30 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
 }
 
 .card:hover {
-  transform: translateY(10px);  
+  transform: translateY(10px);
 }
+
 .slider-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
 .card-header {
   display: flex;
   gap: 10px;
   align-items: center;
 }
+
 .card-header hr {
-  width: 41px;
+  width: 10%;
   height: 3px;
   border-radius: 4px;
   background: #ff931e;
   border: none;
 }
+
 .slider-heading {
   width: 227px;
   height: 25px;
@@ -123,9 +128,9 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   padding-right: 10px;
   padding-left: 10px;
   background: linear-gradient(
-    360deg,
-    rgba(255, 185, 73, 0.5) -102%,
-    #ffffff 48%
+      360deg,
+      rgba(255, 185, 73, 0.5) -102%,
+      #ffffff 48%
   );
   font-family: "medium";
   font-weight: 700;
@@ -135,6 +140,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   text-align: center;
   color: #ffb949;
 }
+
 .slider-heading1 {
   font-size: 35px;
   color: #222;
@@ -145,6 +151,10 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   vertical-align: middle;
   font-family: "medium";
   font-weight: 700;
+}
+
+.card-date {
+  width: 40%;
 }
 
 .card-date p {
@@ -205,6 +215,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   padding-bottom: 10px;
   width: 92%;
 }
+
 .card img {
   width: 100%;
   height: 230px;
@@ -217,36 +228,54 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
 
 .card-title {
   font-weight: 700;
-  font-size: 18px;
-  line-height: 30px;
+  width: 60%;
+  font-size: 1rem;
   text-align: right;
   margin: 0;
-  font-family: "bold";
+  font-family: "bold", serif;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: calc(var(--line-height) * 1em);
+  line-height: var(--line-height);
+  --line-height: 1.5;
+
 }
 
 .card-text {
-font-weight: 700;
-font-size: 18px;
-
-color: #000000;
-font-family: "medium";
-margin-top: 8px;
-
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #000000;
+  font-family: "medium", serif;
+  margin-top: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: calc(var(--line-height) * 2em);
+  line-height: var(--line-height);
+  --line-height: 1.5;
 }
+
 
 .card-footer {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-.card-footer p{
-font-weight: 400;
-font-size: 14px;
-font-family: "regular";
-margin-top: 2px;
-color: #656B78;
-line-height: 170%;
+
+.card-footer p {
+  font-weight: 400;
+  font-size: 14px;
+  font-family: "regular";
+  margin-top: 2px;
+  color: #656B78;
+  line-height: 170%;
 }
+
 .card-name {
   font-weight: 700;
   font-size: 17px;
