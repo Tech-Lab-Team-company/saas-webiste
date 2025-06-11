@@ -47,10 +47,10 @@ export default class RegisterController extends ControllerInterface<UserModel> {
         if (this.state.value.data) {
           console.log(this.state.value.data);
           userStore.setUser(this.state.value.data);
-          router.push("/auth/varifyotp");
+          router.push("/Auth/varifyotp");
         }
 
-        await router.push("/auth/varifyotp");
+        await router.push("/Auth/varifyotp");
         // const userStore = useUserStore();
         // if (this.state.value.data) {
         //   console.log(this.state.value.data)

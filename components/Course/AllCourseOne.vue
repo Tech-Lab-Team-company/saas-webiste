@@ -17,8 +17,13 @@ const props = defineProps<{
           :key="card.id"
           :to="`/course/${card.id}`"
           class="card"
-          :style="{ backgroundImage: `url(${card?.image?.[0]?.file})` }"
+          
+          :style="{ backgroundImage: `url(${card.image.img})` }"
         >
+          <!-- <div class="image-container">
+  
+              <img :src="card.image.img || ''" alt="course image" class="card-image" />
+            </div> -->
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
@@ -47,6 +52,18 @@ const props = defineProps<{
 </template>
 
 <style scoped lang="scss">
+
+
+
+.card-footer {
+    .card-icon 
+    {
+    .teacher-image{
+      max-width: 50px;
+    }
+  }
+
+}
 .cards-wrapper {
   // display: flex;
   flex-direction: column;

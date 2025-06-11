@@ -38,8 +38,22 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
     return [];
   }
 });
-</script>
 
+// Navigation functions
+const goNext = () => {
+  if (containerRef.value) {
+    containerRef.value.swiper.slideNext();
+    swiper_position.value = 'next';
+  }
+};
+
+const goPrev = () => {
+  if (containerRef.value) {
+    containerRef.value.swiper.slidePrev();
+    swiper_position.value = 'prev';
+  }
+};
+</script>
 
 <template>
     <div class="main-container">
@@ -84,19 +98,11 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
         </swiper-container>
         <!-- Navigation buttons -->
         <div v-if="!pending && !error" class="home-buttons">
-          <button class="prev-btn" @click="swiper.prev(); swiper_position = 'prev';" :class="{ active: swiper_position === 'prev' }"></button>
-          <button class="next-btn" @click="swiper.next(); swiper_position = 'next';" :class="{ active: swiper_position === 'next' }"></button>
+          <button class="prev-btn" @click="goPrev()" :class="{ active: swiper_position === 'prev' }"></button>
+          <button class="next-btn" @click="goNext()" :class="{ active: swiper_position === 'next' }"></button>
         </div>
       </ClientOnly>
-
-      
-     
     </div>
     <EducationStages />
     <Students />
-
-  </template>
-  
-
-
-
+</template>

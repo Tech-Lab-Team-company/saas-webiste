@@ -30,7 +30,7 @@ class ApiNames {
   public setNewPassword = "reset_password";
   
   //Education Stages
-  public educationstages = "fetch_education_type";
+  public educationstages =this.baseUrl + "fetch_education_type";
   public educationlevels = "fetch_stages";
   
   

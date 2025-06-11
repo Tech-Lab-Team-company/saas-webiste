@@ -57,7 +57,7 @@ const CheckCode = ()=>{
       <p class="pass-code">
         ادخل الكود الذى تم ارساله اليك على بريدك الاكترونى
       </p>
-      <P class="pass-code1"> sarael*****@gmail.com</P>
+      <P class="pass-code1"> {{ EmailBuilder.Instance.getEmail() }}</P>
 
       <div class="inputs inputs-pass">
         <div class="login-code">

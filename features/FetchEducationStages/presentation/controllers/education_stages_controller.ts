@@ -36,20 +36,17 @@ export default class EducationStagesController extends ControllerInterface<Title
         //   imageElement: successImage,
         //   messageContent: null,
         // });
-        // await FetchMyReviewsController.getInstance().fetchMyReviews(
-        //   new FetchMyReviewParams(1, 10),
-        // );
       } else {
         throw new Error(this.state.value.error?.title);
       }
     } catch (error: any) {
-      DialogSelector.instance.errorDialog.openDialog({
-        dialogName: "dialog",
-        titleContent: error,
-        imageElement: errorImage,
-        messageContent: null,
-      });
-      return this.state;
+      // DialogSelector.instance.errorDialog.openDialog({
+      //   dialogName: "dialog",
+      //   titleContent: error,
+      //   imageElement: errorImage,
+      //   messageContent: null,
+      // });
+      // return this.state;
     }
     return this.state;
   }

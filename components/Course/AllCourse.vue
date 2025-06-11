@@ -78,7 +78,7 @@ const selectedToggle = ref();
 
   <div class="aa">
     <div class="header-toggle">
-      <p class="cards-heading">(6) جميع الكورسات</p>
+      <p class="cards-heading">{{ CoursesFilter.length }} جميع الكورسات</p>
       <div class="toggle">
         <div
           :class="['toggle-icon', { active: selectedToggle === 'two' }]"
@@ -96,7 +96,7 @@ const selectedToggle = ref();
     </div>
 
     <!-- {{  console.log(CoursesFilter , "response.data")  }} -->
-    <div v-if="selectedToggle === 'two'">
+    <div v-if="selectedToggle === 'one'">
       <CourseAllCourseOne :HomeSections="CoursesFilter " />
     </div>
     <div v-else>

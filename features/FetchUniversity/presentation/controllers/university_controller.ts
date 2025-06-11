@@ -31,12 +31,12 @@ export default class UniversityController extends ControllerInterface<TitleModel
         await this.universityUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        // DialogSelector.instance.successDialog.openDialog({
-        //   dialogName: "dialog",
-        //   titleContent: "Vote Success",
-        //   imageElement: successImage,
-        //   messageContent: null,
-        // });
+        DialogSelector.instance.successDialog.openDialog({
+          dialogName: "dialog",
+          titleContent: "Vote Success",
+          imageElement: successImage,
+          messageContent: null,
+        });
         // await FetchMyReviewsController.getInstance().fetchMyReviews(
         //   new FetchMyReviewParams(1, 10),
         // );

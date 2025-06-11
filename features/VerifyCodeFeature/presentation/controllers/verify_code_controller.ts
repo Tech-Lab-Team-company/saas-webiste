@@ -30,6 +30,7 @@ export default class VerifyCodeController extends ControllerInterface<UserModel>
         await this.VerifyCodeUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
+       
         DialogSelector.instance.successDialog.openDialog({
           dialogName: "dialog",
           titleContent: "Verify Code Success",
@@ -50,11 +51,12 @@ export default class VerifyCodeController extends ControllerInterface<UserModel>
         // }
       } else {
 
+          console.log("inside error 1");
         throw new Error(this.state.value.error?.title);
       }
       // useLoaderStore().endLoadingWithDialog();
     } catch (error: any) {
-
+      console.log("inside error 2");
       
       DialogSelector.instance.errorDialog.openDialog({
         dialogName: "dialog",
