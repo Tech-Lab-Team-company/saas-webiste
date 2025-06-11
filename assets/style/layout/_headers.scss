@@ -54,6 +54,19 @@
         padding: 10px;
         border-radius: 10px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        width:120px;
+         @media (min-width:768px) {
+            display: none;
+        }
+
+        .list{
+          margin-left: auto;
+        }
+
+        li{
+          text-align: right;
+          font-size: 15px;
+        }
       }
     }
 
@@ -82,6 +95,9 @@
       .buttons{
         display: flex;
         gap: 10px;
+         @media (max-width:768px) {
+          display: none;
+        }
       }
                         
 

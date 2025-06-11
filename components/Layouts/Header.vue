@@ -57,7 +57,14 @@ const droplist = ref(false);
       <IconsBars class="bars-icon" @click="droplist = !droplist" />
 
       <div v-if="droplist" class="droplist-menu">
-        aaaaaaaa
+        <ul class="list">
+          <NuxtLink to="/login" ><li>تسجيل الدخول</li></NuxtLink>
+          <NuxtLink to="/Auth/register" ><li>إنشاء حساب</li></NuxtLink>
+          <NuxtLink to="/" ><li>الرئيسية</li></NuxtLink>
+          <NuxtLink to="/aboutus" ><li>نبذة عنا</li></NuxtLink>
+          <NuxtLink to="/course" ><li>الكورسات</li></NuxtLink>
+          <NuxtLink to="/blogs" ><li>المدونة</li></NuxtLink>
+        </ul>
       </div>
     </div>
 

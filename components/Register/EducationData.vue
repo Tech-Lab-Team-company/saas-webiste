@@ -108,13 +108,11 @@ onMounted(()=>{
   FetchEducationStages();
 })
 
-const SendData = ()=>{
-  // student category ==  caregory_id
-  // student category ==  caregory_id
+const SendData = async ()=>{
   const EducationDataParams = new SubmitEducationDataParams(Eductaion_Type.value[0].id , CollegeDeprtmentDivision.value[0].id , studentCategory.value ,University.value[0].id ,
    Colleges.value[0].id , CollegeDeprtment.value[0].id );
   const submitEducationDataController = SubmitEducationDataController.getInstance(); 
-  submitEducationDataController.SubmitEducationData(EducationDataParams);
+  const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
 }
 
 
