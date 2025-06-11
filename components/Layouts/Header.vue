@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-import { useRoute } from "vue-router";
-import { ref, onMounted } from "vue";
+// import { useRoute } from "vue-router";
+import { ref, onMounted, watch } from "vue";
 import { useUserStore } from "~/stores/user";
 import { useRouter } from "vue-router";
-import Logo from "~/public/icons/Logo.vue"
+// import Logo from "~/public/icons/Logo.vue"
 const isLoggedIn = ref(false);
 const userStore = useUserStore()
 const router = useRouter();
+import { useSettingStore } from "~/stores/setting";
 
 onMounted(() => {
   isLoggedIn.value = localStorage.getItem("auth") === "true";
@@ -40,7 +41,14 @@ const handleLogout = () => {
 
 const settingStore = useSettingStore();
 // const setting = computed(() => settingStore.setting);
-console.log(settingStore.setting,"store");
+
+// watch(
+//     () => settingStore.setting,
+//     (newVal, oldVal) => {
+//       console.log("setting changed:", newVal);
+//     },
+//     { deep: true }
+// );
 
 const droplist = ref(false);
 </script>
@@ -104,13 +112,13 @@ const droplist = ref(false);
         <!-- setting?.image?.img-->
                <!-- <pre>Image path: {{ settingStore.setting?.image?.img }}</pre> -->
 
-      <NuxtImg 
+      <NuxtImg
         v-if="settingStore.setting?.image?.img"
-        :src="settingStore.setting.image.img" 
-        :alt="settingStore.setting.image.alt || ''" 
-        width="75" 
-        format="webp" 
-      />      
+        :src="settingStore.setting.image.img"
+        :alt="settingStore.setting.image.alt || ''"
+        width="75"
+        format="webp"
+      />
     </NuxtLink>
     </nav>
   </header>
