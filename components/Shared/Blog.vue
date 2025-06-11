@@ -24,20 +24,20 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
     data: HomeFirstSection[]; 
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
+  }>(`${baseUrl}/fetch_blogs`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
       "web-domain":"hrarabians.com",
     },
-    body:{
-        type:SectionTypeEnum.Blog
-    }
+    // body:{
+    //     type:SectionTypeEnum.Blog
+    // }
 
   });
 
   console.log(response.data , "response.data")
-  return response.data[response.data.length - 1];
+  return response.data;
 });
 
 </script>
