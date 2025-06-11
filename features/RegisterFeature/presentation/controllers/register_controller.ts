@@ -1,19 +1,13 @@
 import { ControllerInterface } from "~/base/persention/Controller/controller_interface";
 import UserModel from '~/features/LoginFeature/Data/models/user_model'
 import type { DataState } from "~/base/core/networkStructure/Resources/dataState/data_state";
-// import type Params from "~/base/core/Params/params";
 import RegisterUseCase from "~/features/RegisterFeature/Domain/use_case/register_use_case";
-// import { useRouter } from "vue-router";
 import errorImage from "~/public/images/error.png";
 import successImage from "~/public/images/success-dialog.png";
-// import { useUserStore } from "~/stores/user";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import { useUserStore } from "~/stores/user";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
-
-// import { useLoaderStore } from "~/stores/dialogs/loader";
-
 export default class RegisterController extends ControllerInterface<UserModel> {
   private static _instance: RegisterController;
   private constructor() {
@@ -29,7 +23,6 @@ export default class RegisterController extends ControllerInterface<UserModel> {
   }
 
   async Register(params: RegisterParams, router: any) {
-    // useLoaderStore().setLoadingWithDialog();
     try {
     
       const dataState: DataState<UserModel> =await this.RegisterUseCase.call(params);
@@ -47,20 +40,12 @@ export default class RegisterController extends ControllerInterface<UserModel> {
         if (this.state.value.data) {
           console.log(this.state.value.data);
           userStore.setUser(this.state.value.data);
-          router.push("/auth/varifyotp");
+          // router.push("/Auth/varifyotp");
         }
 
-        await router.push("/auth/varifyotp");
-        // const userStore = useUserStore();
-        // if (this.state.value.data) {
-        //   console.log(this.state.value.data)
-        //   userStore.setUser(this.state.value.data);
-        // }
+        await router.push("/Auth/varifyotp");
 
-        // useLoaderStore().endLoadingWithDialog();
-        
       } else {
-        // console.log("Faild Log in")
         throw new Error(this.state.value.error?.title);
       }
       return this.state;
@@ -72,7 +57,6 @@ export default class RegisterController extends ControllerInterface<UserModel> {
         imageElement: errorImage,
         messageContent: null,
       });
-      // useLoaderStore().endLoadingWithDialog();
     }
   }
 }

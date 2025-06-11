@@ -39,8 +39,10 @@ const handleLogout = () => {
 
 
 const settingStore = useSettingStore();
-const setting = computed(() => settingStore.setting);
+// const setting = computed(() => settingStore.setting);
+console.log(settingStore.setting,"store");
 
+const droplist = ref(false);
 </script>
 <template>
   <header class="header">
@@ -49,8 +51,27 @@ const setting = computed(() => settingStore.setting);
     </div>
 
     <nav class="header-container">
+
+    <div class="side-menu">
+
+      <IconsBars class="bars-icon" @click="droplist = !droplist" />
+
+      <div v-if="droplist" class="droplist-menu">
+        <ul class="list">
+          <NuxtLink to="/login" ><li>تسجيل الدخول</li></NuxtLink>
+          <NuxtLink to="/Auth/register" ><li>إنشاء حساب</li></NuxtLink>
+          <NuxtLink to="/" ><li>الرئيسية</li></NuxtLink>
+          <NuxtLink to="/aboutus" ><li>نبذة عنا</li></NuxtLink>
+          <NuxtLink to="/course" ><li>الكورسات</li></NuxtLink>
+          <NuxtLink to="/blogs" ><li>المدونة</li></NuxtLink>
+        </ul>
+      </div>
+    </div>
+
       <div class="buttons" v-if="!isLoggedIn">
-        <button class="btn btn-primary btn-create">انشاء حساب</button>
+        <NuxtLink to="/Auth/register">
+          <button class="btn btn-primary btn-create">انشاء حساب</button>
+        </NuxtLink>
         <NuxtLink to="/login">
           <button class="btn btn-secondary btn-secondary-create" @click="handleLogin">
             تسجيل الدخول
@@ -73,18 +94,24 @@ const setting = computed(() => settingStore.setting);
       <!-- روابط التنقل -->
       <ul class="nav-links">
         <NuxtLink to="/blogs" exactActiveClass="active" class="nav-link"><li>المدونه</li></NuxtLink>
-        <NuxtLink to="/questions" exactActiveClass="active" class="nav-link"><li>بنك الاسئله</li></NuxtLink>
+        <!-- <NuxtLink to="/questions" exactActiveClass="active" class="nav-link"><li>بنك الاسئله</li></NuxtLink> -->
         <NuxtLink to="/course" exactActiveClass="active" class="nav-link"><li>الكورسات</li></NuxtLink>
         <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link"><li>نبذه عنا</li></NuxtLink>
         <NuxtLink to="/" exactActiveClass="active" class="nav-link"><li>الرئيسيه</li></NuxtLink>
       </ul>
-
       <NuxtLink to="/" class="logo">
         <!-- <Logo /> -->
-         <!-- {{ console.log(setting , "setting") }}-->
         <!-- setting?.image?.img-->
-        <NuxtImg src="https://saas.crazyidea.online/uploads/teachers/299811749565472.jpeg" :alt="setting?.image?.alt" width="75" format="webp" />
-      </NuxtLink>
+               <!-- <pre>Image path: {{ settingStore.setting?.image?.img }}</pre> -->
+
+      <NuxtImg 
+        v-if="settingStore.setting?.image?.img"
+        :src="settingStore.setting.image.img" 
+        :alt="settingStore.setting.image.alt || ''" 
+        width="75" 
+        format="webp" 
+      />      
+    </NuxtLink>
     </nav>
   </header>
 </template>

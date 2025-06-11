@@ -34,7 +34,7 @@ const CollegeDeprtmentDivision = ref<TitleModel[]>([]);
 
 
 const FetchEducationStages = async() =>{
-  const educationStagesParams = new EducationStagesParams(2); 
+  const educationStagesParams = new EducationStagesParams(studentCategory.value); 
   const educationStagesController = EducationStagesController.getInstance();
   const state = await educationStagesController.FetchEducationStages(educationStagesParams);
 
@@ -42,6 +42,12 @@ const FetchEducationStages = async() =>{
     Eductaion_Type.value.push(...state.value.data);
   }
 }
+
+watch(()=>studentCategory.value ,
+(NewValue)=>{
+  studentCategory.value = NewValue;
+  FetchEducationStages();
+})
 
 
 
@@ -102,13 +108,11 @@ onMounted(()=>{
   FetchEducationStages();
 })
 
-const SendData = ()=>{
-  // student category ==  caregory_id
-  // student category ==  caregory_id
+const SendData = async ()=>{
   const EducationDataParams = new SubmitEducationDataParams(Eductaion_Type.value[0].id , CollegeDeprtmentDivision.value[0].id , studentCategory.value ,University.value[0].id ,
    Colleges.value[0].id , CollegeDeprtment.value[0].id );
   const submitEducationDataController = SubmitEducationDataController.getInstance(); 
-  submitEducationDataController.SubmitEducationData(EducationDataParams);
+  const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
 }
 
 

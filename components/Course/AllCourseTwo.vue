@@ -76,6 +76,15 @@ const props = defineProps<{
 
 
 <style scoped lang="scss">
+.card-footer {
+    .card-icon 
+    {
+    .teacher-image{
+      max-width: 50px;
+    }
+  }
+
+}
 .card-course-twoo{
   width:100%;
 }

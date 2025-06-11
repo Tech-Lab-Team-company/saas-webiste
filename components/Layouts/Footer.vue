@@ -46,10 +46,10 @@ const setting = computed(() => settingStore.setting);
         <NuxtLink to="/terms">
           <p>شروط الاستخدام</p>
         </NuxtLink>
-        <NuxtLink to="/blogs">
+        <NuxtLink to="/fqs">
           <p>الاسئله الشائعه</p>
         </NuxtLink>
-        <NuxtLink to="/fqs">
+        <NuxtLink to="/blogs">
           <p>المدونه</p>
         </NuxtLink>
       </div>
@@ -63,13 +63,14 @@ const setting = computed(() => settingStore.setting);
         <Nuxt-link to="/"> <p>الرئيسيه</p></Nuxt-link>
         <Nuxt-link to="/course"><p>كورساتي</p></Nuxt-link>
         <Nuxt-link to="/aboutus"><p>من نحن</p></Nuxt-link>
-        <Nuxt-link to="/blogs"><p>تواصل معنا</p></Nuxt-link>
+        <p>تواصل معنا</p>
       </div>
     </div>
 
     <div class="col">
  
-        <NuxtImg :src="setting?.image?.img" :alt="setting?.image?.alt" format="webp"  class="col-logo" />
+        <NuxtImg v-if="settingStore.setting?.image?.img"
+        :src="settingStore.setting.image.img"  :alt="setting?.image?.alt" format="webp"  class="col-logo" />
 
       <div class="col-data-details">
         <p>

@@ -109,4 +109,3 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
   </template>
 
 
-

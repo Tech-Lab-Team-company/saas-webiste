@@ -42,10 +42,9 @@
         </div>
   
         <div class="auth-info-container" 
-   
             :class="[
                 route.path == '/Auth/register' || route.path == '/auth/register' ? 'active' : '',
-                route.path == '/Auth/varifyotp' || route.path == '/Auth/categories' ||  route.path == '/Auth/education' ? 'entered' : '',
+                route.path == '/Auth/varifyotp'   || route.path == '/Auth/categories' ||  route.path == '/Auth/education' ? 'entered' : '',
             ]">
 
             <div class="auth-text">

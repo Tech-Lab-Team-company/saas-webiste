@@ -30,8 +30,8 @@ export default class CoursesPaymentParams implements Params {
   toMap(): { [p: string]: any } {
     const data: { [p: string]: any } = {};
      data["course_id"] = this.CourseId
-     data["payment_method_id"] = this.PaymentMethod
-     data["transfered_account"] = this.Account
+    //  data["payment_method_id"] = this.PaymentMethod
+    //  data["transfered_account"] = this.Account
      data["receipt"] = this.Receipt
  
     return data;

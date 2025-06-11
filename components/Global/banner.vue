@@ -6,6 +6,7 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
+
 const allRoutes = ref([
   { name: "الرئيسية", path: "/" },
   { name: "الكورسات", path: "/course" },
@@ -14,7 +15,7 @@ const allRoutes = ref([
   { name: "المدونة", path: "/blogs" },
   { 
     name: "تفاصيل الكورس", 
-    path: "/course/:courseId",
+    path: `/course/${route.params.id}`,
     matcher: (path: string) => {
       const pattern = /^\/course\/([^/]+)$/;
       const match = path.match(pattern);

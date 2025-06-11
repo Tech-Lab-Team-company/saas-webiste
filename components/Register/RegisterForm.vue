@@ -64,7 +64,7 @@ const license_accept = ref(0);
 const Education_Type =ref(0)
 
 
-const CheckData = ()=>{
+const CheckData = async ()=>{
   
   const registerParams = new RegisterParams(FullName.value , 
   Email.value , 
@@ -77,7 +77,8 @@ const CheckData = ()=>{
   nationality.value,
   studentType.value )
 
-  const response =  RegisterController.getInstance().Register(registerParams,router);
+  const registerController =  RegisterController.getInstance();
+  const state = await registerController.Register(registerParams,router);
 
 }
 

@@ -13,7 +13,7 @@ import { useSettingStore } from "./stores/setting";
 import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
 import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 
-const { data: webstatus } = await useAsyncData("webstatus", async () => {
+const { data: webstatus, pending } = await useAsyncData("webstatus", async () => {
   const response = await $fetch<{
     data: WebStatus;
     message: string;
@@ -21,15 +21,17 @@ const { data: webstatus } = await useAsyncData("webstatus", async () => {
   }>(`${baseUrl}/fetch_web_status`, {
     method: "GET",
     headers: {
-      "web-domain":"hrarabians.com",
+      "web-domain": "hrarabians.com",
     },
-
-    });
+  });
 
   const UserSettingStore = useSettingStore();
   UserSettingStore.setSetting(response.data);
+
   return response.data;
 });
+
+// You can use pending state to show loading if needed
 
 // onMounted(() => {
 //   cons
@@ -41,7 +43,7 @@ const { data: webstatus } = await useAsyncData("webstatus", async () => {
 <template>
   <div>
     <NuxtLayout>
-    
+    {{ webstatus }}
       <NuxtPage />
       <MainDialog />
       <LoaderDialog />
