@@ -105,6 +105,18 @@ export default abstract class ServicesInterface {
           case 408:
             console.error(`RequestTimeoutException >> ${statusCode}`);
             throw new RequestTimeoutException("Request timeout");
+          case 422:
+          { console.error(`ConflictException >> ${statusCode}`);
+            const errors = error.response?.data.errors;
+            let message = "Validation error";
+            if (Array.isArray(errors)) {
+              message = errors.join("\n");
+            } else if (errors && typeof errors === "object") {
+              message = Object.values(errors)
+                  .flat()
+                  .join("\n");
+            }
+            throw new ConflictException(message); }
           case 409:
             console.error(`ConflictException >> ${statusCode}`);
             throw new ConflictException("Conflict");

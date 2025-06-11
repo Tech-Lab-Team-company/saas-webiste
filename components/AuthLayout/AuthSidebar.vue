@@ -30,16 +30,16 @@
 
 <template>
     <div class="auth-sidebar">
-        <div class="auth-lang">
-            <AutoComplete 
-                v-model="value" 
-                dropdown 
-                :suggestions="['ar', 'en']"
-                @complete="search"
-                class="auth-input" 
-          
-                />
-        </div>
+<!--        <div class="auth-lang">-->
+<!--            <AutoComplete -->
+<!--                v-model="value" -->
+<!--                dropdown -->
+<!--                :suggestions="['ar', 'en']"-->
+<!--                @complete="search"-->
+<!--                class="auth-input" -->
+<!--          -->
+<!--                />-->
+<!--        </div>-->
   
         <div class="auth-info-container" 
             :class="[
