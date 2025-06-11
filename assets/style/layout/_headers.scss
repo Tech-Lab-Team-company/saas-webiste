@@ -33,13 +33,14 @@
     background-color: #ffffff;
     
     .side-menu{
+      display: none;
       position: relative;
-
+      @media (max-width:768px) {
+        display: block;
+      }
       .bars-icon{
         cursor: pointer;
-        @media (min-width:768px) {
-            display: none;
-        }
+
       }
   
       .droplist-menu{

@@ -7,6 +7,7 @@ import type Stages from "~/types/stages";
 import type Universitiey from "~/types/universitey";
 import { baseUrl } from "~/constant/baseUrl";
 import { useFiltersStore } from '~/stores/courses_filter';
+import {useSettingStore} from "~/stores/setting";
 
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
@@ -215,13 +216,13 @@ const SendData = () => {
   })
 };
 
-
+const settingStore = useSettingStore();
 
 
 </script>
 
 <template>
-  <div class="stage-container stage-container-dots">
+  <div class="stage-container stage-container-dots" v-if="!settingStore?.setting?.has_general">
     <div class="stages-background">
       <LeftDots class="background-icon" />
       <RightDots class="background-icon" />

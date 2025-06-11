@@ -47,15 +47,17 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
           <div class="card-body">
             <div class="card-header">
               <hr />
-              <h5 class="card-title">{{ card.title || 'No Title' }}</h5>
-              <div class="card-date">
-                <p>{{ card.date }}</p>
+              <div class="flex">
+                <h5 class="card-title" v-html="card.title"></h5>
+                <div class="card-date">
+                  <p>{{ card.date }}</p>
+                </div>
               </div>
             </div>
-            <p class="card-text">{{ card.description || 'No Description' }}</p>
-            <div class="card-footer">
-              <p v-html="card.subtitle"></p>
-            </div>
+            <p class="card-text" v-html="card.description"></p>
+<!--            <div class="card-footer">-->
+<!--              <p v-html="card.subtitle"></p>-->
+<!--            </div>-->
           </div>
         </NuxtLink>
       </div>
@@ -135,11 +137,40 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 
 .card-title {
   font-weight: 700;
-  font-size: 18px;
-  line-height: 30px;
+  width: 60%;
+  font-size: 1rem;
   text-align: right;
   margin: 0;
-  font-family: "bold";
+  font-family: "bold", serif;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: calc(var(--line-height) * 1em);
+  line-height: var(--line-height);
+  --line-height: 1.5;
+
+}
+
+.card-text {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #000000;
+  font-family: "medium", serif;
+  margin-top: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: calc(var(--line-height) * 2em);
+  line-height: var(--line-height);
+  --line-height: 1.5;
+}
+
+.card-date {
+  width: 40%;
 }
 
 .card-date p {
@@ -161,14 +192,6 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   margin-left: 8px;
   background: #a3adbb;
   border-radius: 50%;
-}
-
-.card-text {
-  font-weight: 700;
-  font-size: 18px;
-  color: #000000;
-  font-family: "medium";
-  margin-top: 8px;
 }
 
 .card-footer {
