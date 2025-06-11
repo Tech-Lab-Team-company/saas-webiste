@@ -3,7 +3,7 @@ import Aura from '@primeuix/themes/aura';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  ssr: false,
+
   modules: ['@nuxt/image', 'nuxt-swiper', '@primevue/nuxt-module', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt' ,'@twicpics/components/nuxt3' ],
   // , '@pinia/nuxt',
   primevue: {
