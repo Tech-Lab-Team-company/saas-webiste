@@ -28,9 +28,8 @@ export default class CoursesPaymentController extends ControllerInterface<Course
       const dataState: DataState<CoursePaymentModel> = await this.coursesPaymentUseCase.call(params)
       this.setState(dataState)
       if (this.isDataSuccess()) {
-        console.log("before success")
         DialogSelector.instance.successDialog.openDialog({
-      dialogName: "dialog",
+          dialogName: "dialog",
           titleContent: "Added was successful",
           imageElement: successImage,
           messageContent: null,

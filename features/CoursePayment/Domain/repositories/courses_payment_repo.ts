@@ -1,7 +1,7 @@
-import RepoInterface from '@/base/Domain/Repositories/repo_interface'
 import type ServicesInterface from '@/base/Data/ApiService/api_service_interface'
 import CoursePaymentModel from '../../Data/models/course_payment_model'
 import { CoursesPaymentApiService } from '../../Data/api_services/courses_payment_api_service'
+import RepoInterface, {ResponseType} from '~/base/Domain/Repositories/repo_interface'
 
 class CoursesPaymentRepo extends RepoInterface<CoursePaymentModel> {
   private static instance: CoursesPaymentRepo
@@ -14,6 +14,10 @@ class CoursesPaymentRepo extends RepoInterface<CoursePaymentModel> {
       this.instance = new CoursesPaymentRepo()
     }
     return this.instance
+  }
+
+  override get responseType(): ResponseType {
+    return ResponseType.withoutData
   }
 
   onParse(data: any): CoursePaymentModel {

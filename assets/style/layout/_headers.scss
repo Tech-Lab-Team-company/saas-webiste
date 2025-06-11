@@ -34,12 +34,15 @@
     
     .side-menu{
       position: relative;
-
+      
+      display: none;
+       @media (max-width:768px) {
+            display: block;
+        }
       .bars-icon{
         cursor: pointer;
-        @media (min-width:768px) {
-            display: none;
-        }
+        // display: none;
+       
       }
   
       .droplist-menu{

@@ -110,12 +110,15 @@ onMounted(() => {
   FetchEducationStages();
 })
 
-const SendData = async () => {
-  const EducationDataParams = new SubmitEducationDataParams(null,null,null,null,null,null);
-  if(studentCategory.value != 3){
+const SendUniversityData = async () => {
     const EducationDataParams = new SubmitEducationDataParams(Eductaion_Type?.value?.[0]?.id, CollegeDeprtmentDivision.value?.[0]?.id, studentCategory?.value, University.value?.[0]?.id,
       Colleges.value?.[0]?.id, CollegeDeprtment.value?.[0]?.id);
-  }
+  const submitEducationDataController = SubmitEducationDataController.getInstance();
+  const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
+}
+
+const SendGeneralData = async () => {
+  const EducationDataParams = new SubmitEducationDataParams(null,null,null,null,null,null);
   const submitEducationDataController = SubmitEducationDataController.getInstance();
   const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
 }
@@ -231,7 +234,14 @@ const Subjects = ref()
 
 
 
-      <div class="btns btns-home" @click="SendData">
+      <div class="btns btns-home" @click="SendUniversityData"  v-if="studentCategory != 3">
+        <button class="login-btn" >
+          اختر فئاتك المفضله
+          <LeftArrowIcon class="left-icon" />
+        </button>
+
+      </div>
+      <div class="btns btns-home" @click="SendGeneralData" v-if="studentCategory == 3">
         <button class="login-btn" >
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
