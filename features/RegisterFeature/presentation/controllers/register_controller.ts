@@ -46,7 +46,13 @@ export default class RegisterController extends ControllerInterface<UserModel> {
         await router.push("/Auth/varifyotp");
 
       } else {
-        throw new Error(this.state.value.error?.title);
+             DialogSelector.instance.errorDialog.openDialog({
+            dialogName: "dialog",
+            titleContent: this.state.value.error?.title,
+            imageElement: errorImage,
+            messageContent: null,
+          });
+        // throw new Error();
       }
       return this.state;
     } catch (error: any) {
