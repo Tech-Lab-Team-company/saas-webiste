@@ -18,6 +18,7 @@ const splideOptions = {
 };
 
 
+const BlogsData = ref<HomeFirstSection[] | null>(null)
 
 const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   const response = await $fetch<{
@@ -37,6 +38,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   });
 
   console.log(response.data , "response.data")
+  BlogsData.value = response.data;
   return response.data;
 });
 
@@ -58,7 +60,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
       </div>
 
       <Splide :options="splideOptions" class="splide-container" >
-        <SplideSlide v-for="(blog, index) in Blogs?.blogs" :key="index">
+        <SplideSlide v-for="(blog, index) in BlogsData" :key="index">
           <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
             <img :src="blog.attachments[0].file" alt="Card image" class="course-image" />
             <div class="card-body">
