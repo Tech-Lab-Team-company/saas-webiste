@@ -40,7 +40,7 @@ const toggleSkill = (skill) => {
 };
 </script>
 <template>
-  <span class="span-page">تخطي الان</span>
+  <NuxtLink class="span-page" to="/">تخطي الان</NuxtLink>
   <div class="skills-container">
     <h3>تم انشاء حسابك بنجاح</h3>
     <p>
@@ -78,7 +78,7 @@ const toggleSkill = (skill) => {
       <div class="login-container">
         <div class="login-form">
           <div class="btns btns-home">
-            <NuxtLink to="/Auth/categories"> <button class="login-btn">
+            <NuxtLink to="/"> <button class="login-btn">
              ابدأ الان 
               <LeftArrowIcon class="left-icon" />
             </button></NuxtLink>
