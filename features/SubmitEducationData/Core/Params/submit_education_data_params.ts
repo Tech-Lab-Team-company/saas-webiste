@@ -1,20 +1,20 @@
 import type Params from "~/base/core/Params/params";
 
 export default class SubmitEducationDataParams implements Params {
-  public UniversityEducationTypeId: number;
-  public DivisionId: number;
-  public CategoryId: number;
-  public UniversityId: number;
-  public CollegeId: number;
-  public DepartmentId: number;
+  public UniversityEducationTypeId: number | null;
+  public DivisionId: number | null;
+  public CategoryId: number | null;
+  public UniversityId: number | null;
+  public CollegeId: number | null;
+  public DepartmentId: number | null;
 
   constructor(
-    UniversityEducationTypeId: number,
-    DivisionId: number,
-    CategoryId: number,
-    UniversityId: number,
-    CollegeId: number,
-    DepartmentId: number,
+    UniversityEducationTypeId: number  | null ,
+    DivisionId: number | null,
+    CategoryId: number | null,
+    UniversityId: number | null,
+    CollegeId: number | null,
+    DepartmentId: number | null,
     
   ) {
     this.UniversityEducationTypeId = UniversityEducationTypeId;
@@ -28,12 +28,12 @@ export default class SubmitEducationDataParams implements Params {
 
   toMap(): { [key: string]: any } {
     const data: { [key: string]: any } = {};
-    data["university_education_type_id"] = this.UniversityEducationTypeId;
-    data["division_id"] = this.DivisionId;
-    data["category_id"] = this.CategoryId;
-    data["university_id"] = this.UniversityId;
-    data["college_id"] = this.CollegeId;
-    data["department_id"] = this.DepartmentId;
+    if(this.UniversityEducationTypeId) data["university_education_type_id"] = this.UniversityEducationTypeId;
+    if(this.DivisionId) data["division_id"] = this.DivisionId;
+    if(this.CategoryId) data["category_id"] = this.CategoryId;
+    if(this.UniversityId) data["university_id"] = this.UniversityId;
+    if(this.CollegeId) data["college_id"] = this.CollegeId;
+    if(this.DepartmentId) data["department_id"] = this.DepartmentId;
     return data;
   }
 }

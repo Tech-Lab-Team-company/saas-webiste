@@ -21,6 +21,8 @@ import CollegeDepartmentDivisionsController from "~/features/FetchCollegeDepartm
 import CollegeDetpartmentDivisionsParams from "~/features/FetchCollegeDepartmentDivisions/Core/Params/colleges_department_divisions_params";
 import SubmitEducationDataController from "~/features/SubmitEducationData/presentation/controllers/submit_education_data_controller";
 import SubmitEducationDataParams from "~/features/SubmitEducationData/Core/Params/submit_education_data_params";
+import FetchGeneralCoursesSubjectController from "~/features/FetchGeneralCourseSubject/presentation/controllers/fetch_general_course_subjects_controller";
+import FetchGeneralCoursesSubjectParams from "~/features/FetchGeneralCourseSubject/Core/Params/fetch_general_course_subjects_params";
 
 const studentCategory = ref(0)
 
@@ -33,8 +35,8 @@ const CollegeDeprtmentDivision = ref<TitleModel[]>([]);
 
 
 
-const FetchEducationStages = async() =>{
-  const educationStagesParams = new EducationStagesParams(studentCategory.value); 
+const FetchEducationStages = async () => {
+  const educationStagesParams = new EducationStagesParams(studentCategory.value);
   const educationStagesController = EducationStagesController.getInstance();
   const state = await educationStagesController.FetchEducationStages(educationStagesParams);
 
@@ -43,89 +45,108 @@ const FetchEducationStages = async() =>{
   }
 }
 
-watch(()=>studentCategory.value ,
-(NewValue)=>{
-  studentCategory.value = NewValue;
-  FetchEducationStages();
-})
+watch(() => studentCategory.value,
+  (NewValue) => {
+    studentCategory.value = NewValue;
+    FetchEducationStages();
+  })
 
 
 
 
-const FetchUniversityEducationLevel = async(data: Event) =>{
+const FetchUniversityEducationLevel = async (data: Event) => {
   console.log(Number((data.target as HTMLSelectElement).value))
   const universityParams = new UniversityParams(Number((data.target as HTMLSelectElement).value), 1);
   const universityController = UniversityController.getInstance();
   const state = await universityController.FetchUniversity(universityParams)
 
 
-  if (state.value.data  ) {
+  if (state.value.data) {
     University.value.push(...state.value.data);
   }
-} 
+}
 
-const FetchColleges = async(data: Event) =>{
+const FetchColleges = async (data: Event) => {
   console.log(Number((data.target as HTMLSelectElement).value))
   const collegesParams = new CollegesParams(Number((data.target as HTMLSelectElement).value));
   const collegesController = CollegesController.getInstance();
   const state = await collegesController.FetchColleges(collegesParams)
 
 
-  if (state.value.data  ) {
+  if (state.value.data) {
     Colleges.value.push(...state.value.data);
   }
-  console.log( Colleges.value)
+  console.log(Colleges.value)
 
-} 
-const FetchCollegesDeprtment = async(data: Event) =>{
+}
+const FetchCollegesDeprtment = async (data: Event) => {
   console.log(Number((data.target as HTMLSelectElement).value))
   const collegeDetpartmentParams = new CollegeDetpartmentParams(Number((data.target as HTMLSelectElement).value));
   const collegeDepartmentController = CollegeDepartmentController.getInstance();
   const state = await collegeDepartmentController.FetchCollegeDepartment(collegeDetpartmentParams)
 
 
-  if (state.value.data  ) {
+  if (state.value.data) {
     CollegeDeprtment.value.push(...state.value.data);
   }
-  console.log( Colleges.value)
+  console.log(Colleges.value)
 
-} 
-const FetchCollegesDeprtmentDivisions = async(data: Event) =>{
+}
+const FetchCollegesDeprtmentDivisions = async (data: Event) => {
   console.log(Number((data.target as HTMLSelectElement).value))
   const collegeDetpartmentDivisionsParams = new CollegeDetpartmentDivisionsParams(Number((data.target as HTMLSelectElement).value));
   const collegeDepartmentDivisionsController = CollegeDepartmentDivisionsController.getInstance();
   const state = await collegeDepartmentDivisionsController.FetchCollegeDepartmentDivisions(collegeDetpartmentDivisionsParams)
 
 
-  if (state.value.data  ) {
+  if (state.value.data) {
     CollegeDeprtmentDivision.value.push(...state.value.data);
   }
 
 
-} 
+}
 
-onMounted(()=>{
+onMounted(() => {
   FetchEducationStages();
 })
 
-const SendData = async ()=>{
-  const EducationDataParams = new SubmitEducationDataParams(Eductaion_Type.value[0].id , CollegeDeprtmentDivision.value[0].id , studentCategory.value ,University.value[0].id ,
-   Colleges.value[0].id , CollegeDeprtment.value[0].id );
-  const submitEducationDataController = SubmitEducationDataController.getInstance(); 
+const SendData = async () => {
+  const EducationDataParams = new SubmitEducationDataParams(null,null,null,null,null,null);
+  if(studentCategory.value != 3){
+    const EducationDataParams = new SubmitEducationDataParams(Eductaion_Type?.value?.[0]?.id, CollegeDeprtmentDivision.value?.[0]?.id, studentCategory?.value, University.value?.[0]?.id,
+      Colleges.value?.[0]?.id, CollegeDeprtment.value?.[0]?.id);
+  }
+  const submitEducationDataController = SubmitEducationDataController.getInstance();
   const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
 }
 
 
 
- 
 
+const selectedSubject = ref()
+const Subjects = ref()
+
+// const FetchSubjects = async ()=>{
+
+//   const generalCoursesParams = new FetchGeneralCoursesSubjectParams(0);
+//   const fetchGeneralCoursesSubjectController = FetchGeneralCoursesSubjectController.getInstance();
+//   const state = await fetchGeneralCoursesSubjectController.fetchGeneralCoursesSubject(generalCoursesParams);
+//   if(state.value.data){
+//     console.log(state.value.data , "state.value.data")
+//     Subjects.value = state.value.data;
+//   }
+// }
+
+// onMounted(()=>{
+//   FetchSubjects();
+// })
 
 </script>
 
 <template>
   <div class="login-container pass-forgit">
     <div class="login-form">
-      <h3 >بياناتك التعليمية</h3>
+      <h3>بياناتك التعليمية</h3>
       <p>
         مرحبا بك فى منصتنا ادخل معلوماتك الشخصيه التاليه و احرص على ادخال
         البياناتك الضروريه و المحاطه باللون الازرق وعلامه مميزه *
@@ -138,93 +159,94 @@ const SendData = async ()=>{
             <option :value="StudentCategoryEnum.base">اساسى</option>
             <option :value="StudentCategoryEnum.university">جامعى</option>
             <option :value="StudentCategoryEnum.general">عام</option>
-            
+
           </select>
           <Award class="login-call-icon" />
         </div>
       </div>
 
-      <div class="inputs">
+      <!-- <div class="inputs" v-if="studentCategory == 3">
         <div class="login-input">
-          <select class="student-select" v-model="EducationCategory" @change="FetchUniversityEducationLevel">
+          <select class="student-select" v-model="selectedSubject" >
             <option value="" disabled selected>نوع التعليم</option>
-            <option v-for="(item,index) in Eductaion_Type" :key="index" :value="item.id">{{ item.title }}</option>
-
+            <option v-for="(item, index) in Subjects" :key="index" :value="item.id">{{ item.title }}</option>
           </select>
           <Award class="login-call-icon" />
-        </div>
-      </div>
-
-      <div class="inputs">
-        <div class="login-input">
-          <select class="student-select" @change="FetchColleges">
-            <option value="" disabled selected>جامعة</option>
-            <option v-for="(item,index) in University" :key="index" :value="item.id">{{ item.title }}</option>
-            
-          </select>
-          <RegisterBook class="login-call-icon" />
-        </div>
-      </div>
-      <div class="inputs">
-        <div class="login-input">
-          <select class="student-select" @change="FetchCollegesDeprtment">
-            <option value="" disabled selected>الكلية</option>
-            <option v-for="(item,index) in Colleges" :key="index" :value="item.id">{{ item.title }}</option>
-            
-       
-          </select>
-          <RegisterBook class="login-call-icon" />
-        </div>
-      </div>
-      <div class="inputs">
-        <div class="login-input">
-          <select class="student-select" @change="FetchCollegesDeprtmentDivisions">
-            <option value="" disabled selected>القسم</option>
-            <option v-for="(item,index) in CollegeDeprtment" :key="index" :value="item.id">{{ item.title }}</option>
-          </select>
-          <RegisterBook class="login-call-icon" />
-        </div>
-      </div>
-      <div class="inputs">
-        <div class="login-input">
-          <select class="student-select" >
-            <option value="" disabled selected>المستوى</option>
-            <option v-for="(item,index) in CollegeDeprtmentDivision" :key="index" :value="item.id">{{ item.title }}</option>
-          </select>
-          <RegisterBook class="login-call-icon" />
-        </div>
-      </div>
-
-<!-- 
-      <div class="inputs">
-        <div class="login-input">
-          <select class="student-select">
-            <option value="" disabled selected>السنه الدراسيه</option>
-            <option value="student1">طالب</option>
-            <option value="student2">طالب</option>
-            <option value="student3">طالب</option>
-          </select>
-          <RegisterBookOne class="login-call-icon" />
         </div>
       </div> -->
 
- 
-      <div class="btns btns-home">
-   <button class="login-btn" @click="SendData"> 
-                 اختر  فئاتك المفضله
-                <LeftArrowIcon class="left-icon" />
-              </button>
-         
+
+
+      <div class="inputs" v-if="studentCategory == 1 || studentCategory == 2">
+        <div class="login-input">
+          <select class="student-select" v-model="EducationCategory" @change="FetchUniversityEducationLevel">
+            <option value="" disabled selected>نوع التعليم</option>
+            <option v-for="(item, index) in Eductaion_Type" :key="index" :value="item.id">{{ item.title }}</option>
+
+          </select>
+          <Award class="login-call-icon" />
         </div>
+      </div>
+      <div class="inputs" v-if="studentCategory == 1 || studentCategory == 2">
+        <div class="login-input">
+          <select class="student-select" @change="FetchColleges">
+            <option value="" disabled selected>جامعة</option>
+            <option v-for="(item, index) in University" :key="index" :value="item.id">{{ item.title }}</option>
+
+          </select>
+          <RegisterBook class="login-call-icon" />
+        </div>
+      </div>
+      <div class="inputs" v-if="studentCategory == 1 || studentCategory == 2">
+        <div class="login-input">
+          <select class="student-select" @change="FetchCollegesDeprtment">
+            <option value="" disabled selected>الكلية</option>
+            <option v-for="(item, index) in Colleges" :key="index" :value="item.id">{{ item.title }}</option>
+
+
+          </select>
+          <RegisterBook class="login-call-icon" />
+        </div>
+      </div>
+      <div class="inputs" v-if="studentCategory == 1 || studentCategory == 2">
+        <div class="login-input">
+          <select class="student-select" @change="FetchCollegesDeprtmentDivisions">
+            <option value="" disabled selected>القسم</option>
+            <option v-for="(item, index) in CollegeDeprtment" :key="index" :value="item.id">{{ item.title }}</option>
+          </select>
+          <RegisterBook class="login-call-icon" />
+        </div>
+      </div>
+      <div class="inputs" v-if="studentCategory == 1 || studentCategory == 2">
+        <div class="login-input">
+          <select class="student-select">
+            <option value="" disabled selected>المستوى</option>
+            <option v-for="(item, index) in CollegeDeprtmentDivision" :key="index" :value="item.id">{{ item.title }}
+            </option>
+          </select>
+          <RegisterBook class="login-call-icon" />
+        </div>
+      </div>
+
+
+
+
+      <div class="btns btns-home" @click="SendData">
+        <button class="login-btn" >
+          اختر فئاتك المفضله
+          <LeftArrowIcon class="left-icon" />
+        </button>
+
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.pass-forgit{
+.pass-forgit {
   background-image: url(../../public//images/background.png);
 }
+
 select {
   color: #a3adbb;
   text-align: right;
@@ -260,10 +282,12 @@ input:focus {
   justify-content: space-between;
   flex-direction: row-reverse;
 }
+
 .left-icon {
   width: 24px;
   height: 24px;
 }
+
 .login-container .login-form .btns.btns-home button {
   width: 51% !important;
 }

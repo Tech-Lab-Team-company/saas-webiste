@@ -35,7 +35,7 @@ watch(() => props.status, (newValue) => {
             <div class="card-text-title">
                 <p class="card-text-subject-title">{{ CardDetails?.Subject.title }}</p>
                 <p class="card-text-main-title">{{ CardDetails?.title }}</p>
-                <Dashedicon class="icon" />
+                <!-- <Dashedicon class="icon" /> -->
             </div>
 
             <div class="card-text-description">

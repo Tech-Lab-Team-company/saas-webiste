@@ -37,7 +37,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
 
   });
 
-  console.log(response.data , "response.data")
+  console.log(response.data , "response.data inside blogs")
   
   return response.data;
 });
@@ -60,8 +60,10 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
       </div>
 
       <Splide :options="splideOptions" class="splide-container" >
-        <SplideSlide v-for="(blog, index) in Blogs?.blogs" :key="index">
-          <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
+        <!-- {{ console.log(Blogs) }} -->
+        <SplideSlide v-for="(blog, index) in Blogs" :key="index">
+          
+           <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
             <img :src="blog.attachments[0].file" alt="Card image" class="course-image" />
             <div class="card-body">
               <div class="card-header">
@@ -77,6 +79,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
               </div>
             </div>
           </NuxtLink>
+          
         </SplideSlide>
       </Splide>
     </div>

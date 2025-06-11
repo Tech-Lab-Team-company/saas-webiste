@@ -140,6 +140,11 @@ class ApiNames {
   //Courses
   public fetch_courses = "fetch_courses";
 
+
+  
+  public generalSubjects = "fetch_general_subjects ";
+
+
 }
 
 export { ApiNames };
