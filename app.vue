@@ -13,7 +13,7 @@ import { useSettingStore } from "./stores/setting";
 import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
 import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 
-const { data: webstatus, pending } = await useAsyncData("webstatus", async () => {
+const { data: webStatus, pending } = await useAsyncData("webStatus", async () => {
   const response = await $fetch<{
     data: WebStatus;
     message: string;
@@ -24,12 +24,11 @@ const { data: webstatus, pending } = await useAsyncData("webstatus", async () =>
       "web-domain": "hrarabians.com",
     },
   });
-
-  const UserSettingStore = useSettingStore();
-  UserSettingStore.setSetting(response.data);
-
   return response.data;
 });
+
+const UserSettingStore = useSettingStore();
+UserSettingStore.setSetting(webStatus.value!);
 
 // You can use pending state to show loading if needed
 
