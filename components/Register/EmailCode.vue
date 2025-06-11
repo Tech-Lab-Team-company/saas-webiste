@@ -3,7 +3,7 @@ import callIcon from "../../public/icons/callIcon.vue";
 import LockIcon from "../../public/icons/LockIcon.vue";
 import LeftArrowIcon from "~/public/icons/LeftArrowIcon.vue";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import VerifyCodeParams from "~/features/VerifyCodeFeature/Core/Params/verfiy_code_params";
 import VerifyCodeUseCase from "~/features/VerifyCodeFeature/Domain/use_case/verify_code_use_case";
 import VerifyCodeController from "~/features/VerifyCodeFeature/presentation/controllers/verify_code_controller";
@@ -26,12 +26,19 @@ const items = ref(["ar", "en"]);
 
 const CheckCode = ()=>{
   EmailBuilder.Instance.getEmail();
-  console.log(EmailBuilder.Instance.getEmail());
-  console.log(optvalue.value);
+  // console.log(EmailBuilder.Instance.getEmail());
+  // console.log(optvalue.value);
   const varifyCode = new VerifyCodeParams(EmailBuilder.Instance.getEmail() || "", optvalue.value , "AuthRegister");
   const verifyCodeUseCase = VerifyCodeController.getInstance();
   verifyCodeUseCase.verifyCode(varifyCode , router);
 }
+
+
+onMounted(() => {
+  if(!EmailBuilder.Instance.getEmail()) {
+    router.push("/Auth/register");
+  }
+});
 
 
 
@@ -43,14 +50,14 @@ const CheckCode = ()=>{
 <template>
   <div class="login-container pass-forgit">
     <div class="login-form">
-      <div class="side card flex justify-center">
-        <AutoComplete
-          v-model="value"
-          dropdown
-          :suggestions="items"
-          class="select"
-        />
-      </div>
+<!--      <div class="side card flex justify-center">-->
+<!--        <AutoComplete-->
+<!--          v-model="value"-->
+<!--          dropdown-->
+<!--          :suggestions="items"-->
+<!--          class="select"-->
+<!--        />-->
+<!--      </div>-->
       <!-- <img class="background-circle" src="../../public/images/Component15.png" alt=""> -->
       <!-- <img src="../../public/images/logo.png" alt=""> -->
       <h3>تأكيد رمز انشاء الحساب</h3>
@@ -118,5 +125,8 @@ const CheckCode = ()=>{
 .left-icon {
   width: 24px;
   height: 24px;
+}
+.login-form {
+  width: 70%;
 }
 </style>
