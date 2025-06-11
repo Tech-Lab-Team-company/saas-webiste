@@ -16,6 +16,7 @@ const props =defineProps(['status'])
 const status = ref(props.status)
 
 console.log(router.currentRoute.value.params.id)
+const emit = defineEmits(['updateData'])
 
 
     const Image = ref<File | null>(null)
@@ -28,8 +29,8 @@ console.log(router.currentRoute.value.params.id)
         const coursePaymentParams = new CoursesPaymentParams( Number(router.currentRoute.value.params.id) , 1 ,1, Image.value);
         const coursesPaymentController = CoursesPaymentController.getInstance();
         const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
-        if(state.value.data){
-            console.log(state.value.data , "state.value.data")
+        if(state.value.message){
+            status.value = 1;
         }
         visible.value = false;
     }
@@ -50,7 +51,7 @@ console.log(router.currentRoute.value.params.id)
                 <button @click="visible = false" v-if="status == 2" disabled class="btn-disabled">تم الشراء</button>
                 <button @click="visible = false" v-if="status == 4" disabled class="btn-disabled">تم رفض الطلب</button>
             </div>
-            <Dialog v-model:visible="visible" class="dialog"  :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Dialog v-model:visible="visible" class="dialog" modal :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <AddMedia
                     class="add-media"
                     :index="0"
