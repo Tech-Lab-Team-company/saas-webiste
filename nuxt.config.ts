@@ -25,16 +25,13 @@ export default defineNuxtConfig({
   css: [
     "@/assets/style/main.min.css",
     '@twicpics/components/style.css',
-    
-    // "@/assets/style/main.css",
-
+    'swiper/swiper-bundle.css'
   ],
   twicpics: {
     domain: 'https://your-subdomain.twic.pics',
     anticipation: 0.5,
     step: 100,
   }
-
 
 })
 

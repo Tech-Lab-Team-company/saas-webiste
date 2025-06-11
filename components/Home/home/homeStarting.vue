@@ -10,6 +10,22 @@ import { register } from 'swiper/element/bundle'; // For web components
 const containerRef = ref<HTMLElement | null>(null);
 const swiper_position = ref('next');
 
+
+
+const _swiper = useSwiper(containerRef, {
+  effect: "fade",
+  loop: true,
+  autoplay: {
+    delay: 2000,
+  },
+  pagination: {
+    el: ".swiper-pagination",
+    clickable: true,
+    type: "bullets",
+    dynamicBullets: true,
+  },
+});
+
 // Register Swiper web components
 onMounted(() => {
   register();
@@ -38,22 +54,8 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
     return [];
   }
 });
-
-// Navigation functions
-const goNext = () => {
-  if (containerRef.value) {
-    containerRef.value.swiper.slideNext();
-    swiper_position.value = 'next';
-  }
-};
-
-const goPrev = () => {
-  if (containerRef.value) {
-    containerRef.value.swiper.slidePrev();
-    swiper_position.value = 'prev';
-  }
-};
 </script>
+
 
 <template>
     <div class="main-container">
@@ -63,7 +65,7 @@ const goPrev = () => {
         <!-- Error state -->
         <div v-else-if="error" class="error">فشل في تحميل السلايدر.</div>
         <!-- Slider -->
-        <swiper-container v-else ref="containerRef">
+        <swiper-container class="header-home-section" v-else ref="containerRef">
           <swiper-slide v-for="slide in sliders" :key="slide.id">
             <div v-if="slide.media.img" class="container">
               <div class="image-container">
@@ -96,13 +98,14 @@ const goPrev = () => {
             </div>
           </swiper-slide>
         </swiper-container>
-        <!-- Navigation buttons -->
-        <div v-if="!pending && !error" class="home-buttons">
-          <button class="prev-btn" @click="goPrev()" :class="{ active: swiper_position === 'prev' }"></button>
-          <button class="next-btn" @click="goNext()" :class="{ active: swiper_position === 'next' }"></button>
-        </div>
       </ClientOnly>
+
+
+
     </div>
     <EducationStages />
     <Students />
-</template>
+
+  </template>
+
+
