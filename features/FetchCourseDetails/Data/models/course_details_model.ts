@@ -3,7 +3,7 @@ import type ImageModel from "./image_model";
 import type TitleModel from "~/base/core/Models/title_model";
 import type TeacherModel from "./teacher_model";
 import type UnitsModel from "./units_model";
-import type ExamsModel from "./exam_model";
+import type examsModel from "./exams_model";
 import type HomeWorkModel from "./homework_model";
 
 export default class CourseDetailsModel {
@@ -14,13 +14,13 @@ export default class CourseDetailsModel {
   public CoursePrice: number; 
   public Subject:TitleModel;
   public Teacher:TeacherModel;
-  public Exams:ExamsModel[];
+  public exams:examsModel[];
   public StageType:number;
-  public ExternalLinks: [];
-  public Lives: [];
-  public Homeworks: HomeWorkModel[];
-  public Sessions: [];
-  public Lessons: [];
+  public externalLinks: [];
+  public lives: [];
+  public homeworks: HomeWorkModel[];
+  public sessions: [];
+  public lessons: [];
   public units: UnitsModel[];
   public allow_status: number;
 
@@ -34,13 +34,13 @@ export default class CourseDetailsModel {
     CoursePrice: number,
     Subject: TitleModel,
     Teacher: TeacherModel,
-    Exams: ExamsModel[],
+    exams: examsModel[],
     StageType: number,
-    ExternalLinks: [],
-    Lives: [],
-    Homeworks: HomeWorkModel[],
-    Sessions: [],
-    Lessons: [],
+    externalLinks: [],
+    lives: [],
+    homeworks: HomeWorkModel[],
+    sessions: [],
+    lessons: [],
     units: UnitsModel[],
     allow_status: number,
 
@@ -52,13 +52,13 @@ export default class CourseDetailsModel {
     this.CoursePrice = CoursePrice;
     this.Subject = Subject;
     this.Teacher = Teacher;
-    this.Exams = Exams;
+    this.exams = exams;
     this.StageType = StageType;
-    this.ExternalLinks = ExternalLinks;
-    this.Lives = Lives;
-    this.Homeworks = Homeworks;
-    this.Sessions = Sessions;
-    this.Lessons = Lessons;
+    this.externalLinks = externalLinks;
+    this.lives = lives;
+    this.homeworks = homeworks;
+    this.sessions = sessions;
+    this.lessons = lessons;
     this.units = units;
     this.allow_status = allow_status;
  

@@ -17,6 +17,7 @@ import bookicon from '~/public/icons/bookicon.vue';
 
 import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
+import {useUserStore} from "~/stores/user";
 
 const props = defineProps({
   CourseData: {
@@ -32,50 +33,50 @@ watch(() => props.CourseData, (newValue) => {
 }, {immediate: true});
 
 
-const contents = ref([
-  {
-    icon: CourseVideoIcon,
-    content: `شرح ل`,
-  },
-  {
-    icon: coursenotesicon,
-    content: 'مقدمه ل',
-  },
-  {
-    icon: microphoneicon,
-    content: 'شرح مسجل ل',
-  },
-  {
-    icon: bookicon,
-    content: 'إمتحان على',
-  },
-])
+function getExtFromUrl(url: string): string {
+  if (!url) return '';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  const match = url.match(/\.([a-zA-Z0-9]+)(?:\?|#|$)/);
+  return match ? match[1].toLowerCase() : '';
+}
+
+const iconMap: Record<string, any> = {
+  youtube: CourseVideoIcon,
+  mp3: microphoneicon,
+  pdf: coursenotesicon,
+  mp4: CourseVideoIcon,
+  // add more as needed
+};
+
+function getIconByExt(link: string) {
+  const ext = getExtFromUrl(link);
+  return iconMap[ext] || CourseVideoIcon; // fallback icon
+}
 
 
-const router = useRouter();
+// const router = useRouter();
 const activePanels = ref<number[]>([]);
 const SecondactivePanels = ref<number[]>([]);
-const thirdactivePanels = ref<number[]>([]);
+// const thirdactivePanels = ref<number[]>([]);
 const activetab = ref(1)
 
 const emit = defineEmits(['coursechanged']);
 
 const sendactivetab = (activetabvalue: number, link: string, title: string, description: string) => {
   activetab.value = activetabvalue;
-  // if (activetabvalue == 0) {
-
-    emit('coursechanged', {activetabvalue: activetabvalue, link: link, title: title, description: description});
-  // } else {
-  //
-  //   emit('coursechanged', {activetabvalue: activetabvalue});
-  // }
-
+  emit('coursechanged', {activetabvalue: activetabvalue, link: link, title: title, description: description});
 }
 
-
+const userStore = useUserStore()
 const activeIndices = ref<number[]>([]);
 
+const selectedSessionIndex = ref<number | null>(null);
 
+function handleSessionClick(index: number, link: string, title: string, text: string) {
+  if (!userStore.user) return;
+  selectedSessionIndex.value = index;
+  sendactivetab(0, link, title, text);
+}
 </script>
 
 <template>
@@ -104,9 +105,13 @@ const activeIndices = ref<number[]>([]);
             <hr class="course-class-hr"/>
             <AccordionContent class="course-class-body">
               <div class="course-body-details" :key="thirdindex" v-for="(session ,thirdindex) in lesson?.sessions"
-                   @click=" sendactivetab(0 ,session.link ,session.title ,session.text)">
-                <component :is="contents[0]?.icon"/>
-                <p>{{ contents[0]?.content }} {{ session.title }} </p>
+                   :class="[
+                      userStore.user ? '' : 'disabled',
+                      selectedSessionIndex === thirdindex ? 'active' : ''
+                    ]"
+                   @click="handleSessionClick(thirdindex, session.link, session.title, session.text)">
+                <component :is="getIconByExt(session.link)"/>
+                <p>{{ session.title }} </p>
               </div>
             </AccordionContent>
           </AccordionPanel>
