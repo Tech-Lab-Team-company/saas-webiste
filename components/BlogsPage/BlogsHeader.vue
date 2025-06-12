@@ -29,6 +29,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
 
 <template>
+  
   <div class="blogs-page-articles-cards" dir="rtl">
     <!-- تكرار المدونات باستخدام v-for -->
     <!-- لم يعد هناك تكرار لأن البيانات كائن واحد -->
