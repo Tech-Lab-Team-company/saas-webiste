@@ -162,13 +162,12 @@ const props = defineProps<{
 
 .card-title {
   font-weight: 700;
-  font-size: 21px;
-  line-height: 100%;
+  font-size: 1.1rem;
   letter-spacing: 0%;
   text-align: right;
   color: #ffffff;
   margin: 0;
-  font-family: "bold";
+  font-family: "bold",serif;
 }
 
 .card-number {
@@ -179,7 +178,7 @@ const props = defineProps<{
   padding: 4px 5px;
   font-weight: 500;
   font-size: 14px;
-  font-family: "regular";
+  font-family: "regular",serif;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -188,11 +187,22 @@ const props = defineProps<{
 .card-text {
   color: #dde1e6;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem;
   text-align: right;
   border-bottom: 1px solid #dde1e6;
-  font-family: "regular";
+  font-family: "regular",serif;
   margin: 10px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: calc(var(--line-height) * 2em);
+  line-height: var(--line-height);
+  --line-height: 1.5;
+  * {
+    font-size: 1rem;
+  }
 }
 
 .card-footer {
@@ -207,7 +217,7 @@ const props = defineProps<{
   letter-spacing: 0%;
   text-align: right;
   color: white;
-  font-family: "bold";
+  font-family: "bold",serif;
   margin: 0px 10px;
 }
 
