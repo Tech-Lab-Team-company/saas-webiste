@@ -36,15 +36,15 @@ const props = defineProps<{
               <p class="card-text" v-html="card.description"></p>
 
               <div class="card-content">
-                <p class="card-text1">
+                <p class="card-text1" v-if="card.course_videos > 0">
                   <video1 />
                   فيديو
                 </p>
-                <p class="card-text1">
+                <p class="card-text1" v-if="card.course_docs > 0">
                   <note />
                   ملف ورقي
                 </p>
-                <p class="card-text1">
+                <p class="card-text1" v-if="card.course_records > 0">
                   <microphone />
                   ملف صوتى
                 </p>
@@ -137,7 +137,7 @@ const props = defineProps<{
   color: #222;
   margin-bottom: 20px;
   font-weight: 400;
-  font-family: "regular";
+  font-family: "regular",serif;
   text-align: right;
   width: 87%;
 }
@@ -181,13 +181,13 @@ const props = defineProps<{
 
 .card-title {
   font-weight: 700;
-  font-size: 22px;
+  font-size: 1.1rem;
   line-height: 100%;
   letter-spacing: 0%;
   text-align: right;
   color: #000;
   margin: 0;
-  font-family: "bold";
+  font-family: "bold",serif;
 }
 
 .card-number {
@@ -198,15 +198,26 @@ const props = defineProps<{
   padding: 4px 5px;
   font-weight: 500;
   font-size: 14px;
-  font-family: "regular";
+  font-family: "regular",serif;
 }
 
 .card-text {
   color: #656b78;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem;
   text-align: right;
-  font-family: "regular";
+  font-family: "regular",serif;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: calc(var(--line-height) * 3em);
+  line-height: var(--line-height);
+  --line-height: 1.5;
+  * {
+    font-size: 1rem;
+  }
   // margin: 10px 0;
 }
 

@@ -14,6 +14,9 @@ export default interface HomeFirstSection {
     media: MediaInterface[];
     courses:CourseInterface[];
     blogs:BlogsCard [];
+    course_records: number;
+    course_videos: number;
+    course_docs: number
     
 }
 
