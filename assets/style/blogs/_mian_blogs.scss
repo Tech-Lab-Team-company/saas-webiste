@@ -1,0 +1,19 @@
+.main-blog-container{
+    .splide-container{ 
+        .splide__arrows {
+            .splide__arrow--next{
+                left: -50px;
+                border-radius: 20px;
+            }
+        } 
+    }
+    
+    .splide-container {
+        .splide__arrows{
+            .splide__arrow--prev{
+                right: -50px;
+                border-radius: 20px;
+            } 
+        }
+    }
+}
