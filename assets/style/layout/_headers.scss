@@ -44,29 +44,40 @@
       }
   
       .droplist-menu{
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        position: absolute;
-        background-color: white;
-        top: 100%;
-        left: 0;
-        z-index: 20;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        width:120px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          position: absolute;
+          background-color: #fff;
+          top: 100%;
+          left: 0;
+          z-index: 20;
+          padding: 10px;
+          border-radius: 10px;
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, .1);
+          width: 100%;
+          position: fixed;
+          top: 138px;
+          border-radius: 0;
+
+          
          @media (min-width:768px) {
             display: none;
         }
 
         .list{
           margin-left: auto;
+          width: 100%;
+
+          .hr{
+            width: 100%;
+          }
         }
 
         li{
           text-align: right;
           font-size: 15px;
+          padding: 10px;
         }
       }
     }

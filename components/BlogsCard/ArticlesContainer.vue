@@ -28,6 +28,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
 </script>
 
 <template>
+
   <div class="blogs-page-articles">
     <div class="container">
       <div class="grid-container">
@@ -42,11 +43,29 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .grid-container {
   display: grid;
   grid-template-columns: 3fr 1fr;
   gap: 20px;
   margin: 5px 40px;
+
+  @media(max-width:768px){
+    grid-template-columns: 1fr;
+  }
 }
+.grid-container > :first-child {
+  @media(max-width: 768px) {
+    order: 2; /* Move to second position */
+  }
+}
+
+/* Target the second child (originally 1fr column) */
+.grid-container > :nth-child(2) {
+  @media(max-width: 768px) {
+    order: 1; /* Move to first position */
+  }
+}
+
+
 </style>

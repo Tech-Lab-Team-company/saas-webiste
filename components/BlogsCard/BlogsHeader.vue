@@ -30,6 +30,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 });
 </script>
 <template>
+  
   <div class="blogs-page-articles-cards" dir="rtl">
     <div class="Blog">
       <div class="cards-container">
@@ -91,6 +92,14 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   margin-right: auto; */
 }
 
+@media(max-width:1000px){
+.cards-container {
+  margin-left: auto;
+  margin-right: auto;
+  grid-template-columns: repeat(1, 1fr);
+}
+}
+
 .card {
   background: white;
   border-radius: 15px;
@@ -125,6 +134,12 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   display: flex;
   gap: 10px;
   align-items: center;
+
+
+}
+
+.card-header .flex{
+  width: 320px;
 }
 
 .card-header hr {

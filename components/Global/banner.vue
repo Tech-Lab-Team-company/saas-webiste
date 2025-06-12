@@ -15,7 +15,7 @@ const allRoutes = ref([
   { name: "المدونة", path: "/blogs" },
   { 
     name: "تفاصيل الكورس", 
-    path: `/course/${route.params.id}`,
+    // path: `/course/${route.params.id}`,
     matcher: (path: string) => {
       const pattern = /^\/course\/([^/]+)$/;
       const match = path.match(pattern);
