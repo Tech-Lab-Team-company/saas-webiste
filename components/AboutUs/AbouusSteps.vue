@@ -66,6 +66,7 @@ const { data: aboutusSteps } = await useAsyncData("AboutSteps", async () => {
         </div>
 
         <div class="aboutus-setps" ref="stepsContainer" :class="{ 'animate': isVisible }">
+          
             <div class="left-stpes">
         
                 <div class="aboutus-circle-steps aboutus-circle-steps-start">

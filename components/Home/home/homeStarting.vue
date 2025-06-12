@@ -54,6 +54,23 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
     return [];
   }
 });
+
+
+
+    const isImage = (url) => {
+        if (!url) return false;
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+        const extension = url.split('.').pop().toLowerCase();
+        return imageExtensions.includes(extension);
+        };
+
+        // Check if URL is a video
+        const isVideo = (url) => {
+        if (!url) return false;
+        const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+        const extension = url.split('.').pop().toLowerCase();
+        return videoExtensions.includes(extension);
+        };
 </script>
 
 
@@ -70,7 +87,13 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
             <div v-if="slide.media.img" class="container">
               <div class="image-container">
                 <BackgoundCircle class="background" />
-                <img :src="slide.media.img" :alt="slide.media.alt" />
+                <!-- <img :src="slide.media.img" :alt="slide.media.alt" /> -->
+                <img  v-if="isImage(slide?.media?.img)"  class="row-img" :src="slide?.media?.img"/>
+                <video v-else-if="isVideo(slide?.media?.img)" class="row-video"  autoplay>
+                    <source :src="slide?.media?.img" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <img  v-else="isImage(slide?.media?.img)"  class="row-img" :src="slide?.media?.img"/>
               </div>
               <div class="details">
                 <div class="title">
@@ -109,3 +132,10 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
   </template>
 
 
+<style scoped>
+.row-video{
+  position: absolute;
+  border-radius: 15px;
+}
+
+</style>
