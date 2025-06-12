@@ -38,8 +38,8 @@ console.log(router.currentRoute.value.params.id)
       </div>
     </Nuxt-link>
     <div v-else-if="exam?.is_finished" class="exam-rate">
-      <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
-      <p class="details">اعرض تفاصيل الامتحان</p>
+      <p class="rating" :class="exam.mark < (exam.exam_mark / 2) ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
+      <p class="details">درجة الامتحان</p>
     </div>
 
 
