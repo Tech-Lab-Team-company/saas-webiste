@@ -132,7 +132,9 @@ margin-top:20px
   align-items: center;
   margin-bottom: 20px;
   padding: 0 20px;
-  width: 100%;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cards-heading {
