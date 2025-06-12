@@ -9,12 +9,15 @@ import StagesTitle from '../Home/home/StagesTitle.vue'
 const splideOptions = {
   perPage: 3,
   gap: "3px",
-  pagination: false,
+  pagination: true,
   perMove: 1,
   arrows: true,
   drag: true,
   cloneStatus: true,
   range: false,
+  loop:true,
+  rewind: true,
+  autoplay: true,
 };
 
 
@@ -31,10 +34,6 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
       "Accept-Language": "ar",
       "web-domain": "hrarabians.org",
     },
-    // body:{
-    //     type:SectionTypeEnum.Blog
-    // }
-
   });
 
   console.log(response.data, "response.data inside blogs")
@@ -45,6 +44,7 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
 </script>
 
 <template>
+
   <div class="Blog" dir="rtl">
     <div class="slider-wrapper pt-md">
 
@@ -59,10 +59,8 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
         </div>
       </div>
 
-      <Splide :options="splideOptions" class="splide-container">
-        <!-- {{ console.log(Blogs) }} -->
+      <Splide  :options="splideOptions" class="splide-container">         
         <SplideSlide v-for="(blog, index) in Blogs" :key="index">
-
           <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
             <img :src="blog.attachments[0].file" alt="Card image" class="course-image"/>
             <div class="card-body">
@@ -94,6 +92,7 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
 .card {
   position: relative;
   transition: transform 0.3s ease-in-out;
+  margin-top: 20px;
 }
 
 .card:hover {

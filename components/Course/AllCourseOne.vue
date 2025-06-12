@@ -90,6 +90,17 @@ const props = defineProps<{
   margin-right: auto;
 }
 
+@media(max-width:768px){
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media(max-width:500px){
+  .cards-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
 .card {
   position: relative;
   background: white;

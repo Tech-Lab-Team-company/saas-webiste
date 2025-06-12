@@ -67,11 +67,17 @@ const droplist = ref(false);
       <div v-if="droplist" class="droplist-menu">
         <ul class="list">
           <NuxtLink to="/login" ><li>تسجيل الدخول</li></NuxtLink>
+          <hr class="hr" />
           <NuxtLink to="/Auth/register" ><li>إنشاء حساب</li></NuxtLink>
+          <hr class="hr" />
           <NuxtLink to="/" ><li>الرئيسية</li></NuxtLink>
+          <hr class="hr" />
           <NuxtLink to="/aboutus" ><li>نبذة عنا</li></NuxtLink>
+          <hr class="hr" />
           <NuxtLink to="/course" ><li>الكورسات</li></NuxtLink>
+          <hr class="hr" />
           <NuxtLink to="/blogs" ><li>المدونة</li></NuxtLink>
+          
         </ul>
       </div>
     </div>
