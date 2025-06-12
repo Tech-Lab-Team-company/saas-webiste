@@ -130,16 +130,30 @@
                     cursor: pointer;
                     padding: 0.75rem;
                     margin-bottom: 0;
+                    &.disabled {
+                        opacity: 0.8;
+                        cursor: not-allowed;
+                    }
                     &:not(:last-child){
                         border-bottom: 1px solid #d9d9d96c;
                     }
-
-                    &:first-child{
-                        color:#D38911;
+                    svg {
+                        path {
+                            stroke: #656B78;
+                        }
                     }
+
+                    //&:first-child{
+                    //    color:#D38911;
+                    //}
             
                     &.active{
                         color:#D38911;
+                        svg {
+                            path {
+                                stroke: #D38911;
+                            }
+                        }
                     }
                 }
 

@@ -48,7 +48,7 @@ watch(() => props.status, (newValue) => {
                 <p class="salary">{{ CardDetails?.CoursePrice }} <span>جنيه</span>  </p>
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher.name }}</p>
-                    <img :src="CardDetails?.Teacher.image.image" >
+                    <img :src="CardDetails?.Teacher.image.img" >
                     <!-- :alt="props.CourseData.Teacher.image.alt" -->
                 </div>
             </div>

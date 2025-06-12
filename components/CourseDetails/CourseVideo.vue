@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import {useUserStore} from "~/stores/user";
+
 const props = defineProps({
   CourseVideoLink: {
     type: Object as () => {
@@ -13,7 +15,6 @@ const props = defineProps({
 
 const CourseVideoLink = ref(props.CourseVideoLink);
 
-
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
   if (link.includes('youtube')) return 'youtube';
@@ -22,39 +23,28 @@ const fileType = computed(() => {
   return 'unknown';
 });
 
-watch(
-    () => props.CourseVideoLink,
-    (newValue) => {
-      CourseVideoLink.value = newValue;
-      if (
-          CourseVideoLink.value &&
-          CourseVideoLink.value.videoLink &&
-          fileType.value === 'youtube'
-      ) {
-        // Only transform if not already in embed format
-        if (!CourseVideoLink.value.videoLink.includes('/embed/')) {
-          const match = CourseVideoLink.value.videoLink.match(/v=([^&]+)/);
-          if (match) {
-            CourseVideoLink.value.videoLink = `https://www.youtube.com/embed/${match[1]}`;
-          }
-        }
-      }
-    },
-    { immediate: true }
-);
+const embedVideoLink = computed(() => {
+  if (fileType.value === 'youtube' && CourseVideoLink.value?.videoLink) {
+    const match = CourseVideoLink.value.videoLink.match(/(?:v=|\/embed\/|\.be\/)([A-Za-z0-9_-]{11})/);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+    return CourseVideoLink.value.videoLink;
+  }
+  return CourseVideoLink.value?.videoLink || '';
+});
 
 const playVideo = ref(false)
 </script>
 
 
 <template>
-  {{CourseVideoLink?.videoLink}}
   <div class="course-video-container">
     <iframe
         v-if="fileType === 'youtube' || fileType === 'pdf'"
         width="100%"
         height="600"
-        :src="CourseVideoLink?.videoLink"
+        :src="embedVideoLink"
         frameborder="0"
         allowfullscreen
     ></iframe>
