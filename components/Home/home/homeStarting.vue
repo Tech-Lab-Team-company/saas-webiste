@@ -42,7 +42,7 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
       method: 'POST',
       headers: {
         'Accept-Language': 'ar',
-        'web-domain': 'hrarabians.com',
+        'web-domain': 'hrarabians.org',
       },
       body: {
         type: 3,

@@ -11,7 +11,7 @@ const { data: fqs } = await useAsyncData("fqs", async () => {
     method: "GET",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.com",
+      "web-domain":"hrarabians.org",
     },
   });
   console.log(response);

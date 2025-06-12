@@ -21,7 +21,7 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
   }>(`${baseUrl}/fetch_web_status`, {
     method: "GET",
     headers: {
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   return response.data;
