@@ -1,29 +1,40 @@
 <script setup lang="ts">
-import {Splide, SplideSlide} from "@splidejs/vue-splide";
-import "@splidejs/vue-splide/css";
-import {baseUrl} from "~/constant/baseUrl";
+import { Splide, SplideSlide } from "@splidejs/vue-splide";
+import "@splidejs/vue-splide/css/skyblue"; // Using skyblue theme for better visibility
+import { ref, onMounted } from 'vue';
+import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
-import {SectionTypeEnum} from "../Home/home/enum/section_type_enum";
 import StagesTitle from '../Home/home/StagesTitle.vue'
 
-const splideOptions = {
+// Make options reactive and better structured
+const splideOptions = ref({
+  type: 'loop',
   perPage: 3,
-  gap: "3px",
-  pagination: true,
+  gap: "1rem", // Increased gap for better visibility
+  pagination: false,
   perMove: 1,
   arrows: true,
   drag: true,
-  cloneStatus: true,
-  range: false,
-  loop:true,
+  dragMinThreshold: 10,
+  direction: 'rtl', // Explicit RTL direction
   rewind: true,
-  autoplay: true,
-};
+  autoWidth: false, // Ensure consistent slide width
+  fixedWidth: false,
+  focus: 'center',
+  trimSpace: false,
+  breakpoints: {
+    1024: {
+      perPage: 2,
+    },
+    768: {
+      perPage: 1,
+    },
+  },
+});
 
+const BlogsData = ref<HomeFirstSection[] | null>(null);
 
-const BlogsData = ref<HomeFirstSection[] | null>(null)
-
-const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
+const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   const response = await $fetch<{
     data: HomeFirstSection[];
     message: string;
@@ -35,31 +46,39 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
       "web-domain": "hrarabians.org",
     },
   });
-
-  console.log(response.data, "response.data inside blogs")
-
   return response.data;
 });
 
+// Ensure slider is properly initialized after mount
+const splideRef = ref();
+
+onMounted(() => {
+  if (splideRef.value && splideRef.value.splide) {
+    splideRef.value.splide.refresh();
+  }
+});
 </script>
 
 <template>
-
+  <div class="main-blog-container">
   <div class="Blog" dir="rtl">
     <div class="slider-wrapper pt-md">
-
       <div class="stage-container">
         <div class="stages student-stages">
-
           <StagesTitle
-              :maintitle="`المدونه`"
-              :title="Blogs?.title"
-              :subtitle="Blogs?.subtitle"
+            :maintitle="`المدونه`"
+            :title="Blogs?.title"
+            :subtitle="Blogs?.subtitle"
           />
         </div>
       </div>
 
-      <Splide  :options="splideOptions" class="splide-container">         
+      <Splide 
+        ref="splideRef"
+        :options="splideOptions" 
+        class="splide-container"
+        v-if="Blogs?.length"
+      >
         <SplideSlide v-for="(blog, index) in Blogs" :key="index">
           <NuxtLink :to="`/blogs/hashtag/${blog.id}`" class="card">
             <img :src="blog.attachments[0].file" alt="Card image" class="course-image"/>
@@ -75,19 +94,19 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
               </div>
               <p class="card-text" v-html="blog.description"></p>
               <div class="card-footer">
-                <P v-html="blog.subtitle"></P>
+                <p v-html="blog.subtitle"></p>
               </div>
             </div>
           </NuxtLink>
-
         </SplideSlide>
       </Splide>
     </div>
   </div>
+  </div>
 </template>
 
-
 <style scoped>
+/* Card styles */
 /* heading */
 .card {
   position: relative;
@@ -110,6 +129,10 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.card-header .flex{
+  width: 350px;
 }
 
 .card-header hr {
@@ -195,6 +218,8 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
   padding-bottom: 30px;
 }
 
+
+
 .splide-slide {
   display: flex;
   flex-direction: column;
@@ -207,7 +232,7 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  height: 100%;
+  height: 90%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -254,7 +279,7 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: calc(var(--line-height) * 2em);
+  /* height: calc(var(--line-height) * 2em); */
   line-height: var(--line-height);
   --line-height: 1.5;
 }
@@ -285,7 +310,8 @@ const {data: Blogs} = await useAsyncData("BlogsHome", async () => {
 /* splide buttons */
 
 .splide__arrow--prev {
-  left: -30px;
+  /* left: -30px; */
+  right: -30px;
 }
 
 .splide__arrow--next {
