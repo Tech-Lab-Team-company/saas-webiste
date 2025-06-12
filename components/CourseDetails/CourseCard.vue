@@ -56,7 +56,6 @@ watch(() => props.status, (newValue) => {
 
             <PaymentDialog 
             :status="status"
-            @updateData="updatedata"
             />
 
         </div>

@@ -22,7 +22,7 @@ const { data: stages } = await useAsyncData("stages", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   return response.data;
@@ -39,7 +39,7 @@ const fetchStageYears = async (stageId: number) => {
     body: { stage_id: stageId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   stageYears.value = response.data;
@@ -57,7 +57,7 @@ const { data:universitiey } = await useAsyncData("universitiey", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
     body: {
       category_id: 2,
@@ -83,7 +83,7 @@ const fetchUniversities = async (typeId: number) => {
     body: { type_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   SelectedEducationTypeId.value = typeId;
@@ -105,7 +105,7 @@ const fetchColleges = async (typeId: number) => {
     body: { university_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   SelectedUniversity.value = typeId;
@@ -126,7 +126,7 @@ const fetchCollegeDepartment = async (typeId: number) => {
     body: { college_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   SelectedCollege.value = typeId;
@@ -147,7 +147,7 @@ const fetchCollegeDepartmentDivision = async (typeId: number) => {
     body: { department_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   SelectedCollegeDepartment.value = typeId;
@@ -168,7 +168,7 @@ const fetchSubjects = async (typeId: number) => {
     body: { category_id: CategryId.value },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.com",
+      "web-domain": "hrarabians.org",
     },
   });
   SelectedCollegeDepartmentDivision.value = typeId;

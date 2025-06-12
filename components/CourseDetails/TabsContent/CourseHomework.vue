@@ -26,8 +26,8 @@ watch(() => props.CourseData, (newValue) => {
 }, { immediate: true });
     
 
-     const activeIndices = ref<number[]>([]);
-        const  activePanels = ref<number[]>([]); 
+   const activeIndices = ref<number[]>([]);
+    const  activePanels = ref<number[]>([]);
     const  SecondactivePanels = ref<number[]>([]); 
     const  thirdactivePanels = ref<number[]>([]); 
     const activetab = ref(1)

@@ -13,7 +13,7 @@ const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () 
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.com",
+      "web-domain":"hrarabians.org",
     },
     body: {
       type: SectionTypeEnum.Course,
