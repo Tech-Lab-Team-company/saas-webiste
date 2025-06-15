@@ -39,8 +39,8 @@ const sendotp =()=>{
    
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
         <img src="../../public/images/logo.png" alt="">
-        <h3>نسيت كلمة المرور</h3>
-        <p>ادخل البريد الالكترونى الذى سوف نرسل اليك كود استرجاع كلمه المرور عليه</p>
+        <h3>{{ $t('نسيت كلمة المرور') }}</h3>
+        <p>{{ $t('ادخل البريد الالكترونى الذى سوف نرسل اليك كود استرجاع كلمه المرور عليه') }}</p>
 
         <div class="inputs inputs-pass forgit-pass">
             <div class="login-input">
@@ -50,7 +50,7 @@ const sendotp =()=>{
             </div>
          
             <div class="btns btns-home" >
-                <button @click="sendotp" class="login-btn">ارسال الكود</button>
+                <button @click="sendotp" class="login-btn">{{ $t('ارسال الكود') }}</button>
             </div>
         </div>
 

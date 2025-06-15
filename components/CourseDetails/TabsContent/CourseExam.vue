@@ -13,6 +13,9 @@ const props = defineProps({
   CourseData: {
     type: Object as () => ExamsModel | null,
     default: null
+  },
+    CourseStatus:{
+    type: Number,
   }
 });
 
@@ -25,6 +28,11 @@ watch(() => props.CourseData, (newValue) => {
 const router = useRouter();
 console.log(router.currentRoute.value.params.id)
 
+const userStore = useUserStore()
+
+const isDisabled = computed(() => {
+  return !userStore.user || props.CourseStatus !== 2;
+});
 </script>
 
 <template>
@@ -32,14 +40,20 @@ console.log(router.currentRoute.value.params.id)
   <div class="course-exam-container" v-for="(exam , index) in CardDetails" :key="index">
 
     <!-- <Nuxt-link  v-if="!(exam?.is_finished)" :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`">  -->
-    <Nuxt-link v-if="!(exam?.is_finished)" :to="`/course/${course_id}/timer?id=${exam.id}`">
+    <Nuxt-link v-if="!(exam?.is_finished)" :to="`/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
+    >
       <div class="btns">
-        <button>ابدأ الامتحان</button>
+        <button
+        :disabled="isDisabled"
+        :class="[
+          props.CourseStatus === 2 ? '' : 'disabled',
+          userStore.user ? '' : 'disabled',
+        ]">{{ $t('ابدأ الامتحان') }}</button>
       </div>
     </Nuxt-link>
     <div v-else-if="exam?.is_finished" class="exam-rate">
       <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
-      <p class="details">اعرض تفاصيل الامتحان</p>
+      <!-- <p class="details">اعرض تفاصيل الامتحان</p> -->
     </div>
 
 
@@ -67,4 +81,9 @@ console.log(router.currentRoute.value.params.id)
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.disabled{
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+</style>

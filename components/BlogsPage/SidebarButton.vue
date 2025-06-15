@@ -23,7 +23,7 @@ watch(
   <!-- sidebar -->
   <div class="sidebar-buttons" dir="rtl">
     <div class="sidebar-page-articles-buttons pt-lg">
-      <h2 class="sidebar-title">الموسوعة</h2>
+      <h2 class="sidebar-title">{{ $t('الموسوعة') }}</h2>
       <div class="grid grid-cols-3 gap-md pt-md hashtags-container">
         <NuxtLink
           v-for="(item, index) in HashtagsContetnt"

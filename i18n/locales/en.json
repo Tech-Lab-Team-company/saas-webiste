@@ -1,0 +1,9 @@
+ {
+  "home": "Home",
+  "login": "Login",
+  "register": "Register",
+  "loginToContinue": "Login to continue",
+  "username": "Username",
+  "password": "Password",
+  "email": "Email"
+}

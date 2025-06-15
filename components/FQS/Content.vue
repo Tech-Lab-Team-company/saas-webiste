@@ -23,7 +23,7 @@ const { data: fqs } = await useAsyncData("fqs", async () => {
 <template>
   <section class="fqs-and-conditions" dir="rtl">
     <div class="container">
-      <h1 class="title"> الاسئلة الشائعة </h1>
+      <h1 class="title"> {{ $t('الاسئلة الشائعة ') }}</h1>
       <hr />
 
       <div v-if="fqs">
@@ -33,7 +33,7 @@ const { data: fqs } = await useAsyncData("fqs", async () => {
         </div>
       </div>
       <div v-else>
-        <p>جاري تحميل الشروط...</p>
+        <p>{{ $t('جاري تحميل الشروط...') }}</p>
       </div>
     </div>
   </section>

@@ -30,7 +30,7 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
 <template>
   <!-- sidebar -->
   <div class="sidebar-articles" dir="rtl" v-if="latestarticles && latestarticles.length">
-    <h2 class="sidebar-title">آخر المقالات</h2>
+    <h2 class="sidebar-title">{{ $t('آخر المقالات') }}</h2>
     <NuxtLink
       :to="`/blogs/${article.slug}`"
       class="sidebar-page-articles-card"

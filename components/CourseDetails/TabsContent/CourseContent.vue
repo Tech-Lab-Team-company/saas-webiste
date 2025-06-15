@@ -23,6 +23,10 @@ const props = defineProps({
   CourseData: {
     type: Object as () => UnitsModel | null,
     default: null
+  },
+  CourseStatus:{
+    type: Number,
+
   }
 });
 
@@ -91,6 +95,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
         :key="index"
         :class="{ 'active': activePanels.includes(index) }"
     >
+   
       <AccordionHeader class="course-content-header ">{{ unit?.title }}</AccordionHeader>
       <AccordionContent class="course-content-body">
         <Accordion value="0" class="course-class-container" v-model:activeIndex="activeIndices"
@@ -107,6 +112,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
               <div class="course-body-details" :key="thirdindex" v-for="(session ,thirdindex) in lesson?.sessions"
                    :class="[
                       userStore.user ? '' : 'disabled',
+                      props.CourseStatus === 2 ? '' : 'disabled',
                       selectedSessionIndex === thirdindex ? 'active' : ''
                     ]"
                    @click="handleSessionClick(thirdindex, session.link, session.title, session.text)">

@@ -61,8 +61,8 @@ const validatePassword = () => {
     <img class="background-circle" src="../../public/images/Component15.png" alt="">
 
     <img src="../../public/images/logo.png" alt="">
-    <h3>كلمه مرور جديده</h3>
-    <p>ادخل كلمه مرور جديده و احرص على ان تكون تحتوى على اكثر من 8 حروف و علامات قويه مثل # @ &</p>
+    <h3>{{ $t('كلمه مرور جديده') }}</h3>
+    <p>{{ $t('ادخل كلمه مرور جديده و احرص على ان تكون تحتوى على اكثر من 8 حروف و علامات قويه مثل # @ &') }}</p>
 
     <div class="inputs inputs-pass">
   
@@ -82,7 +82,7 @@ const validatePassword = () => {
        
     
         <div class="btns btns-home">
-            <button @click="setNewPassword" class="login-btn">تأكيد</button>
+            <button @click="setNewPassword" class="login-btn">{{ $t('تأكيد') }}</button>
         </div>
     
                 

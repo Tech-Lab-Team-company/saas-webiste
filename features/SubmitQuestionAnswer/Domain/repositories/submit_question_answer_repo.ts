@@ -1,5 +1,5 @@
 import { VoteReviewsApiService } from "~/features/VoteReviewFeature/Data/api_services/vote_review_api_service";
-import RepoInterface from "~/base/Domain/Repositories/repo_interface";
+import RepoInterface, { ResponseType } from "~/base/Domain/Repositories/repo_interface";
 import type ServicesInterface from "~/base/Data/ApiService/api_service_interface";
 import {  QuestionsAnswreApiService } from "../../Data/api_services/submit_question_answer_api_services";
 // import UserModel from "../../Data/models/education_stages_model";
@@ -17,6 +17,10 @@ class QuestionAnswerRepo extends RepoInterface<QuestionAnswerModel> {
     }
     return this.instance;
   }
+
+    override get responseType(): ResponseType {
+      return ResponseType.withoutData
+    }
 
 
   onParse(data: any): QuestionAnswerModel {

@@ -34,8 +34,8 @@ const LoginData = ()=>{
     <img class="background-circle" src="../../public/images/Component15.png" alt="">
 
     <img src="../../public/images/logo.png" alt="">
-    <h3>مرحبا بك فى منصتنا التعليمية</h3>
-    <p>تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.</p>
+    <h3>{{ $t('مرحبا بك فى منصتنا التعليمية') }}</h3>
+    <p>{{ $t('تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.') }}</p>
 
     <div class="inputs">
         <div class="login-input">
@@ -48,15 +48,15 @@ const LoginData = ()=>{
         </div>
        
         <div class="login-or">
-            <nuxt-link to="/login/resetpassword"><p>هل نسيت كلمه المرور..؟</p></nuxt-link>
+            <nuxt-link to="/login/resetpassword"><p>{{ $t('هل نسيت كلمه المرور..؟') }}</p></nuxt-link>
             <div class="remember-me">
-                <label for="remember">تذكرنى</label>
+                <label for="remember">{{ $t('تذكرنى') }}</label>
                 <input id="remember" type="checkbox" >
             </div>
         </div>
 
         <div class="btns btns-home">
-            <button class="login-btn" @click="LoginData">تسجيل الدخول</button>
+            <button class="login-btn" @click="LoginData">{{ $t('تسجيل الدخول') }}</button>
         </div>
     
     </div>

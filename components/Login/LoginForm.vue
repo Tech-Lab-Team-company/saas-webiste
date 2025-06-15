@@ -41,7 +41,7 @@ const login = async () => {
     </h1>
     <p class="mb-4">{{ $t("Login_to_access_your_account") }}</p>
     <div class="input-wrapper">
-      <label class="input-label" for="email">Email</label>
+      <label class="input-label" for="email">{{ $t('Email') }}</label>
       <input
         class="input"
         type="email"
@@ -51,7 +51,7 @@ const login = async () => {
       />
     </div>
     <div class="input-wrapper">
-      <label class="input-label" for="password">Password</label>
+      <label class="input-label" for="password">{{ $t('Password') }}</label>
       <input
         class="input"
         type="password"

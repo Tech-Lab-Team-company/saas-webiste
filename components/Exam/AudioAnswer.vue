@@ -210,16 +210,16 @@ const selectAnswer = (index: number) => {
     </form>
 
     <div class="next-btn" v-if="QuestionIndex === 0">
-      <button @click="IncreaseIndex">التالي</button>
+      <button @click="IncreaseIndex">{{ $t('التالي') }}</button>
     </div>
 
     <div class="btns" v-else>
       <button @click="DecreaseIndex">
         <LeftArrowIcon />
-        السابق
+        {{ $t('السابق') }}
       </button>
       <button @click="IncreaseIndex">
-        التالي
+        {{ $t('التالي') }}
         <RightArrowIcon />
       </button>
     </div>

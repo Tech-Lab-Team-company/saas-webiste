@@ -36,7 +36,7 @@
     const router = useRouter()
     console.log(Answer.value , "Answer")
 
-    const sendData= async() =>{
+    const sendData= async(status:string) =>{
         console.log(selected.value[QuestionIndex.value]  )
         const questionAnswerParams = new QuestionAnswerParams(
             Number(router.currentRoute.value.params.exam) , 
@@ -44,7 +44,7 @@
             selected.value[QuestionIndex.value]  
         );
         const questionAnswerController = QuestionAnswerController.getInstance()
-        const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams);
+        const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams , status);
     }
 
     
@@ -52,7 +52,7 @@
     
     const IncreaseIndex = ()=>{
 
-        sendData();
+        sendData('');
         if(selected.value[QuestionIndex.value] == undefined){
             return;
         }
@@ -67,7 +67,7 @@
     
     const EndExam = ()=>{
 
-        sendData();
+        sendData("final");
         if(selected.value[QuestionIndex.value] == undefined){
             return;
         }
@@ -112,21 +112,21 @@
         </form>
 
         <div class="next-btn" v-if="QuestionIndex == 0 && QuestionIndex !=  questionDetails?.questions.length -1">
-            <button @click="IncreaseIndex">التالي </button>
+            <button @click="IncreaseIndex">{{ $t('التالي') }} </button>
         </div>
         
         <div class="btns" v-if="QuestionIndex > 0 && QuestionIndex < questionDetails?.questions.length -1 ">
             <button @click="DeacreseIndes">
                 <LeftArrowIcon />
-                السابق 
+                {{ $t('السابق') }} 
             </button>
             <button @click="IncreaseIndex">
-                التالي 
+                {{ $t('التالي') }} 
                 <RightArrowIcon />
             </button>
         </div>
         <div class="next-btn" v-if="QuestionIndex ==  questionDetails?.questions.length -1">
-            <button @click="EndExam" >إنهاء الامتحان </button>
+            <button @click="EndExam" >{{ $t('إنهاء الامتحان ') }}</button>
         </div>
     </div>
 </template>

@@ -78,7 +78,7 @@ const selectedToggle = ref();
 
   <div class="aa">
     <div class="header-toggle">
-      <p class="cards-heading">{{ CoursesFilter.length }} جميع الكورسات</p>
+      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('جميع الكورسات') }}</p>
       <div class="toggle">
         <div
           :class="['toggle-icon', { active: selectedToggle === 'two' }]"

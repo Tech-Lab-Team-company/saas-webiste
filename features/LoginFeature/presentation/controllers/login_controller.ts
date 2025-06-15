@@ -31,6 +31,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
         await this.LoginUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
+        
           DialogSelector.instance.successDialog.openDialog({
             dialogName: "dialog",
             titleContent: "Login Success",

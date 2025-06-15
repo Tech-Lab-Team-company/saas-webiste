@@ -45,7 +45,7 @@ watch(() => props.status, (newValue) => {
 
             <hr />
             <div class="card-text-footer">
-                <p class="salary">{{ CardDetails?.CoursePrice }} <span>جنيه</span>  </p>
+                <p class="salary">{{ CardDetails?.CoursePrice }} <span>{{ $t('جنيه') }}</span>  </p>
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher.name }}</p>
                     <img :src="CardDetails?.Teacher.image.img" >

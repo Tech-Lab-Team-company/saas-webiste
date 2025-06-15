@@ -82,23 +82,23 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
       <div class="tabs-header">
         <div class="tab-title" v-if="CardData?.homeworks?.length" @click="tab_value = 'homework'" :class="tab_value === 'homework' ? 'active-tab' : ''">
           <homeworkicon/>
-          <p>الواجب المنزلي</p>
+          <p>{{ $t('الواجب المنزلي') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.lives?.length" @click="tab_value = 'live'" :class="tab_value === 'live' ? 'active-tab' : ''">
           <wifiIcon/>
-          <p>بث مباشر </p>
+          <p>{{ $t('بث مباشر ') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.externalLinks?.length" @click="tab_value = 'urls'" :class="tab_value === 'urls' ? 'active-tab' : ''">
           <exterinalurls/>
-          <p>روابط خارجيه </p>
+          <p>{{ $t('روابط خارجيه ') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.exams?.length" @click="tab_value = 'exams'" :class="tab_value === 'exams' ? 'active-tab' : ''">
           <examsicon/>
-          <p>الامتحانات </p>
+          <p>{{ $t('الامتحانات ') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.units" @click="tab_value = 'content'" :class="tab_value === 'content' ? 'active-tab' : ''">
           <ContentIcon/>
-          <p>المحتوى</p>
+          <p>{{ $t('المحتوى ') }}</p>
         </div>
 
 
@@ -110,27 +110,32 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
         <div v-if="tab_value === 'homework'">
           <CourseDetailsTabsContentCourseHomework
               :CourseData="CardData?.homeworks"
+              :CourseStatus="CardData?.allow_status"
           />
         </div>
         <div v-if="tab_value === 'content'">
           <CourseDetailsTabsContentCourseContent
               @coursechanged="Data"
               :CourseData="CardData?.units"
+              :CourseStatus="CardData?.allow_status"
           />
         </div>
         <div v-if="tab_value === 'urls'">
           <CourseDetailsTabsContentCourseUrls
               :CourseData="CardData?.externalLinks"
+              :CourseStatus="CardData?.allow_status"
           />
         </div>
         <div v-if="tab_value === 'live'">
           <CourseDetailsTabsContentCourseLive
               :CourseData="CardData?.lives"
+              :CourseStatus="CardData?.allow_status"
           />
         </div>
         <div v-if="tab_value === 'exams'">
           <CourseDetailsTabsContentCourseExam
               :CourseData="CardData?.exams"
+              :CourseStatus="CardData?.allow_status"
           />
         </div>
       </div>

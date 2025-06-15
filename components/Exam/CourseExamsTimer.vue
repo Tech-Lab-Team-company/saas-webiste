@@ -3,12 +3,28 @@
 const router = useRouter();
 const route = useRoute()
 const examId = route.query.id
+const Starttime = route.query.time
+
+console.log(examId, Starttime , "examId, Starttime")
+
+
+
+const starttime = new Date(Starttime as string); 
+const currentTime = new Date(); 
+const diffInMs = starttime.getTime() - currentTime.getTime();
+
+const diffInSeconds = Math.floor(diffInMs / 1000);
+const hours = Math.floor(diffInSeconds / 3600);
+const minutes = Math.floor((diffInSeconds % 3600) / 60);
+const seconds = diffInSeconds % 60;
+const totalRemainingSeconds = hours * 3600 + minutes * 60 + seconds;
+
 
 setTimeout(() => {
     router.push(`/course/${router.currentRoute.value.params.id}/${examId}`)
-} , 10000)
+} , totalRemainingSeconds)
 
-
+ 
 </script>
 
 <template>

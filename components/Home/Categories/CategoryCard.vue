@@ -57,7 +57,7 @@ console.log("Category type:", props.popularCategory.type);
       />
     </div>
     <h6 class="category-title">{{ popularCategory.name }}</h6>
-    <p class="category-count">{{ popularCategory.place_count }} place</p>
+    <p class="category-count">{{ popularCategory.place_count }} {{ $t('place') }}</p>
   </div>
 </template>
 

@@ -78,9 +78,9 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
     <div class="main-container">
       <ClientOnly>
         <!-- Loading state -->
-        <div v-if="pending" class="loading">جاري التحميل...</div>
+        <div v-if="pending" class="loading">{{ $t('جاري التحميل...') }}</div>
         <!-- Error state -->
-        <div v-else-if="error" class="error">فشل في تحميل السلايدر.</div>
+        <div v-else-if="error" class="error">{{ $t('فشل في تحميل السلايدر.') }}</div>
         <!-- Slider -->
         <swiper-container class="header-home-section" v-else ref="containerRef">
           <swiper-slide v-for="slide in sliders" :key="slide.id">
@@ -116,7 +116,7 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
                   <p class="vid-main-title">{{ slide.title }}</p>
                   <p class="vid-sub-title">{{ slide.subtitle }}</p>
                 </div>
-                <button class="btn btn-primary">ابــــدأ الآن</button>
+                <button class="btn btn-primary">{{ $t('ابــــدأ الآن') }}</button>
               </div>
             </div>
           </swiper-slide>
