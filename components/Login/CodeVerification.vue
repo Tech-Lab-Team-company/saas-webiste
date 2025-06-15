@@ -37,8 +37,8 @@ const CheckCode = ()=>{
  
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
         <img src="../../public/images/logo.png" alt="">
-        <h3>نسيت كلمة المرور</h3>
-        <p class="pass-code">ادخل الكود الذى تم ارساله اليك على بريدك الاكترونى sarael*****@gmail.com</p>
+        <h3>{{  }}</h3>
+        <p class="pass-code">{{ $t(`ادخل الكود الذى تم ارساله اليك على بريدك الاكترونى sarael*****@gmail.com`) }}</p>
 
         <div class="inputs inputs-pass ">
 

@@ -63,7 +63,7 @@ watch(() => props.CourseData, (newValue) => {
         <div  class="live-rate">
             <a :href="live.link" target="_blank">
             <div class="btns">
-                <button>انضم الان</button>
+                <button>{{ $t('انضم الان') }}</button>
             </div>
             </a>
         </div>

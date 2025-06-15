@@ -32,7 +32,7 @@ const cards = [
 <template>
      <!-- sidebar -->
      <div class="sidebar-articles" dir="rtl">
-          <h2 class="sidebar-title">آخر المقالات</h2>
+          <h2 class="sidebar-title">{{ $t('آخر المقالات') }}</h2>
           <div
             class="sidebar-page-articles-card"
             v-for="(card, index) in cards"

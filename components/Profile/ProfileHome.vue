@@ -53,33 +53,32 @@ onMounted(() => {
 <template>
   <div class="profile-home">
     <div class="profile-home-text">
-      <p>البيانات الشخصيه</p>
+      <p>{{ $t('البيانات الشخصيه') }}</p>
       <p>
-        هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين
-        الآخرين
+        {{ $t('هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين الآخرين') }}
       </p>
     </div>
     <hr class="profile-text-hr" />
 
     <div class="profile-home-information">
       <div class="profile-info-container">
-        <label>الاسم بالكامل</label>
+        <label>{{ $t('الاسم بالكامل') }}</label>
         <div class="profile-input-container">
-          <button>تعديل</button>
+          <button>{{ $t('تعديل') }}</button>
           <input type="text" class="input" placeholder=" " v-model="name" />
         </div>
       </div>
       <div class="profile-info-container">
-        <label>البريد الالكتروني</label>
+        <label>{{ $t('البريد الالكتروني') }}</label>
         <div class="profile-input-container">
-          <button>تعديل</button>
+          <button>{{ $t('تعديل') }}</button>
           <input type="text" class="input" placeholder="" v-model="email" />
         </div>
       </div>
       <div class="profile-info-container">
-        <label>رقم الهاتف </label>
+        <label>{{ $t('رقم الهاتف') }}</label>
         <div class="profile-input-container">
-          <button>تعديل</button>
+          <button>{{ $t('تعديل') }}</button>
           <input type="text" class="input" placeholder="" v-model="phone" />
         </div>
       </div>

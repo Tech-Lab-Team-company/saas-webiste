@@ -62,9 +62,9 @@ const showSubCategories = ref<boolean>(false);
           <NuxtImg src="/logo.png" alt="logo" class="logo-img" format="webp" />
         </NuxtLink>
         <div class="links">
-          <NuxtLink class="link" to="/">Home</NuxtLink>
-          <NuxtLink class="link" to="/about-us">About Us</NuxtLink>
-          <NuxtLink class="link" to="/blogs">Blog</NuxtLink>
+          <NuxtLink class="link" to="/">{{ $t('Home') }}</NuxtLink>
+          <NuxtLink class="link" to="/about-us">{{ $t('About Us') }}</NuxtLink>
+          <NuxtLink class="link" to="/blogs">{{ $t('Blog') }}</NuxtLink>
           <div class="dropdown">
             <span class="dropdown-trigger"
               >{{ $t("categories") }}
@@ -147,13 +147,13 @@ const showSubCategories = ref<boolean>(false);
               {{ $t("links") }}
             </span>
             <div class="links-mobile">
-              <NuxtLink class="link" to="/">Home</NuxtLink>
-              <NuxtLink class="link" to="/about-us">About Us</NuxtLink>
-              <NuxtLink class="link" to="/blogs">Blog</NuxtLink>
+              <NuxtLink class="link" to="/">{{ $t('Home') }}</NuxtLink>
+              <NuxtLink class="link" to="/about-us">{{ $t('About Us') }}</NuxtLink>
+              <NuxtLink class="link" to="/blogs">{{ $t('Blog') }}</NuxtLink>
               <Accordion>
                 <AccordionPanel value="0">
                   <AccordionHeader>
-                    <h4 class="accord-title">Categories</h4>
+                    <h4 class="accord-title">{{ $t('Categories') }}</h4>
                   </AccordionHeader>
                   <AccordionContent>
                     <ul class="flex flex-col gap-2">

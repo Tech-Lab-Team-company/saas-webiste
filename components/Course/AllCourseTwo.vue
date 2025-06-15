@@ -38,15 +38,15 @@ const props = defineProps<{
               <div class="card-content">
                 <p class="card-text1" v-if="card.course_videos > 0">
                   <video1 />
-                  فيديو
+                  {{ $t('فيديو') }}
                 </p>
                 <p class="card-text1" v-if="card.course_docs > 0">
                   <note />
-                  ملف ورقي
+                  {{ $t('ملف ورقي') }}
                 </p>
                 <p class="card-text1" v-if="card.course_records > 0">
                   <microphone />
-                  ملف صوتى
+                  {{ $t('ملف صوتى') }}
                 </p>
               </div>
 
@@ -64,7 +64,7 @@ const props = defineProps<{
 
               <div class="card-extra-content">
                 <Arrroww />
-                <p>ابدا الان</p>
+                <p>{{ $t('ابدا الان') }}</p>
               </div>
             </div>
           </div>

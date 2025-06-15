@@ -65,10 +65,10 @@ watch(() => props.CourseData, (newValue) => {
         {{ console.log(CardDetails , "before") }}
         <Accordion value="0" >
             <template #collapseicon>
-                <p class="collapse-text">اعرض تفاصيل الواجب</p>
+                <p class="collapse-text">{{ $t('اعرض تفاصيل الواجب') }}</p>
             </template>
             <template #expandicon>
-                <p class="collapse-text">اعرض تفاصيل الواجب</p>
+                <p class="collapse-text">{{ $t('اعرض تفاصيل الواجب') }}</p>
             </template>
             {{ console.log(CardDetails , "after") }}
             <AccordionPanel expandIcon="title" class="panels" :value="index" v-for="(homework , index) in CardDetails" :key="index">
@@ -102,7 +102,7 @@ watch(() => props.CourseData, (newValue) => {
                         <hr class="homework-left-hr"/>
                     </div>
                     <div class="homework-upload">
-                        <p class="homework-upload-title">ارفق صوره الاجابه</p>
+                        <p class="homework-upload-title">{{ $t('ارفق صوره الاجابه') }}</p>
                         <AddMedia 
                             class="add-media"
                             :index="index"
@@ -111,7 +111,7 @@ watch(() => props.CourseData, (newValue) => {
                         <input type="text" class="notes-input" placeholder="ملاحظات" v-model="notes">
                     </div>
                     <div class="btn-container">
-                        <button class="submit-image" @click="SubmitHomeWork(homework?.id)">ارفق الصوره</button>
+                        <button class="submit-image" @click="SubmitHomeWork(homework?.id)">{{ $t('ارفق الصوره') }}</button>
                     </div>
                 </AccordionContent>
             </AccordionPanel>

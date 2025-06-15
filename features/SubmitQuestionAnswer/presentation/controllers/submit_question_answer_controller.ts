@@ -22,7 +22,7 @@ export default class QuestionAnswerController extends ControllerInterface<Questi
     return this.instance;
   }
 
-  async SubmitQuestionAnswer(params: Params) {
+  async SubmitQuestionAnswer(params: Params , status:string) {
     // useLoaderStore().setLoadingWithDialog();
     try {
       this.setLoading();
@@ -30,23 +30,36 @@ export default class QuestionAnswerController extends ControllerInterface<Questi
         await this.questionAnswerUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        // DialogSelector.instance.successDialog.openDialog({
-        //   dialogName: "dialog",
-        //   titleContent: "Vote Success",
-        //   imageElement: successImage,
-        //   messageContent: null,
-        // });
+
+
+        if(status === "final") {
+            DialogSelector.instance.successDialog.openDialog({
+          dialogName: "dialog",
+          titleContent: "Exam Finished Successfully",
+          imageElement: successImage,
+          messageContent: null,
+        });
+        } else{
+
+          DialogSelector.instance.successDialog.openDialog({
+            dialogName: "dialog",
+            titleContent: "Answer Submitted Successfully",
+            imageElement: successImage,
+            messageContent: null,
+          });
+        }
+
   
       } else {
         throw new Error(this.state.value.error?.title);
       }
     } catch (error: any) {
-      // DialogSelector.instance.errorDialog.openDialog({
-      //   dialogName: "dialog",
-      //   titleContent: error,
-      //   imageElement: errorImage,
-      //   messageContent: null,
-      // });
+      DialogSelector.instance.errorDialog.openDialog({
+        dialogName: "dialog",
+        titleContent: error,
+        imageElement: errorImage,
+        messageContent: null,
+      });
       return this.state;
     }
     return this.state;

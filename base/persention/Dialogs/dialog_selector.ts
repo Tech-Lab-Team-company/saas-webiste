@@ -14,3 +14,5 @@ export default class DialogSelector {
   public successDialog: ShowSuccessDialog = ShowSuccessDialog.Instance
   public errorDialog: ShowSuccessDialog = ShowErrorDialog.Instance
 }
+
+

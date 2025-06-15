@@ -239,13 +239,13 @@ const settingStore = useSettingStore();
           class="btn btn-secondary btn-stages"
           @click="showStages = !showStages; showUniversities = false; CategryId=1"
         >
-          تعليم اساسي
+          {{ $t('تعليم اساسي') }}
         </button>
         <button 
           class="btn btn-secondary btn-stages"
           @click="showUniversities = !showUniversities; showStages = false ;CategryId=2"
         >
-          تعليم جامعي
+          {{ $t('تعليم جامعي') }}
         </button>
       </div>
 

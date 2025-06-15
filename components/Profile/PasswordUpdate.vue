@@ -21,9 +21,9 @@ const changePassword = async () => {
 <template>
   <div class="profile-home">
     <div class="profile-home-text">
-      <p>تغيير كلمة المرور</p>
+      <p>{{ $t('تغيير كلمة المرور') }}</p>
       <p>
-        قم بتغيير كلمة المرور الخاصة بك هنا للحفاظ على حسابك آمناً.
+        {{ $t('قم بتغيير كلمة المرور الخاصة بك هنا للحفاظ على حسابك آمناً.') }}
       </p>
     </div>
 
@@ -32,7 +32,7 @@ const changePassword = async () => {
     <form @submit.prevent="changePassword" class="profile-home-information mt-12">
       
       <div class="profile-info-container">
-        <label class="input-label" for="current_password">كلمة المرور الحالية</label>
+        <label class="input-label" for="current_password">{{ $t('كلمة المرور الحالية') }}</label>
         <div class="profile-input-container">
           <input
             id="current_password"
@@ -45,7 +45,7 @@ const changePassword = async () => {
       </div>
 
       <div class="profile-info-container">
-        <label class="input-label" for="new_password">كلمة المرور الجديدة</label>
+        <label class="input-label" for="new_password">{{ $t('كلمة المرور الجديدة') }}</label>
         <div class="profile-input-container">
           <input
             id="new_password"
@@ -58,7 +58,7 @@ const changePassword = async () => {
       </div>
 
       <div class="profile-info-container">
-        <label class="input-label" for="new_password_confirm">تأكيد كلمة المرور الجديدة</label>
+        <label class="input-label" for="new_password_confirm">{{ $t('تأكيد كلمة المرور الجديدة') }}</label>
         <div class="profile-input-container">
           <input
             id="new_password_confirm"
@@ -77,7 +77,7 @@ const changePassword = async () => {
             aria-label="submit"
             type="submit"
           >
-            حفظ كلمة المرور
+            {{ $t('حفظ كلمة المرور') }}
           </button>
         </div>
       </div>
