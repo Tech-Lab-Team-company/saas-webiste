@@ -44,8 +44,10 @@ watch(() => props.status, (newValue) => {
             </div>
 
             <hr />
+            {{ console.log(CardDetails, "CardDetails")   }}
             <div class="card-text-footer">
-                <p class="salary">{{ CardDetails?.CoursePrice }} <span>{{ $t('جنيه') }}</span>  </p>
+                <p class="salary" v-if="CardDetails?.CoursePrice">{{ CardDetails?.CoursePrice }} <span>{{ $t('جنيه') }}</span>  </p>
+                <p class="salary" v-else>{{ $t('مجانى') }}  </p>
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher.name }}</p>
                     <img :src="CardDetails?.Teacher.image.img" >
