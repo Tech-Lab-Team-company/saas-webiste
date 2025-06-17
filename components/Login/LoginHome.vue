@@ -39,7 +39,7 @@ const router = useRouter();
                     <iphoneIcon />
                     </button>
                 </div>
-                <p class="login-later-btn">{{ $t('التسجيل لاحقا..') }} <span> {{ $t('الدخول كزائر') }}</span></p>
+                <NuxtLink to="/"><p class="login-later-btn">{{ $t('التسجيل لاحقا..') }} <span> {{ $t('الدخول كزائر') }}</span></p></NuxtLink>
             </div>
 
         </div>

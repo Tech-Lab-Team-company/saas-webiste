@@ -108,11 +108,12 @@ function handleSessionClick(index: number, link: string, title: string, text: st
             <AccordionHeader class="course-class-header"> {{ lesson.title }}</AccordionHeader>
 
             <hr class="course-class-hr"/>
+            {{ console.log(CardDetails, "CardDetails") }}
             <AccordionContent class="course-class-body">
               <div class="course-body-details" :key="thirdindex" v-for="(session ,thirdindex) in lesson?.sessions"
                    :class="[
-                      userStore.user ? '' : 'disabled',
-                      props.CourseStatus === 2 ? '' : 'disabled',
+                     (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '', 
+                    (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',
                       selectedSessionIndex === thirdindex ? 'active' : ''
                     ]"
                    @click="handleSessionClick(thirdindex, session.link, session.title, session.text)">

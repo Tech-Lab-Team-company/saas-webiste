@@ -82,6 +82,10 @@ watch(() => props.status, (newValue) => {
     }
 
     .card-video{
+        img{
+
+            height: 100%;
+        }
         @media (max-width:768px) {
            width: 100%;
         }

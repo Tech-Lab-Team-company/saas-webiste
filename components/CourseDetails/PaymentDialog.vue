@@ -35,6 +35,7 @@ const AddPayment = async () => {
   visible.value = false;
 }
 
+const userStore = useUserStore()
 watch(
     () => props.status,
     (newValue) => {
@@ -46,10 +47,11 @@ watch(
 <template>
   <div class="edit-dialog-container">
     <div class="btns">
-      <button @click="visible = true" v-if="status == 0">شراء الكورس</button>
-      <button @click="visible = false" v-if="status == 1" disabled class="btn-disabled">فى انتظار قبول الطلب</button>
-      <button @click="visible = false" v-if="status == 2" disabled class="btn-disabled">تم الشراء</button>
-      <button @click="visible = false" v-if="status == 4" disabled class="btn-disabled">تم رفض الطلب</button>
+      <button @click="visible = true"  v-if="status == 0 && userStore.user">شراء الكورس</button>
+      <button @click="visible = false" v-if="status == 1 && userStore.user" disabled class="btn-disabled">فى انتظار قبول الطلب</button>
+      <button @click="visible = false" v-if="status == 2 && userStore.user" disabled class="btn-disabled">تم الشراء</button>
+      <button @click="visible = false" v-if="status == 4 && userStore.user" disabled class="btn-disabled">تم رفض الطلب</button>
+      <button @click="visible = false" v-if="!userStore.user" disabled class="btn-disabled">يجب تسجيل الدخول</button>
     </div>
     <Dialog v-model:visible="visible" class="dialog" modal :style="{ width: '50rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

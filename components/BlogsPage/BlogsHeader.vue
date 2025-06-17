@@ -74,6 +74,16 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
 
 <style scoped>
+
+.blogs-page-articles-cards {
+  border-radius: 18px;
+  height: auto;
+  padding: 24px;
+  background: #f6f6f6;
+  margin: 5px 10px;
+  width: 95%;
+}
+
 .sidebar-date{
   display: flex;
   align-items: center;
@@ -119,6 +129,10 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   text-align: right;
   color: #000000;
   margin: 0 10px;
+}
+
+.blogs-header .sidebar-page-articles-card{
+  max-width: 500px;
 }
 .blogs-header hr {
   border: 1px solid #ebebeb;
