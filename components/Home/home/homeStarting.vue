@@ -84,16 +84,16 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
         <!-- Slider -->
         <swiper-container class="header-home-section" v-else ref="containerRef">
           <swiper-slide v-for="slide in sliders" :key="slide.id">
-            <div v-if="slide.media.img" class="container">
+            <div v-if="isImage(slide?.media?.img)" class="container">
               <div class="image-container">
                 <BackgoundCircle class="background" />
                 <!-- <img :src="slide.media.img" :alt="slide.media.alt" /> -->
                 <img  v-if="isImage(slide?.media?.img)"  class="row-img" :src="slide?.media?.img"/>
-                <video v-else-if="isVideo(slide?.media?.img)" class="row-video"  autoplay>
+                <!-- <video v-else-if="isVideo(slide?.media?.img)" class="row-video"  autoplay>
                     <source :src="slide?.media?.img" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
-                <img  v-else="isImage(slide?.media?.img)"  class="row-img" :src="slide?.media?.img"/>
+                <img  v-else="isImage(slide?.media?.img)"  class="row-img" :src="slide?.media?.img"/> -->
               </div>
               <div class="details">
                 <div class="title">
@@ -116,7 +116,7 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
                   <p class="vid-main-title">{{ slide.title }}</p>
                   <p class="vid-sub-title">{{ slide.subtitle }}</p>
                 </div>
-                <button class="btn btn-primary">{{ $t('ابــــدأ الآن') }}</button>
+                <!-- <button class="btn btn-primary">{{ $t('ابــــدأ الآن') }}</button> -->
               </div>
             </div>
           </swiper-slide>

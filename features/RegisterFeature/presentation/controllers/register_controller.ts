@@ -31,7 +31,7 @@ export default class RegisterController extends ControllerInterface<UserModel> {
       if (this.isDataSuccess()) {
         DialogSelector.instance.successDialog.openDialog({
           dialogName: "dialog",
-          titleContent: "Login Success",
+          titleContent: " Success",
           imageElement: successImage,
           messageContent: null,
         });

@@ -157,8 +157,9 @@ const Subjects = ref()
 
       <div class="inputs">
         <div class="login-input">
+           <label :class="{'select-placeholder': !studentCategory , 'hidden':studentCategory}">نوع التعليم</label>
           <select class="student-select" v-model="studentCategory">
-            <option value="" disabled selected> نوع التعليم</option>
+            <!-- <option value="" disabled selected> نوع التعليم</option> -->
             <option :value="StudentCategoryEnum.base">اساسى</option>
             <option :value="StudentCategoryEnum.university">جامعى</option>
             <option :value="StudentCategoryEnum.general">عام</option>
@@ -253,6 +254,24 @@ const Subjects = ref()
 </template>
 
 <style scoped>
+
+.hidden{
+  display: none;
+}
+
+.login-input {
+  position: relative;
+}
+
+.select-placeholder {
+  position: absolute;
+  top: 50%;
+  right: 7%;
+  transform: translateY(-50%);
+  color: #909dad;
+  pointer-events: none;
+  transition: 0.2s;
+}
 .pass-forgit {
   background-image: url(../../public//images/background.png);
 }

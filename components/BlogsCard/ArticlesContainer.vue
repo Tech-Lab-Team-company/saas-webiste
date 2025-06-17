@@ -32,6 +32,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
   <div class="blogs-page-articles">
     <div class="container">
       <div class="grid-container">
+        
         <BlogsCardBlogsHeader 
         />
         <BlogsPageSidebar 

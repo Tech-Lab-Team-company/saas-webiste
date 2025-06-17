@@ -21,7 +21,6 @@
 
     .image-container {
       position: relative;
-
       animation: fadein 2s ease-out;
       // animation-iteration-count: infinite;
       transition: all 0.3 linear;
@@ -44,6 +43,10 @@
         width: 500px;
         top: 50%;
         transform: translateY(-50%);
+      }
+
+      .row-video{
+        
       }
     }
 
@@ -114,7 +117,7 @@
 
     .video {
       border-radius: 15px;
-      width: 70%;
+      width: 90%;
       margin: auto;
       overflow: hidden;
       height: 500px;

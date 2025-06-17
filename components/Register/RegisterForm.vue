@@ -151,16 +151,18 @@ watch(
             <callIcon class="login-call-icon" />
           </div>
           <div class="login-input">
+            <label :class="{'select-placeholder': !studentType , 'hidden':studentType}">نوع الطالب</label>
             <select class="student-select" v-model="studentType" required>
-              <option value="" disabled selected>نوع الطالب</option>
+              <!-- <option value="" disabled selected>نوع الطالب</option> -->
               <option :value="GenderEnum.male">ذكر</option>
               <option :value="GenderEnum.female">انثى</option>
             </select>
             <student class="login-call-icon" />
           </div>
           <div class="login-input">
+            <label :class="{'select-placeholder': !Education_Type , 'hidden':Education_Type}">نوع التعليم</label>
             <select class="student-select" v-model="Education_Type" required>
-              <option value="" disabled selected>نوع التعليم</option>
+              <!-- <option value="" disabled selected>نوع التعليم</option> -->
               <option :value="StudentCategoryEnum.base">اساسى</option>
               <option :value="StudentCategoryEnum.university">جامعى</option>
               <option :value="StudentCategoryEnum.general">عام</option>
@@ -203,9 +205,9 @@ watch(
           </div>
   
           <div class="login-input">
-           
+           <label :class="{'select-placeholder': !nationality , 'hidden':nationality}">الجنسيه</label>
             <select class="natioal-select" v-model="nationality" >
-              <option value="" disabled selected>الجنسيه</option>
+              <!-- <option value="" disabled selected>الجنسيه</option> -->
               <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.title }}</option>
             </select>
           </div>
@@ -214,8 +216,9 @@ watch(
               <MapIcon />
             </div>
             <div class="login-input">
+              <label :class="{'select-placeholder': !country , 'hidden':country}">الدوله</label>
               <select class="city-select" v-model="country">
-                <option value="" disabled selected>الدوله</option>
+                <!-- <option value="" disabled selected>الدوله</option> -->
                 <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.title }}</option> 
               </select>
               <city class="login-call-icon" />
@@ -263,8 +266,27 @@ watch(
   </template>
 
 <style scoped>
+.hidden{
+  display: none;
+}
 
-    
+.login-input {
+  position: relative;
+}
+
+.select-placeholder {
+  position: absolute;
+  top: 50%;
+  right: 7%;
+  transform: translateY(-50%);
+  color: #909dad;
+  pointer-events: none;
+  transition: 0.2s;
+}
+
+/*  */
+
+
 .remember-mee {
   display: flex;
   align-items: center;

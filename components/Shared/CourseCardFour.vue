@@ -90,9 +90,9 @@ const splideOptions = {
   <div class="card-course-four">
     <div class="slider-wrapper flex" dir="ltr">
      
-      <h1 class="slider-heading">ماذا قال الطلبه عنا ؟</h1>
+      <h1 class="slider-heading">{{ studentopinionssection?.title }}</h1>
       <p class="slider-paragraph">
-        تعرّف على تجارب الطلاب وآرائهم حول رحلتهم التعليمية معنا
+        {{ studentopinionssection?.description }}
       </p>
 
       <Splide :options="splideOptions" class="splide-container">

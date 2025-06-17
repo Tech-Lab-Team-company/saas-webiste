@@ -111,18 +111,36 @@ const props = defineProps<{
   // align-items: start;
   flex-direction: row;
 }
+@media (max-width: 768px) {
+  .card-inner {
+    flex-direction: column;
+  }  
+}
 .image-container {
   position: relative;
   width: 48%;
-  height: 100%;
+  // height: 100%;
+  max-height: 210px;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
+.image-container img{
+  border-radius: 12px;
+}
+
+@media(max-width: 768px) {
+  .image-container {
+    width: 100%;
+    height: 200px;
+  }
+}
 .card-image {
   width: 100%;
-  height: 95%;
+  // height: fit-content;
+  min-height: 210px;  
 }
 
 .cards-wrapper {
@@ -215,10 +233,17 @@ const props = defineProps<{
   height: calc(var(--line-height) * 3em);
   line-height: var(--line-height);
   --line-height: 1.5;
+  height: 80px;
   * {
     font-size: 1rem;
   }
   // margin: 10px 0;
+}
+@media(max-width: 768px) {
+  .card-text {
+    height: 70px;
+  }
+
 }
 
 .card-footer {
