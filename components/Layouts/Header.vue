@@ -89,7 +89,8 @@ const droplist = ref(false);
       <!-- بعد تسجيل الدخول -->
       <div class="buttons" v-else>
         <NuxtLink to="/profile" class="user-info" v-if="userStore.user">
-          <img :src="userStore.image || ''" alt="User Image" class="user-avatar" />
+          <img v-if="userStore.image" :src="userStore.image || ''" alt="User Image" class="user-avatar" />
+          <img v-else src="../../public/images/profile.png" alt="User Image" class="user-avatar" />
           <span class="user-name">{{ userStore.user.name }}</span>
         </NuxtLink>
 
@@ -106,7 +107,7 @@ const droplist = ref(false);
         <NuxtLink :to="`/${locale}/aboutus`" exactActiveClass="active" class="nav-link"><li>نبذه عنا</li></NuxtLink>
         <NuxtLink :to="`/${locale}`" exactActiveClass="active" class="nav-link"><li>الرئيسيه</li></NuxtLink>
       </ul>
-      <NuxtLink to="/" class="logo">
+      <NuxtLink :to="`/${locale}`" class="logo">
         <!-- <Logo /> -->
         <!-- setting?.image?.img-->
                <!-- <pre>Image path: {{ settingStore.setting?.image?.img }}</pre> -->
