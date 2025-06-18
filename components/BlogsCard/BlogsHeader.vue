@@ -31,6 +31,8 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 </script>
 <template>
 
+  
+
   <div class="blogs-page-articles-cards" dir="rtl">
     <div class="Blog">
       <div class="cards-container">
@@ -48,7 +50,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
           <div class="card-body">
             <div class="card-header">
               <hr />
-              <div class="flex">
+              <div class="flex card-header-text">
                 <h5 class="card-title" v-html="card.title"></h5>
                 <div class="card-date">
                   <p>{{ card.date }}</p>
@@ -66,7 +68,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped >
 .blogs-page-articles-cards {
   border-radius: 18px;
   height: auto;
@@ -142,6 +144,22 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   width: 320px;
 }
 
+@media(max-width:768px){
+  .card-header .flex{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+}
+@media(max-width:768px){
+  .card-header .flex .card-title{
+    width: 100%;
+  }
+
+}
+
+
 .card-header hr {
   width: 41px;
   height: 3px;
@@ -186,6 +204,13 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 
 .card-date {
   width: 40%;
+}
+
+@media(max-width:768px){
+.card-date {  
+    width: 100%;
+  }
+
 }
 
 .card-date p {

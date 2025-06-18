@@ -38,9 +38,9 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
         <div class="stages student-stages">
             
             <StagesTitle 
-                :maintitle="homefirstsection?.description"  
-                :title="homefirstsection?.title"
-                :subtitle="homefirstsection?.subtitle"
+                :maintitle="homefirstsection?.title"  
+                :title="homefirstsection?.subtitle"
+                :subtitle="homefirstsection?.description"
                 />
         </div>
     </div>
