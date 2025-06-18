@@ -44,7 +44,7 @@ UserSettingStore.setSetting(webStatus.value!);
     <NuxtLayout>
       <NuxtPage />
       <MainDialog v-if="!pending" />
-      <LoaderDialog  v-if="!pending"/>
+      <!--  <LoaderDialog  v-if="!pending"/> -->
     </NuxtLayout>
   </div>
 </template>
