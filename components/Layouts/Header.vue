@@ -33,7 +33,7 @@ const handleLogout = () => {
   localStorage.removeItem("user");          
   userStore.logout();                     
   isLoggedIn.value = false; 
-  router.push("/");
+  router.push(`/${locale.value}`); // Redirect to the home page after logout
 
 };
 

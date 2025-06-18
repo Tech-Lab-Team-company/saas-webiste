@@ -6,7 +6,7 @@
     import AutoComplete from 'primevue/autocomplete';
 
     import { ref } from "vue";
-
+const { locale } = useI18n()
     const value = ref(null);
     const items = ref(['ar' , 'en']);
 
@@ -43,8 +43,8 @@
   
         <div class="auth-info-container" 
             :class="[
-                route.path == '/Auth/register' || route.path == '/auth/register' ? 'active' : '',
-                route.path == '/Auth/varifyotp'   || route.path == '/Auth/categories' ||  route.path == '/Auth/education' ? 'entered' : '',
+                route.path == `/${locale}/Auth/register` || route.path == `/${locale}/auth/register` ? 'active' : '',
+                route.path == `/${locale}/Auth/varifyotp`   || route.path == `/${locale}/Auth/categories` ||  route.path == `/${locale}/Auth/education` ? 'entered' : '',
             ]">
 
             <div class="auth-text">
@@ -56,8 +56,8 @@
         
         <div class="auth-info-container" 
             :class="[
-                route.path === '/Auth/varifyotp' ? 'active' : '',
-                route.path === '/Auth/education' || route.path === '/Auth/categories' ? 'entered' : '' ,
+                route.path === `/${locale}/Auth/varifyotp` ? 'active' : '',
+                route.path === `/${locale}/Auth/education` || route.path === `/${locale}/Auth/categories` ? 'entered' : '' ,
             ]"
         >
         
@@ -69,8 +69,8 @@
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === '/Auth/education' ? 'active' : '',
-                route.path === '/Auth/categories' ? 'entered' : '',
+                route.path === `/${locale}/Auth/education` ? 'active' : '',
+                route.path === `/${locale}/Auth/categories` ? 'entered' : '',
             ]">
             
             <div class="auth-text">
@@ -81,7 +81,7 @@
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === '/Auth/categories' ? 'active' : '',
+                route.path === `/${locale}/Auth/categories` ? 'active' : '',
             ]">
 
             <div class="auth-text">

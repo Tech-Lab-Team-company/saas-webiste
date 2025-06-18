@@ -4,6 +4,8 @@ import { baseUrl } from "~/constant/baseUrl";
 
 const router = useRouter();
 
+const { locale } = useI18n()
+
 // Fetch blog data
 const { data: blogscard } = await useAsyncData("blogscard", async () => {
   try {
@@ -30,16 +32,13 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 });
 </script>
 <template>
-
-  
-
   <div class="blogs-page-articles-cards" dir="rtl">
     <div class="Blog">
       <div class="cards-container">
         <NuxtLink
           v-for="(card, index) in blogscard"
           :key="index"
-          :to="`/blogs/${card.slug}`"
+          :to="`/${locale}/blogs/${card.slug}`"
           class="card"
         >
         <img

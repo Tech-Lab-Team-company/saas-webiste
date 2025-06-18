@@ -39,8 +39,8 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
             
             <StagesTitle 
                 :maintitle="homefirstsection?.title"  
-                :title="homefirstsection?.subtitle"
-                :subtitle="homefirstsection?.description"
+                :title="homefirstsection?.description"
+                :subtitle="homefirstsection?.subtitle"
                 />
         </div>
     </div>
