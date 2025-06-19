@@ -15,7 +15,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": getWebDomain,
+        "web-domain": getWebDomain(),
       },
     });
     console.log(response);

@@ -26,7 +26,7 @@ const { data: studentopinionssection } = await useAsyncData("studentopinionssect
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
     body: {
       type: SectionTypeEnum.StudentOpinions,

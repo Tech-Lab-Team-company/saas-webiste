@@ -21,7 +21,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
     body:{
         type:SectionTypeEnum.Media

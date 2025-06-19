@@ -16,7 +16,7 @@ import Arrrow from "@/public/icons/Arrrow.vue";
 //     method: "POST",
 //     headers: {
 //       "Accept-Language": "ar",
-//       "web-domain": getWebDomain,
+//       "web-domain": getWebDomain(),
 //     },
 //     body: {
 //       type: SectionTypeEnum.Course,

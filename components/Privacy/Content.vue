@@ -12,7 +12,7 @@ const { data: privacy } = await useAsyncData("privacy", async () => {
     method: "GET",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
   });
   // console.log(response);

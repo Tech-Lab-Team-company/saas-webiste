@@ -20,7 +20,7 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
     body: {
       type: SectionTypeEnum.GraduationParty,

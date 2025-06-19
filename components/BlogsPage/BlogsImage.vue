@@ -13,7 +13,7 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": getWebDomain,
+        "web-domain": getWebDomain(),
       },
       body: { slug: useRoute().params.slug },
     });

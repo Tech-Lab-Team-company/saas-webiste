@@ -20,7 +20,7 @@ const { data: aboutusOpinions } = await useAsyncData("AboutOpinions", async () =
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
     body: {
       type:SectionTypeEnum.Opinions, 

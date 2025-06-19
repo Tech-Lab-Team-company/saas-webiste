@@ -40,7 +40,7 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
 
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
       Authorization: `Bearer 56|WiITQt5rnt3hYXXz3lGWkhUV79lUmkPn8gq5xWDlf072a567`,
       "content-type": "application/json",
     },

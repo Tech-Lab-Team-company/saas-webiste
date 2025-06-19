@@ -44,7 +44,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
   });
   return response.data;

@@ -44,7 +44,7 @@ const { data: aboutusSteps } = await useAsyncData("AboutSteps", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
     body: {
       type:SectionTypeEnum.AboutSteps, 

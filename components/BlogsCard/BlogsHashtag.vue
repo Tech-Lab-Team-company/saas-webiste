@@ -14,7 +14,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": getWebDomain,
+        "web-domain": getWebDomain(),
       },
       body: { hashtag_id: useRoute().params.hashtagId },
     });

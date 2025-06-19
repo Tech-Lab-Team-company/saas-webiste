@@ -22,7 +22,7 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
   }>(`${baseUrl}/fetch_web_status`, {
     method: "GET",
     headers: {
-      "web-domain": getWebDomain,
+      "web-domain": getWebDomain(),
     },
   });
   return response.data;
