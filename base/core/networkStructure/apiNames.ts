@@ -138,7 +138,7 @@ class ApiNames {
   
   
   //Courses
-  public fetch_courses = "fetch_courses";
+  public fetch_courses = "fetch_my_courses";
 
 
   

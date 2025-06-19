@@ -18,6 +18,7 @@ class LoginApiService extends ServicesInterface {
 
   async applyService(params: Params): Promise<{ data: any; statusCode: number }> {
     console.log(CrudType.POST)
+    console.log(params , 'params in LoginApiService')
     return await super.call({
       url: ApiNames.Instance.login,
       type: CrudType.POST,
