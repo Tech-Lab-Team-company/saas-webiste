@@ -80,7 +80,6 @@ onMounted(() => {
         class="splide-container"
         v-if="Blogs?.length"
       >
-      {{ console.log(Blogs , "Blogs data") }}
         <SplideSlide v-for="(blog, index) in Blogs" :key="index">
           <NuxtLink :to="`/blogs/${blog.slug}`" class="card">
             <img :src="blog.attachments[0].file" alt="Card image" class="course-image"/>

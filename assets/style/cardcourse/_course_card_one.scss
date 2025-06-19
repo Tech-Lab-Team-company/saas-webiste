@@ -66,21 +66,41 @@
     .card-title {
       font-weight: 700;
       font-size: 20px;
-      line-height: 30px;
-      text-align: right;
+      text-align: start;
       margin: 0;
-      font-family: "bold";
+      font-family: "bold", serif;
+      color: #032855;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: calc(var(--line-height) * 2em);
+      line-height: var(--line-height);
+      --line-height: 1.5;
     }
 
     .card-text {
       font-weight: 400;
-      font-size: 18px;
-      line-height: 150%;
-      text-align: right;
+      font-size: 0.9rem;
+      text-align: start;
       color: #656b78;
       margin: 10px 0;
       border-bottom: 1px solid #656b78;
-      font-family: "regular";
+      font-family: "regular", serif;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: calc(var(--line-height) * 4em);
+      line-height: var(--line-height);
+      --line-height: 1.5;
+      * {
+        font-size: 0.9rem;
+        font-family: "regular", serif;
+        font-weight: 400;
+      }
     }
 
     .card-footer {

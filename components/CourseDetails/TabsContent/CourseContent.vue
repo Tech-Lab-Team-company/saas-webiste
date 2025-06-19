@@ -12,10 +12,10 @@ import AccordionContent from 'primevue/accordioncontent';
 import CourseVideoIcon from '~/public/icons/CourseVideoIcon.vue';
 import coursenotesicon from '~/public/icons/coursenotesicon.vue';
 import microphoneicon from '~/public/icons/microphoneicon.vue';
-import bookicon from '~/public/icons/bookicon.vue';
+// import bookicon from '~/public/icons/bookicon.vue';
 
 
-import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+// import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
 import {useUserStore} from "~/stores/user";
 
@@ -108,7 +108,6 @@ function handleSessionClick(index: number, link: string, title: string, text: st
             <AccordionHeader class="course-class-header"> {{ lesson.title }}</AccordionHeader>
 
             <hr class="course-class-hr"/>
-            {{ console.log(CardDetails, "CardDetails") }}
             <AccordionContent class="course-class-body">
               <div class="course-body-details" :key="thirdindex" v-for="(session ,thirdindex) in lesson?.sessions"
                    :class="[

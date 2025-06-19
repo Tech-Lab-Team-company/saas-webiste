@@ -44,8 +44,6 @@ const droplist = ref(false);
 
 </script>
 <template>
-  {{ console.log(settingStore.setting  , "settingStore.setting ") }}
-  {{ console.log(userStore.user  , "userStore.user ") }}
   <header class="header">
     <div class="header-nav">
       <p class="header-title">👋 هل تريد معرفة المزيد عنا ! .. دعني اوضح لك</p>
