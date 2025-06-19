@@ -6,7 +6,7 @@
 <template>
   <div class="course-page">
     <CourseAllCourse class="course-page-content"  />
-    <GlobalSecondbanner  />
+    <!-- <GlobalSecondbanner  /> -->
 
   </div>
 </template>
