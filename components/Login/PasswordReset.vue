@@ -27,6 +27,7 @@ const sendotp =()=>{
     sentCodeController.sentCode(restpassparams,router);
 }
 
+const UserSettingStore = useSettingStore();
 </script>
 
 
@@ -38,7 +39,7 @@ const sendotp =()=>{
     <div class="login-form">
    
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
-        <img src="../../public/images/logo.png" alt="">
+        <img :src="UserSettingStore.setting.image.img" width="150px" alt="logo">
         <h3>{{ $t('نسيت كلمة المرور') }}</h3>
         <p>{{ $t('ادخل البريد الالكترونى الذى سوف نرسل اليك كود استرجاع كلمه المرور عليه') }}</p>
 

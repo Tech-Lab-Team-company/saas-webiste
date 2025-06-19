@@ -43,8 +43,8 @@ const { locale } = useI18n()
   
         <div class="auth-info-container" 
             :class="[
-                route.path == `/${locale}/Auth/register` || route.path == `/${locale}/auth/register` ? 'active' : '',
-                route.path == `/${locale}/Auth/varifyotp`   || route.path == `/${locale}/Auth/categories` ||  route.path == `/${locale}/Auth/education` ? 'entered' : '',
+                route.path == `/Auth/register` || route.path == `/auth/register` ? 'active' : '',
+                route.path == `/Auth/varifyotp`   || route.path == `/Auth/categories` ||  route.path == `/Auth/education` ? 'entered' : '',
             ]">
 
             <div class="auth-text">
@@ -56,8 +56,8 @@ const { locale } = useI18n()
         
         <div class="auth-info-container" 
             :class="[
-                route.path === `/${locale}/Auth/varifyotp` ? 'active' : '',
-                route.path === `/${locale}/Auth/education` || route.path === `/${locale}/Auth/categories` ? 'entered' : '' ,
+                route.path === `/Auth/varifyotp` ? 'active' : '',
+                route.path === `/Auth/education` || route.path === `/Auth/categories` ? 'entered' : '' ,
             ]"
         >
         
@@ -69,8 +69,8 @@ const { locale } = useI18n()
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === `/${locale}/Auth/education` ? 'active' : '',
-                route.path === `/${locale}/Auth/categories` ? 'entered' : '',
+                route.path === `/Auth/education` ? 'active' : '',
+                route.path === `/Auth/categories` ? 'entered' : '',
             ]">
             
             <div class="auth-text">
@@ -81,7 +81,7 @@ const { locale } = useI18n()
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === `/${locale}/Auth/categories` ? 'active' : '',
+                route.path === `/Auth/categories` ? 'active' : '',
             ]">
 
             <div class="auth-text">

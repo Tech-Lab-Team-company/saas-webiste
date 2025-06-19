@@ -14,6 +14,8 @@ const login = async () => {
       new LoginParams(email.value, password.value), router
   );
 };
+
+
 </script>
 
 <template>

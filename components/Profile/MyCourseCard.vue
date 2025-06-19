@@ -197,6 +197,7 @@ watch(
   width: 100%;
   justify-items: center;
   align-items: center;
+  direction: rtl;
 }
 
 .card {

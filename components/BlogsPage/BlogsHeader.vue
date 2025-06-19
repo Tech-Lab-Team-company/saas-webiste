@@ -50,7 +50,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
           <div class="blog-name-icon">
             <!-- إذا كنت ترغب في إضافة المزيد من الأيقونات هنا -->
             <!-- <component :is="card.icon1" class="sidebar-icon" /> -->
-            <p class="sidebar-date">{{ $t('التاريخ') }}</p>
+            <p class="sidebar-date">{{ $t('date') }}</p>
           </div>
           <p class="sidebar-text">{{ blogdetails.date }}</p>
         </div>

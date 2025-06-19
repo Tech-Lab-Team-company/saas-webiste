@@ -21,6 +21,7 @@ const LoginData = ()=>{
     loginController.login(loginParams,router);
 }
 
+const UserSettingStore = useSettingStore();
 
 </script>
 
@@ -33,7 +34,7 @@ const LoginData = ()=>{
 <div class="login-form">
     <img class="background-circle" src="../../public/images/Component15.png" alt="">
 
-    <img src="../../public/images/logo.png" alt="">
+    <img :src="UserSettingStore.setting.image.img" width="150px" alt="logo">
     <h3>{{ $t('مرحبا بك فى منصتنا التعليمية') }}</h3>
     <p>{{ $t('تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.') }}</p>
 

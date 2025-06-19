@@ -31,7 +31,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   <!-- sidebarone -->
   <div class="sidebarone-buttons" dir="rtl" v-if="blogdetails?.hashtags?.length">
     <div class="sidebarone-page-articles-buttons pt-lg">
-      <h2 class="sidebarone-title">{{ $t('الموسوعة') }}</h2>
+      <h2 class="sidebarone-title">{{ $t('encyclopedia') }}</h2>
       <div class="sidebarone-page-buttons gap-md pt-md">
         <Nuxt-link 
         v-for="tag in blogdetails.hashtags"

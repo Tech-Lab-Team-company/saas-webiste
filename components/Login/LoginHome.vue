@@ -1,10 +1,10 @@
     
 <script lang="ts" setup>
-import googleIcon from '../../public/icons/googleIcon.vue'; 
-import iphoneIcon from '../../public/icons/iphoneIcon.vue'; 
-import { ref } from "vue";
+// import googleIcon from '../../public/icons/googleIcon.vue';
+// import iphoneIcon from '../../public/icons/iphoneIcon.vue';
+// import { ref } from "vue";
 
-const router = useRouter();
+// const router = useRouter();
 
 const UserSettingStore = useSettingStore();
 

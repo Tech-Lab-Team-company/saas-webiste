@@ -33,7 +33,7 @@ const handleLogout = () => {
   localStorage.removeItem("user");          
   userStore.logout();                     
   isLoggedIn.value = false; 
-  router.push(`/${locale.value}`); // Redirect to the home page after logout
+  router.push(`/`); // Redirect to the home page after logout
 
 };
 
@@ -61,13 +61,13 @@ const droplist = ref(false);
           <hr class="hr" />
           <NuxtLink to="/Auth/register" ><li>إنشاء حساب</li></NuxtLink>
           <hr class="hr" />
-          <NuxtLink :to="`/${locale}`" ><li>الرئيسية</li></NuxtLink>
+          <NuxtLink to="/"><li>الرئيسية</li></NuxtLink>
           <hr class="hr" />
-          <NuxtLink :to="`/${locale}/aboutus`" ><li>نبذة عنا</li></NuxtLink>
+          <NuxtLink to="/aboutus" ><li>نبذة عنا</li></NuxtLink>
           <hr class="hr" />
-          <NuxtLink :to="`/${locale}/course`" ><li>الكورسات</li></NuxtLink>
+          <NuxtLink to="/course" ><li>الكورسات</li></NuxtLink>
           <hr class="hr" />
-          <NuxtLink :to="`/${locale}/blogs`" ><li>المدونة</li></NuxtLink>
+          <NuxtLink to="/blogs" ><li>المدونة</li></NuxtLink>
           
         </ul>
       </div>
@@ -99,13 +99,13 @@ const droplist = ref(false);
 
       <!-- روابط التنقل -->
       <ul class="nav-links">
-        <NuxtLink :to="`/${locale}/blogs`" exactActiveClass="active" class="nav-link"><li>المدونه</li></NuxtLink>
+        <NuxtLink to="/blogs" exactActiveClass="active" class="nav-link"><li>المدونه</li></NuxtLink>
         <!-- <NuxtLink to="/questions" exactActiveClass="active" class="nav-link"><li>بنك الاسئله</li></NuxtLink> -->
-        <NuxtLink :to="`/${locale}/course`" exactActiveClass="active" class="nav-link"><li>الكورسات</li></NuxtLink>
-        <NuxtLink :to="`/${locale}/aboutus`" exactActiveClass="active" class="nav-link"><li>نبذه عنا</li></NuxtLink>
-        <NuxtLink :to="`/${locale}`" exactActiveClass="active" class="nav-link"><li>الرئيسيه</li></NuxtLink>
+        <NuxtLink to="/course" exactActiveClass="active" class="nav-link"><li>الكورسات</li></NuxtLink>
+        <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link"><li>نبذه عنا</li></NuxtLink>
+        <NuxtLink to="/" exactActiveClass="active" class="nav-link"><li>الرئيسيه</li></NuxtLink>
       </ul>
-      <NuxtLink :to="`/${locale}`" class="logo">
+      <NuxtLink to="/" class="logo">
         <!-- <Logo /> -->
         <!-- setting?.image?.img-->
                <!-- <pre>Image path: {{ settingStore.setting?.image?.img }}</pre> -->

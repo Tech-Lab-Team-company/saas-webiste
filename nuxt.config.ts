@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     }
   },
   i18n: {
+    strategy: 'no_prefix',
     locales: [
       {
         code: "ar",
@@ -37,9 +38,10 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
-      redirectOn: 'root',
+      // redirectOn: 'root',
+      redirectOn: false, // disables root redirect
       fallbackLocale: 'ar',
-      alwaysRedirect: true,
+      alwaysRedirect: false,
     },
   },
   css: [
