@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type Terms from "~/types/terms";
 import { baseUrl } from "~/constant/baseUrl";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: terms } = await useAsyncData("terms", async () => {
   const response = await $fetch<{
@@ -11,7 +12,7 @@ const { data: terms } = await useAsyncData("terms", async () => {
     method: "GET",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   console.log(response);

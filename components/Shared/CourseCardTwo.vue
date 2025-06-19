@@ -2,9 +2,10 @@
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import Arrrow from "@/public/icons/Arrrow.vue";
-import { baseUrl } from "~/constant/baseUrl";
-import type HomeFirstSection from "~/types/home_first_section";
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+// import getWebDomain from "~/constant/webDomain";
+// import { baseUrl } from "~/constant/baseUrl";
+// import type HomeFirstSection from "~/types/home_first_section";
+// import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 
 // const { data: HomeSections } = await useAsyncData("SecondHomeSections", async () => {
 //   const response = await $fetch<{
@@ -15,7 +16,7 @@ import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 //     method: "POST",
 //     headers: {
 //       "Accept-Language": "ar",
-//       "web-domain":"hrarabians.org",
+//       "web-domain": getWebDomain,
 //     },
 //     body: {
 //       type: SectionTypeEnum.Course,

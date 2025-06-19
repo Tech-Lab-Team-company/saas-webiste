@@ -6,6 +6,7 @@ import Logout from "~/public/icons/Logout.vue";
 import CoursesNote from "~/public/icons/CoursesNote.vue";
 import EditImageIcon from "~/public/icons/EditImageIcon.vue";
 import type ProfileImage from "~/types/profileimage";
+import {getWebDomain} from "~/constant/webDomain";
 
 const SelectedOption = ref("");
 
@@ -39,7 +40,7 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
 
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
       Authorization: `Bearer 56|WiITQt5rnt3hYXXz3lGWkhUV79lUmkPn8gq5xWDlf072a567`,
       "content-type": "application/json",
     },

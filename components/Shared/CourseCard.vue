@@ -3,6 +3,7 @@
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () => {
   const response = await $fetch<{
@@ -13,7 +14,7 @@ const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () 
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       type: SectionTypeEnum.Course,

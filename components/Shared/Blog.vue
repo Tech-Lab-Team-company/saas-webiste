@@ -5,6 +5,7 @@ import { ref, onMounted } from 'vue';
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import StagesTitle from '../Home/home/StagesTitle.vue'
+import {getWebDomain} from "~/constant/webDomain";
 
 // Make options reactive and better structured
 const splideOptions = ref({
@@ -43,7 +44,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   return response.data;

@@ -5,7 +5,8 @@ import EducationStages from './EducationStages.vue';
 import Students from './Students.vue';
 import { baseUrl } from '~/constant/baseUrl';
 import type { SwiperHome } from '~/types/swiperhome';
-import { register } from 'swiper/element/bundle'; // For web components
+import { register } from 'swiper/element/bundle';
+import {getWebDomain} from "~/constant/webDomain"; // For web components
 
 const containerRef = ref<HTMLElement | null>(null);
 const swiper_position = ref('next');
@@ -42,7 +43,7 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
       method: 'POST',
       headers: {
         'Accept-Language': 'ar',
-        'web-domain': 'hrarabians.org',
+        'web-domain': getWebDomain,
       },
       body: {
         type: 3,

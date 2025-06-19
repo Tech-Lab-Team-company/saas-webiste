@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type BlogsImage from "~/types/blogsimage";
-import { baseUrl } from "~/constant/baseUrl";
+// import { baseUrl } from "~/constant/baseUrl";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
   try {
@@ -12,7 +13,7 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": "hrarabians.org",
+        "web-domain": getWebDomain,
       },
       body: { slug: useRoute().params.slug },
     });

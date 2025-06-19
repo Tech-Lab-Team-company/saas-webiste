@@ -7,6 +7,7 @@ import type Terms from "~/types/terms";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from './enum/section_type_enum';
+import {getWebDomain} from "~/constant/webDomain";
 
 const containerRef = ref(null)
 
@@ -20,7 +21,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body:{
         type:SectionTypeEnum.Media

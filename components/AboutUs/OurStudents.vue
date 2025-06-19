@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import person1 from "@/public/images/person1.png";
+// import person1 from "@/public/images/person1.png";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import QuoteIcone from "~/public/icons/quoteIcone.vue";
 import { baseUrl,DashboradbaseUrl } from "~/constant/baseUrl";
-import type { StudentsOpinionInterface } from "~/types/student_opinions";
+// import type { StudentsOpinionInterface } from "~/types/student_opinions";
 
 import type AboutUsInterface from '~/types/about_us_interface';
 import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
+import {getWebDomain} from "~/constant/webDomain";
 
 
 const { data: aboutusOpinions } = await useAsyncData("AboutOpinions", async () => {
@@ -19,7 +20,7 @@ const { data: aboutusOpinions } = await useAsyncData("AboutOpinions", async () =
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       type:SectionTypeEnum.Opinions, 

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
-import microphone from "@/public/icons/microphone.vue";
-import note from "@/public/icons/note.vue";
-import video1 from "~/public/icons/video1.vue";
+// import microphone from "@/public/icons/microphone.vue";
+// import note from "@/public/icons/note.vue";
+// import video1 from "~/public/icons/video1.vue";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import SquareIcon from "~/public/icons/squareIcon.vue";
+import {getWebDomain} from "~/constant/webDomain";
 
 
 const { data: GraduationParty } = await useAsyncData("GraduationParty", async () => {
@@ -19,7 +20,7 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       type: SectionTypeEnum.GraduationParty,

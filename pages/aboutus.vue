@@ -4,6 +4,7 @@ import type AboutUsInterface from '~/types/about_us_interface';
 import { baseUrl, DashboradbaseUrl } from "~/constant/baseUrl";
 import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
 import CourseCardFour from '~/components/Shared/CourseCardFour.vue';
+import {getWebDomain} from "~/constant/webDomain";
 
 
 const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async () => {
@@ -16,7 +17,7 @@ const { data: aboutusstatistics } = await useAsyncData("AboutUsSections", async 
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       type:SectionTypeEnum.AboutStatistics, 

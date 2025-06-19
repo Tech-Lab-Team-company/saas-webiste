@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type Privacy from "~/types/privacy";
 import { baseUrl } from "~/constant/baseUrl";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: privacy } = await useAsyncData("privacy", async () => {
   const response = await $fetch<{
@@ -11,10 +12,10 @@ const { data: privacy } = await useAsyncData("privacy", async () => {
     method: "GET",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
-  console.log(response);
+  // console.log(response);
 
   return response.data;
 });

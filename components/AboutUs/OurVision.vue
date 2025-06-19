@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
 import Arrow from '@/public/icons/arrow.vue';
 import BgCircieIcon from '~/public/icons/BgCircieIcon.vue';
 import {DashboradbaseUrl ,baseUrl} from "~/constant/baseUrl";
 import type AboutUsInterface from '~/types/about_us_interface';
 import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
+import {getWebDomain} from "~/constant/webDomain";
 
 
 const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => {
@@ -16,7 +16,7 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       type:SectionTypeEnum.AboutVision, 

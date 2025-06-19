@@ -5,6 +5,7 @@ import toggletwo from "~/public/icons/toggletwo.vue";
 import { baseUrl } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 import { useFiltersStore } from '~/stores/courses_filter';
+import {getWebDomain} from "~/constant/webDomain";
 
 const filtersStore = useFiltersStore();
 
@@ -40,7 +41,7 @@ const fetchCourses = async () => {
     },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
 

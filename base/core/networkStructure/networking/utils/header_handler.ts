@@ -1,6 +1,7 @@
 // import { useUserStore } from "~/stores/user";
 
 import { useUserStore } from "~/stores/user";
+import {getWebDomain} from "~/constant/webDomain";
 
 
 class HeaderHandler {
@@ -35,7 +36,7 @@ class HeaderHandler {
       headers['Accept-Language'] = savedLocale;
     }
     headers['Content-Type'] = 'application/json';
-    headers['web-domain'] = 'hrarabians.org';
+    headers['web-domain'] = getWebDomain;
     headers['Accept'] = 'application/json';
 
 

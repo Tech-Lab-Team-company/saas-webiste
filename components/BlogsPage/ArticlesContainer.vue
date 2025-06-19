@@ -4,6 +4,7 @@ import pic from "@/assets/images/pic.png";
 import type  SidebarHashtag  from "~/types/sidebarhashtag";
 
 import { baseUrl } from "~/constant/baseUrl";
+import {getWebDomain} from "~/constant/webDomain";
 // Fetch blog data
 const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () => {
   try {
@@ -15,10 +16,10 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain":"hrarabians.org",
+        "web-domain": getWebDomain,
       },
     });
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (err) {
     console.error("Failed to fetch blogs:", err);

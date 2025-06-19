@@ -2,6 +2,7 @@
 import type LatestArticles from "~/types/latestarticles";
 import { baseUrl } from "~/constant/baseUrl";
 import pic from "@/assets/images/pic.png";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: latestarticles } = await useAsyncData("latestarticles", async () => {
   try {
@@ -13,11 +14,11 @@ const { data: latestarticles } = await useAsyncData("latestarticles", async () =
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": "hrarabians.org",
+        "web-domain": getWebDomain,
       },
     });
 
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (err) {
     console.error("فشل في جلب التدوينة:", err);

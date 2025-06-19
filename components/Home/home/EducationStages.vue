@@ -8,6 +8,7 @@ import type Universitiey from "~/types/universitey";
 import { baseUrl } from "~/constant/baseUrl";
 import { useFiltersStore } from '~/stores/courses_filter';
 import {useSettingStore} from "~/stores/setting";
+import {getWebDomain} from "~/constant/webDomain";
 
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
@@ -22,7 +23,7 @@ const { data: stages } = await useAsyncData("stages", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   return response.data;
@@ -39,7 +40,7 @@ const fetchStageYears = async (stageId: number) => {
     body: { stage_id: stageId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   stageYears.value = response.data;
@@ -57,7 +58,7 @@ const { data:universitiey } = await useAsyncData("universitiey", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       category_id: 2,
@@ -83,7 +84,7 @@ const fetchUniversities = async (typeId: number) => {
     body: { type_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   SelectedEducationTypeId.value = typeId;
@@ -105,7 +106,7 @@ const fetchColleges = async (typeId: number) => {
     body: { university_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   SelectedUniversity.value = typeId;
@@ -126,7 +127,7 @@ const fetchCollegeDepartment = async (typeId: number) => {
     body: { college_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   SelectedCollege.value = typeId;
@@ -147,7 +148,7 @@ const fetchCollegeDepartmentDivision = async (typeId: number) => {
     body: { department_id: typeId },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   SelectedCollegeDepartment.value = typeId;
@@ -168,7 +169,7 @@ const fetchSubjects = async (typeId: number) => {
     body: { category_id: CategryId.value },
     headers: {
       "Accept-Language": "ar",
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   SelectedCollegeDepartmentDivision.value = typeId;

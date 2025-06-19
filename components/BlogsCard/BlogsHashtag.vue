@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type  BlogsCard  from "~/types/blogscard";
 import { baseUrl } from "~/constant/baseUrl";
+import {getWebDomain} from "~/constant/webDomain";
 
 // Fetch blog data
 const { data: blogscard } = await useAsyncData("blogscard", async () => {
@@ -13,7 +14,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain":"hrarabians.org",
+        "web-domain": getWebDomain,
       },
       body: { hashtag_id: useRoute().params.hashtagId },
     });

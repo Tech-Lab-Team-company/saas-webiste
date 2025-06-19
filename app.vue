@@ -11,7 +11,8 @@ import { baseUrl } from "~/constant/baseUrl";
 import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
 import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
-import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
+// import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: webStatus, pending } = await useAsyncData("webStatus", async () => {
   const response = await $fetch<{
@@ -21,7 +22,7 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
   }>(`${baseUrl}/fetch_web_status`, {
     method: "GET",
     headers: {
-      "web-domain": "hrarabians.org",
+      "web-domain": getWebDomain,
     },
   });
   return response.data;

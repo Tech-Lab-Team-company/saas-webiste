@@ -6,6 +6,7 @@ import { ref, onMounted } from 'vue';
 import { DashboradbaseUrl ,baseUrl } from "~/constant/baseUrl";
 import type AboutUsInterface from '~/types/about_us_interface';
 import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
+import {getWebDomain} from "~/constant/webDomain";
 
 const stepsContainer = ref<HTMLElement | null>(null);
 const isVisible = ref(false);
@@ -43,7 +44,7 @@ const { data: aboutusSteps } = await useAsyncData("AboutSteps", async () => {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
-      "web-domain":"hrarabians.org",
+      "web-domain": getWebDomain,
     },
     body: {
       type:SectionTypeEnum.AboutSteps, 

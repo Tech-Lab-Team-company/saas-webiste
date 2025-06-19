@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type BlogsDetails from "~/types/blogsdetails";
 import { baseUrl } from "~/constant/baseUrl";
+import {getWebDomain} from "~/constant/webDomain";
 
 const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   try {
@@ -12,12 +13,12 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
       method: "POST",
       headers: {
         "Accept-Language": "ar",
-        "web-domain": "hrarabians.org",
+        "web-domain": getWebDomain,
       },
       body: { slug: useRoute().params.slug },
     });
 
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (err) {
     console.error("فشل في جلب التدوينة:", err);
