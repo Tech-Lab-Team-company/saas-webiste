@@ -90,7 +90,7 @@ const droplist = ref(false);
       <div class="buttons" v-else>
         <NuxtLink to="/profile" class="user-info" v-if="userStore.user">
           <img v-if="userStore.image" :src="userStore.image || ''" alt="User Image" class="user-avatar" />
-          <img v-else src="../../public/images/profile.png" alt="User Image" class="user-avatar" />
+          <img v-else src="../../public/images/user.png" alt="User Image" class="user-avatar" />
           <span class="user-name">{{ userStore.user.name }}</span>
         </NuxtLink>
 

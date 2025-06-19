@@ -89,13 +89,8 @@ const uploadImage = async () => {
         <label for="profile-image-input">
           <EditImageIcon class="edit-icon" />
         </label>
-        <input
-          id="profile-image-input"
-          type="file"
-          accept="image/*"
-          @change="handleImageChange"
-          style="display: none"
-        />
+        <input id="profile-image-input" type="file" accept="image/*" @change="handleImageChange"
+          style="display: none" />
       </div>
       <p class="person-name">{{ userStore.user.name }}</p>
       <p class="person-stage">طالب ثانوي</p>
@@ -103,52 +98,29 @@ const uploadImage = async () => {
     </div>
 
     <ul class="profile-options">
-      <NuxtLink
-        to="/profile"
-        exactActiveClass="active"
-        class="profile-option"
-        @click="UpdateSidebar('profile')"
-        :class="{ active: SelectedOption === 'profile' }"
-      >
+      <NuxtLink to="/profile" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('profile')"
+        :class="{ active: SelectedOption === 'profile' }">
         <p>الملف الشخصي</p>
         <SettingsIcon class="profile-icon" />
       </NuxtLink>
 
-      <NuxtLink
-        to="/passwordupdate"
-        exactActiveClass="active"
-        class="profile-option"
-        @click="UpdateSidebar('security')"
-        :class="{ active: SelectedOption === 'security' }"
-      >
-        <p>الامان</p>
+      <NuxtLink to="/passwordupdate" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('security')"
+        :class="{ active: SelectedOption === 'security' }">
+        <p>تغير كلمة المرور</p>
         <KeyIcon class="profile-icon" />
       </NuxtLink>
-      <NuxtLink
-        exactActiveClass="active"
-        to="/profilecourse"
-        class="profile-option"
-        @NuxtLinkck="UpdateSidebar('courses')"
-        :class="{ active: SelectedOption === 'courses' }"
-      >
+      <NuxtLink exactActiveClass="active" to="/profilecourse" class="profile-option"
+        @NuxtLinkck="UpdateSidebar('courses')" :class="{ active: SelectedOption === 'courses' }">
         <p>كورساتي</p>
         <CoursesNote class="profile-icon" />
       </NuxtLink>
-      <li
-        class="profile-option"
-        @click="UpdateSidebar('questionsbank')"
-        exactActiveClass="active"
-        :class="{ active: SelectedOption === 'questionsbank' }"
-      >
+      <!-- <li class="profile-option" @click="UpdateSidebar('questionsbank')" exactActiveClass="active"
+        :class="{ active: SelectedOption === 'questionsbank' }">
         <p>بنك اسئلتي</p>
         <QuestionBank class="profile-icon" />
-      </li>
-      <li
-        class="profile-option"
-        @click="handleLogout"
-        exactActiveClass="active"
-        :class="{ active: SelectedOption === 'logout' }"
-      >
+      </li> -->
+      <li class="profile-option" @click="handleLogout" exactActiveClass="active"
+        :class="{ active: SelectedOption === 'logout' }">
         <p>تسجيل الخروج</p>
         <Logout class="profile-icon" />
       </li>
@@ -175,12 +147,14 @@ const uploadImage = async () => {
 
     .profile-image-container {
       position: relative;
+
       img {
         width: 150px;
         height: 150px;
         border-radius: 50%;
         border: 10px solid white;
       }
+
       .edit-icon {
         width: 25px;
         position: absolute;
@@ -194,9 +168,11 @@ const uploadImage = async () => {
       font-size: 20px;
       margin-top: 15px;
     }
+
     .person-stage {
       color: #6f777b;
     }
+
     .error-message {
       color: red;
       margin-top: 10px;
@@ -216,6 +192,7 @@ const uploadImage = async () => {
       &.active {
         background-color: #fff6e6;
       }
+
       .profile-icon {
         width: 20px;
       }
