@@ -1,4 +1,5 @@
-export function getWebDomain(url: string): string {
+export function getWebDomain(): string {
+    const url = window.location.href
     try {
         const hostname = new URL(url).hostname;
         if (hostname === 'localhost') return 'hrarabians.org';
