@@ -7,11 +7,11 @@ const router = useRouter()
 const email = ref<string>("");
 const password = ref<string>("");
 
-const loginController = LoginController.getInstance();
+const loginController = v.getInstance();
 
 const login = async () => {
   await loginController.login(
-      new LoginParams(email.value, password.value, ""), router
+      new LoginParams(email.value, password.value), router
   );
 };
 </script>

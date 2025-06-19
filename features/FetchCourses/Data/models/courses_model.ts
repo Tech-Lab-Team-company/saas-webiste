@@ -6,7 +6,10 @@ export default class CoursesModel {
   public title: string;
   public subtitle: string;
   public subject: TitleModel;
-  public img: string;
+  public image:{
+    img: string;
+    alt: string;
+  };
   public videos_number: number;
   public docs_number: number;
   public progress: number;
@@ -17,7 +20,10 @@ export default class CoursesModel {
     title: string,
     subtitle: string,
     subject: TitleModel,
-    img: string,
+    image: {
+    img: string;
+    alt: string;
+  },
     videos_number: number,
     docs_number: number,
     progress: number,
@@ -28,7 +34,7 @@ export default class CoursesModel {
     this.title = title;
     this.subtitle = subtitle;
     this.subject = subject;
-    this.img = img;
+    this.image = image;
     this.videos_number = videos_number;
     this.docs_number = docs_number;
     this.progress = progress;
@@ -43,7 +49,7 @@ export default class CoursesModel {
       map["title"],
       map["subtitle"],
       map["subject"],
-      map["img"],
+      map["image"],
       map["videos_number"],
       map["docs_number"],
       map["progress"],

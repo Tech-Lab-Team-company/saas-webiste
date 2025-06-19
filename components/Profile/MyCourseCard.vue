@@ -118,10 +118,13 @@ watch(
   <template #success>
     <div class="profile-home">
     <div class="slider-wrapper">
+
       <div class="cards-container">
-        <div class="card" v-for="(course, index) in state.data" :key="index">
+        {{ console.log(state.data , "state.data")   }}
+        <NuxtLink class="card" v-for="(course, index) in state.data" :key="index" :to="`/course/${course.id}`">
+        <div >
           <div class="image-container">
-            <img :src="course.img" alt="Card image" class="course-image" />
+            <img :src="course?.image?.img" alt="Card image" class="course-image" />
             
             <p class="overlay-text">{{ course.subject.title }}</p>
           </div>
@@ -154,6 +157,7 @@ watch(
             </div>
           </div>
         </div>
+        </NuxtLink>
       </div>
     </div>
   </div>
@@ -190,7 +194,7 @@ watch(
   grid-template-columns: repeat(3, 1fr);
   width: 90%;
   gap: 10px;
-  width: 90%;
+  width: 100%;
   justify-items: center;
   align-items: center;
 }
@@ -210,7 +214,7 @@ watch(
 
 .card img {
   width: 100%;
-  height: auto;
+  /* height: auto; */
   object-fit: cover;
 }
 
@@ -345,7 +349,7 @@ watch(
 @media (max-width: 1440px) {
   .cards-container {
     grid-template-columns: repeat(3, 1fr);
-    width: 80%;
+    width: 100%;
   }
   .card {
     width: 100%;
@@ -354,7 +358,7 @@ watch(
 @media (max-width: 1024px) {
   .cards-container {
     grid-template-columns: repeat(2, 1fr);
-    width: 70%;
+    width: 100%;
   }
   .card {
     width: 90%;
@@ -364,7 +368,7 @@ watch(
 @media (max-width: 767px) {
   .cards-container {
     grid-template-columns: 1fr;
-    width: 90%;
+    width: 100%;
   }
   .card {
     width: 97%;

@@ -13,6 +13,7 @@ const errorMessage = ref<string | null>(null);
 const profileimage = ref<ProfileImage | null>(null);
 const userStore = useUserStore();
 const isLoggedIn = ref(false);
+const {locale} = useI18n();
 
 const router = useRouter();
 
@@ -98,18 +99,18 @@ const uploadImage = async () => {
     </div>
 
     <ul class="profile-options">
-      <NuxtLink to="/profile" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('profile')"
+      <NuxtLink :to="`/${locale}/profile`" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('profile')"
         :class="{ active: SelectedOption === 'profile' }">
         <p>الملف الشخصي</p>
         <SettingsIcon class="profile-icon" />
       </NuxtLink>
 
-      <NuxtLink to="/passwordupdate" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('security')"
+      <NuxtLink :to="`/${locale}/passwordupdate`" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('security')"
         :class="{ active: SelectedOption === 'security' }">
         <p>تغير كلمة المرور</p>
         <KeyIcon class="profile-icon" />
       </NuxtLink>
-      <NuxtLink exactActiveClass="active" to="/profilecourse" class="profile-option"
+      <NuxtLink exactActiveClass="active" :to="`/${locale}/profilecourse`" class="profile-option"
         @NuxtLinkck="UpdateSidebar('courses')" :class="{ active: SelectedOption === 'courses' }">
         <p>كورساتي</p>
         <CoursesNote class="profile-icon" />
@@ -135,6 +136,13 @@ const uploadImage = async () => {
   width: 250px;
   margin: 40px auto 20px;
   grid-column: span 1;
+
+  @media (max-width: 768px) {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    
+  }
 
   .person-data {
     display: flex;

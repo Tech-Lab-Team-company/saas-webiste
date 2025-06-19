@@ -21,6 +21,7 @@ class LoginRepo extends RepoInterface<UserModel> {
   }
 
   get serviceInstance(): ServicesInterface {
+    console.log('LoginRepo serviceInstance called');
     return LoginApiService.getInstance();
   }
 }

@@ -6,6 +6,7 @@ import { LoginRepo } from '~/features/LoginFeature/Domain/repositories/login_rep
 
 export default class LoginUseCase implements UseCase<UserModel, Params> {
   async call(params: Params): Promise<DataState<UserModel>> {
+    console.log('LoginUseCase called with params:', params)
     return LoginRepo.getInstance().call(params)
   }
 }

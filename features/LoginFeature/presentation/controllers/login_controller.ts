@@ -25,6 +25,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
   }
   async login(params: LoginParams, router: any) {
     // useLoaderStore().setLoadingWithDialog();
+    console.log("login params", params);
     try {
       const router = useRouter();
       const dataState: DataState<UserModel> =
@@ -40,7 +41,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
           });
           const userStore = useUserStore();
           if (this.state.value.data) {
-            console.log(this.state.value.data);
+            console.log(this.state.value);
             
             
            await userStore.setUser(this.state.value.data);
@@ -49,6 +50,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
           }
       
       } else {
+        
         throw new Error(this.state.value.error?.title);
       }
       // useLoaderStore().endLoadingWithDialog();
@@ -61,5 +63,6 @@ export default class LoginController extends ControllerInterface<UserModel> {
         messageContent: null,
       });
     }
+    console.log(this.state.value);
   }
 }

@@ -6,6 +6,7 @@ import { ref } from "vue";
 
 const router = useRouter();
 
+const UserSettingStore = useSettingStore();
 
 
 </script>
@@ -17,15 +18,17 @@ const router = useRouter();
     <div class="login-image">
         <img src="../../public/images/login.png" alt="login">
     </div>
+    
     <div class="login-form">
             <img class="background-circle" src="../../public/images/Component15.png" alt="">
-            <img src="../../public/images/logo.png" alt="">
+            <img :src="UserSettingStore.setting.image.img" alt="" width="150">
             <h3>{{ $t('مرحبا بك فى منصتنا التعليمية') }}</h3>
             <p>{{ $t('تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.') }}</p>
 
             <div class="btns">
                 <nuxt-link class="nuxt-link-btn" to="/login/loginhome"><button class="login-btn">{{ $t('تسجيل الدخول') }}</button></nuxt-link>
                 <nuxt-link class="nuxt-link-btn" to="/auth/register"> <button class="create-account-btn">{{ $t('انشاء حساب') }}</button></nuxt-link>
+
 
 <!--                <div class="btn-or">-->
 <!--                    <hr class="login-hr" />-->

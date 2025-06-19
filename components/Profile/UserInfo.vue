@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import UpdateProfileController
-  from "~/features/UpdateProfileFeature/presentation/controllers/update_profile_controller";
+from "~/features/UpdateProfileFeature/presentation/controllers/update_profile_controller";
 import UpdateProfileParams from "~/features/UpdateProfileFeature/Core/Params/update_profile_params";
 //state
 const firstName = ref<string>("");
