@@ -46,7 +46,7 @@ onMounted(() => {
 
 
 const Data = (data: { activetabvalue: number, link: string, title: string, description: string }) => {
-  console.log(data, "data")
+  // console.log(data, "data")
   activetab.value = data.activetabvalue;
   videoLink.value.videoLink = data.link;
   videoLink.value.title = data.title;
@@ -57,8 +57,6 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
 </script>
 
 <template>
-
-
   <div v-if="activetab==0">
     <CourseDetailsCourseVideo
         :CourseData="CardData"
@@ -100,8 +98,6 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
           <ContentIcon/>
           <p>{{ $t('المحتوى ') }}</p>
         </div>
-
-
       </div>
 
       <hr/>

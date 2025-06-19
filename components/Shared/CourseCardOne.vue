@@ -210,24 +210,6 @@ watch(
   flex-direction: column;
 }
 
-.card-title {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: #032855;
-}
-
-.card-text {
-  font-size: 0.875rem;
-  color: #666;
-  margin-bottom: 1rem;
-  flex-grow: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
 .card-footer {
   display: flex;
   align-items: center;
