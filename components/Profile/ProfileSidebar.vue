@@ -137,6 +137,13 @@ const uploadImage = async () => {
   margin: 40px auto 20px;
   grid-column: span 1;
 
+  @media (max-width: 768px) {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    
+  }
+
   .person-data {
     display: flex;
     flex-direction: column;

@@ -4,7 +4,7 @@
 
 <template>
     <div class="prfile-home">
-        <ProfileHome />
+        <ProfileHome class="profile-home" />
         <ProfileSidebar />
     </div>
 </template>

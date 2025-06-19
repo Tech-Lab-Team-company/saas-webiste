@@ -3,7 +3,9 @@
 // import MultiSelect from "primevue/multiselect";
 import { useUserStore } from "~/stores/user";
 import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
-
+import UpdateProfileController
+from "~/features/UpdateProfileFeature/presentation/controllers/update_profile_controller";
+import UpdateProfileParams from "~/features/UpdateProfileFeature/Core/Params/update_profile_params";
 const studentCategory = ref(0);
 
 const userStore = useUserStore();
@@ -48,6 +50,32 @@ onMounted(() => {
     console.log("User data is not available.");
   }
 });
+
+
+const updateProfileController = UpdateProfileController.getInstance();
+const UpdateData = async () => {
+
+  await updateProfileController.updateProfile(
+      new UpdateProfileParams(
+          null,
+          null,
+          name.value,
+          email.value,
+          phone.value,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+      )
+  );
+}
+
+
 </script>
 
 <template>
@@ -84,12 +112,18 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="hrs">
-      <hr class="profile-first-hr" />
-      <hr class="profile-second-hr" />
+    <div class="button" @click="UpdateData">
+      <button class="btn-save-changes">
+        {{ $t('حفظ التغييرات') }}
+      </button>
     </div>
 
-    <div class="profile-home-text profile-home-text2">
+    <!-- <div class="hrs">
+      <hr class="profile-first-hr" />
+      <hr class="profile-second-hr" />
+    </div> -->
+
+    <!-- <div class="profile-home-text profile-home-text2">
       <p>البيانات الشخصيه</p>
       <p>
         هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين
@@ -172,12 +206,12 @@ onMounted(() => {
           />
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <div class="hrs">
+    <!-- <div class="hrs">
       <hr class="profile-first-hr" />
       <hr class="profile-second-hr" />
-    </div>
+    </div> -->
 
     <!-- <div class="profile-home-text profile-home-text2">
       <p>المجالات المهتم بيها</p>
@@ -227,4 +261,21 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.profile-home{
+  .button{
+    display: flex;
+    .btn-save-changes{
+      background-color:#ffb949;
+      color:white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      justify-content: center;
+      margin-left:auto;
+      margin-right:auto;
+      margin-top:20px;
+    }
+  }
+
+}
+</style>
