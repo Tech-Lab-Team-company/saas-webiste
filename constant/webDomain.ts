@@ -5,8 +5,9 @@ export function getWebDomain(): string {
         const hostname = new URL(url).hostname;
         console.log("webDomain hostname", hostname);
         if (hostname === 'localhost') return 'hrarabians.org';
-        const parts = hostname.split('.');
-        return parts.slice(-2).join('.');
+        // const parts = hostname.split('.');
+        // return parts.slice(-2).join('.');
+        return hostname;
     } catch {
         return 'hrarabians.org';
     }
