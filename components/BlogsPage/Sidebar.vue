@@ -23,7 +23,7 @@ watch(
 <template>
   <!-- sidebar -->
   <div class="sidebar" dir="rtl">
-    <BlogsPageSidebarArticles />
+<!--    <BlogsPageSidebarArticles />-->
     <BlogsPageSidebarButton 
     :hashtags="HashtagsContetnt ?? []"
     />

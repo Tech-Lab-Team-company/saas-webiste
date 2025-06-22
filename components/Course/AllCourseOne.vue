@@ -8,6 +8,7 @@ const props = defineProps<{
 const { locale } = useI18n();
 </script>
 <template>
+  
   <!-- <pre>{{ props.HomeSections }}</pre> -->
   <div class="card-course">
     <div

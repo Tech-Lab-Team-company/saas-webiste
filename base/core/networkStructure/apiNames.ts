@@ -135,6 +135,10 @@ class ApiNames {
 
   public SubmitHomeWork = this.baseUrl + "submit_student_answer";
 
+  public educationbasiclevels = this.baseUrl + "fetch_stages";
+  public educationbasicstagesyear = this.baseUrl + "fetch_stage_years ";
+  public educationbasicsubjects = this.baseUrl + "fetch_subjects  ";
+
   
   
   //Courses

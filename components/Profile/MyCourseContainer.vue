@@ -5,10 +5,8 @@
 
 <template>
     <div class="prfile-home">
-       
-            <ProfileMyCourseCard class="courses-container" />
-            <ProfileSidebar />
-      
+        <ProfileMyCourseCard class="courses-container aa" />
+        <ProfileSidebar />
     </div>
 
 </template>
