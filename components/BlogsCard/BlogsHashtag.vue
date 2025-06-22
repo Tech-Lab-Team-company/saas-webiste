@@ -25,6 +25,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
     return [];
   }
 });
+const { locale } = useI18n();
 </script>
 <template>
   <div class="blogs-page-articles-cards" dir="rtl">

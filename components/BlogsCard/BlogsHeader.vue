@@ -39,7 +39,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
         <NuxtLink
           v-for="(card, index) in blogscard"
           :key="index"
-          :to="`/${locale}/blogs/${card.slug}`"
+          :to="`/blogs/${card.slug}`"
           class="card"
         >
         <img

@@ -131,7 +131,7 @@ margin-top:20px
   justify-content: space-between;
   flex-direction: row-reverse;
   align-items: center;
-  margin-bottom: 20px;
+  margin: 20px 0;
   padding: 0 20px;
   width: 90%;
   margin-left: auto;

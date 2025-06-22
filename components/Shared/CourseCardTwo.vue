@@ -86,6 +86,8 @@ const splideOptions = {
     }
   }
 };
+
+const { locale } = useI18n();
 </script>
 
 <template>

@@ -99,18 +99,18 @@ const uploadImage = async () => {
     </div>
 
     <ul class="profile-options">
-      <NuxtLink :to="`/${locale}/profile`" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('profile')"
+      <NuxtLink :to="`/profile`" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('profile')"
         :class="{ active: SelectedOption === 'profile' }">
         <p>الملف الشخصي</p>
         <SettingsIcon class="profile-icon" />
       </NuxtLink>
 
-      <NuxtLink :to="`/${locale}/passwordupdate`" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('security')"
+      <NuxtLink :to="`/passwordupdate`" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('security')"
         :class="{ active: SelectedOption === 'security' }">
         <p>تغير كلمة المرور</p>
         <KeyIcon class="profile-icon" />
       </NuxtLink>
-      <NuxtLink exactActiveClass="active" :to="`/${locale}/profilecourse`" class="profile-option"
+      <NuxtLink exactActiveClass="active" :to="`/profilecourse`" class="profile-option"
         @NuxtLinkck="UpdateSidebar('courses')" :class="{ active: SelectedOption === 'courses' }">
         <p>كورساتي</p>
         <CoursesNote class="profile-icon" />

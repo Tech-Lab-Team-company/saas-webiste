@@ -33,6 +33,7 @@ const userStore = useUserStore()
 const isDisabled = computed(() => {
   return !userStore.user || props.CourseStatus !== 2;
 });
+const { locale } = useI18n();
 </script>
 
 <template>

@@ -25,6 +25,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
     return null;
   }
 });
+const { locale } = useI18n();
 </script>
 
 <template>

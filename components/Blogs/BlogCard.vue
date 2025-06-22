@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type Blog from "~/types/blog";
+const {locale} = useI18n();
 
 const props = defineProps<{ blog: Blog }>();
 </script>
