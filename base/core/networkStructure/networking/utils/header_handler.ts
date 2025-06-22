@@ -31,10 +31,10 @@ class HeaderHandler {
       }
     }
 
-    const savedLocale = localStorage.getItem('lang');
-    if (savedLocale) {
-      headers['Accept-Language'] = "ar";
-    }
+    // const savedLocale = localStorage.getItem('lang');
+    // if (savedLocale) {
+    // }
+    headers['Accept-Language'] = "ar";
     headers['Content-Type'] = 'application/json';
     headers['web-domain'] = getWebDomain();
     headers['Accept'] = 'application/json';
