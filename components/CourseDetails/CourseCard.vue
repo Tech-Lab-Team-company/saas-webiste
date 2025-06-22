@@ -34,7 +34,7 @@ watch(() => props.status, (newValue) => {
         <div class="card-text">
 
             <div class="card-text-title">
-                <p class="card-text-subject-title">{{ CardDetails?.Subject.title }}</p>
+                <p class="card-text-subject-title">{{ CardDetails?.Subject?.title }}</p>
                 <p class="card-text-main-title">{{ CardDetails?.title }}</p>
             </div>
 
@@ -42,14 +42,13 @@ watch(() => props.status, (newValue) => {
                 <p v-html="CardDetails?.description"></p>
             </div>
             <hr />
-            {{ console.log(CardDetails, "CardDetails") }}
             <div class="card-text-footer">
                 <p class="salary" v-if="CardDetails?.CoursePrice != 0">{{ CardDetails?.CoursePrice }} <span>{{ $t('جنيه')
                         }}</span> </p>
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
                 <div class="card-profile">
-                    <p>{{ CardDetails?.Teacher.name }}</p>
-                    <img :src="CardDetails?.Teacher.image.img">
+                    <p>{{ CardDetails?.Teacher?.name }}</p>
+                    <img :src="CardDetails?.Teacher?.image?.img">
                 </div>
             </div>
 
@@ -58,7 +57,7 @@ watch(() => props.status, (newValue) => {
 
         </div>
         <div class="card-video">
-            <img :src="CardDetails?.Image.img" :alt="CardDetails?.Image.image">
+            <img :src="CardDetails?.Image?.img" :alt="CardDetails?.Image?.image">
         </div>
 
     </div>
@@ -88,7 +87,8 @@ watch(() => props.status, (newValue) => {
 
 
 .card-text-description{
-    height: 500px;
-    overflow-y: scroll;
+    max-height: 500px;
+    height: fit-content;
+    overflow-y: auto;
 }
 </style>

@@ -5,6 +5,7 @@ import type Blog from "~/types/blog";
 
 const props = defineProps<{ blog: Blog }>();
 
+const { locale } = useI18n();
 </script>
 
 <template>

@@ -42,8 +42,15 @@ export default class RegisterController extends ControllerInterface<UserModel> {
           userStore.setUser(this.state.value.data);
           // router.push("/Auth/varifyotp");
         }
+        const settingStore = useSettingStore();
+        if(settingStore.setting?.whatsapp_otp_activation == 1){
 
-        await router.push("/Auth/varifyotp");
+          await router.push("/Auth/varifyotp");
+        }
+        else{
+          await router.push("/Auth/education");
+        }
+
 
       } else {
              DialogSelector.instance.errorDialog.openDialog({

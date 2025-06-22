@@ -19,6 +19,8 @@ const addToBookmark = async (id: number) => {
     console.error("Failed to update bookmark:", error);
   }
 };
+
+const { locale } = useI18n();
 </script>
 
 <template>

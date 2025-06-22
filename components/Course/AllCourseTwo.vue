@@ -8,6 +8,7 @@ import type HomeFirstSection from "~/types/home_first_section";
 const props = defineProps<{
   HomeSections: HomeFirstSection[];
 }>();
+const { locale } = useI18n();
 </script>
 
 <template>
@@ -25,26 +26,26 @@ const props = defineProps<{
           <div class="card-inner" dir="rtl">
             <div class="image-container">
     
-              <img :src="card.image.img || ''" alt="course image" class="card-image" />
+              <img :src="card?.image?.img || ''" alt="course image" class="card-image" />
             </div>
 
             <div class="card-body">
               <div class="card-header">
-                <h5 class="card-title">{{ card.title }}</h5>
+                <h5 class="card-title">{{ card?.title }}</h5>
               </div>
 
-              <p class="card-text" v-html="card.description"></p>
+              <p class="card-text" v-html="card?.description"></p>
 
               <div class="card-content">
-                <p class="card-text1" v-if="card.course_videos > 0">
+                <p class="card-text1" v-if="card?.course_videos > 0">
                   <video1 />
                   {{ $t('فيديو') }}
                 </p>
-                <p class="card-text1" v-if="card.course_docs > 0">
+                <p class="card-text1" v-if="card?.course_docs > 0">
                   <note />
                   {{ $t('ملف ورقي') }}
                 </p>
-                <p class="card-text1" v-if="card.course_records > 0">
+                <p class="card-text1" v-if="card?.course_records > 0">
                   <microphone />
                   {{ $t('ملف صوتى') }}
                 </p>
@@ -53,13 +54,13 @@ const props = defineProps<{
               <div class="card-footer">
                 <span class="card-icon">
                   <img
-                  :src="card.teacher.image.img"
-                  :alt="card.teacher.image.alt"
+                  :src="card?.teacher?.image?.img"
+                  :alt="card?.teacher?.image?.alt"
                   class="teacher-image"
                 />
-                  <span class="card-name">{{ card.teacher.name }}</span>
+                  <span class="card-name">{{ card?.teacher?.name }}</span>
                 </span>
-                <p class="card-number">{{ card.course_price }}</p>
+                <p class="card-number">{{ card?.course_price }}</p>
               </div>
 
               <div class="card-extra-content">

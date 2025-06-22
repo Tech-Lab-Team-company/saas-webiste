@@ -115,45 +115,47 @@ watch(
   <template #loader>
     loader
   </template>
+  <template #empty>
+    لا يوجد كورسات 
+  </template>
   <template #success>
     <div class="profile-home">
     <div class="slider-wrapper">
 
       <div class="cards-container">
-        {{ console.log(state.data , "state.data")   }}
         <NuxtLink class="card" v-for="(course, index) in state.data" :key="index" :to="`/course/${course.id}`">
         <div >
           <div class="image-container">
             <img :src="course?.image?.img" alt="Card image" class="course-image" />
             
-            <p class="overlay-text">{{ course.subject.title }}</p>
+            <p class="overlay-text">{{ course?.subject?.title }}</p>
           </div>
           <div class="card-body" dir="rtl">
-            <h5 class="card-title">{{ course.title }}</h5>
+            <h5 class="card-title">{{ course?.title }}</h5>
             <div class="card-content">
-              <p class="card-text">{{ course.subtitle }}</p>
+              <p class="card-text">{{ course?.subtitle }}</p>
             </div>
             <div class="card-one_footer">
               <div class="card-text1">
-                <p class="card-text1"><note_one />{{ course.videos_number }} فيديو</p>
-                <p class="card-text1"><note_two />{{ course.docs_number }} ملف ورقي</p>
+                <p class="card-text1"><note_one />{{ course?.videos_number }} فيديو</p>
+                <p class="card-text1"><note_two />{{ course?.docs_number }} ملف ورقي</p>
               </div>
               <div class="progress-container">
                 <div class="progress-bar">
                   <div
                     class="progress"
-                    :style="{ width: course.progress + '%' }"
+                    :style="{ width: course?.progress + '%' }"
                   ></div>
                 </div>
-                <span class="progress-percentage">{{ course.progress }}%</span>
+                <span class="progress-percentage">{{ course?.progress }}%</span>
               </div>
             </div>
             <div class="card-footer">
               <span class="card-icon flex">
                 <!-- <component :is="card.icon" /> -->
-                 <img :src="course.teacher.image.image" :alt="course.teacher.image.alt">
+                 <img :src="course?.teacher?.image?.image" :alt="course?.teacher?.image?.alt">
               </span>
-              <span class="card-name">{{course.teacher.name }}</span>
+              <span class="card-name">{{course?.teacher?.name }}</span>
             </div>
           </div>
         </div>

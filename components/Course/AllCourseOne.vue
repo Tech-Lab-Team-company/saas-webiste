@@ -4,8 +4,11 @@ import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/course
 const props = defineProps<{
   HomeSections: CoursesFilterModel[];
 }>();
+
+const { locale } = useI18n();
 </script>
 <template>
+  
   <!-- <pre>{{ props.HomeSections }}</pre> -->
   <div class="card-course">
     <div
@@ -13,7 +16,7 @@ const props = defineProps<{
     >
       <div class="cards-grid">
         <NuxtLink
-          v-for="card in props.HomeSections"
+          v-for="card in props.HomeSections"           
           :key="card.id"
           :to="`/course/${card.id}`"
           class="card"

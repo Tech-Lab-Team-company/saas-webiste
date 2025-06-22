@@ -7,6 +7,9 @@ export default class SubmitEducationDataParams implements Params {
   public UniversityId: number | null;
   public CollegeId: number | null;
   public DepartmentId: number | null;
+  public YearId: number | null;
+  public EducationTypeId: number | null;
+  public StageId: number | null;
 
   constructor(
     UniversityEducationTypeId: number  | null ,
@@ -15,6 +18,9 @@ export default class SubmitEducationDataParams implements Params {
     UniversityId: number | null,
     CollegeId: number | null,
     DepartmentId: number | null,
+    YearId: number | null,
+    EducationTypeId: number | null,
+    StageId: number | null,
     
   ) {
     this.UniversityEducationTypeId = UniversityEducationTypeId;
@@ -23,6 +29,9 @@ export default class SubmitEducationDataParams implements Params {
     this.UniversityId = UniversityId;
     this.CollegeId = CollegeId;
     this.DepartmentId = DepartmentId;
+    this.YearId = YearId;
+    this.EducationTypeId = EducationTypeId;
+    this.StageId = StageId;
 
   }
 
@@ -34,6 +43,9 @@ export default class SubmitEducationDataParams implements Params {
     if(this.UniversityId) data["university_id"] = this.UniversityId;
     if(this.CollegeId) data["college_id"] = this.CollegeId;
     if(this.DepartmentId) data["department_id"] = this.DepartmentId;
+    if(this.YearId) data["year_id"] = this.YearId;
+    if(this.EducationTypeId) data["basic_education_type_id"] = this.EducationTypeId;
+    if(this.StageId) data["stage_id"] = this.StageId;
     return data;
   }
 }

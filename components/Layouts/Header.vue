@@ -7,7 +7,7 @@ import { useSettingStore } from "~/stores/setting";
 const isLoggedIn = ref(false);
 const userStore = useUserStore()
 const router = useRouter();
-const { locale } = useI18n()
+// const { locale } = useI18n()
 
 
 
@@ -99,6 +99,7 @@ const droplist = ref(false);
 
       <!-- روابط التنقل -->
       <ul class="nav-links">
+
         <NuxtLink to="/blogs" exactActiveClass="active" class="nav-link"><li>المدونه</li></NuxtLink>
         <!-- <NuxtLink to="/questions" exactActiveClass="active" class="nav-link"><li>بنك الاسئله</li></NuxtLink> -->
         <NuxtLink to="/course" exactActiveClass="active" class="nav-link"><li>الكورسات</li></NuxtLink>

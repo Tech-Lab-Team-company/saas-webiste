@@ -51,6 +51,8 @@ watch(
   },
   { immediate: true }
 )
+
+const { locale } = useI18n();
 </script>
 
 <template>
@@ -61,20 +63,20 @@ watch(
         <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
           <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-wrapper">
-              <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
+              <img :src="course?.image?.img" :alt="course?.image?.alt" class="course-image" />
               <!-- <img src="../../assets/images/img1.png" alt=""> -->
               <div class="card-overlay-content">
-                <p class="card-number">{{ course.course_price }} جنيه</p>
+                <p class="card-number">{{ course?.course_price }} جنيه</p>
               </div>
             </div>
             <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ course.title }}</h5>
-              <div class="card-text" v-html="course.description"></div>
+              <h5 class="card-title">{{ course?.title }}</h5>
+              <div class="card-text" v-html="course?.description"></div>
               <div class="card-footer">
                 <span class="card-icon flex">
-                  <img :src="course.teacher.image.img" :alt="course.teacher.image.alt">
+                  <img :src="course.teacher?.image?.img" :alt="course?.teacher?.image?.alt">
                 </span>
-                <span class="card-name">{{ course.teacher.name }}</span>
+                <span class="card-name">{{ course?.teacher?.name }}</span>
               </div>
             </div>
           </NuxtLink>

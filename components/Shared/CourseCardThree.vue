@@ -53,7 +53,7 @@ watch(
   },
   { immediate: true }
 )
-
+const { locale } = useI18n();
 </script>
 
 <template>

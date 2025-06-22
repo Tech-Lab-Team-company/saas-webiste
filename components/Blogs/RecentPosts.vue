@@ -13,6 +13,7 @@ const { data: blogs } = await useAsyncData("recent-blog", async () => {
   });
   return response.data; // Extract only the `data` part
 });
+const { locale } = useI18n();
 </script>
 
 <template>

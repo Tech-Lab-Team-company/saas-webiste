@@ -25,6 +25,7 @@ export default interface WebStatus {
     cover: ImageModel;
     primary_color: string;
     secondary_color: string;
+    whatsapp_otp_activation:number;
 
 }
 

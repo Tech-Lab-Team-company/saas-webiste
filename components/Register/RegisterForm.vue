@@ -102,7 +102,6 @@ onMounted(() => {
 
 
 
-// console.log(cities.value , "cities.value");
 
 watch(
   ()=> data.value, 
@@ -124,7 +123,7 @@ watch(
   //
   // }
 
-
+const settingStore = useSettingStore();
   
 </script>
 
@@ -163,9 +162,9 @@ watch(
             <label :class="{'select-placeholder': !Education_Type , 'hidden':Education_Type}">نوع التعليم</label>
             <select class="student-select" v-model="Education_Type" required>
               <!-- <option value="" disabled selected>نوع التعليم</option> -->
-              <option :value="StudentCategoryEnum.base">اساسى</option>
-              <option :value="StudentCategoryEnum.university">جامعى</option>
-              <option :value="StudentCategoryEnum.general">عام</option>
+              <option v-if="settingStore.setting?.categories.includes(1)" :value="StudentCategoryEnum.base">اساسى</option>
+              <option v-if="settingStore.setting?.categories.includes(2)" :value="StudentCategoryEnum.university">جامعى</option>
+              <option v-if="settingStore.setting?.has_general" :value="StudentCategoryEnum.general">عام</option>
             </select>
             <student class="login-call-icon" />
           </div>

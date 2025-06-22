@@ -34,7 +34,7 @@ const splideOptions = ref({
 });
 
 const BlogsData = ref<HomeFirstSection[] | null>(null);
-
+const {locale} = useI18n();
 const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   const response = await $fetch<{
     data: HomeFirstSection[];

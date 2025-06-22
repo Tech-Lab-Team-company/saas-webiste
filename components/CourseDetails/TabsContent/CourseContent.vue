@@ -87,7 +87,6 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 
 
   <Accordion value="0" class="course-content-container">
-
     <AccordionPanel
         :value="index"
         class="course-content-panel"
@@ -99,13 +98,13 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       <AccordionHeader class="course-content-header ">{{ unit?.title }}</AccordionHeader>
       <AccordionContent class="course-content-body">
         <Accordion value="0" class="course-class-container" v-model:activeIndex="activeIndices"
-                   v-for="(lesson ,secondindex) in unit.lessons" :key="secondindex">
+                   v-for="(lesson ,secondindex) in unit?.lessons" :key="secondindex">
           <AccordionPanel
               :class="{ 'active': SecondactivePanels.includes(secondindex) }"
               :value="secondindex"
               class="course-class-panel"
           >
-            <AccordionHeader class="course-class-header"> {{ lesson.title }}</AccordionHeader>
+            <AccordionHeader class="course-class-header"> {{ lesson?.title }}</AccordionHeader>
 
             <hr class="course-class-hr"/>
             <AccordionContent class="course-class-body">
@@ -115,9 +114,9 @@ function handleSessionClick(index: number, link: string, title: string, text: st
                     (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',
                       selectedSessionIndex === thirdindex ? 'active' : ''
                     ]"
-                   @click="handleSessionClick(thirdindex, session.link, session.title, session.text)">
-                <component :is="getIconByExt(session.link)"/>
-                <p>{{ session.title }} </p>
+                   @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text)">
+                <component :is="getIconByExt(session?.link)"/>
+                <p>{{ session?.title }} </p>
               </div>
             </AccordionContent>
           </AccordionPanel>

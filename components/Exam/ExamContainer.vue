@@ -33,6 +33,8 @@ const cardd = [
     qusetion1: "30 سؤال",
     heart: heart, 
 }]
+
+const { locale } = useI18n();
 </script>
 
 <template>
