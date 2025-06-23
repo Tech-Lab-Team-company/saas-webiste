@@ -69,6 +69,7 @@ const AddPayment = async () => {
 
             <div class="btns btns-container">
 
+                <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
                 <PaymentDialog :status="status" class="payment-dialog"/>
                 <!-- <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
                         طلب الانضمام
@@ -92,6 +93,10 @@ const AddPayment = async () => {
 
     .payment-dialog{
         width: 100%;
+
+        &.multi-btn{
+            width: 50%;
+        }
     }
     button{
         width: 50%;
