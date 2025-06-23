@@ -30,7 +30,7 @@ const { locale } = useI18n();
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-number">{{ card.course_price }}</p>
+              <p class="card-number">{{ card.course_price }} {{ card?.currency }}</p>
             </div>
             <p class="card-text" v-html="card.description"></p>
             <div class="card-footer">

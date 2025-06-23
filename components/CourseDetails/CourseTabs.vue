@@ -109,10 +109,24 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               :CourseStatus="CardData?.allow_status"
           />
         </div>
-        <div v-if="tab_value === 'content'">
+        <div v-if="tab_value === 'content' && CardData?.StageType == 3" >
           <CourseDetailsTabsContentCourseContent
               @coursechanged="Data"
               :CourseData="CardData?.units"
+              :CourseStatus="CardData?.allow_status"
+          />
+        </div>
+        <div v-if="tab_value === 'content' && CardData?.StageType == 2">
+          <CourseDetailsTabsContentCourseContentStageTwo
+              @coursechanged="Data"
+              :CourseData="CardData?.lessons"
+              :CourseStatus="CardData?.allow_status"
+          />
+        </div>
+        <div v-if="tab_value === 'content' && CardData?.StageType == 1">
+          <CourseDetailsTabsContentCourseContentStageOne
+              @coursechanged="Data"
+              :CourseData="CardData?.sessions"
               :CourseStatus="CardData?.allow_status"
           />
         </div>

@@ -56,7 +56,7 @@ const cards = [
 ];
 
 const splideOptions = {
-  type: "loop",
+  // type: "loop",
   perPage: 5,
   perMove: 1,
   gap: "10px",

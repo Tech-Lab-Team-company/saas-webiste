@@ -2,6 +2,8 @@
 import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 import Dashedicon from '~/public/icons/dashedicon.vue';
 import PaymentDialog from './PaymentDialog.vue';
+import CoursesPaymentParams from '~/features/CoursePayment/Core/Params/courses_payment_params';
+import CoursesPaymentController from '~/features/CoursePayment/presentation/controllers/courses_payment_controller';
 
 
 
@@ -26,6 +28,19 @@ watch(() => props.status, (newValue) => {
     status.value = newValue;
 }, { immediate: true });
 
+const userSetting = useSettingStore();
+
+const router = useRouter();
+
+const AddPayment = async () => {
+  const coursePaymentParams = new CoursesPaymentParams(Number(router.currentRoute.value.params.id), 1, 1, null);
+  const coursesPaymentController = CoursesPaymentController.getInstance();
+  const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
+  if (state.value.message) {
+    status.value = 1;
+  }
+  
+}
 </script>
 
 <template>
@@ -43,8 +58,7 @@ watch(() => props.status, (newValue) => {
             </div>
             <hr />
             <div class="card-text-footer">
-                <p class="salary" v-if="CardDetails?.CoursePrice != 0">{{ CardDetails?.CoursePrice }} <span>{{ $t('جنيه')
-                        }}</span> </p>
+                <p class="salary" v-if="CardDetails?.CoursePrice != 0"> <span>{{ $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher?.name }}</p>
@@ -53,7 +67,13 @@ watch(() => props.status, (newValue) => {
             </div>
 
 
-            <PaymentDialog :status="status" />
+            <div class="btns btns-container">
+
+                <PaymentDialog :status="status" class="payment-dialog"/>
+                <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
+                        طلب الانضمام
+                </button>
+            </div>
 
         </div>
         <div class="card-video">
@@ -64,6 +84,25 @@ watch(() => props.status, (newValue) => {
 </template>
 
 <style scoped lang="scss">
+.btns-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    .payment-dialog{
+        width: 50%;
+    }
+    button{
+        width: 50%;
+    }
+}
+.salary{
+    display: flex;
+    gap: 4px;
+    
+    align-items: center;
+}
 .icon {
     position: absolute;
 }

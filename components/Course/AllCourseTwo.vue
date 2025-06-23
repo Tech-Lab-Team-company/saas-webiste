@@ -19,8 +19,8 @@ const { locale } = useI18n();
       <div class="cards-grid">
         <NuxtLink
           v-for="card in HomeSections"
-          :key="card.id"
-          :to="`/course/${card.id}`"
+          :key="card?.id"
+          :to="`/course/${card?.id}`"
           class="card"
         >
           <div class="card-inner" dir="rtl">
@@ -37,16 +37,20 @@ const { locale } = useI18n();
               <p class="card-text" v-html="card?.description"></p>
 
               <div class="card-content">
-                <p class="card-text1" v-if="card?.course_videos > 0">
+                <p class="card-text1" v-if="card?.course_videos ">
                   <video1 />
+                  {{ card?.course_videos }}
                   {{ $t('فيديو') }}
                 </p>
-                <p class="card-text1" v-if="card?.course_docs > 0">
+                <p class="card-text1" v-if="card?.course_docs ">
                   <note />
+                  {{ card?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                <p class="card-text1" v-if="card?.course_records > 0">
+                {{ console.log(card,  "card ") }}
+                <p class="card-text1" >
                   <microphone />
+                  {{ card?.course_records }}
                   {{ $t('ملف صوتى') }}
                 </p>
               </div>
@@ -60,7 +64,7 @@ const { locale } = useI18n();
                 />
                   <span class="card-name">{{ card?.teacher?.name }}</span>
                 </span>
-                <p class="card-number">{{ card?.course_price }}</p>
+                <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
               </div>
 
               <div class="card-extra-content">

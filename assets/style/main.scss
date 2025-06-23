@@ -66,3 +66,19 @@
 @import "./blogs/mian_blogs";
 
 @import "./splider_arrows";
+
+// .card-course-three,
+.card-course-two,
+.card-course-one
+{
+
+    .slider-wrapper{
+        .splide-container{
+            .splide__track{
+                ul{
+                    flex-direction: row-reverse;
+                }
+            }
+        }
+    }
+}

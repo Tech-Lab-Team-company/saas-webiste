@@ -23,6 +23,7 @@ export default class CourseDetailsModel {
   public lessons: [];
   public units: UnitsModel[];
   public allow_status: number;
+  public currency: string;
 
 
 
@@ -43,6 +44,7 @@ export default class CourseDetailsModel {
     lessons: [],
     units: UnitsModel[],
     allow_status: number,
+    currency: string,
 
   ) {
     this.id = id;
@@ -61,6 +63,7 @@ export default class CourseDetailsModel {
     this.lessons = lessons;
     this.units = units;
     this.allow_status = allow_status;
+    this.currency = currency;
  
   }
 
@@ -83,6 +86,7 @@ export default class CourseDetailsModel {
       map["lessons"],
       map["units"],
       map["allow_status"],
+      map["currency"],
     );
   }
 }

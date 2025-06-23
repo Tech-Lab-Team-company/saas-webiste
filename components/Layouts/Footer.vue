@@ -7,6 +7,7 @@ import instagramIcon from "~/public/icons/instagramIcon.vue";
 import linkedInIcon from "~/public/icons/linkedInIcon.vue";
 import twitterIcon from "~/public/icons/twitterIcon.vue";
 import { NuxtLink } from "#components";
+import Email from "../Icons/Email.vue";
 
 const settingStore = useSettingStore();
 const setting = computed(() => settingStore.setting);
@@ -20,8 +21,9 @@ const setting = computed(() => settingStore.setting);
       <div class="col-description">
         <div class="col-details">
           <div>
+            {{ console.log("setting", setting) }}
             <p>رقم الهاتف</p>
-            <p>+966543042000</p>
+            <p>{{ setting?.phone }}</p>
           </div>
           <PhoneIcon />
         </div>
@@ -29,9 +31,16 @@ const setting = computed(() => settingStore.setting);
         <div class="col-details">
           <div>
             <p>موقعنا</p>
-            <p>706 Campfire Ave. Meriden, CT 06450</p>
+            <p>{{ setting?.address }}</p>
           </div>
           <Location />
+        </div>
+        <div class="col-details">
+          <div>
+            <p>حسابنا</p>
+            <p>{{ setting?.email }}</p>
+          </div>
+          <Email class="email-icon" />
         </div>
       </div>
     </div>
@@ -60,30 +69,38 @@ const setting = computed(() => settingStore.setting);
       </div>
 
       <div class="col-data-details">
-        <Nuxt-link to="/"> <p>الرئيسيه</p></Nuxt-link>
-        <Nuxt-link to="/course"><p>كورساتي</p></Nuxt-link>
-        <Nuxt-link to="/aboutus"><p>من نحن</p></Nuxt-link>
-        <p>تواصل معنا</p>
+        <Nuxt-link to="/">
+          <p>الرئيسيه</p>
+        </Nuxt-link>
+        <Nuxt-link to="/course">
+          <p>كورساتي</p>
+        </Nuxt-link>
+        <Nuxt-link to="/aboutus">
+          <p>من نحن</p>
+        </Nuxt-link>
+        <!-- <p>تواصل معنا</p> -->
       </div>
     </div>
 
     <div class="col">
- 
-        <NuxtImg v-if="settingStore.setting?.image?.img"
-        :src="settingStore.setting.image.img"  :alt="setting?.image?.alt" format="webp"  class="col-logo" />
 
-      <div class="col-data-details">
-        <p>
-          منصة شاملة تضم كورساتك و آلاف الأسئلة والتدريبات لمساعدتك على
-          الاستعداد لأي اختبار ..ذاكر كورساتك ، اختبر مستواك ، حسّن مهاراتك، وكن
-          مستعدًا للنجاح!
-        </p>
-<!--        <div class="col-icons">-->
-<!--          <FcaebookIcon />-->
-<!--          <instagramIcon />-->
-<!--          <linkedInIcon />-->
-<!--          <twitterIcon />-->
-<!--        </div>-->
+      <NuxtImg v-if="settingStore.setting?.image?.img" :src="settingStore.setting.image.img" :alt="setting?.image?.alt"
+        format="webp" class="col-logo" />
+
+      <div v-html="setting?.description" class="col-data-details"></div>
+      <div class="social-media-icons">
+        <NuxtLink :to="setting?.twitter">
+          <IconsTwiter class="social-icon" />
+        </NuxtLink>
+        <NuxtLink :to="setting?.linkedin">
+          <IconsLinked class="social-icon" />
+        </NuxtLink>
+        <NuxtLink :to="setting?.instagram">
+          <IconsInsta class="social-icon" />
+        </NuxtLink>
+        <NuxtLink :to="setting?.facebook">
+          <IconsFacebookIcon class="social-icon" />
+        </NuxtLink>
       </div>
     </div>
 
@@ -91,4 +108,33 @@ const setting = computed(() => settingStore.setting);
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.social-media-icons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 30px;
+
+  .social-icon {
+    width: 50px;
+    padding: 7px;
+    /* width: 48px; */
+    background-color: rgba(37, 37, 173, 0.0509803922);
+    height: 42px;
+    border-radius: 31px;
+  }
+
+}
+.col{
+  .col-description{
+    .col-details{
+      .email-icon {
+        background-color: #ECECF2;
+        // width: 20px;
+        // height: 20px;
+        padding: 6px;
+        border-radius: 50px;
+      }
+    }
+  }
+}
+</style>
