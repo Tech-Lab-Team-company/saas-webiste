@@ -1,0 +1,13 @@
+.card-course-two,
+.card-course-one
+{
+    .slider-wrapper{
+        .splide-container{
+            .splide__track{
+                ul{
+                    flex-direction: row-reverse;
+                }
+            }
+        }
+    }
+}

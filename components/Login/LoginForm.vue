@@ -19,7 +19,7 @@ const login = async () => {
 </script>
 
 <template>
-  <form @submit.prevent="login" class="login-form">
+  <form   @submit.prevent="login" class="login-form">
     <NuxtLink to="/" class="back-link">
       <svg
         width="9"
@@ -39,7 +39,7 @@ const login = async () => {
       <span>{{ $t("back_to_home") }}</span></NuxtLink
     >
     <h1 class="main-title">
-      {{ $t("welcome_in") }} <span class="rakwa">Rakwa</span> !
+      {{ $t("welcome_in") }} <span class="rakwa"></span> 
     </h1>
     <p class="mb-4">{{ $t("Login_to_access_your_account") }}</p>
     <div class="input-wrapper">

@@ -17,7 +17,7 @@ const CourseVideoLink = ref(props.CourseVideoLink);
 
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
-  if (link.includes('youtube')) return 'youtube';
+  if (link.includes('youtube') || link.includes('youtu.be')) return 'youtube';
   if (link.endsWith('.mp3')) return 'audio';
   if (link.endsWith('.pdf')) return 'pdf';
   return 'unknown';

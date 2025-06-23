@@ -18,6 +18,7 @@ import microphoneicon from '~/public/icons/microphoneicon.vue';
 // import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
 import {useUserStore} from "~/stores/user";
+import CourseContentStageTwo from './CourseContentStageTwo.vue';
 
 const props = defineProps({
   CourseData: {
@@ -86,7 +87,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 <template>
 
 
-  <Accordion value="0" class="course-content-container">
+  <Accordion value="0" class="course-content-container" >
     <AccordionPanel
         :value="index == 0 ? '0' : index"
         class="course-content-panel"
@@ -124,5 +125,8 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       </AccordionContent>
     </AccordionPanel>
   </Accordion>
+
+
+
 </template>
 
