@@ -16,6 +16,10 @@ const CollegeId =   ref(filtersStore.SelectedCollege);
 const DepartmentId = ref(filtersStore.SelectedCollegeDepartment);
 const DivisionId = ref(filtersStore.SelectedCollegeDepartmentDivision);
 const SubjectId =   ref(filtersStore.SelectedSubject);
+const StageId =   ref(filtersStore.SelectedStage);
+const StageYearId =   ref(filtersStore.SelectedStageYear);
+const StageTitle =   ref(filtersStore.SelectedStageTitle);
+const StageYearTitle =   ref(filtersStore.SelectedStageYearTitle);
 
 
 const CoursesFilter = ref<CoursesFilterModel[]>([]);
@@ -30,8 +34,8 @@ const fetchCourses = async () => {
         category_id: CategoryId.value,
         type: 1,
         education_type_id: EduicationType.value,
-        stage_id: null,
-        year_id: null,
+        stage_id: StageId.value,
+        year_id: StageYearId.value,
         subject_id:null ,
         university_id: UniversityId.value,
         college_id: CollegeId.value,
@@ -50,7 +54,6 @@ const fetchCourses = async () => {
 };
 
 const CourseFilterData = (data)=>{
-  console.log(data , "filter data")
   CategoryId.value = data.CategryId
   EduicationType.value = data.SelectedEductionType
   UniversityId.value = data.SelectedUniversity
@@ -58,6 +61,10 @@ const CourseFilterData = (data)=>{
   DepartmentId.value = data.SelectedCollegeDepartment
   DivisionId.value = data.SelectedCollegeDepartmentDivision
   SubjectId.value = data.SelectedSubject
+  StageId.value = data.SelectedStage
+  StageYearId.value = data.SelectedStageYear
+  StageTitle.value=data.SelectedStageTitle
+  StageYearTitle.value=data.SelectedStageYearTitle
   fetchCourses();
 }
 
@@ -73,13 +80,23 @@ const props = defineProps(['showUniversities' , 'showStages'])
 
 
 const selectedToggle = ref();
+
+watch(()=>filtersStore,
+()=>{
+  StageTitle.value = filtersStore.SelectedStageTitle
+  StageYearTitle.value = filtersStore.SelectedStageYearTitle
+}
+
+
+)
 </script>
 <template>
   
 
   <div class="aa">
     <div class="header-toggle">
-      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('جميع الكورسات') }}</p>
+    
+      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('جميع الكورسات') }} {{ StageTitle ?  `(${StageTitle} - ${StageYearTitle ? StageYearTitle:''})` : `` }}</p>
       <div class="toggle">
         <div
           :class="['toggle-icon', { active: selectedToggle === 'two' }]"

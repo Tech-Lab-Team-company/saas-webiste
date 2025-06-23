@@ -70,9 +70,9 @@ const AddPayment = async () => {
             <div class="btns btns-container">
 
                 <PaymentDialog :status="status" class="payment-dialog"/>
-                <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
+                <!-- <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
                         طلب الانضمام
-                </button>
+                </button> -->
             </div>
 
         </div>
@@ -91,7 +91,7 @@ const AddPayment = async () => {
     gap: 10px;
 
     .payment-dialog{
-        width: 50%;
+        width: 100%;
     }
     button{
         width: 50%;

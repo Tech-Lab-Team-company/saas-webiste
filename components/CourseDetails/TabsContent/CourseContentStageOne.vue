@@ -77,12 +77,31 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 </script>
 
 <template>
-    <div class="course-body-details" :key="thirdindex" v-for="(session, thirdindex) in CourseData" :class="[
+    <div class="course-body-details" :key="index" v-for="(session, index) in CourseData" :class="[
         (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '',
         (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',]" 
-        
-        @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text)">
+        @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text)">
         <component :is="getIconByExt(session?.link)" />
         <p>{{ session?.title }} </p>
     </div>
 </template>
+
+<style scoped lang="scss">
+.course-body-details{
+       margin-left: auto;
+    margin-right: auto;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+    color: black;
+    width: 70%;
+    cursor: pointer;
+    border-radius: 10px;
+    margin-top: 1rem;
+    padding: 0.7rem;
+    box-shadow: 3px 3px 3px 2px #00000038;
+    
+
+}  
+</style>

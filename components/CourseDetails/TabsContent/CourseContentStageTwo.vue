@@ -78,7 +78,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 <template>
 
     <Accordion value="0" class="course-content-container">
-        <AccordionPanel :value="index" class="course-content-panel" v-for="(lesson, index) in CardDetails" :key="index"
+        <AccordionPanel :value="index == 0 ? '0' : index" class="course-content-panel" v-for="(lesson, index) in CardDetails" :key="index"
             :class="{ 'active': activePanels.includes(index) }">
             <AccordionHeader class="course-content-header ">{{ lesson?.title }}</AccordionHeader>
             <AccordionContent class="course-class-body">
@@ -102,5 +102,12 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 
 .course-body-details{
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    box-shadow: 3px 3px 3px 0px #00000038;
+    padding: 0.7rem;
+    border-radius: 10px;
 }
 </style>

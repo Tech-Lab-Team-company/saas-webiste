@@ -9,6 +9,8 @@ const props = defineProps<{
   HomeSections: HomeFirstSection[];
 }>();
 const { locale } = useI18n();
+
+const UserSetting = useSettingStore();
 </script>
 
 <template>
@@ -47,7 +49,6 @@ const { locale } = useI18n();
                   {{ card?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                {{ console.log(card,  "card ") }}
                 <p class="card-text1" >
                   <microphone />
                   {{ card?.course_records }}
@@ -58,11 +59,11 @@ const { locale } = useI18n();
               <div class="card-footer">
                 <span class="card-icon">
                   <img
-                  :src="card?.teacher?.image?.img"
+                  :src="card?.teacher?.image?.img || UserSetting.setting?.image?.img"
                   :alt="card?.teacher?.image?.alt"
                   class="teacher-image"
                 />
-                  <span class="card-name">{{ card?.teacher?.name }}</span>
+                  <span class="card-name">{{ card?.teacher?.name || UserSetting.setting?.name }}</span>
                 </span>
                 <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
               </div>
