@@ -21,7 +21,6 @@ const setting = computed(() => settingStore.setting);
       <div class="col-description">
         <div class="col-details">
           <div>
-            {{ console.log("setting", setting) }}
             <p>رقم الهاتف</p>
             <p>{{ setting?.phone }}</p>
           </div>

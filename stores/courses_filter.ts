@@ -8,7 +8,12 @@ export const useFiltersStore = defineStore('filters', {
     SelectedCollege: null as number | null,
     SelectedCollegeDepartment: null as number | null,
     SelectedCollegeDepartmentDivision: null as number | null,
-    SelectedSubject: null as number | null
+    SelectedSubject: null as number | null,
+    SelectedStage: null as number | null,
+    SelectedStageYear: null as number | null,
+    SelectedStageTitle: null as string | null,
+    SelectedStageYearTitle: null as string | null,
+    
   }),
   actions: {
     updateFilters(filters: any) {

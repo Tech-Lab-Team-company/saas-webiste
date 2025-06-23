@@ -123,7 +123,7 @@ const isVideo = (url) => {
 
 
   </div>
-  <EducationStages/>
+  <EducationStages />
   <Students/>
 
 </template>

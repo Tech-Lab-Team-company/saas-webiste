@@ -29,8 +29,10 @@ const { data: stages } = await useAsyncData("stages", async () => {
   return response.data;
 });
 
+
 const stageYears = ref<Stages[]>([]);
-const fetchStageYears = async (stageId: number) => {
+const SelectedStage = ref<number>() //level
+const fetchStageYears = async (stageId: number , stagetitle:string) => {
   const response = await $fetch<{
     data: Stages[];
     message: string;
@@ -43,7 +45,10 @@ const fetchStageYears = async (stageId: number) => {
       "web-domain": getWebDomain(),
     },
   });
+  SelectedStage.value = stageId;
+  SelectedStageTitle.value = stagetitle;
   stageYears.value = response.data;
+  SendData();
 };
 
 const universitieyTypes = ref<Universitiey[]>([]);
@@ -177,6 +182,7 @@ const fetchSubjects = async (typeId: number) => {
   SendData();
 };
 
+const router = useRouter();
 
 const SelectedSubject = ref(filtersStore.SelectedSubject)
 const SelectSubject = (typeId: number)=>{
@@ -195,6 +201,9 @@ watch(
 )
 const emit = defineEmits(['UpdateData'])
 
+const SelectedStageTitle = ref<string>()
+const SelectedStageYearTitle = ref<string>()
+
 const SendData = () => {
   filtersStore.updateFilters({
     CategryId: CategryId.value,
@@ -203,21 +212,39 @@ const SendData = () => {
     SelectedCollege: SelectedCollege.value,
     SelectedCollegeDepartment: SelectedCollegeDepartment.value,
     SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
-    SelectedSubject: SelectedSubject.value
+    SelectedSubject: SelectedSubject.value,
+    SelectedStage:SelectedStage.value,
+    SelectedStageYear:SelectedYearId.value,
+    SelectedStageTitle:SelectedStageTitle.value,
+    SelectedStageYearTitle:SelectedStageYearTitle.value
   });
-
   emit('UpdateData' ,{
-        CategryId: CategryId.value,
+    CategryId: CategryId.value,
     SelectedEductionType: SelectedEducationTypeId.value,
     SelectedUniversity: SelectedUniversity.value,
     SelectedCollege: SelectedCollege.value,
     SelectedCollegeDepartment: SelectedCollegeDepartment.value,
     SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
-    SelectedSubject: SelectedSubject.value
+    SelectedSubject: SelectedSubject.value,
+    SelectedStage:SelectedStage.value,
+    SelectedStageYear:SelectedYearId.value,
+    SelectedStageTitle:SelectedStageTitle.value,
+    SelectedStageYearTitle:SelectedStageYearTitle.value
   })
 };
 
+const SelectedYearId = ref<number>()
+const updateStageYear = (stageYearId:number , stageYearTitle:string)=>{
+  console.log(stageYearId);
+  SelectedYearId.value = stageYearId;
+  SelectedStageYearTitle.value = stageYearTitle;
+  SendData();
+  router.push(`/course`)
+}
+
 const settingStore = useSettingStore();
+
+
 
 
 </script>
@@ -239,12 +266,14 @@ const settingStore = useSettingStore();
         <button
           class="btn btn-secondary btn-stages"
           @click="showStages = !showStages; showUniversities = false; CategryId=1"
+          v-if="settingStore.setting?.categories?.includes(1)"
         >
           {{ $t('تعليم اساسي') }}
         </button>
         <button 
           class="btn btn-secondary btn-stages"
           @click="showUniversities = !showUniversities; showStages = false ;CategryId=2"
+          v-if="settingStore.setting?.categories?.includes(2)"
         >
           {{ $t('تعليم جامعي') }}
         </button>
@@ -257,17 +286,20 @@ const settingStore = useSettingStore();
             v-for="stage in stages"
             :key="`basic-${stage.id}`"
             class="btn btn-secondary btn-stages btn-stages-education"
-            @click="fetchStageYears(stage.id)"
+            @click="fetchStageYears(stage.id , stage.title)"
           >
             {{ stage.title }}
           </button>
         </template>
+      </div>
 
+      <div class="stages-years">
         <template v-if="stageYears">
           <button
             v-for="year in stageYears"
             :key="`secondary-${year.id}`"
             class="btn btn-secondary btn-stages btn-stages-education"
+            @click="updateStageYear(year.id , year.title)"
           >
             {{ year.title }}
           </button>
@@ -363,6 +395,13 @@ const settingStore = useSettingStore();
 </template>
 
 <style setup lang="scss">
+.stages-years{
+  margin-top:20px;
+  display: flex;
+  flex-direction: row;
+  gap:10px
+
+}
 .subjects-btns{
   display: flex;
   align-items: center;

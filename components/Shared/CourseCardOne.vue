@@ -55,6 +55,7 @@ watch(
 )
 
 const { locale } = useI18n();
+
 </script>
 
 <template>
@@ -79,9 +80,9 @@ const { locale } = useI18n();
               <div class="card-text" v-html="course?.description"></div>
               <div class="card-footer">
                 <span class="card-icon flex">
-                  <img :src="course.teacher?.image?.img" :alt="course?.teacher?.image?.alt">
+                  <img :src="course.teacher?.image?.img ||UserSetting.setting?.image?.img " :alt="course?.teacher?.image?.alt">
                 </span>
-                <span class="card-name">{{ course?.teacher?.name }}</span>
+                <span class="card-name">{{ course?.teacher?.name || UserSetting.setting?.name }}</span>
               </div>
             </div>
           </NuxtLink>

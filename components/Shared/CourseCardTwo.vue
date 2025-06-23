@@ -89,13 +89,13 @@ const splideOptions = {
 };
 
 const { locale } = useI18n();
+const UserSetting = useSettingStore();
 </script>
 
 <template>
 
   <div class="card-course-two">
     <div class="slider-wrapper">
-      {{ console.log(homesection , "hommmmemememem") }}
       <h1 class="slider-heading">{{ homesection?.title }}</h1>
       <Splide :options="splideOptions" class="splide-container" v-if="homesection?.courses?.length >= 2" >
         <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
@@ -108,9 +108,9 @@ const { locale } = useI18n();
               <div class="card-text" v-html="course.description"></div>
               <div class="card-footer">
                 <span class="card-icon">
-                  <img :src="course.teacher.image.img" :alt="course.teacher.image.alt" class="teacher-image" />
+                  <img :src="course.teacher.image.img  ||UserSetting.setting?.image?.img" :alt="course.teacher.image.alt" class="teacher-image" />
                 </span>
-                <span class="card-name">{{ course.teacher.name }}</span>
+                <span class="card-name">{{ course.teacher.name || UserSetting.setting?.name }}</span>
               </div>
               <div class="card-extra-content">
                 <Arrrow/>
