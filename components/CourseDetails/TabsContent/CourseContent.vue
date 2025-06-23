@@ -89,7 +89,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 
   <Accordion value="0" class="course-content-container" >
     <AccordionPanel
-        :value="index"
+        :value="index == 0 ? '0' : index"
         class="course-content-panel"
         v-for="(unit ,index) in CardDetails"
         :key="index"
