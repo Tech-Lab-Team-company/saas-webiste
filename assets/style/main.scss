@@ -68,4 +68,9 @@
 @import "./splider_arrows";
 
 // .card-course-three,
-@import "slider/slider"
+@import "slider/slider";
+
+
+.course-body-details svg path {
+  stroke: #8C8896
+}
