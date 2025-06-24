@@ -12,6 +12,7 @@ import { useUserStore } from "~/stores/user";
 import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons_model';
 import type SessionsModel from '~/features/FetchCourseDetails/Data/models/sessions_model';
 import {ContentTypeEnum} from "~/components/CourseDetails/Enum/content_type_enum";
+import LockIcon from '~/public/icons/LockIcon.vue';
 
 const props = defineProps({
     CourseData: {
@@ -21,6 +22,12 @@ const props = defineProps({
     CourseStatus: {
         type: Number,
 
+    },
+       isSubscribed: {
+        type: Boolean,
+    },
+       isPaied: {
+        type: Boolean,
     }
 });
 
@@ -70,30 +77,99 @@ const activeIndices = ref<number[]>([]);
 
 const selectedSessionIndex = ref<number | null>(null);
 const toast = useToast();
+const isdisabled = ref(false)
 
-function handleSessionClick(index: number, link: string, title: string, text: string) {
-    if (!userStore.user){
-toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+function handleSessionClick(index: number, link: string, title: string, text: string,show:boolean) {
+  if (!userStore.user){
+    toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+    // return;
+  }
+  else {
+    if(show === false){
+        if((UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-') && (UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-')) {
+            visible.value=true;
+        }
     }
-    else{
-
-        selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+    else if(show === true){
+        if(!props.isSubscribed && props.isPaied){
+          isdisabled.value = true
+          console.log("non")
+        }
+        else if(props.isSubscribed && props.isPaied){
+          isdisabled.value = false
+          selectedSessionIndex.value = index;
+          sendactivetab(0, link, title, text);
+          visible.value=false;   
+        }
+        else if((!props.isPaied)){
+          isdisabled.value = false
+          selectedSessionIndex.value = index;
+          sendactivetab(0, link, title, text);
+          visible.value=false;   
+        }
     }
+  }
 }
+const visible = ref(false)
+const UserSetting =useUserStore();
 </script>
 
 <template>
-    <div class="course-body-details" :key="index" v-for="(session, index) in CourseData" :class="[
-        (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '',
-        (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',]" 
-        @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text)">
+    <div class="course-body-details" :key="index" v-for="(session, index) in CourseData"    
+    :class="[ selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
+        @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text , session?.web_show_video)">
         <component :is="getIconByType(session?.type)" />
-        <p>{{ session?.title }} </p>
+      <div class="session-name">
+          <LockIcon v-if="!session?.web_show_video" />
+          <p>{{ session?.title }} </p>
+          <p  v-if="!session?.web_show_video" >(هذا المحتوى حصرى للتطبيق فقط)</p>
     </div>
+ 
+    </div>
+    <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
+        <div class="stores-logos-container">
+            <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.app_store">
+            <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
+            
+            </a>
+            <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.play_store">
+            <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
+            </a>
+        </div>
+</Dialog>
 </template>
 
 <style scoped lang="scss">
+
+.stores-logos-container{
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  .stores-logos-link{
+    width:50%;
+
+    .stores-logos-apple{
+      width:88%;
+    }
+  }
+
+}
+.course-body-details{
+  position:relative;
+}
+.disabled{
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+
+}
+
+.session-name{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    position: relative;
+  }
 .course-body-details{
        margin-left: auto;
     margin-right: auto;

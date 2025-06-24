@@ -15,6 +15,7 @@ export default class SessionsModel {
   public StratDate: string;
   public EndDate: string;
   public Secure: number;
+  public web_show_video: boolean;
 
 
 
@@ -33,6 +34,7 @@ export default class SessionsModel {
     StratDate: string,
     EndDate: string,
     Secure: number,
+    web_show_video: boolean,
 
 
   ) {
@@ -48,6 +50,7 @@ export default class SessionsModel {
     this.StratDate = StratDate;
     this.EndDate = EndDate;
     this.Secure = Secure;
+    this.web_show_video = web_show_video;
     
  
   }
@@ -67,6 +70,7 @@ export default class SessionsModel {
       map["start_date"],
       map["end_date"],
       map["secure"],
+      map["web_show_video"],
     );
   }
 }
