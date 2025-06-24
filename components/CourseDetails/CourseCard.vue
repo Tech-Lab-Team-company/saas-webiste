@@ -5,7 +5,9 @@ import PaymentDialog from './PaymentDialog.vue';
 import CoursesPaymentParams from '~/features/CoursePayment/Core/Params/courses_payment_params';
 import CoursesPaymentController from '~/features/CoursePayment/presentation/controllers/courses_payment_controller';
 
-
+import microphone from "@/public/icons/microphone.vue";
+import note from "@/public/icons/note.vue";
+import video1 from "~/public/icons/video1.vue";
 
 const props = defineProps({
     CourseData: {
@@ -61,7 +63,7 @@ const AddPayment = async () => {
                 <p class="salary" v-if="CardDetails?.CoursePrice != 0"> <span>{{
                     $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
-                   <!-- <div class="card-content">
+                   <div class="card-content">
                 <p class="card-text1" v-if="CardDetails?.course_videos ">
                   <video1 />
                   {{ CardDetails?.course_videos }}
@@ -72,15 +74,15 @@ const AddPayment = async () => {
                   {{ CardDetails?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                <p class="card-text1" >
+                <p class="card-text1" v-if="CardDetails?.course_records ">
                   <microphone />
                   {{ CardDetails?.course_records }}
                   {{ $t('ملف صوتى') }}
                 </p>
-              </div> -->
+              </div>
                 <div class="card-profile">
-                    <p>{{ CardDetails?.Teacher?.name }}</p>
-                    <img :src="CardDetails?.Teacher?.image?.img">
+                    <p>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</p>
+                    <img :src="CardDetails?.Teacher?.image?.img ||userSetting.setting?.image?.img ">
                 </div>
             </div>
 
@@ -103,6 +105,26 @@ const AddPayment = async () => {
 </template>
 
 <style scoped lang="scss">
+.card-text-footer{
+    gap:50px;
+}
+.card-content{
+    display: flex;
+    flex-direction:row-reverse;
+    justify-content: center;
+    width:50%;
+    margin-left:auto;
+    gap:50px;
+
+    
+    .card-text1{
+        display: flex;
+        flex-direction:row-reverse;
+        gap:6px;
+
+    }
+
+}
 .btns-container {
     display: flex;
     justify-content: center;

@@ -6,7 +6,7 @@ import { useSettingStore } from "./stores/setting";
 import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
 import FetchPaymentMethodsParams from "./features/fetch_payment_methods/Core/Params/fetch_payment_methods_params";
 import FetchPaymentMethodController from "./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
-// import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
+import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 import {getWebDomain} from "~/constant/webDomain";
 
 
@@ -70,7 +70,7 @@ UserSettingStore.setSetting(webStatus.value!);
       <Toast />
       <NuxtPage />
       <MainDialog v-if="!pending" />
-      <!--  <LoaderDialog  v-if="!pending"/> -->
+       <LoaderDialog  v-if="!pending"/>
     </NuxtLayout>
   </div>
 </template>
