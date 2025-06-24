@@ -63,6 +63,7 @@ const sendactivetab = (activetabvalue: number, link: string, title: string, desc
     activetab.value = activetabvalue;
     emit('coursechanged', { activetabvalue: activetabvalue, link: link, title: title, description: description });
 }
+const toast = useToast();
 
 const userStore = useUserStore()
 const activeIndices = ref<number[]>([]);
@@ -70,9 +71,15 @@ const activeIndices = ref<number[]>([]);
 const selectedSessionIndex = ref<number | null>(null);
 
 function handleSessionClick(index: number, link: string, title: string, text: string) {
-    if (!userStore.user) return;
-    selectedSessionIndex.value = index;
-    sendactivetab(0, link, title, text);
+    if (!userStore.user){
+
+        toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+    }
+    else{
+
+        selectedSessionIndex.value = index;
+        sendactivetab(0, link, title, text);
+    }
 }
 </script>
 

@@ -61,6 +61,23 @@ const AddPayment = async () => {
                 <p class="salary" v-if="CardDetails?.CoursePrice != 0"> <span>{{
                     $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
+                   <!-- <div class="card-content">
+                <p class="card-text1" v-if="CardDetails?.course_videos ">
+                  <video1 />
+                  {{ CardDetails?.course_videos }}
+                  {{ $t('فيديو') }}
+                </p>
+                <p class="card-text1" v-if="CardDetails?.course_docs ">
+                  <note />
+                  {{ CardDetails?.course_docs }}
+                  {{ $t('ملف ورقي') }}
+                </p>
+                <p class="card-text1" >
+                  <microphone />
+                  {{ CardDetails?.course_records }}
+                  {{ $t('ملف صوتى') }}
+                </p>
+              </div> -->
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher?.name }}</p>
                     <img :src="CardDetails?.Teacher?.image?.img">

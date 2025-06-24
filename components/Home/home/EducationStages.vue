@@ -14,27 +14,7 @@ const filtersStore = useFiltersStore();
 const showStages = ref(false);
 const showUniversities = ref(false);
 
-
-const stages = ref<Stages[]>([]);
-
-// const FetchStages = await useAsyncData("stages", async () => {
-//   const response = await $fetch<{
-//     data: Stages[];
-//     message: string;
-//     status: number;
-//   }>(`${baseUrl}/fetch_stages`, {
-//     method: "POST",
-//     headers: {
-//       "Accept-Language": "ar",
-//       "web-domain": getWebDomain(),
-//     },
-//   });
-//   stages.value = 
-//   return response.data;
-// });
-
-
-const FetchStages = async () => {
+const { data: stages } = await useAsyncData("stages", async () => {
   const response = await $fetch<{
     data: Stages[];
     message: string;
@@ -46,12 +26,8 @@ const FetchStages = async () => {
       "web-domain": getWebDomain(),
     },
   });
-
-  stages.value = response.data;
-  SendData();
-};
-
-
+  return response.data;
+});
 
 
 const stageYears = ref<Stages[]>([]);
@@ -74,15 +50,6 @@ const fetchStageYears = async (stageId: number , stagetitle:string) => {
   stageYears.value = response.data;
   SendData();
 };
-
-onMounted(()=>{
-  if(filtersStore.SelectedStage){
-    fetchStageYears(filtersStore.SelectedStage, filtersStore.SelectedStageTitle ?? "");
-  }
-  if(filtersStore.SelectedEductionType){
-
-  }
-})
 
 const universitieyTypes = ref<Universitiey[]>([]);
 const universities = ref<Universitiey[]>([]);
@@ -278,7 +245,9 @@ const updateStageYear = (stageYearId:number , stageYearTitle:string)=>{
 const settingStore = useSettingStore();
 
 
-
+const CategoryBtn = ref<boolean>(false)
+const StageBtn = ref<boolean>(false)
+const StageYearBtn = ref<boolean>(false)
 
 </script>
 
@@ -298,7 +267,8 @@ const settingStore = useSettingStore();
       <div class="stages-buttons flex flex-row gap-4 justify-start mt-4">
         <button
           class="btn btn-secondary btn-stages"
-          @click="showStages = !showStages; showUniversities = false; CategryId=1;FetchStages()"
+          @click="showStages = !showStages; showUniversities = false; CategryId=1 ;CategoryBtn=true"
+           :class="{'active-btn':CategryId===1}"
           v-if="settingStore.setting?.categories?.includes(1)"
         >
           {{ $t('تعليم اساسي') }}
@@ -318,9 +288,9 @@ const settingStore = useSettingStore();
           <button
             v-for="stage in stages"
             :key="`basic-${stage.id}`"
-            class="btn btn-secondary btn-stages btn-stages-education"
-            @click="fetchStageYears(stage.id , stage.title)"
-            
+            class="btn btn-secondary btn-stages btn-stages-education "
+            :class="{'active-btn':SelectedStage === stage.id}"
+            @click="fetchStageYears(stage.id , stage.title);StageBtn=true"
           >
             {{ stage.title }}
           </button>
@@ -333,7 +303,8 @@ const settingStore = useSettingStore();
             v-for="year in stageYears"
             :key="`secondary-${year.id}`"
             class="btn btn-secondary btn-stages btn-stages-education"
-            @click="updateStageYear(year.id , year.title)"
+            @click="updateStageYear(year.id , year.title);StageYearBtn=true"
+             :class="{'active-btn':SelectedStageYearTitle === year.title}"
           >
             {{ year.title }}
           </button>
@@ -429,6 +400,11 @@ const settingStore = useSettingStore();
 </template>
 
 <style setup lang="scss">
+.active-btn{
+  background-color: #ffb949;
+  color: white !important;
+  
+}
 .stages-years{
   margin-top:20px;
   display: flex;

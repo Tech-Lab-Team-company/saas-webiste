@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/image', 'nuxt-swiper', '@primevue/nuxt-module', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt' ,'@twicpics/components/nuxt3' ,'@nuxtjs/i18n' ],
   // , '@pinia/nuxt',
   primevue: {
+    // useToastService: true,
     /* Options */
     options: {
       theme: {
@@ -20,8 +21,8 @@ export default defineNuxtConfig({
     },
     usePrimeVue: true,
     components: {
-      include: ['Button', 'InputText', 'Tag', 'Terminal']
-    }
+      include: ['Button', 'InputText', 'Tag', 'Terminal' ,'Toast']
+    },
   },
   i18n: {
     strategy: 'no_prefix',
@@ -45,6 +46,7 @@ export default defineNuxtConfig({
     },
   },
   css: [
+    'primeicons/primeicons.css',
     "@/assets/style/main.min.css",
     '@twicpics/components/style.css',
     'swiper/swiper-bundle.css'

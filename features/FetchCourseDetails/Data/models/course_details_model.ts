@@ -24,7 +24,10 @@ export default class CourseDetailsModel {
   public units: UnitsModel[];
   public allow_status: number;
   public currency: string;
-
+  public course_docs: number;
+  public course_records: number;
+  public course_videos: number;
+  
 
 
   constructor(
@@ -45,6 +48,9 @@ export default class CourseDetailsModel {
     units: UnitsModel[],
     allow_status: number,
     currency: string,
+    course_docs: number,
+    course_records: number,
+    course_videos: number,
 
   ) {
     this.id = id;
@@ -64,6 +70,9 @@ export default class CourseDetailsModel {
     this.units = units;
     this.allow_status = allow_status;
     this.currency = currency;
+    this.course_docs = course_docs;
+    this.course_records = course_records;
+    this.course_videos = course_videos;
  
   }
 
@@ -87,6 +96,9 @@ export default class CourseDetailsModel {
       map["units"],
       map["allow_status"],
       map["currency"],
+      map["course_docs"],
+      map["course_records"],
+      map["course_videos"],
     );
   }
 }
