@@ -46,7 +46,7 @@ const droplist = ref(false);
 <template>
   <header class="header">
     <div class="header-nav">
-      <p class="header-title">👋 هل تريد معرفة المزيد عنا ! .. دعني اوضح لك</p>
+      <a :href="`https://wa.me/${settingStore.setting?.whatsapp}`" class="header-title">👋 هل تريد معرفة المزيد عنا ! .. دعني اوضح لك</a>
     </div>
 
     <nav class="header-container">

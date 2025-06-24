@@ -1,12 +1,5 @@
 <script setup lang="ts">
 
-// import homeStarting from './components/Home/home/homestarting.vue'
-// import CourseCard from "~/components/Shared/CourseCard.vue";
-// import CourseDetails from "~/components/CourseDetails/CourseDetails.vue";
- 
-// import Profile from "~/components/Profile/Profile.vue";
-
-
 import { baseUrl } from "~/constant/baseUrl";
 import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
@@ -15,6 +8,7 @@ import FetchPaymentMethodsParams from "./features/fetch_payment_methods/Core/Par
 import FetchPaymentMethodController from "./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
 // import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 import {getWebDomain} from "~/constant/webDomain";
+
 
 const { data: webStatus, pending } = await useAsyncData("webStatus", async () => {
   const response = await $fetch<{
@@ -64,11 +58,6 @@ onMounted(
 const UserSettingStore = useSettingStore();
 UserSettingStore.setSetting(webStatus.value!);
 
-// You can use pending state to show loading if needed
-
-// onMounted(() => {
-//   cons
-// })
 
 
 </script>
@@ -76,6 +65,9 @@ UserSettingStore.setSetting(webStatus.value!);
 <template>
   <div>
     <NuxtLayout>
+    
+      <SpeedDialToast class="social-icons"/>
+      <Toast />
       <NuxtPage />
       <MainDialog v-if="!pending" />
       <!--  <LoaderDialog  v-if="!pending"/> -->
@@ -83,4 +75,13 @@ UserSettingStore.setSetting(webStatus.value!);
   </div>
 </template>
 
-<style></style>
+<style scoped lang="scss">
+.social-icons{
+  top: 94%;
+  left: 4%;
+  z-index: 1000;
+  position: fixed;
+  cursor: pointer;
+}
+</style>
+

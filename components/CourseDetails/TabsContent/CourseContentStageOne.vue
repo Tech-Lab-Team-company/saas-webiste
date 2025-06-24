@@ -68,11 +68,17 @@ const userStore = useUserStore()
 const activeIndices = ref<number[]>([]);
 
 const selectedSessionIndex = ref<number | null>(null);
+const toast = useToast();
 
 function handleSessionClick(index: number, link: string, title: string, text: string) {
-    if (!userStore.user) return;
-    selectedSessionIndex.value = index;
-    sendactivetab(0, link, title, text);
+    if (!userStore.user){
+toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+    }
+    else{
+
+        selectedSessionIndex.value = index;
+        sendactivetab(0, link, title, text);
+    }
 }
 </script>
 
