@@ -67,8 +67,6 @@ export default class SessionsModel {
       map["start_date"],
       map["end_date"],
       map["secure"],
-
-
     );
   }
 }

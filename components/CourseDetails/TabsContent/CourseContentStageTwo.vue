@@ -7,9 +7,10 @@ import AccordionContent from 'primevue/accordioncontent';
 import CourseVideoIcon from '~/public/icons/CourseVideoIcon.vue';
 import coursenotesicon from '~/public/icons/coursenotesicon.vue';
 import microphoneicon from '~/public/icons/microphoneicon.vue';
-import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
+// import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
 import { useUserStore } from "~/stores/user";
 import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons_model';
+import {ContentTypeEnum} from "~/components/CourseDetails/Enum/content_type_enum";
 
 const props = defineProps({
     CourseData: {
@@ -36,17 +37,17 @@ function getExtFromUrl(url: string): string {
     return match ? match[1].toLowerCase() : '';
 }
 
-const iconMap: Record<string, any> = {
-    youtube: CourseVideoIcon,
-    mp3: microphoneicon,
-    pdf: coursenotesicon,
-    mp4: CourseVideoIcon,
-    // add more as needed
+const typeIconMap: Record<ContentTypeEnum, any> = {
+  [ContentTypeEnum.VIDEO]: CourseVideoIcon,
+  [ContentTypeEnum.PDF]: coursenotesicon,
+  [ContentTypeEnum.AUDIO]: microphoneicon,
+  [ContentTypeEnum.VIDEO_PDF]: CourseVideoIcon,
+  [ContentTypeEnum.AUDIO_PDF]: microphoneicon,
+  [ContentTypeEnum.GENERALSESSION]: coursenotesicon,
 };
 
-function getIconByExt(link: string) {
-    const ext = getExtFromUrl(link);
-    return iconMap[ext] || CourseVideoIcon; // fallback icon
+function getIconByType(type: ContentTypeEnum) {
+  return typeIconMap[type] || CourseVideoIcon;
 }
 
 
@@ -89,14 +90,13 @@ function handleSessionClick(index: number, link: string, title: string, text: st
             :class="{ 'active': activePanels.includes(index) }">
             <AccordionHeader class="course-content-header ">{{ lesson?.title }}</AccordionHeader>
             <AccordionContent class="course-class-body">
-                {{ console.log(lesson?.sessions ,  " Sessions") }}
                 <div class="course-body-details" :key="thirdindex" v-for="(session, thirdindex) in lesson?.sessions"
                     :class="[
                         (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '',
                         (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',
                         selectedSessionIndex === thirdindex ? 'active' : ''
                     ]" @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text)">
-                    <component :is="getIconByExt(session?.link)" />
+                    <component :is="getIconByType(session?.type)" />
                     <p>{{ session?.title }} </p>
                 </div>
             </AccordionContent>
@@ -113,7 +113,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1rem;
-    box-shadow: 3px 3px 3px 0px #00000038;
+    box-shadow: 3px 3px 3px 0 #00000038;
     padding: 0.7rem;
     border-radius: 10px;
 }

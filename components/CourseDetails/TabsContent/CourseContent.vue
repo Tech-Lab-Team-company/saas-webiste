@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ContentTypeEnum } from '~/components/CourseDetails/Enum/content_type_enum';
 
 import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
@@ -37,25 +38,17 @@ watch(() => props.CourseData, (newValue) => {
   CardDetails.value = newValue;
 }, {immediate: true});
 
-
-function getExtFromUrl(url: string): string {
-  if (!url) return '';
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
-  const match = url.match(/\.([a-zA-Z0-9]+)(?:\?|#|$)/);
-  return match ? match[1].toLowerCase() : '';
-}
-
-const iconMap: Record<string, any> = {
-  youtube: CourseVideoIcon,
-  mp3: microphoneicon,
-  pdf: coursenotesicon,
-  mp4: CourseVideoIcon,
-  // add more as needed
+const typeIconMap: Record<ContentTypeEnum, any> = {
+  [ContentTypeEnum.VIDEO]: CourseVideoIcon,
+  [ContentTypeEnum.PDF]: coursenotesicon,
+  [ContentTypeEnum.AUDIO]: microphoneicon,
+  [ContentTypeEnum.VIDEO_PDF]: CourseVideoIcon,
+  [ContentTypeEnum.AUDIO_PDF]: microphoneicon,
+  [ContentTypeEnum.GENERALSESSION]: coursenotesicon,
 };
 
-function getIconByExt(link: string) {
-  const ext = getExtFromUrl(link);
-  return iconMap[ext] || CourseVideoIcon; // fallback icon
+function getIconByType(type: ContentTypeEnum) {
+  return typeIconMap[type] || CourseVideoIcon;
 }
 
 
@@ -123,8 +116,8 @@ function handleSessionClick(index: number, link: string, title: string, text: st
                       selectedSessionIndex === thirdindex ? 'active' : ''
                     ]"
                    @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text)">
-                <component :is="getIconByExt(session?.link)"/>
                 <p>{{ session?.title }} </p>
+                <component :is="getIconByType(session?.type)"/>
               </div>
             </AccordionContent>
           </AccordionPanel>
@@ -138,6 +131,15 @@ function handleSessionClick(index: number, link: string, title: string, text: st
 </template>
 
 
-
-
-
+<style scoped lang="scss">
+.course-class-container .course-class-panel .course-class-body .course-body-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  box-shadow: 3px 3px 3px 0 #00000038;
+  padding: 0.7rem;
+  border-radius: 10px;
+  width: 100%;
+}
+</style>

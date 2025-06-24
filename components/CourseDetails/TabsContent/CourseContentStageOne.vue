@@ -11,6 +11,7 @@ import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_mod
 import { useUserStore } from "~/stores/user";
 import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons_model';
 import type SessionsModel from '~/features/FetchCourseDetails/Data/models/sessions_model';
+import {ContentTypeEnum} from "~/components/CourseDetails/Enum/content_type_enum";
 
 const props = defineProps({
     CourseData: {
@@ -37,17 +38,17 @@ function getExtFromUrl(url: string): string {
     return match ? match[1].toLowerCase() : '';
 }
 
-const iconMap: Record<string, any> = {
-    youtube: CourseVideoIcon,
-    mp3: microphoneicon,
-    pdf: coursenotesicon,
-    mp4: CourseVideoIcon,
-    // add more as needed
+const typeIconMap: Record<ContentTypeEnum, any> = {
+  [ContentTypeEnum.VIDEO]: CourseVideoIcon,
+  [ContentTypeEnum.PDF]: coursenotesicon,
+  [ContentTypeEnum.AUDIO]: microphoneicon,
+  [ContentTypeEnum.VIDEO_PDF]: CourseVideoIcon,
+  [ContentTypeEnum.AUDIO_PDF]: microphoneicon,
+  [ContentTypeEnum.GENERALSESSION]: coursenotesicon,
 };
 
-function getIconByExt(link: string) {
-    const ext = getExtFromUrl(link);
-    return iconMap[ext] || CourseVideoIcon; // fallback icon
+function getIconByType(type: ContentTypeEnum) {
+  return typeIconMap[type] || CourseVideoIcon;
 }
 
 
@@ -87,7 +88,7 @@ toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل 
         (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '',
         (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',]" 
         @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text)">
-        <component :is="getIconByExt(session?.link)" />
+        <component :is="getIconByType(session?.type)" />
         <p>{{ session?.title }} </p>
     </div>
 </template>
@@ -99,12 +100,11 @@ toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل 
     background: white;
     display: flex;
     justify-content: space-between;
-    padding: 6px;
     color: black;
     width: 70%;
     cursor: pointer;
     border-radius: 10px;
-    margin-top: 1rem;
+    margin-bottom: 1rem;
     padding: 0.7rem;
     box-shadow: 3px 3px 3px 2px #00000038;
     
