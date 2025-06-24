@@ -6,6 +6,7 @@ const props = defineProps<{
 }>();
 
 const { locale } = useI18n();
+const UserSetting = useSettingStore();
 </script>
 <template>
   
@@ -21,7 +22,7 @@ const { locale } = useI18n();
           :to="`/course/${card.id}`"
           class="card"
           
-          :style="{ backgroundImage: `url(${card.image.img})` }"
+          :style="{ backgroundImage: `url(${card.image.img|| UserSetting.setting?.image?.img})` }"
         >
           <!-- <div class="image-container">
   
@@ -91,6 +92,8 @@ const { locale } = useI18n();
   width: 80%;
   margin-left: auto;
   margin-right: auto;
+  justify-items: start; 
+  direction: rtl;
 }
 
 @media(max-width:768px){

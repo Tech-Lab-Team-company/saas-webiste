@@ -62,7 +62,7 @@ onMounted(() => {
 
 <template>
   <div class="main-blog-container">
-  <div class="Blog" dir="rtl">
+  <div class="Blog" dir="rtl" v-if="Blogs?.length > 0">
     <div class="slider-wrapper pt-md">
       <div class="stage-container">
         <div class="stages student-stages">

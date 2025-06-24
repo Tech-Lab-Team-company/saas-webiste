@@ -11,6 +11,11 @@ const props = defineProps<{
 const { locale } = useI18n();
 
 const UserSetting = useSettingStore();
+
+
+
+
+
 </script>
 
 <template>
@@ -27,8 +32,8 @@ const UserSetting = useSettingStore();
         >
           <div class="card-inner" dir="rtl">
             <div class="image-container">
-    
-              <img :src="card?.image?.img || ''" alt="course image" class="card-image" />
+              <!-- return image but not working  -->
+              <img  :src="card?.image?.img || UserSetting.setting?.image.img" alt="course image" class="card-image" />
             </div>
 
             <div class="card-body">
