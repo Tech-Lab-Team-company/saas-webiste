@@ -33,13 +33,13 @@ const userSetting = useSettingStore();
 const router = useRouter();
 
 const AddPayment = async () => {
-  const coursePaymentParams = new CoursesPaymentParams(Number(router.currentRoute.value.params.id), 1, 1, null);
-  const coursesPaymentController = CoursesPaymentController.getInstance();
-  const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
-  if (state.value.message) {
-    status.value = 1;
-  }
-  
+    const coursePaymentParams = new CoursesPaymentParams(Number(router.currentRoute.value.params.id), 1, 1, null);
+    const coursesPaymentController = CoursesPaymentController.getInstance();
+    const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
+    if (state.value.message) {
+        status.value = 1;
+    }
+
 }
 </script>
 
@@ -58,7 +58,8 @@ const AddPayment = async () => {
             </div>
             <hr />
             <div class="card-text-footer">
-                <p class="salary" v-if="CardDetails?.CoursePrice != 0"> <span>{{ $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
+                <p class="salary" v-if="CardDetails?.CoursePrice != 0"> <span>{{
+                    $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher?.name }}</p>
@@ -69,7 +70,8 @@ const AddPayment = async () => {
 
             <div class="btns btns-container">
 
-                <PaymentDialog :status="status" class="payment-dialog"/>
+                <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
+                <PaymentDialog :status="status" class="payment-dialog" />
                 <!-- <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
                         طلب الانضمام
                 </button> -->
@@ -84,25 +86,32 @@ const AddPayment = async () => {
 </template>
 
 <style scoped lang="scss">
-.btns-container{
+.btns-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
 
-    .payment-dialog{
+    .payment-dialog {
         width: 100%;
+
+        &.multi-btn {
+            width: 50%;
+        }
     }
-    button{
+
+    button {
         width: 50%;
     }
 }
-.salary{
+
+.salary {
     display: flex;
     gap: 4px;
-    
+
     align-items: center;
 }
+
 .icon {
     position: absolute;
 }
@@ -125,7 +134,7 @@ const AddPayment = async () => {
 }
 
 
-.card-text-description{
+.card-text-description {
     max-height: 500px;
     height: fit-content;
     overflow-y: auto;

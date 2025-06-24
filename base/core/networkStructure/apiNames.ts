@@ -137,7 +137,10 @@ class ApiNames {
 
   public educationbasiclevels = this.baseUrl + "fetch_stages";
   public educationbasicstagesyear = this.baseUrl + "fetch_stage_years ";
-  public educationbasicsubjects = this.baseUrl + "fetch_subjects  ";
+  public educationbasicsubjects = this.baseUrl + "fetch_subjects";
+  
+  
+  public paymentmethods = this.baseUrl + "fetch_payment_methods";
 
   
   

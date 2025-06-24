@@ -14,7 +14,27 @@ const filtersStore = useFiltersStore();
 const showStages = ref(false);
 const showUniversities = ref(false);
 
-const { data: stages } = await useAsyncData("stages", async () => {
+
+const stages = ref<Stages[]>([]);
+
+// const FetchStages = await useAsyncData("stages", async () => {
+//   const response = await $fetch<{
+//     data: Stages[];
+//     message: string;
+//     status: number;
+//   }>(`${baseUrl}/fetch_stages`, {
+//     method: "POST",
+//     headers: {
+//       "Accept-Language": "ar",
+//       "web-domain": getWebDomain(),
+//     },
+//   });
+//   stages.value = 
+//   return response.data;
+// });
+
+
+const FetchStages = async () => {
   const response = await $fetch<{
     data: Stages[];
     message: string;
@@ -26,8 +46,12 @@ const { data: stages } = await useAsyncData("stages", async () => {
       "web-domain": getWebDomain(),
     },
   });
-  return response.data;
-});
+
+  stages.value = response.data;
+  SendData();
+};
+
+
 
 
 const stageYears = ref<Stages[]>([]);
@@ -50,6 +74,15 @@ const fetchStageYears = async (stageId: number , stagetitle:string) => {
   stageYears.value = response.data;
   SendData();
 };
+
+onMounted(()=>{
+  if(filtersStore.SelectedStage){
+    fetchStageYears(filtersStore.SelectedStage, filtersStore.SelectedStageTitle ?? "");
+  }
+  if(filtersStore.SelectedEductionType){
+
+  }
+})
 
 const universitieyTypes = ref<Universitiey[]>([]);
 const universities = ref<Universitiey[]>([]);
@@ -265,7 +298,7 @@ const settingStore = useSettingStore();
       <div class="stages-buttons flex flex-row gap-4 justify-start mt-4">
         <button
           class="btn btn-secondary btn-stages"
-          @click="showStages = !showStages; showUniversities = false; CategryId=1"
+          @click="showStages = !showStages; showUniversities = false; CategryId=1;FetchStages()"
           v-if="settingStore.setting?.categories?.includes(1)"
         >
           {{ $t('تعليم اساسي') }}
@@ -287,6 +320,7 @@ const settingStore = useSettingStore();
             :key="`basic-${stage.id}`"
             class="btn btn-secondary btn-stages btn-stages-education"
             @click="fetchStageYears(stage.id , stage.title)"
+            
           >
             {{ stage.title }}
           </button>

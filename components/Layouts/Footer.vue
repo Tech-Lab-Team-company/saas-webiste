@@ -36,7 +36,7 @@ const setting = computed(() => settingStore.setting);
         </div>
         <div class="col-details">
           <div>
-            <p>حسابنا</p>
+            <p>البريد</p>
             <p>{{ setting?.email }}</p>
           </div>
           <Email class="email-icon" />
