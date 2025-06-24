@@ -23,7 +23,7 @@ const UserSettingStore = useSettingStore();
             <img class="background-circle" src="../../public/images/Component15.png" alt="">
             <img :src="UserSettingStore.setting.image.img" alt="" width="150">
             <h3>{{ $t('مرحبا بك فى منصتنا التعليمية') }}</h3>
-            <p>{{ $t('تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.') }}</p>
+            <p>{{ $t(`${UserSettingStore.setting?.description}`) }}</p>
 
             <div class="btns">
                 <nuxt-link class="nuxt-link-btn" to="/login/loginhome"><button class="login-btn">{{ $t('تسجيل الدخول') }}</button></nuxt-link>

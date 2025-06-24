@@ -81,12 +81,21 @@ const setting = computed(() => settingStore.setting);
       </div>
     </div>
 
-    <div class="col">
+    <div class="col logo-col">
 
       <NuxtImg v-if="settingStore.setting?.image?.img" :src="settingStore.setting.image.img" :alt="setting?.image?.alt"
         format="webp" class="col-logo" />
 
       <div v-html="setting?.description" class="col-data-details"></div>
+      <div class="stores-logos-container">
+        <a v-if="settingStore.setting?.app_store && settingStore.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="settingStore.setting?.app_store">
+          <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
+          
+        </a>
+        <a v-if="settingStore.setting?.play_store && settingStore.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="settingStore.setting?.play_store">
+          <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
+        </a>
+      </div>
       <div class="social-media-icons">
         <NuxtLink :to="setting?.twitter">
           <IconsTwiter class="social-icon" />
@@ -108,6 +117,20 @@ const setting = computed(() => settingStore.setting);
 </template>
 
 <style scoped lang="scss">
+.stores-logos-container{
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  .stores-logos-link{
+    width:50%;
+
+    .stores-logos-apple{
+      width:88%;
+    }
+  }
+
+}
+
 .social-media-icons {
   display: flex;
   justify-content: flex-end;
@@ -124,6 +147,13 @@ const setting = computed(() => settingStore.setting);
 
 }
 .col{
+  &.logo-col{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap:15px;
+  }
   .col-description{
     .col-details{
       .email-icon {

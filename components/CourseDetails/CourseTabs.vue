@@ -9,6 +9,7 @@ import homeworkicon from '~/public/icons/homeworkicon.vue';
 import CourseDetailsParams from '~/features/FetchCourseDetails/Core/Params/course_details_params';
 import CourseDetailsController from '~/features/FetchCourseDetails/presentation/controllers/course_details_controller';
 import type CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
+import Loder from '../Loader/Loder.vue';
 
 const value = ref('0');
 const route = useRoute()
@@ -57,6 +58,12 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
 </script>
 
 <template>
+
+<!--  -->
+  <div class="page-loader" v-if="!CardData"  >
+    <Loder 
+   />
+  </div>
   <div v-if="activetab==0">
     <CourseDetailsCourseVideo
         :CourseData="CardData"
@@ -64,15 +71,17 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
     />
   </div>
 
-  <div v-if="activetab!=0">
+  <div v-if="activetab!=0 " >
     <CourseDetailsCourseCard
         :CourseData="CardData"
         :status="CardData?.allow_status"
+        :isSubscribed="CardData?.is_subscribed"
+        :isPaied="CardData?.is_paid"
     />
 
   </div>
 
-  <div class="course-tabs">
+  <div class="course-tabs"  >
     <RightDots class="right-dots"/>
     <RightDots class="left-dots"/>
 
@@ -114,6 +123,8 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               @coursechanged="Data"
               :CourseData="CardData?.units"
               :CourseStatus="CardData?.allow_status"
+              :isSubscribed="CardData?.is_subscribed"
+              :isPaied="CardData?.is_paid"
           />
         </div>
         <div v-if="tab_value === 'content' && CardData?.StageType == 2">
@@ -121,6 +132,8 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               @coursechanged="Data"
               :CourseData="CardData?.lessons"
               :CourseStatus="CardData?.allow_status"
+              :isSubscribed="CardData?.is_subscribed"
+              :isPaied="CardData?.is_paid"
           />
         </div>
         <div v-if="tab_value === 'content' && CardData?.StageType == 1">
@@ -128,6 +141,8 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               @coursechanged="Data"
               :CourseData="CardData?.sessions"
               :CourseStatus="CardData?.allow_status"
+              :isSubscribed="CardData?.is_subscribed"
+              :isPaied="CardData?.is_paid"
           />
         </div>
         <div v-if="tab_value === 'urls'">
@@ -156,5 +171,15 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
 
 </template>
 
-<style scoped></style>
+<style scoped>
+.page-loader{
+  height: 100vh;
+  width: 100%;
+      position: absolute;
+    background-color: #000000c9;
+    top: 0;
+    left: 0;
+        z-index: 99;
+}
+</style>
 

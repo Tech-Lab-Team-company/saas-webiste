@@ -27,6 +27,8 @@ export default interface WebStatus {
     secondary_color: string;
     whatsapp_otp_activation:number;
     join_option_status:number;
+    app_store:string;
+    play_store:string;
 
 }
 

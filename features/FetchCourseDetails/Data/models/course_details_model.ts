@@ -27,6 +27,8 @@ export default class CourseDetailsModel {
   public course_docs: number;
   public course_records: number;
   public course_videos: number;
+  public is_subscribed: boolean;
+  public is_paid: boolean;
   
 
 
@@ -51,6 +53,8 @@ export default class CourseDetailsModel {
     course_docs: number,
     course_records: number,
     course_videos: number,
+    is_paid: boolean,
+    is_subscribed: boolean,
 
   ) {
     this.id = id;
@@ -73,6 +77,8 @@ export default class CourseDetailsModel {
     this.course_docs = course_docs;
     this.course_records = course_records;
     this.course_videos = course_videos;
+    this.is_paid = is_paid;
+    this.is_subscribed = is_subscribed;
  
   }
 
@@ -99,6 +105,8 @@ export default class CourseDetailsModel {
       map["course_docs"],
       map["course_records"],
       map["course_videos"],
+      map["is_paid"],
+      map["is_subscribed"],
     );
   }
 }

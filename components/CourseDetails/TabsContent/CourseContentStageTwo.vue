@@ -11,7 +11,7 @@ import microphoneicon from '~/public/icons/microphoneicon.vue';
 import { useUserStore } from "~/stores/user";
 import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons_model';
 import {ContentTypeEnum} from "~/components/CourseDetails/Enum/content_type_enum";
-
+import LockIcon from '~/public/icons/LockIcon.vue';
 const props = defineProps({
     CourseData: {
         type: Object as () => LessonsModel | null,
@@ -19,7 +19,12 @@ const props = defineProps({
     },
     CourseStatus: {
         type: Number,
-
+    },
+    isSubscribed: {
+        type: Boolean,
+    },
+    isPaied: {
+        type: Boolean,
     }
 });
 
@@ -67,20 +72,52 @@ const toast = useToast();
 
 const userStore = useUserStore()
 const activeIndices = ref<number[]>([]);
+const isdisabled  = ref(false)
 
 const selectedSessionIndex = ref<number | null>(null);
 
-function handleSessionClick(index: number, link: string, title: string, text: string) {
-    if (!userStore.user){
-
-        toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+function handleSessionClick(index: number, link: string, title: string, text: string,show:boolean) {
+  if (!userStore.user){
+    toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+    // return;
+  }
+  else {
+    if(show === false){
+        if((UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-') && (UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-')) {
+            visible.value=true;
+        }
     }
-    else{
-
-        selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+    else if(show === true){
+        if(!props.isSubscribed && props.isPaied){
+          isdisabled.value = true
+          console.log("non")
+        }
+        else if(props.isSubscribed && props.isPaied){
+          isdisabled.value = false
+          selectedSessionIndex.value = index;
+          sendactivetab(0, link, title, text);
+          visible.value=false;   
+        }
+        else if((!props.isPaied)){
+          isdisabled.value = false
+          selectedSessionIndex.value = index;
+          sendactivetab(0, link, title, text);
+          visible.value=false;   
+        }
     }
+  }
 }
+
+
+// :class="[
+//                         (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '',
+//                         (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',
+//                         selectedSessionIndex === thirdindex ? 'active' : '',
+//                          props.isSubscribed && !props.isPaied? '':'disabled',
+//                         // session?.web_show_video? '':'disabled',
+//                     ]"
+const visible = ref(false);
+const UserSetting =useUserStore();
 </script>
 
 <template>
@@ -91,22 +128,69 @@ function handleSessionClick(index: number, link: string, title: string, text: st
             <AccordionHeader class="course-content-header ">{{ lesson?.title }}</AccordionHeader>
             <AccordionContent class="course-class-body">
                 <div class="course-body-details" :key="thirdindex" v-for="(session, thirdindex) in lesson?.sessions"
-                    :class="[
-                        (!userStore.user && CardDetails?.isPaid) ? 'disabled' : '',
-                        (props.CourseStatus !== 2 && CardDetails?.isPaid) ? 'disabled' : '',
-                        selectedSessionIndex === thirdindex ? 'active' : ''
-                    ]" @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text)">
+                :class="[ selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
+                     @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text , session?.web_show_video)">
+
                     <component :is="getIconByType(session?.type)" />
-                    <p>{{ session?.title }} </p>
+                        <div class="session-name">
+                            <p  v-if="!session?.web_show_video" >(هذا المحتوى حصرى للتطبيق فقط)</p>
+                            <p>{{ session?.title }} </p>
+                            <LockIcon v-if="!session?.web_show_video" />
+                        </div>
+
+                       
+                        
+                    
                 </div>
             </AccordionContent>
         </AccordionPanel>
     </Accordion>
+    <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
+        <div class="stores-logos-container">
+            <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.app_store">
+            <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
+            
+            </a>
+            <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.play_store">
+            <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
+            </a>
+        </div>
+</Dialog>
 </template>
 
 
-<style scoped>
+<style scoped lang="scss">
 
+.stores-logos-container{
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  .stores-logos-link{
+    width:50%;
+
+    .stores-logos-apple{
+      width:88%;
+    }
+  }
+
+}
+.course-body-details{
+  position:relative;
+  justify-content: space-between;
+}
+.disabled{
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+
+}
+
+.session-name{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    position: relative;
+  }
 .course-body-details{
     cursor: pointer;
     display: flex;
