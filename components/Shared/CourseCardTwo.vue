@@ -103,7 +103,8 @@ const UserSetting = useSettingStore();
             <div class="card-body" dir="rtl">
               <div class="card-header">
                 <h5 class="card-title">{{ course.title }}</h5>
-                <p class="card-number">{{ course.course_price }} {{ course?.currency }}</p>
+                <p class="card-number" v-if="course.course_price > 0">{{ course.course_price }} {{ course?.currency }}</p>
+                <p class="card-number" v-else>{{$t('مجانى') }}</p>
               </div>
               <div class="card-text" v-html="course.description"></div>
               <div class="card-footer">

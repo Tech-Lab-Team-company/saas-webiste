@@ -110,7 +110,7 @@ const UserSetting = useUserStore();
 <template>
 
 
-  <Accordion value="0" class="course-content-container" >
+  <Accordion value="0" class="course-content-container" v-if="CardDetails.length > 0">
     <AccordionPanel
         :value="index == 0 ? '0' : index"
         class="course-content-panel"
@@ -155,17 +155,22 @@ const UserSetting = useUserStore();
       </AccordionContent>
     </AccordionPanel>
   </Accordion>
-    <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
-        <div class="stores-logos-container">
-            <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.app_store">
-            <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
-            
-            </a>
-            <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.play_store">
-            <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
-            </a>
-        </div>
-</Dialog>
+
+  <div v-else>
+    <NuxtImg class="empty-content" src="/images/EmptyContent.png" alt="empty content" />
+  </div>
+
+  <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
+      <div class="stores-logos-container">
+          <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.app_store">
+          <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
+          
+          </a>
+          <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.play_store">
+          <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
+          </a>
+      </div>
+  </Dialog>
 
 
 
@@ -173,7 +178,11 @@ const UserSetting = useUserStore();
 
 
 <style scoped lang="scss">
-
+.empty-content{
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
 .stores-logos-container{
   display:flex;
   align-items:center;

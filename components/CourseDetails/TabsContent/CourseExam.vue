@@ -34,6 +34,10 @@ const isDisabled = computed(() => {
   return !userStore.user || props.CourseStatus !== 2;
 });
 const { locale } = useI18n();
+const currentTime = new Date(); 
+
+
+
 </script>
 
 <template>
@@ -41,10 +45,17 @@ const { locale } = useI18n();
   <div class="course-exam-container" v-for="(exam , index) in CardDetails" :key="index">
 
     <!-- <Nuxt-link  v-if="!(exam?.is_finished)" :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`">  -->
-    <Nuxt-link v-if="!(exam?.is_finished)" :to="`/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
+    {{ console.log(exam ,"exammmm") }}
+      <Nuxt-link  v-if="!(exam?.is_finished) " :to="`/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
     >
       <div class="btns">
         <button
+        v-if="(new Date(exam.end_time).getTime() -currentTime.getTime()) < 0"
+        :disabled="true"
+        class="disabled "
+        >{{ $t('انتهى الوقت') }}</button>
+        <button
+        v-else
         :disabled="isDisabled"
         :class="[
           props.CourseStatus === 2 ? '' : 'disabled',
@@ -53,7 +64,8 @@ const { locale } = useI18n();
       </div>
     </Nuxt-link>
     <div v-else-if="exam?.is_finished" class="exam-rate">
-      <p class="rating" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
+      <p class="rating" v-if="exam.degree_type == 2" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
+      <p class="rating" v-if="exam.degree_type == 1" :class="(exam.mark / exam.exam_mark)* 100 < 50 ? 'failed' : ''"> {{ ((exam.mark / exam.exam_mark)* 100).toFixed(2) }} %</p>
       <!-- <p class="details">اعرض تفاصيل الامتحان</p> -->
     </div>
 

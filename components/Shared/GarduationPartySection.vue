@@ -71,12 +71,11 @@ const splideOptions = {
       <p class="description-text">{{ GraduationParty?.description }}</p>
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(image, index) in GraduationParty?.media" :key="index">
+          <NuxtLink :to="image?.link || '#'">  
             <div class="image-container card">
               <img :src="image?.file" :alt="image.alt" class="course-image" />
             </div>
-         
-            
-            
+          </NuxtLink>  
         </SplideSlide>
     </Splide>
 </div>

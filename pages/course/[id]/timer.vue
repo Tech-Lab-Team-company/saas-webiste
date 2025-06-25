@@ -1,12 +1,8 @@
-<script setup></script>
+<script setup>
+
+</script>
 <template>
-
-<div>
-    <ExamCourseExamsTimer />
-</div>
+    <div>
+        <ExamCourseExamsTimer />
+    </div>
 </template>
-
-
-
-
-

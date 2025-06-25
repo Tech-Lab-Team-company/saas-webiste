@@ -22,7 +22,7 @@ const totalRemainingSeconds = hours * 3600 + minutes * 60 + seconds;
 
 setTimeout(() => {
     router.push(`/course/${router.currentRoute.value.params.id}/${examId}`)
-} , totalRemainingSeconds)
+} , totalRemainingSeconds * 1000)
 
  
 </script>
@@ -34,7 +34,7 @@ setTimeout(() => {
         </div>
 
         <div class="exams-timer-text">
-            <p class="main-title"> <span>العد التنازلي بدأ ! </span>جاهز  لامتحان اساسيات النحو؟</p>
+            <p class="main-title"> <span>العد التنازلي بدأ ! </span>جاهز  للامتحان</p>
             <p class="second-title"> دقائق بسيطة وتبدأ التحدي الحقيقي! حضّر نفسك وورّينا مستواك!</p>
         </div>
 

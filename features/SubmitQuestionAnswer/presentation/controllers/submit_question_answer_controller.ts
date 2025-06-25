@@ -7,6 +7,7 @@ import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 // import type UserModel from "../../Data/models/education_stages_model";
 import QuestionAnswerUseCase from "../../Domain/use_case/submit_question_answer_use_case";
 import type QuestionAnswerModel from "../../Data/models/submit_question_answer_model";
+import { routerKey } from "vue-router";
 
 export default class QuestionAnswerController extends ControllerInterface<QuestionAnswerModel> {
   private static instance: QuestionAnswerController;
@@ -39,14 +40,16 @@ export default class QuestionAnswerController extends ControllerInterface<Questi
           imageElement: successImage,
           messageContent: null,
         });
+        const router = useRouter();
+        router.push(`/course/${router.currentRoute.value.params.id}`)
         } else{
 
-          DialogSelector.instance.successDialog.openDialog({
-            dialogName: "dialog",
-            titleContent: "Answer Submitted Successfully",
-            imageElement: successImage,
-            messageContent: null,
-          });
+          // DialogSelector.instance.successDialog.openDialog({
+          //   dialogName: "dialog",
+          //   titleContent: "Answer Submitted Successfully",
+          //   imageElement: successImage,
+          //   messageContent: null,
+          // });
         }
 
   
@@ -54,12 +57,12 @@ export default class QuestionAnswerController extends ControllerInterface<Questi
         throw new Error(this.state.value.error?.title);
       }
     } catch (error: any) {
-      DialogSelector.instance.errorDialog.openDialog({
-        dialogName: "dialog",
-        titleContent: error,
-        imageElement: errorImage,
-        messageContent: null,
-      });
+      // DialogSelector.instance.errorDialog.openDialog({
+      //   dialogName: "dialog",
+      //   titleContent: error,
+      //   imageElement: errorImage,
+      //   messageContent: null,
+      // });
       return this.state;
     }
     return this.state;

@@ -54,7 +54,7 @@ const UserSetting = useSettingStore();
                   {{ card?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                <p class="card-text1" >
+                <p class="card-text1" v-if="card?.course_records " >
                   <microphone />
                   {{ card?.course_records }}
                   {{ $t('ملف صوتى') }}
@@ -70,7 +70,8 @@ const UserSetting = useSettingStore();
                 />
                   <span class="card-name">{{ card?.teacher?.name || UserSetting.setting?.name }}</span>
                 </span>
-                <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
+                <p class="card-number" v-if="card?.course_price > 0">{{ card?.course_price }} {{ card?.currency }}</p>
+                <p class="card-number" v-else>{{$t('مجانى') }}</p>
               </div>
 
               <div class="card-extra-content">

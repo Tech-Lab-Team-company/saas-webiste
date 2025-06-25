@@ -49,7 +49,7 @@ watch(
     <div class="btns">
       <button @click="visible = true"  v-if="status == 0 && userStore.user">شراء الكورس</button>
       <button @click="visible = false" v-if="status == 1 && userStore.user" disabled class="btn-disabled">فى انتظار قبول الطلب</button>
-      <button @click="visible = false" v-if="status == 2 && userStore.user" disabled class="btn-disabled">تم الشراء</button>
+      <!-- <button @click="visible = false" v-if="status == 2 && userStore.user" disabled class="btn-disabled">تم الشراء</button> -->
       <button @click="visible = false" v-if="status == 4 && userStore.user" disabled class="btn-disabled">تم رفض الطلب</button>
       <button @click="visible = false" v-if="!userStore.user" disabled class="btn-disabled">يجب تسجيل الدخول</button>
     </div>
