@@ -72,7 +72,8 @@ const { locale } = useI18n();
               <img :src="course?.image?.img" :alt="course?.image?.alt" class="course-image" />
               <!-- <img src="../../assets/images/img1.png" alt=""> -->
               <div class="card-overlay-content">
-                <p class="card-number">{{ course?.course_price }} {{ course?.currency }}</p>
+                <p class="card-number" v-if="course?.course_price > 0">{{ course?.course_price }} {{ course?.currency }}</p>
+                <p class="card-number" v-else>{{ $t('مجانى') }}</p>
               </div>
             </div>
             <div class="card-body" dir="rtl">
@@ -82,7 +83,7 @@ const { locale } = useI18n();
                 <span class="card-icon flex">
                   <img :src="course.teacher?.image?.img ||UserSetting.setting?.image?.img " :alt="course?.teacher?.image?.alt">
                 </span>
-                <span class="card-name">{{ course?.teacher?.name || UserSetting.setting?.name }}</span>
+                <span class="card-name">{{ course?.teacher?.name || UserSetting.setting?.nameall }}</span>
               </div>
             </div>
           </NuxtLink>
@@ -423,8 +424,8 @@ const { locale } = useI18n();
 
 .card-inner {
   display: flex;
-  width: 98%;
-  height: 95%;
+  // width: 98%;
+  // height: 95%;
   // align-items: start;
   flex-direction: row;
 }

@@ -1,17 +1,9 @@
 <script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
-
-// import img1 from "@/assets/images/img1.png";
 import img2 from "@/assets/images/img2.png";
 import img3 from "@/assets/images/img3.png";
 import img4 from "@/assets/images/img4.png";
-// import img5 from "@/assets/images/img5.png";
-
-
-
-
-
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
@@ -56,7 +48,6 @@ const cards = [
 ];
 
 const splideOptions = {
-  // type: "loop",
   perPage: 5,
   perMove: 1,
   gap: "10px",

@@ -115,7 +115,8 @@ const UserSetting =useUserStore();
 </script>
 
 <template>
-    <div class="course-body-details" :key="index" v-for="(session, index) in CourseData"    
+  
+    <div class="course-body-details" v-if="CourseData?.length >  0" :key="index" v-for="(session, index) in CourseData"    
     :class="[ selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
         @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text , session?.web_show_video)">
         <component :is="getIconByType(session?.type)" />
@@ -126,6 +127,11 @@ const UserSetting =useUserStore();
     </div>
  
     </div>
+
+      <div v-else>
+        <NuxtImg class="empty-content" src="/images/EmptyContent.png" alt="empty content" />
+      </div>
+
     <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
         <div class="stores-logos-container">
             <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.app_store">
@@ -136,10 +142,15 @@ const UserSetting =useUserStore();
             <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
             </a>
         </div>
-</Dialog>
+  </Dialog>
 </template>
 
 <style scoped lang="scss">
+.empty-content{
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
 
 .stores-logos-container{
   display:flex;

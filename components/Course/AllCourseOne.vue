@@ -31,7 +31,9 @@ const UserSetting = useSettingStore();
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-number">{{ card.course_price }} {{ card?.currency }}</p>
+              <p class="card-number" v-if="card.course_price > 0 && !(card.is_subscribed)">{{ card.course_price }} {{ card?.currency }}</p>
+               <p class="salary" v-else-if="card?.is_subscribed">تم شراء الكورس</p>
+              <p class="card-number" v-else>{{$t('مجانى') }}</p>
             </div>
             <p class="card-text" v-html="card.description"></p>
             <div class="card-footer">
@@ -114,7 +116,7 @@ const UserSetting = useSettingStore();
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   height: 320px;
-  /* width: 92%; */
+  width: 100%; 
   display: flex;
   flex-direction: column;
   justify-content: flex-end;

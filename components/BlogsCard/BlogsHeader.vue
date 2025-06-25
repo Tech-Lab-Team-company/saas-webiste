@@ -33,10 +33,9 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 });
 </script>
 <template>
-
   <div class="blogs-page-articles-cards" dir="rtl" >
     <div class="Blog">
-      <div class="cards-container" v-if="blogscard?.length > 0">
+      <div class="cards-container" v-if="blogscard?.length < 0">
         <NuxtLink
           v-for="(card, index) in blogscard"
           :key="index"
@@ -66,7 +65,8 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
         </NuxtLink>
       </div>
       <div class="error-message-container" v-else>
-        <p class="error-message">{{ $t('لا يوجد محتوى') }}</p>
+        <!-- <p class="error-message">{{ $t('لا يوجد محتوى') }}</p> -->
+         <NuxtImg src="/images/EmptyData.png" alt="Empty Image"  />
       </div>
     </div>
   </div>

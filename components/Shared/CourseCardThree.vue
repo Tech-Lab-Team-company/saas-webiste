@@ -87,7 +87,7 @@ const { locale } = useI18n();
 </script>
 
 <template>
-  <div class="card-course-three">
+  <div class="card-course-three courses-card">
     <div class="slider-wrapper">
   
       <h3 class="slider-heading">{{ homesection?.title }}</h3>
@@ -96,7 +96,8 @@ const { locale } = useI18n();
           <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-container">
               <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
-              <p class="overlay-text">{{ course.course_price }} {{ course?.currency }}</p>
+              <p class="overlay-text" v-if="course.course_price > 0">{{ course.course_price }} {{ course?.currency }}</p>
+              <p class="overlay-text" v-else>{{ $t('مجانى') }}</p>
             </div>
 
             <div class="card-body" dir="rtl">
@@ -254,6 +255,9 @@ const { locale } = useI18n();
   position: relative;
   width: 100%;
   padding: 6px;
+}
+.image-container img {
+height: 100%;
 }
 
 .course-image {
@@ -503,8 +507,8 @@ const { locale } = useI18n();
 
 .card-inner {
   display: flex;
-  width: 98%;
-  height: 95%;
+  // width: 98%;
+  // height: 95%;
   // align-items: start;
   flex-direction: row;
 }
@@ -519,7 +523,7 @@ const { locale } = useI18n();
   position: relative;
   width: 48%;
   // height: 100%;
-  max-height: 210px;
+  max-height: 290px;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -577,7 +581,7 @@ const { locale } = useI18n();
   // height: 320px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  // justify-content: flex-end;
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -635,20 +639,12 @@ const { locale } = useI18n();
   height: calc(var(--line-height) * 3em);
   line-height: var(--line-height);
   --line-height: 1.5;
-  height: 80px;
 
   * {
     font-size: 1rem;
   }
 
   // margin: 10px 0;
-}
-
-@media(max-width: 768px) {
-  .card-text {
-    height: 70px;
-  }
-
 }
 
 .card-footer {

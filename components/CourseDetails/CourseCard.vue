@@ -60,8 +60,10 @@ const AddPayment = async () => {
             </div>
             <hr />
             <div class="card-text-footer">
-                <p class="salary" v-if="CardDetails?.CoursePrice != 0"> <span>{{
+                <p class="salary" v-if="CardDetails?.CoursePrice != 0 && !(CardDetails?.is_subscribed)"> <span>{{
                     $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
+                <p class="salary" v-else-if="CardDetails?.is_subscribed">تم شراء الكورس</p>
+                
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
                    <div class="card-content">
                 <p class="card-text1" v-if="CardDetails?.course_videos ">
@@ -98,7 +100,7 @@ const AddPayment = async () => {
 
         </div>
         <div class="card-video">
-            <img :src="CardDetails?.Image?.img" :alt="CardDetails?.Image?.image">
+            <img :src="CardDetails?.Image?.img ||userSetting.setting?.image?.img " :alt="CardDetails?.Image?.image">
         </div>
 
     </div>

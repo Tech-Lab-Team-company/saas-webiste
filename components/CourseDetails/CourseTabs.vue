@@ -26,18 +26,13 @@ const videoLink = ref({
 
 const CardData = ref<CourseDetailsModel | null>(null);
 
-
 const FetchCourseDetails = async () => {
   const courseDetailsParams = new CourseDetailsParams(route.params.id as string);
   const courseDetailsController = CourseDetailsController.getInstance();
   const state = await courseDetailsController.FetchCourseDetails(courseDetailsParams);
-
   if (state.value.data) {
-    // console.log(state.value.data , "Course Details")
     CardData.value = state.value.data
   }
-
-  // console.log(CardData.value)
 }
 
 

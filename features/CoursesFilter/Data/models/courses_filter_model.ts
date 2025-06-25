@@ -14,6 +14,7 @@ export default class CoursesFilterModel {
     public course_videos: number;
     public course_docs: number;
     public course_records: number
+    public is_subscribed: boolean
 
     constructor(
       id: number,
@@ -27,6 +28,7 @@ export default class CoursesFilterModel {
       course_videos: number,
       course_docs: number,
       course_records: number,
+      is_subscribed: boolean,
 
     ) {
       this.id = id
@@ -40,6 +42,7 @@ export default class CoursesFilterModel {
       this.course_videos = course_videos
       this.course_docs = course_docs
       this.course_records = course_records
+      this.is_subscribed = is_subscribed
 
     }
 
@@ -56,6 +59,7 @@ export default class CoursesFilterModel {
           data.course_videos,
           data.course_docs,
           data.course_records,
+          data.is_subscribed,
 
       )
     }

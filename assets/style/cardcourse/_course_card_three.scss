@@ -64,6 +64,14 @@
       text-align: right;
       margin: 0;
       font-family: "bold";
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: calc(var(--line-height) * 2em);
+      line-height: var(--line-height);
+      --line-height: 1.5;
     }
 
   

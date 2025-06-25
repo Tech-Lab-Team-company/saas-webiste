@@ -1,13 +1,18 @@
-.card-course-two,
-.card-course-one
+.courses-card,
+.card-course-one,
+.card-course-two
 {
-    .slider-wrapper{
-        .splide-container{
-            .splide__track{
-                ul{
-                    flex-direction: row-reverse;
+ 
+
+        .slider-wrapper{
+            .splide-container{
+                .splide__track{
+                    ul{
+                        display: flex;
+                        flex-direction: row-reverse;
+                    }
                 }
             }
         }
-    }
+    
 }
