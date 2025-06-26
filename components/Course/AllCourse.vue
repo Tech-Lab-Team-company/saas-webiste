@@ -6,6 +6,8 @@ import { baseUrl } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 import { useFiltersStore } from '~/stores/courses_filter';
 import {getWebDomain} from "~/constant/webDomain";
+import CoursesFilterParams from "~/features/CoursesFilter/Core/Params/courses_filter_params";
+import CoursesFilterController from "~/features/CoursesFilter/presentation/controllers/courses_filter_controller";
 
 const filtersStore = useFiltersStore();
 
@@ -20,6 +22,10 @@ const StageId =   ref(filtersStore.SelectedStage);
 const StageYearId =   ref(filtersStore.SelectedStageYear);
 const StageTitle =   ref(filtersStore.SelectedStageTitle);
 const StageYearTitle =   ref(filtersStore.SelectedStageYearTitle);
+
+
+   const userStore = useUserStore(); 
+
 
 
 const CoursesFilter = ref<CoursesFilterModel[]>([]);
@@ -44,6 +50,7 @@ const fetchCourses = async () => {
         university_subject_id: SubjectId.value,
     },
     headers: {
+      // 'Authorization': `Bearer ${userStore?.user?.apiToken}`,
       "Accept-Language": "ar",
       "web-domain": getWebDomain(),
     },
@@ -52,6 +59,8 @@ const fetchCourses = async () => {
   CoursesFilter.value = response.data;
 
 };
+
+
 
 const CourseFilterData = (data)=>{
   CategoryId.value = data.CategryId

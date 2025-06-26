@@ -752,6 +752,7 @@ const UserSetting = useSettingStore();
   font-family: "regular";
   display: flex;
   gap: 5px;
+  
 }
 
 .card-icon {

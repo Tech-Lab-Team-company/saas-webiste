@@ -49,11 +49,11 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
     <div class="gallery-container  ">
         <ClientOnly >
             <swiper-container 
+            :loop="true"
                 ref="containerRef"
                 class="gallery-track"
                 :slides-per-view="4"
                 :space-between="50"
-                :loop="true"
                 :autoplay="{
                     delay: 0,
                     disableOnInteraction: false,

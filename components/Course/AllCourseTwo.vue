@@ -20,20 +20,13 @@ const UserSetting = useSettingStore();
 
 <template>
   <div class="card-course-twoo">
-    <div
-
-    >
+    <div>
       <div class="cards-grid">
-        <NuxtLink
-          v-for="card in HomeSections"
-          :key="card?.id"
-          :to="`/course/${card?.id}`"
-          class="card"
-        >
+        <NuxtLink v-for="card in HomeSections" :key="card?.id" :to="`/course/${card?.id}`" class="card">
           <div class="card-inner" dir="rtl">
             <div class="image-container">
               <!-- return image but not working  -->
-              <img  :src="card?.image?.img || UserSetting.setting?.image.img" alt="course image" class="card-image" />
+              <img :src="card?.image?.img || UserSetting.setting?.image.img" alt="course image" class="card-image" />
             </div>
 
             <div class="card-body">
@@ -44,17 +37,17 @@ const UserSetting = useSettingStore();
               <p class="card-text" v-html="card?.description"></p>
 
               <div class="card-content">
-                <p class="card-text1" v-if="card?.course_videos ">
+                <p class="card-text1" v-if="card?.course_videos">
                   <video1 />
                   {{ card?.course_videos }}
                   {{ $t('فيديو') }}
                 </p>
-                <p class="card-text1" v-if="card?.course_docs ">
+                <p class="card-text1" v-if="card?.course_docs">
                   <note />
                   {{ card?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                <p class="card-text1" v-if="card?.course_records " >
+                <p class="card-text1" v-if="card?.course_records">
                   <microphone />
                   {{ card?.course_records }}
                   {{ $t('ملف صوتى') }}
@@ -63,15 +56,13 @@ const UserSetting = useSettingStore();
 
               <div class="card-footer">
                 <span class="card-icon">
-                  <img
-                  :src="card?.teacher?.image?.img || UserSetting.setting?.image?.img"
-                  :alt="card?.teacher?.image?.alt"
-                  class="teacher-image"
-                />
+                  <img :src="card?.teacher?.image?.img || UserSetting.setting?.image?.img"
+                    :alt="card?.teacher?.image?.alt" class="teacher-image" />
                   <span class="card-name">{{ card?.teacher?.name || UserSetting.setting?.name }}</span>
                 </span>
-                <p class="card-number" v-if="card?.course_price > 0">{{ card?.course_price }} {{ card?.currency }}</p>
-                <p class="card-number" v-else>{{$t('مجانى') }}</p>
+                <p class="card-number" v-if="card?.course_price > 0 && !(card?.is_subscribed)">{{ card?.course_price }} {{ card?.currency }}</p>
+                <p class="card-number" v-else-if="card?.course_price == 0">{{ $t('مجانى') }}</p>
+                <p v-else></p>
               </div>
 
               <div class="card-extra-content">
@@ -89,17 +80,18 @@ const UserSetting = useSettingStore();
 
 <style scoped lang="scss">
 .card-footer {
-    .card-icon 
-    {
-    .teacher-image{
+  .card-icon {
+    .teacher-image {
       max-width: 50px;
     }
   }
 
 }
-.card-course-twoo{
-  width:100%;
+
+.card-course-twoo {
+  width: 100%;
 }
+
 .card {
   display: flex;
   border-radius: 15px;
@@ -123,11 +115,13 @@ const UserSetting = useSettingStore();
   // align-items: start;
   flex-direction: row;
 }
+
 @media (max-width: 768px) {
   .card-inner {
     flex-direction: column;
-  }  
+  }
 }
+
 .image-container {
   position: relative;
   width: 48%;
@@ -139,7 +133,7 @@ const UserSetting = useSettingStore();
   align-items: center;
 }
 
-.image-container img{
+.image-container img {
   border-radius: 12px;
 }
 
@@ -149,10 +143,11 @@ const UserSetting = useSettingStore();
     height: 200px;
   }
 }
+
 .card-image {
   width: 100%;
   // height: fit-content;
-  min-height: 210px;  
+  min-height: 210px;
 }
 
 .cards-wrapper {
@@ -162,12 +157,13 @@ const UserSetting = useSettingStore();
   justify-content: center;
   padding: 20px;
 }
+
 .cards-heading {
   font-size: 25px;
   color: #222;
   margin-bottom: 20px;
   font-weight: 400;
-  font-family: "regular",serif;
+  font-family: "regular", serif;
   text-align: right;
   width: 87%;
 }
@@ -217,7 +213,7 @@ const UserSetting = useSettingStore();
   text-align: right;
   color: #000;
   margin: 0;
-  font-family: "bold",serif;
+  font-family: "bold", serif;
 }
 
 .card-number {
@@ -228,7 +224,7 @@ const UserSetting = useSettingStore();
   padding: 4px 5px;
   font-weight: 500;
   font-size: 14px;
-  font-family: "regular",serif;
+  font-family: "regular", serif;
 }
 
 .card-text {
@@ -236,7 +232,7 @@ const UserSetting = useSettingStore();
   font-weight: 400;
   font-size: 1rem;
   text-align: right;
-  font-family: "regular",serif;
+  font-family: "regular", serif;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -246,11 +242,14 @@ const UserSetting = useSettingStore();
   line-height: var(--line-height);
   --line-height: 1.5;
   height: 80px;
+
   * {
     font-size: 1rem;
   }
+
   // margin: 10px 0;
 }
+
 @media(max-width: 768px) {
   .card-text {
     height: 70px;
@@ -302,11 +301,20 @@ const UserSetting = useSettingStore();
   padding-top: 4px;
   color: #000000;
 }
+
 .card-content {
   display: flex;
   gap: 2rem;
+  flex-direction: row;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  @media(max-width:768px){
+    flex-direction: column;
+    gap: 2px;
+  }
   // margin-top: 10px;
 }
+
 .card-text1 {
   color: #737e8a;
   font-weight: 400;
@@ -316,6 +324,7 @@ const UserSetting = useSettingStore();
   display: flex;
   gap: 5px;
 }
+
 .card-icon {
   display: flex;
   align-items: center;

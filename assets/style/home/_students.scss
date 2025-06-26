@@ -62,6 +62,9 @@
             will-change: transform;
             scale: 1.1;
             margin-right: 20px;
+            @media (max-width:768px) {
+                scale: 1.5;
+            }
 
             &:hover {
                 transform: scale(1.05);

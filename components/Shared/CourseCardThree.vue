@@ -8,73 +8,16 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import AllCourseTwo from "../Course/AllCourseTwo.vue";
-
-
-const splideOptions = {
-  // type: "loop",
-  perPage: 3,
-  perMove: 1,
-  gap: "1.5rem",
-  pagination: false,
-  arrows: true,
-  drag: true,
-  breakpoints: {
-    1200: {
-      perPage: 3,
-      gap: "1.5rem"
-    },
-    992: {
-      perPage: 2,
-      gap: "1rem"
-    },
-    768: {
-      perPage: 2,
-      gap: "0.8rem"
-    },
-    576: {
-      perPage: 1,
-      gap: "0.5rem",
-      arrows: true,
-      drag: true
-    }
-  }
-};
-const splideOptions2 = {
-  // type: "loop",
-  perPage: 2,
-  perMove: 1,
-  gap: "1.5rem",
-  // pagination: false,
-  // arrows: true,
-  // drag: true,
-  breakpoints: {
-    1200: {
-      perPage: 2,
-      gap: "1.5rem"
-    },
-    992: {
-      perPage: 2,
-      gap: "1rem"
-    },
-    768: {
-      perPage: 2,
-      gap: "0.8rem"
-    },
-    576: {
-      perPage: 1,
-      gap: "0.5rem",
-      arrows: true,
-      drag: true
-    }
-  }
-};
-
+import { ref, watch, onMounted, nextTick, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";
+import SplideCore from "@splidejs/splide";
 
 const props = defineProps<{
   HomeSections: {};
 }>();
 
-const homesection = ref(props.HomeSections)
+const homesection = ref(props.HomeSections);
+const { locale } = useI18n();
 
 watch(
   () => props.HomeSections,
@@ -82,14 +25,72 @@ watch(
     homesection.value = newValue;
   },
   { immediate: true }
-)
-const { locale } = useI18n();
+);
+
+const splideOptions = {
+  type: "slide",
+  rewind: false,
+  perPage: 3,
+  perMove: 1,
+  gap: "1rem",
+  pagination: false,
+  arrows: true,
+  drag: true,
+  dragMinThreshold: {
+    mouse: 10,
+    touch: 10,
+  },
+  flickPower: 100,
+  flickMaxPages: 1,
+  observeResize: true,
+  classes: {
+    arrows: 'splide__arrows slider-arrows',
+    arrow: 'splide__arrow slider-arrow',
+    prev: 'splide__arrow--prev slider-prev',
+    next: 'splide__arrow--next slider-next',
+  },
+  breakpoints: {
+    1200: { perPage: 3, gap: "1rem" },
+    992: { perPage: 2, gap: "0.8rem" },
+    768: { perPage: 2, gap: "0.6rem" },
+    576: {
+      perPage: 1,
+      gap: "0.5rem",
+      padding: { left: "2.5rem", right: "2.5rem" },
+    },
+    400: {
+      perPage: 1,
+      gap: "0.4rem",
+      padding: { left: "2rem", right: "2rem" },
+    },
+  },
+};
+
+let splideInstance: SplideCore | null = null;
+
+const refreshSlider = () => {
+  splideInstance?.refresh?.();
+};
+
+onMounted(async () => {
+  await nextTick();
+  const el = document.querySelector(".splide-container") as HTMLElement;
+  if (el) {
+    splideInstance = new SplideCore(el, splideOptions);
+    splideInstance.mount();
+  }
+  window.addEventListener("resize", refreshSlider);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", refreshSlider);
+  splideInstance?.destroy?.();
+});
 </script>
 
 <template>
   <div class="card-course-three courses-card">
     <div class="slider-wrapper">
-  
       <h3 class="slider-heading">{{ homesection?.title }}</h3>
       <Splide :options="splideOptions" class="splide-container" v-if="homesection?.courses?.length >= 2">
         <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
@@ -124,76 +125,7 @@ const { locale } = useI18n();
         </SplideSlide>
       </Splide>
     </div>
-
   </div>
-
-     <div class="card-course-twoo"  v-if="homesection?.courses?.length < 2">
-    <div
-
-    >
-      <div class="cards-grid">
-        <NuxtLink
-          v-for="card in homesection?.courses"
-          :key="card?.id"
-          :to="`/course/${card?.id}`"
-          class="card"
-        >
-          <div class="card-inner" dir="rtl">
-            <div class="image-container">
-    
-              <img :src="card?.image?.img || ''" alt="course image" class="card-image" />
-            </div>
-
-            <div class="card-body">
-              <div class="card-header">
-                <h5 class="card-title">{{ card?.title }}</h5>
-              </div>
-
-              <p class="card-text" v-html="card?.description"></p>
-
-              <div class="card-content">
-                <p class="card-text1" v-if="card?.course_videos ">
-                  <video1 />
-                  {{ card?.course_videos }}
-                  {{ $t('فيديو') }}
-                </p>
-                <p class="card-text1" v-if="card?.course_docs ">
-                  <note />
-                  {{ card?.course_docs }}
-                  {{ $t('ملف ورقي') }}
-                </p>
-                {{ console.log(card,  "card ") }}
-                <p class="card-text1" >
-                  <microphone />
-                  {{ card?.course_records }}
-                  {{ $t('ملف صوتى') }}
-                </p>
-              </div>
-
-              <div class="card-footer">
-                <span class="card-icon">
-                  <img
-                  :src="card?.teacher?.image?.img"
-                  :alt="card?.teacher?.image?.alt"
-                  class="teacher-image"
-                />
-                  <span class="card-name">{{ card?.teacher?.name }}</span>
-                </span>
-                <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
-              </div>
-
-              <div class="card-extra-content">
-                <Arrroww />
-                <p>{{ $t('ابدا الان') }}</p>
-              </div>
-            </div>
-          </div>
-        </NuxtLink>
-      </div>
-    </div>
-  </div>
-  
-
 </template>
 
 <style scoped lang="scss">
@@ -211,6 +143,7 @@ const { locale } = useI18n();
   align-items: center;
   justify-content: center;
   width: 100%;
+  margin-top: 20px;
 }
 
 .slider-heading {
@@ -306,6 +239,9 @@ height: 100%;
   margin: 15px 0;
   flex-wrap: wrap;
   gap: 10px;
+  @media(max-width:768px){
+    gap: 5px;
+  }
 }
 
 .card-text {

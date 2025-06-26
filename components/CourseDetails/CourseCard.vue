@@ -92,7 +92,7 @@ const AddPayment = async () => {
             <div class="btns btns-container">
 
                 <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
-                <PaymentDialog :status="status" class="payment-dialog" />
+                <PaymentDialog :status="status" class="payment-dialog" v-if="CardDetails?.CoursePrice != 0"/>
                 <!-- <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
                         طلب الانضمام
                 </button> -->
@@ -117,6 +117,13 @@ const AddPayment = async () => {
     width:50%;
     margin-left:auto;
     gap:50px;
+    flex-wrap: wrap;
+
+
+    @media(max-width:1000px){
+    gap: 5px;
+        justify-content: flex-start;
+    }
 
     
     .card-text1{

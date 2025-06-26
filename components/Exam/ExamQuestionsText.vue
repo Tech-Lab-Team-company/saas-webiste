@@ -163,10 +163,6 @@ watch(() => props.remainingTimeMinutes,
         
         </div>
     </div>
-
-    <!-- <div class="no-content" v-else>
-        <p>لايوجد استلة</p>
-    </div> -->
 </template>
 
 

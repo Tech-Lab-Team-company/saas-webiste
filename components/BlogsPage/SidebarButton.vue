@@ -22,6 +22,7 @@ const { locale } = useI18n();
 </script>
 <template>
   <!-- sidebar -->
+   
   <div class="sidebar-buttons" dir="rtl">
     <div class="sidebar-page-articles-buttons pt-lg">
       <h2 class="sidebar-title">{{ $t('encyclopedia') }}</h2>
@@ -61,7 +62,7 @@ const { locale } = useI18n();
 }
 .sidebar-button {
   width: 85px;
-  height: 45px;
+  height: fit-content;
   border-radius: 5px;
   padding: 10px;
   gap: 10px;

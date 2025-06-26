@@ -120,6 +120,7 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               :CourseStatus="CardData?.allow_status"
               :isSubscribed="CardData?.is_subscribed"
               :isPaied="CardData?.is_paid"
+              :courseId="CardData?.id"
           />
         </div>
         <div v-if="tab_value === 'content' && CardData?.StageType == 2">
@@ -129,6 +130,7 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               :CourseStatus="CardData?.allow_status"
               :isSubscribed="CardData?.is_subscribed"
               :isPaied="CardData?.is_paid"
+              :courseId="CardData?.id"
           />
         </div>
         <div v-if="tab_value === 'content' && CardData?.StageType == 1">
@@ -138,6 +140,7 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               :CourseStatus="CardData?.allow_status"
               :isSubscribed="CardData?.is_subscribed"
               :isPaied="CardData?.is_paid"
+              :courseId="CardData?.id"
           />
         </div>
         <div v-if="tab_value === 'urls'">
@@ -156,6 +159,8 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
           <CourseDetailsTabsContentCourseExam
               :CourseData="CardData?.exams"
               :CourseStatus="CardData?.allow_status"
+              :isPaid="CardData?.is_paid"
+              :isSubscribed="CardData?.is_subscribed"
           />
         </div>
       </div>
