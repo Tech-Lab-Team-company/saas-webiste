@@ -5,6 +5,10 @@
   margin-right: auto;
   margin-top: 20px;
 
+  @media (max-width: 1000px) {
+      width: 90%;
+  }
+
   .course-content-panel {
     border: none;
 

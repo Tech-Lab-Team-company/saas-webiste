@@ -27,7 +27,7 @@ const splideOptions = ref({
     1024: {
       perPage: 2,
     },
-    768: {
+    590: {
       perPage: 1,
     },
   },
@@ -217,6 +217,11 @@ onMounted(() => {
   width: 86%;
   height: 100%;
   padding-bottom: 30px;
+}
+@media (max-width: 768px) {
+  .splide-container {
+    width: 90%;
+  }
 }
 
 

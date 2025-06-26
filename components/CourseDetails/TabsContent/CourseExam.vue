@@ -16,7 +16,13 @@ const props = defineProps({
   },
     CourseStatus:{
     type: Number,
-  }
+  },
+    isPaid:{
+    type: Boolean,
+  },
+    isSubscribed:{
+    type: Boolean,
+  },
 });
 
 const CardDetails = ref(props.CourseData);
@@ -31,7 +37,7 @@ console.log(router.currentRoute.value.params.id)
 const userStore = useUserStore()
 
 const isDisabled = computed(() => {
-  return !userStore.user || props.CourseStatus !== 2;
+  return !userStore.user || ( props.isPaid &&!(props.isSubscribed));
 });
 const { locale } = useI18n();
 const currentTime = new Date(); 
@@ -46,27 +52,35 @@ const currentTime = new Date();
 
     <!-- <Nuxt-link  v-if="!(exam?.is_finished)" :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`">  -->
     {{ console.log(exam ,"exammmm") }}
-      <Nuxt-link  v-if="!(exam?.is_finished) " :to="`/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
+   <a
+   v-if="!(exam?.is_finished)"
+  :href="isDisabled || exam?.is_finished ? null : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
+  @click.prevent="(isDisabled || exam?.is_finished) && $event.preventDefault()"
+>
+  <div class="btns">
+    <button
+      v-if="(new Date(exam.end_time).getTime() - currentTime.getTime()) < 0"
+      disabled
+      class="disabled"
     >
-      <div class="btns">
-        <button
-        v-if="(new Date(exam.end_time).getTime() -currentTime.getTime()) < 0"
-        :disabled="true"
-        class="disabled "
-        >{{ $t('انتهى الوقت') }}</button>
-        <button
-        v-else
-        :disabled="isDisabled"
-        :class="[
-          props.CourseStatus === 2 ? '' : 'disabled',
-          userStore.user ? '' : 'disabled',
-        ]">{{ $t('ابدأ الامتحان') }}</button>
-      </div>
-    </Nuxt-link>
+      {{ $t('انتهى الوقت') }}
+    </button>
+
+    <button
+      v-else
+      :disabled="isDisabled"
+      :class="[
+        props.isPaid && !props.isSubscribed ? 'disabled' : '',
+        userStore.user ? '' : 'disabled',
+      ]"
+    >
+      {{ $t('ابدأ الامتحان') }}
+    </button>
+  </div>
+</a>
     <div v-else-if="exam?.is_finished" class="exam-rate">
       <p class="rating" v-if="exam.degree_type == 2" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
       <p class="rating" v-if="exam.degree_type == 1" :class="(exam.mark / exam.exam_mark)* 100 < 50 ? 'failed' : ''"> {{ ((exam.mark / exam.exam_mark)* 100).toFixed(2) }} %</p>
-      <!-- <p class="details">اعرض تفاصيل الامتحان</p> -->
     </div>
 
 

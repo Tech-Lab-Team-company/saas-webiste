@@ -8,30 +8,35 @@ import AccordionContent from 'primevue/accordioncontent';
 import CourseVideoIcon from '~/public/icons/CourseVideoIcon.vue';
 import coursenotesicon from '~/public/icons/coursenotesicon.vue';
 import microphoneicon from '~/public/icons/microphoneicon.vue';
+import examsicon from '~/public/icons/examsicon.vue';
 import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
-import {useUserStore} from "~/stores/user";
+import { useUserStore } from "~/stores/user";
 import LockIcon from '~/public/icons/LockIcon.vue';
 const props = defineProps({
   CourseData: {
     type: Object as () => UnitsModel | null,
     default: null
   },
-  CourseStatus:{
+  CourseStatus: {
     type: Number,
   },
-  isSubscribed:{
+  isSubscribed: {
     type: Boolean,
   },
-  isPaied:{
+  isPaied: {
     type: Boolean,
+  },
+  courseId:{
+    type: Number
   }
 });
 
 const CardDetails = ref(props.CourseData);
+const CourseId = ref(props.courseId)
 
 watch(() => props.CourseData, (newValue) => {
   CardDetails.value = newValue;
-}, {immediate: true});
+}, { immediate: true });
 
 const typeIconMap: Record<ContentTypeEnum, any> = {
   [ContentTypeEnum.VIDEO]: CourseVideoIcon,
@@ -40,6 +45,7 @@ const typeIconMap: Record<ContentTypeEnum, any> = {
   [ContentTypeEnum.VIDEO_PDF]: CourseVideoIcon,
   [ContentTypeEnum.AUDIO_PDF]: microphoneicon,
   [ContentTypeEnum.GENERALSESSION]: coursenotesicon,
+  [ContentTypeEnum.EXAM]: examsicon,
 };
 
 function getIconByType(type: ContentTypeEnum) {
@@ -57,7 +63,7 @@ const emit = defineEmits(['coursechanged']);
 
 const sendactivetab = (activetabvalue: number, link: string, title: string, description: string) => {
   activetab.value = activetabvalue;
-  emit('coursechanged', {activetabvalue: activetabvalue, link: link, title: title, description: description});
+  emit('coursechanged', { activetabvalue: activetabvalue, link: link, title: title, description: description });
 }
 
 const userStore = useUserStore()
@@ -67,88 +73,103 @@ const selectedSessionIndex = ref<number | null>(null);
 const toast = useToast();
 const isdisabled = ref(false)
 
-function handleSessionClick(index: number, link: string, title: string, text: string,show:boolean) {
-  if (!userStore.user){
+function handleSessionClick(index: number, link: string, title: string, text: string, show: boolean) {
+  if (!userStore.user) {
     toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
     // return;
   }
   else {
-    if(show === false){
-        if((UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-') && (UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-')) {
-            visible.value=true;
-        }
+    if (show === false) {
+      if ((UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-') && (UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-')) {
+        visible.value = true;
+      }
     }
 
-    else if(show === true){
-      console.log(props.isSubscribed , "props.isSubscribed")
-      console.log(props.isPaid , "props.isPaid")
-      if(!props.isSubscribed && props.isPaied){
-          isdisabled.value = true
-          console.log("non")
-        }
-        else if(props.isSubscribed && props.isPaied){
-          isdisabled.value = false
-          selectedSessionIndex.value = index;
-          sendactivetab(0, link, title, text);
-          visible.value=false;   
-        }
-        else if((!props.isPaied)){
-          isdisabled.value = false
-          selectedSessionIndex.value = index;
-          sendactivetab(0, link, title, text);
-          visible.value=false;   
-        }
+    else if (show === true) {
+      console.log(props.isSubscribed, "props.isSubscribed")
+      console.log(props.isPaid, "props.isPaid")
+      if (!props.isSubscribed && props.isPaied) {
+        isdisabled.value = true
+        console.log("non")
+      }
+      else if (props.isSubscribed && props.isPaied) {
+        isdisabled.value = false
+        selectedSessionIndex.value = index;
+        sendactivetab(0, link, title, text);
+        visible.value = false;
+      }
+      else if ((!props.isPaied)) {
+        isdisabled.value = false
+        selectedSessionIndex.value = index;
+        sendactivetab(0, link, title, text);
+        visible.value = false;
+      }
     }
   }
 }
+//  <Nuxt-link  v-if="!(exam?.is_finished) " :to="`/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
 
-
+const router = useRouter();
 const visible = ref(false);
 const UserSetting = useUserStore();
+
+
+const ExamTime = ref()
+const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:number , IsFinished:boolean)=>{
+    const start = new Date(StartTime).getTime();
+    const end = new Date(EndTime).getTime();
+    ExamTime.value = Math.floor((end - start) / 1000 / 60);
+    if(!IsFinished && ExamTime.value > 0){
+      router.push(`/course/${CourseId}/timer?id=${examId}&time=${StartTime}`)
+    }
+}
 </script>
 
 <template>
 
 
   <Accordion value="0" class="course-content-container" v-if="CardDetails.length > 0">
-    <AccordionPanel
-        :value="index == 0 ? '0' : index"
-        class="course-content-panel"
-        v-for="(unit ,index) in CardDetails"
-        :key="index"
-        :class="{ 'active': activePanels.includes(index) }"
-    >
-   
+    <AccordionPanel :value="index == 0 ? '0' : index" class="course-content-panel" v-for="(unit, index) in CardDetails"
+      :key="index" :class="{ 'active': activePanels.includes(index) }">
+
       <AccordionHeader class="course-content-header ">{{ unit?.title }}</AccordionHeader>
       <AccordionContent class="course-content-body">
         <Accordion value="0" class="course-class-container" v-model:activeIndex="activeIndices"
-                   v-for="(lesson ,secondindex) in unit?.lessons" :key="secondindex">
-          <AccordionPanel
-              :class="{ 'active': SecondactivePanels.includes(secondindex) }"
-              :value="secondindex"
-              class="course-class-panel"
-          >
+          v-for="(lesson, secondindex) in unit?.lessons" :key="secondindex">
+          <AccordionPanel :class="{ 'active': SecondactivePanels.includes(secondindex) }" :value="secondindex"
+            class="course-class-panel">
             <AccordionHeader class="course-class-header"> {{ lesson?.title }}</AccordionHeader>
 
-            <hr class="course-class-hr"/>
-            <AccordionContent class="course-class-body">
-              <div class="course-body-details" 
-              :key="thirdindex" 
-              v-for="(session ,thirdindex) in lesson?.sessions"
-                    :class="[ selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
-                   @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text ,session?.web_show_video);">
+            <hr class="course-class-hr" />
+            <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
+              <div class="course-body-details" :key="thirdindex" 
+                :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
+                @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video);">
                 <div class="session-name">
                   <LockIcon v-if="!session?.web_show_video" />
                   <p>{{ session?.title }} </p>
-                  <p  v-if="!session?.web_show_video" >(هذا المحتوى حصرى للتطبيق فقط)</p>
+                  <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
                 </div>
-                    <div class="card flex justify-center" v-if="!(session?.web_show_video)">
-                       
-                    
-                    </div>  
-
-                <component :is="getIconByType(session?.type)"/>
+                <div>
+                </div>
+                <component :is="getIconByType(session?.type)" />
               </div>
+
+               <div  class="course-body-details course-exam"  v-if="session?.exam"
+               @click="GotoExam(session?.exam?.id , session?.exam?.start_time ,session?.exam?.end_time , CourseId  , session?.exam?.is_finished)"
+               >
+                <div class="session-name">
+                  <p>{{ session?.exam?.title }} </p>
+                  <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
+                  <div v-else>
+                      <div class="exam-rate">
+                        <p class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''"> {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}</p>
+                        <p class="rating" v-if="session?.exam.degree_type == 1" :class="(session?.exam.mark / session?.exam.exam_mark)* 100 < 50 ? 'failed' : ''"> {{ ((session?.exam.mark / session?.exam.exam_mark)* 100).toFixed(2) }} %</p>
+                      </div>
+                  </div>
+                </div>
+              </div>
+             
             </AccordionContent>
           </AccordionPanel>
         </Accordion>
@@ -161,15 +182,17 @@ const UserSetting = useUserStore();
   </div>
 
   <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
-      <div class="stores-logos-container">
-          <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.app_store">
-          <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
-          
-          </a>
-          <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="UserSetting.setting?.play_store">
-          <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
-          </a>
-      </div>
+    <div class="stores-logos-container">
+      <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link"
+        target="_blank" :href="UserSetting.setting?.app_store">
+        <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
+
+      </a>
+      <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link"
+        target="_blank" :href="UserSetting.setting?.play_store">
+        <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
+      </a>
+    </div>
   </Dialog>
 
 
@@ -178,40 +201,74 @@ const UserSetting = useUserStore();
 
 
 <style scoped lang="scss">
-.empty-content{
+
+    .exam-rate{
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        .rating{
+            color: #08851B;
+            background-color: #E8FFEF;
+            padding: 4px 20px;
+            border-radius: 20px;
+
+            &.failed{
+                background-color: #FFEBEC;
+                color: #BE2426;
+            }
+        
+        }
+        .details{
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+    }
+.empty-content {
   margin-left: auto;
   margin-right: auto;
   width: 50%;
 }
-.stores-logos-container{
-  display:flex;
-  align-items:center;
-  justify-content: center;
-  .stores-logos-link{
-    width:50%;
 
-    .stores-logos-apple{
-      width:88%;
+.stores-logos-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .stores-logos-link {
+    width: 50%;
+
+    .stores-logos-apple {
+      width: 88%;
     }
   }
 
 }
-.course-body-details{
-  position:relative;
+
+.course-body-details {
+  position: relative;
+
+ 
 }
-.disabled{
-    pointer-events: none;
-    opacity: 0.5;
-    cursor: not-allowed;
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
 
 }
 
-.session-name{
-    display:flex;
-    align-items:center;
-    gap:5px;
-    position: relative;
-  }
+.session-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .course-class-container .course-class-panel .course-class-body .course-body-details {
   display: flex;
   align-items: center;
@@ -223,5 +280,3 @@ const UserSetting = useUserStore();
   width: 100%;
 }
 </style>
-
-

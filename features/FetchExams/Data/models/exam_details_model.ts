@@ -15,6 +15,7 @@ export default class ExamDetailsModel {
   public questions: QuestionsModel[]; 
   public examType: number; 
   public allow_shuffle: number; 
+  public duration: number; 
 
 
 
@@ -32,6 +33,7 @@ export default class ExamDetailsModel {
     questions: QuestionsModel[],
     examType: number,
     allow_shuffle: number,
+    duration: number,
 
 
   ) {
@@ -47,6 +49,7 @@ export default class ExamDetailsModel {
     this.questions = questions;
     this.examType = examType;
     this.allow_shuffle = allow_shuffle;
+    this.duration= duration;
 
  
   }
@@ -66,6 +69,7 @@ export default class ExamDetailsModel {
       map["questions"],
       map["exam_type"],
       map["allow_shuffle"],
+      map["duration"],
     );
   }
 }

@@ -27,6 +27,7 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
   return response?.data[response.data.length - 1];
 });
 
+const userSetting = useSettingStore();
 
 </script>
 
@@ -35,7 +36,7 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
 <template>
   <div class="aboutus-vision-conatiner">
       <div class="aboutus-vid-container">
-        <div class="aboutus-vid">
+        <div class="aboutus-vid" v-if="aboutusVision?.media?.[0]?.file">
            <video
                 width="100%"
                 height="100%"
@@ -46,6 +47,9 @@ const { data: aboutusVision } = await useAsyncData("AboutUsVision", async () => 
                 autoplay
        
               ></video>
+        </div>
+        <div class="aboutus-vid" v-else>
+          <img :src="userSetting.setting?.image?.img" alt="">
         </div>
         <BgCircieIcon class="right-circle" />
         <BgCircieIcon class="left-circle"/>

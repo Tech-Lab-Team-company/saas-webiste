@@ -2,7 +2,7 @@ import type Params from "@/base/core/Params/params";
 
 
 export default class CoursesFilterParams implements Params {
-    CategoryId: number;
+    CategoryId: number | null;
     Type: number |null;
     EduicationType: number;
     StageId: number |null;
@@ -16,7 +16,7 @@ export default class CoursesFilterParams implements Params {
 
 
   constructor(
-    CategoryId: number,
+    CategoryId: number | null,
     Type: number |null,
     EduicationType: number,
     StageId: number |null,

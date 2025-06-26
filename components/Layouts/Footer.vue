@@ -37,7 +37,7 @@ const setting = computed(() => settingStore.setting);
         <div class="col-details">
           <div>
             <p>البريد</p>
-            <p>{{ setting?.email }}</p>
+            <p>{{ setting?.email || setting?.name }}</p>
           </div>
           <Email class="email-icon" />
         </div>
@@ -135,15 +135,27 @@ const setting = computed(() => settingStore.setting);
   display: flex;
   justify-content: flex-end;
   gap: 30px;
+  flex-wrap: wrap;
 
-  .social-icon {
-    width: 50px;
-    padding: 7px;
-    /* width: 48px; */
-    background-color: rgba(37, 37, 173, 0.0509803922);
-    height: 42px;
-    border-radius: 31px;
+  a{
+
+    @media(max-width:1000px){
+      width: 40px;
+    }
+
+    .social-icon {
+      width: 37px;
+      padding: 7px;
+      /* width: 48px; */
+      background-color: rgba(37, 37, 173, 0.0509803922);
+      height: 40px;
+      border-radius: 31px;
+  
+      
+    }
   }
+
+ 
 
 }
 .col{

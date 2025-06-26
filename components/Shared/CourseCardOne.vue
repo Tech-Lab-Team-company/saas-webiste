@@ -15,15 +15,27 @@ const props = defineProps<{
 const homesection = ref(props.HomeSections)
 const UserSetting = useSettingStore();
 
-
 const splideOptions = {
-  // type: "loop",
+  type: "slide", // Explicitly set to slide mode
+  rewind: false, // Disable rewind to prevent snapping back
   perPage: 3,
   perMove: 1,
   gap: "1rem",
   pagination: false,
   arrows: true,
   drag: true,
+  dragMinThreshold: {
+    mouse: 10,
+    touch: 10
+  },
+  flickPower: 100, // Increase flick power for better mobile response
+  flickMaxPages: 1, // Limit flick pages
+  classes: {
+    arrows: 'splide__arrows slider-arrows',
+    arrow: 'splide__arrow slider-arrow',
+    prev: 'splide__arrow--prev slider-prev',
+    next: 'splide__arrow--next slider-next',
+  },
   breakpoints: {
     1200: {
       perPage: 3,
@@ -32,16 +44,21 @@ const splideOptions = {
     992: {
       perPage: 2,
       gap: "0.8rem",
+      // arrows: true,
+      drag: true,
     },
     768: {
       perPage: 2,
       gap: "0.6rem",
+      // arrows: true,
+      drag: true,
     },
     576: {
       perPage: 1,
       gap: "0.5rem",
-      arrows: true, // Keep arrows visible on mobile
+      // arrows: true,
       drag: true,
+      padding: { left: '2.5rem', right: '2.5rem' } // Add padding for arrows
     }
   }
 };
@@ -62,8 +79,7 @@ const { locale } = useI18n();
 
   <div class="card-course-one">
     <div class="slider-wrapper">
-      
-     
+    
       <h3 class="slider-heading">{{homesection?.title || UserSetting.setting?.name }}</h3>
       <Splide :options="splideOptions" class="splide-container"  v-if="homesection?.courses?.length >= 2">
         <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
@@ -89,6 +105,10 @@ const { locale } = useI18n();
           </NuxtLink>
         </SplideSlide>
       </Splide>
+
+      <div class="btns">
+
+      </div>
     </div>
   </div>
 
@@ -161,6 +181,7 @@ const { locale } = useI18n();
 </template>
 
 <style scoped lang="scss">
+
 .card-course-one {
   width: 100%;
   /* max-width: 1400px; */
@@ -173,6 +194,9 @@ const { locale } = useI18n();
   width: 100%;
   overflow: hidden;
   position: relative;
+  margin-top: 20px;
+
+
 }
 
 .slider-heading {
@@ -381,16 +405,13 @@ const { locale } = useI18n();
   }
 @media (max-width:500px) {
   
-  .splide__slide{
-    width: calc(100% + 0rem);
-    margin-left: auto;
-    margin-right: auto;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    padding-bottom: 28px;
-  
-  }
+.splide__slide {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 28px;
+  box-sizing: border-box;
+  width: 100%; // ✅ Ensure proper width
+}
 }
 
 .card-footer {
@@ -407,9 +428,13 @@ const { locale } = useI18n();
 }
 
 .card {
+  width: 100%; // ✅ important for mobile
+}
+.card {
   display: flex;
   border-radius: 15px;
   background: white;
+  
 }
 
 @media(max-width: 768px) {
@@ -556,7 +581,7 @@ const { locale } = useI18n();
   height: calc(var(--line-height) * 3em);
   line-height: var(--line-height);
   --line-height: 1.5;
-  height: 80px;
+  height: 75px;
 
   * {
     font-size: 1rem;
@@ -621,16 +646,25 @@ const { locale } = useI18n();
   display: flex;
   gap: 2rem;
   // margin-top: 10px;
+  @media (max-width:768px){
+    flex-direction: column;
+    gap: 5px;
+
+  }
 }
 
 .card-text1 {
-  color: #737e8a;
+  color: #737e8a; 
   font-weight: 400;
   font-size: 16px;
   text-align: right;
   font-family: "regular";
   display: flex;
   gap: 5px;
+
+  @media (max-width:768px) {
+      font-size: 15px;
+  }
 }
 
 .card-icon {
@@ -638,4 +672,5 @@ const { locale } = useI18n();
   align-items: center;
   gap: 8px;
 }
+
 </style>

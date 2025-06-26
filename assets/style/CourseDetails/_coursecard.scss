@@ -4,13 +4,14 @@
     padding: 20px;
     display: flex;
     // justify-content: space-between;
-    // align-items: center;
+    align-items: center;
     gap: 10px;
 
     .card-text{
         display: flex;
         flex-direction: column;
         width: 100%;
+        gap: 25px;
         // justify-content: space-between;
         // gap: 20px;
         // align-items: flex-end;
@@ -81,12 +82,21 @@
       
             padding: 0 10px;
             font-weight: 800;
+
+            @media(max-width:768px){
+                flex-direction: column;
+                align-items: flex-end;
+            }
            
            
             .card-profile{
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                width: 100%;
+                justify-content: flex-end;
+                width: fit-content;
+    min-width: 120px;
         
                 
                 img{
@@ -97,10 +107,25 @@
             .salary{
                 color:#FFB949;
                 font-size: 23px;
+                // width: 100%;
+                display: flex;
+                justify-content: flex-start;
+                // min-width: 130px;
+                @media(max-width:768px){
+                    justify-content: flex-end;
+
+
+                }
                 
+                
+
                 span{
                     font-size: 26px;
                     font-weight: 500;
+
+                    @media (max-width:1000px) {
+                            font-size: 20px;
+                    }
                 }
             }
         }

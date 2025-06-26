@@ -65,6 +65,7 @@ const splideOptions = {
     },
     480: {
       perPage: 1,
+      focus: 'center', // Center the single slide
     },
   },
   autoplay: true,
@@ -97,12 +98,12 @@ const splideOptions = {
 </template>
 <style>
 
-
 .slider-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-top: 20px;
 }
 
 .slider-heading {
@@ -140,6 +141,23 @@ const splideOptions = {
 .slider-image {
   width: 300px;
   height: 212px;
+}
+
+/* Center single slide on small screens */
+@media (max-width: 480px) {
+  .splide__track {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .splide__list {
+    justify-content: center;
+  }
+  
+  .splide__slide {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 /* splide buttons */
