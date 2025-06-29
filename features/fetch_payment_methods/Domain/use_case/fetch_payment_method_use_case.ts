@@ -5,9 +5,9 @@ import {   FetchPaymentMethodRepo } from "../repositories/fetch_payment_method_r
 import type PaymentMethodModel from "../../Data/models/fetch_payment_method_model";
 
 export default class FetchPaymentMethodUseCase
-  implements UseCase<PaymentMethodModel, Params>
+  implements UseCase<PaymentMethodModel[], Params>
 {
-  async call(params: Params): Promise<DataState<PaymentMethodModel>> {
+  async call(params: Params): Promise<DataState<PaymentMethodModel[]>> {
     return FetchPaymentMethodRepo.getInstance().call(params);
   }
 }

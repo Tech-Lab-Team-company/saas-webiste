@@ -1,0 +1,31 @@
+
+.chat-icons{   
+    position: absolute;
+    right: 0;
+    top: 0;
+    right: 0;
+    transform: translate(19%, -61%);
+
+
+    .p-button{
+      background-color: #061147;
+      border: 1px solid #061147;
+      &:hover{
+          background-color: #061147;
+          border: 1px solid #061147;
+      }
+
+      animation: move-top-down 1s ease-in-out infinite;
+      @keyframes move-top-down {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+    }
+}

@@ -141,6 +141,8 @@ class ApiNames {
   
   
   public paymentmethods = this.baseUrl + "fetch_payment_methods";
+  public fetchchatbot = this.baseUrl + "fetch_chatbots";
+  public chatbotmessages = this.baseUrl + "chat";
 
   
   

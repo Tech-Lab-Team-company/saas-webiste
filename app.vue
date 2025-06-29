@@ -41,11 +41,14 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
 //   });
 //   return response.data;
 // });
-
+const PaymentStore = usePaymentStore()
 const FetchPaymentMethod = async () => {
   const paymentMethod = new FetchPaymentMethodsParams(1);
   const fetchPaymentMethodController = FetchPaymentMethodController.getInstance();
   const state = await fetchPaymentMethodController.FetchPaymentMthod(paymentMethod);
+  if(state.value.data){
+    PaymentStore.setPayment(state.value.data);
+  }
 }
 
 onMounted(

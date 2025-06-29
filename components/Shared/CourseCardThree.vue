@@ -86,6 +86,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", refreshSlider);
   splideInstance?.destroy?.();
 });
+const UserSetting = useSettingStore();
 </script>
 
 <template>
@@ -124,6 +125,62 @@ onBeforeUnmount(() => {
           </NuxtLink>
         </SplideSlide>
       </Splide>
+    </div>
+  </div>
+
+
+    <div class="card-course-twoo" v-if="homesection?.courses?.length < 2">
+    <div>
+      <div class="cards-grid">
+        <NuxtLink v-for="card in homesection?.courses" :key="card?.id" :to="`/course/${card?.id}`" class="card">
+          <div class="card-inner" dir="rtl">
+            <div class="image-container">
+
+              <img :src="card?.image?.img || ''" alt="course image" class="card-image" />
+            </div>
+
+            <div class="card-body">
+              <div class="card-header">
+                <h5 class="card-title">{{ card?.title }}</h5>
+              </div>
+
+              <p class="card-text" v-html="card?.description"></p>
+
+              <div class="card-content">
+                <p class="card-text1" v-if="card?.course_videos">
+                  <video1 />
+                  {{ card?.course_videos }}
+                  {{ $t('فيديو') }}
+                </p>
+                <p class="card-text1" v-if="card?.course_docs">
+                  <note />
+                  {{ card?.course_docs }}
+                  {{ $t('ملف ورقي') }}
+                </p>
+                <p class="card-text1" v-if="card?.course_records">
+                  <microphone />
+                  {{ card?.course_records }}
+                  {{ $t('ملف صوتى') }}
+                </p>
+              </div>
+
+              <div class="card-footer">
+                <span class="card-icon">
+                  <img :src="card?.teacher?.image?.img || UserSetting.setting?.image?.img"
+                    :alt="card?.teacher?.image?.alt" class="teacher-image" />
+                  <span class="card-name">{{ card?.teacher?.name || UserSetting.setting?.name }}</span>
+                </span>
+                <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
+              </div>
+
+              <div class="card-extra-content">
+                <Arrroww />
+                <p>{{ $t('ابدا الان') }}</p>
+              </div>
+            </div>
+          </div>
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>

@@ -72,6 +72,7 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
         :status="CardData?.allow_status"
         :isSubscribed="CardData?.is_subscribed"
         :isPaied="CardData?.is_paid"
+        @Changestatus="FetchCourseDetails"
     />
 
   </div>
