@@ -12,7 +12,6 @@ const items = [
         command: () => {
             window.location.href = `tel:${UserSetting.setting?.phone}`
         }
-
     },
 ];
 
@@ -23,15 +22,13 @@ const FetchChatBots = async () => {
     const state = await fetchChatBotController.fetchChatBots(fetchChatBotParams);
     if (state.value.data) {
         ChatBots.value = state.value.data;
-
-
     }
 }
-
 
 onMounted(() => {
     FetchChatBots();
 })
+
 const position = ref('center');
 const visible = ref(false);
 const SelectedBot = ref()
@@ -40,21 +37,18 @@ const openPosition = (pos, id: Number) => {
     position.value = pos;
     visible.value = true;
     SelectedBot.value = id;
-
 }
 
-
-//  width: window.innerWidth <= 768 ? '100%' : '50%',
-
-const style ={
-    width: window.innerWidth <= 768 ? '100%' : '50%',
-    
-}
-
+// Computed property for responsive dialog styles
+const dialogStyles = computed(() => {
+    if (process.client && window.innerWidth <= 768) {
+        return { width: '100%', height: '50%', justifyContent: 'flex-end' };
+    }
+    return { width: '50%', height: '50%', justifyContent: 'flex-end' };
+});
 </script>
 
 <template>
-
     <SpeedDial class="chat-icons" :model="items" direction="left">
         <template #icon>
             <i class="pi pi-comment"></i>
@@ -67,28 +61,36 @@ const style ={
         </template>
     </SpeedDial>
 
-    <Dialog class="responsive-dialog " v-model:visible="visible" :style="{ width: '50%', height: '50%', justifyContent: 'flex-end'  }"
-        :contentClass="'chat-bot-dialog'" :position="position" :draggable="false" modal :dismissableMask="true">
+    <Dialog 
+        class="responsive-dialog" 
+        v-model:visible="visible" 
+        :style="dialogStyles"
+        :contentClass="'chat-bot-dialog'" 
+        :position="position" 
+        :draggable="false" 
+        modal 
+        :dismissableMask="true">
         <ChatBotBots :bot="SelectedBot" />
         <template #closebutton>
             <i @click="visible = false" class="pi pi-times"></i>
         </template>
     </Dialog>
-
 </template>
 
 <style scoped lang="scss">
+// Alternative approach using CSS custom properties and :deep()
 .responsive-dialog {
-    width: 50%;
-    height: 50%;
-    justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-    .responsive-dialog {
-        width: 100%;
+    :deep(.p-dialog) {
+        width: 50%;
+        height: 50%;
+        justify-content: flex-end;
+        
+        @media (max-width: 768px) {
+            width: 100% !important;
+        }
     }
 }
+
 .chat-bots-container {
     display: flex;
     gap: 10px;
@@ -100,7 +102,6 @@ const style ={
         padding: 7px;
         font-size: 15px;
         cursor: pointer;
-
     }
 }
 
@@ -108,7 +109,6 @@ const style ={
     position: absolute;
     right: 0;
     top: 0;
-    right: 0;
     transform: translate(19%, -61%);
 }
 
