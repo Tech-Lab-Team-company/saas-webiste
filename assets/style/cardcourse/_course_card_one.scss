@@ -1,141 +1,141 @@
-/* heading */
-.card-course-one {
-  .slider-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+// /* heading */
+// .card-course-one {
+//   .slider-wrapper {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
 
-    .slider-heading {
-      font-size: 35px;
-      color: #222;
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: 800;
-      line-height: 200%;
-      letter-spacing: 0%;
-      vertical-align: middle;
-      font-family: "bold";
-    }
-  }
+//     .slider-heading {
+//       font-size: 35px;
+//       color: #222;
+//       text-align: center;
+//       margin-bottom: 20px;
+//       font-weight: 800;
+//       line-height: 200%;
+//       letter-spacing: 0%;
+//       vertical-align: middle;
+//       font-family: "bold";
+//     }
+//   }
 
-  /* splide style */
-  .splide-container {
-    width: 86%;
-    height: 100%;
-    padding-bottom: 30px;
-  }
+//   /* splide style */
+//   .splide-container {
+//     width: 86%;
+//     height: 100%;
+//     padding-bottom: 30px;
+//   }
 
-  .splide-slide {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+//   .splide-slide {
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//   }
 
-  /* card */
-  .card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-bottom: 10px;
-    width: 90%;
+//   /* card */
+//   .card {
+//     background: white;
+//     border-radius: 15px;
+//     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+//     overflow: hidden;
+//     height: 100%;
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     padding-bottom: 10px;
+//     width: 90%;
 
-    .image-wrapper{
-      padding:10px;
-    }
+//     .image-wrapper{
+//       padding:10px;
+//     }
 
-    img {
+//     img {
 
-      &.course-image{
-        width: 100%;
-        height: 230px;
-        object-fit: cover;
-        border-radius: 10px;
-      }
-    }
+//       &.course-image{
+//         width: 100%;
+//         height: 230px;
+//         object-fit: cover;
+//         border-radius: 10px;
+//       }
+//     }
 
-    .card-body {
-      padding: 20px;
-    }
+//     .card-body {
+//       padding: 20px;
+//     }
 
-    .card-title {
-      font-weight: 700;
-      font-size: 20px;
-      text-align: start;
-      margin: 0;
-      font-family: "bold", serif;
-      color: #032855;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      height: calc(var(--line-height) * 2em);
-      line-height: var(--line-height);
-      --line-height: 1.5;
-    }
+//     .card-title {
+//       font-weight: 700;
+//       font-size: 20px;
+//       text-align: start;
+//       margin: 0;
+//       font-family: "bold", serif;
+//       color: #032855;
+//       display: -webkit-box;
+//       -webkit-line-clamp: 2;
+//       -webkit-box-orient: vertical;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       height: calc(var(--line-height) * 2em);
+//       line-height: var(--line-height);
+//       --line-height: 1.5;
+//     }
 
-    .card-text {
-      font-weight: 400;
-      font-size: 0.9rem;
-      text-align: start;
-      color: #656b78;
-      margin: 10px 0;
-      border-bottom: 1px solid #656b78;
-      font-family: "regular", serif;
-      display: -webkit-box;
-      -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      height: calc(var(--line-height) * 4em);
-      line-height: var(--line-height);
-      --line-height: 1.5;
-      * {
-        font-size: 0.9rem;
-        font-family: "regular", serif;
-        font-weight: 400;
-      }
-    }
+//     .card-text {
+//       font-weight: 400;
+//       font-size: 0.9rem;
+//       text-align: start;
+//       color: #656b78;
+//       margin: 10px 0;
+//       border-bottom: 1px solid #656b78;
+//       font-family: "regular", serif;
+//       display: -webkit-box;
+//       -webkit-line-clamp: 4;
+//       -webkit-box-orient: vertical;
+//       overflow: hidden;
+//       text-overflow: ellipsis;
+//       height: calc(var(--line-height) * 4em);
+//       line-height: var(--line-height);
+//       --line-height: 1.5;
+//       * {
+//         font-size: 0.9rem;
+//         font-family: "regular", serif;
+//         font-weight: 400;
+//       }
+//     }
 
-    .card-footer {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
+//     .card-footer {
+//       display: flex;
+//       align-items: center;
+//       gap: 1rem;
+//     }
 
-    .card-name {
-      font-weight: 700;
-      font-size: 17px;
-      letter-spacing: 0%;
-      text-align: right;
-      font-family: "bold";
+//     .card-name {
+//       font-weight: 700;
+//       font-size: 17px;
+//       letter-spacing: 0%;
+//       text-align: right;
+//       font-family: "bold";
       
-    }
-  }
+//     }
+//   }
 
 
   
-  /* splide buttons */
+//   /* splide buttons */
 
 
-  // .splide__arrow--prev {
-  //   left: -50px !important;
-  // }
+//   // .splide__arrow--prev {
+//   //   left: -50px !important;
+//   // }
 
-  // .splide__arrow--next {
-  //   right: -20px;
-  // }
+//   // .splide__arrow--next {
+//   //   right: -20px;
+//   // }
 
-  .course-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border: 1px solid #ccc;
-  }
-}
+//   .course-image {
+//     width: 100%;
+//     height: 100%;
+//     object-fit: cover;
+//     border: 1px solid #ccc;
+//   }
+// }

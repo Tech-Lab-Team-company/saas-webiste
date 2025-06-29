@@ -8,9 +8,21 @@ import linkedInIcon from "~/public/icons/linkedInIcon.vue";
 import twitterIcon from "~/public/icons/twitterIcon.vue";
 import { NuxtLink } from "#components";
 import Email from "../Icons/Email.vue";
+import FetchChatBotParams from "~/features/FetchChatBot/Core/Params/fetch_chat_bot_params";
+import FetchChatBotController from "~/features/FetchChatBot/presentation/controllers/fetch_chat_bot_controller";
+import type ChatBotModel from "~/features/FetchChatBot/Data/models/chat_bot_model";
+
 
 const settingStore = useSettingStore();
 const setting = computed(() => settingStore.setting);
+
+
+
+
+
+
+
+
 </script>
 
 <template>
@@ -82,6 +94,8 @@ const setting = computed(() => settingStore.setting);
     </div>
 
     <div class="col logo-col">
+   
+        <ChatBotButton class="chat-bot-button"/>
 
       <NuxtImg v-if="settingStore.setting?.image?.img" :src="settingStore.setting.image.img" :alt="setting?.image?.alt"
         format="webp" class="col-logo" />
@@ -112,11 +126,24 @@ const setting = computed(() => settingStore.setting);
       </div>
     </div>
 
-    <hr class="hr" />
+    <!-- <hr class="hr" /> -->
+    <hr class="rights-hr" />
+    <TechLabRights class="tech-lab-rights"/>
   </div>
 </template>
 
 <style scoped lang="scss">
+
+.chat-bot-button{
+  position: absolute;
+  // background-image: url(../../public/images/background.png);
+}
+
+
+
+.pi-comment{
+  font-size: 20px;
+}
 .stores-logos-container{
   display:flex;
   align-items:center;
@@ -165,6 +192,12 @@ const setting = computed(() => settingStore.setting);
     align-items: center;
     justify-content: center;
     gap:15px;
+    position: relative;
+    .chatbot{
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
   }
   .col-description{
     .col-details{
@@ -178,4 +211,26 @@ const setting = computed(() => settingStore.setting);
     }
   }
 }
+.rights-hr{
+  margin-top: 1rem;
+  grid-column: span 4;
+}
+.tech-lab-rights{
+  width: 100%;
+  grid-column: span 4;
+  // @media (max-width:768px) {
+  //     grid-column: span 3;
+  // }
+  // @media (max-width:400px) {
+  //     grid-column: span 2;
+  // }
+  // @media (max-width:300px) {
+  //     grid-column: span 1;
+  // }
+}
 </style>
+
+
+
+
+

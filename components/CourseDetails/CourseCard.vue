@@ -34,15 +34,25 @@ const userSetting = useSettingStore();
 
 const router = useRouter();
 
-const AddPayment = async () => {
-    const coursePaymentParams = new CoursesPaymentParams(Number(router.currentRoute.value.params.id), 1, 1, null);
+const emit = defineEmits(['Changestatus'])
+const JoinCourse = async () => {
+    // router.currentRoute.value.params.id
+    const coursePaymentParams = new CoursesPaymentParams({
+        CourseId: Number(router.currentRoute.value.params.id),
+        PaymentMethod: 0,
+        Account: "",
+        Receipt: null
+    });
     const coursesPaymentController = CoursesPaymentController.getInstance();
     const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
-    if (state.value.message) {
-        status.value = 1;
+    if(state.value){
+        emit('Changestatus')
     }
-
 }
+const PaymentStore = usePaymentStore()
+
+
+
 </script>
 
 <template>
@@ -61,30 +71,30 @@ const AddPayment = async () => {
             <hr />
             <div class="card-text-footer">
                 <p class="salary" v-if="CardDetails?.CoursePrice != 0 && !(CardDetails?.is_subscribed)"> <span>{{
-                    $t(`${CardDetails?.currency}`)}}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
+                    $t(`${CardDetails?.currency}`) }}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
                 <p class="salary" v-else-if="CardDetails?.is_subscribed">تم شراء الكورس</p>
-                
+
                 <p class="salary" v-else>{{ $t('مجانى') }} </p>
-                   <div class="card-content">
-                <p class="card-text1" v-if="CardDetails?.course_videos ">
-                  <video1 />
-                  {{ CardDetails?.course_videos }}
-                  {{ $t('فيديو') }}
-                </p>
-                <p class="card-text1" v-if="CardDetails?.course_docs ">
-                  <note />
-                  {{ CardDetails?.course_docs }}
-                  {{ $t('ملف ورقي') }}
-                </p>
-                <p class="card-text1" v-if="CardDetails?.course_records ">
-                  <microphone />
-                  {{ CardDetails?.course_records }}
-                  {{ $t('ملف صوتى') }}
-                </p>
-              </div>
+                <div class="card-content">
+                    <p class="card-text1" v-if="CardDetails?.course_videos">
+                        <video1 />
+                        {{ CardDetails?.course_videos }}
+                        {{ $t('فيديو') }}
+                    </p>
+                    <p class="card-text1" v-if="CardDetails?.course_docs">
+                        <note />
+                        {{ CardDetails?.course_docs }}
+                        {{ $t('ملف ورقي') }}
+                    </p>
+                    <p class="card-text1" v-if="CardDetails?.course_records">
+                        <microphone />
+                        {{ CardDetails?.course_records }}
+                        {{ $t('ملف صوتى') }}
+                    </p>
+                </div>
                 <div class="card-profile">
                     <p>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</p>
-                    <img :src="CardDetails?.Teacher?.image?.img ||userSetting.setting?.image?.img ">
+                    <img :src="CardDetails?.Teacher?.image?.img || userSetting.setting?.image?.img">
                 </div>
             </div>
 
@@ -92,48 +102,51 @@ const AddPayment = async () => {
             <div class="btns btns-container">
 
                 <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
-                <PaymentDialog :status="status" class="payment-dialog" v-if="CardDetails?.CoursePrice != 0"/>
-                <!-- <button v-if="userSetting.setting?.join_option_status == 1" class="payment-btn" @click="AddPayment">
-                        طلب الانضمام
-                </button> -->
+                <PaymentDialog :status="status" class="payment-dialog"
+                    v-if="CardDetails?.CoursePrice != 0 && PaymentStore.Payment.length > 0" />
+                <button class="payment-btn" @click="JoinCourse" v-if="status != 1">
+                    طلب الانضمام
+                </button>
             </div>
 
         </div>
         <div class="card-video">
-            <img :src="CardDetails?.Image?.img ||userSetting.setting?.image?.img " :alt="CardDetails?.Image?.image">
+            <img :src="CardDetails?.Image?.img || userSetting.setting?.image?.img" :alt="CardDetails?.Image?.image">
         </div>
 
     </div>
 </template>
 
 <style scoped lang="scss">
-.card-text-footer{
-    gap:50px;
+.card-text-footer {
+    gap: 50px;
 }
-.card-content{
+
+.card-content {
     display: flex;
-    flex-direction:row-reverse;
+    flex-direction: row-reverse;
     justify-content: center;
-    width:50%;
-    margin-left:auto;
-    gap:50px;
+    width: 50%;
+    margin-left: auto;
+    gap: 50px;
     flex-wrap: wrap;
 
 
-    @media(max-width:1000px){
-    gap: 5px;
+    @media(max-width:1000px) {
+        gap: 5px;
         justify-content: flex-start;
     }
 
-    
-    .card-text1{
+
+    .card-text1 {
         display: flex;
-        flex-direction:row-reverse;
-        gap:6px;
+        flex-direction: row-reverse;
+        gap: 6px;
 
     }
 
 }
+
 .btns-container {
     display: flex;
     justify-content: center;

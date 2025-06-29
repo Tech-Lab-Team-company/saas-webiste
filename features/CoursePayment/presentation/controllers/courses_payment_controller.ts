@@ -30,7 +30,7 @@ export default class CoursesPaymentController extends ControllerInterface<Course
       if (this.isDataSuccess()) {
         DialogSelector.instance.successDialog.openDialog({
           dialogName: "dialog",
-          titleContent: "Added was successful",
+          titleContent: "تم ارسال الطلب ",
           imageElement: successImage,
           messageContent: null,
         })

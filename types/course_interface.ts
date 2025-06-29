@@ -17,5 +17,8 @@ export default interface CourseInterface {
     teacher:TeacherInterface;
     course_videos: number,
     course_docs: number,
-    course_records: number    
+    course_records: number,
+    is_paid: boolean,    
+    is_subscribed: boolean,    
+    currency: String,    
 }

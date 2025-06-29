@@ -8,7 +8,7 @@ import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import type PaymentMethodModel from "../../Data/models/fetch_payment_method_model";
 import FetchPaymentMethodUseCase from "../../Domain/use_case/fetch_payment_method_use_case";
 
-export default class FetchPaymentMethodController extends ControllerInterface<PaymentMethodModel> {
+export default class FetchPaymentMethodController extends ControllerInterface<PaymentMethodModel[]> {
   private static instance: FetchPaymentMethodController;
   private constructor() {
     super();
@@ -26,7 +26,7 @@ export default class FetchPaymentMethodController extends ControllerInterface<Pa
     // useLoaderStore().setLoadingWithDialog();
     try {
       this.setLoading();
-      const dataState: DataState<PaymentMethodModel> =
+      const dataState: DataState<PaymentMethodModel[]> =
         await this.fetchPaymentMethodUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
