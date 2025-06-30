@@ -27,6 +27,7 @@ const setting = computed(() => settingStore.setting);
 
 <template>
   <div class="grid grid-cols-1 md:grid-cols-4 footer-container">
+    
     <div class="col">
       <p class="col-title">وسائل التواصل</p>
 
@@ -94,8 +95,8 @@ const setting = computed(() => settingStore.setting);
     </div>
 
     <div class="col logo-col">
+      
    
-        <ChatBotButton class="chat-bot-button"/>
 
       <NuxtImg v-if="settingStore.setting?.image?.img" :src="settingStore.setting.image.img" :alt="setting?.image?.alt"
         format="webp" class="col-logo" />
@@ -127,17 +128,21 @@ const setting = computed(() => settingStore.setting);
     </div>
 
     <!-- <hr class="hr" /> -->
-    <hr class="rights-hr" />
-    <TechLabRights class="tech-lab-rights"/>
+    <!-- <hr class="rights-hr" /> -->
+    <!-- <TechLabRights class="tech-lab-rights"/> -->
   </div>
 </template>
 
 <style scoped lang="scss">
 
-.chat-bot-button{
-  position: absolute;
-  // background-image: url(../../public/images/background.png);
+.footer-container{
+  position: relative;
+  @media(max-width:768px){
+    grid-column: 1fr 1fr;
+  }
 }
+
+
 
 
 

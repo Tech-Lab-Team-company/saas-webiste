@@ -6,7 +6,7 @@
 <template>
   <!-- sidebar -->
   <div class="sidebar" dir="rtl">
-    {{ console.log("Sidebar", "Sidebar") }}
+    <!-- {{ console.log("Sidebar", "Sidebar") }} -->
     <BlogsCardSidebarArticles />
     <BlogsCardSidebarButton />
   </div>

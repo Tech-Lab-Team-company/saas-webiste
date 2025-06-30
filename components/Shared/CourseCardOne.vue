@@ -1,3 +1,5 @@
+Course Card One 
+
 <script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
@@ -5,11 +7,12 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import AllCourseTwo from "../Course/AllCourseTwo.vue";
+import type HomeSection from "~/types/home_section_interface";
 
 
 
 const props = defineProps<{
-  HomeSections: {};
+  HomeSections: HomeSection;
 }>();
 
 const homesection = ref(props.HomeSections)
@@ -64,9 +67,9 @@ const splideOptions = {
 };
 
 watch(
-  ()=>props.HomeSections,
+  () => props.HomeSections,
   (newValue) => {
-    homesection.value = newValue; 
+    homesection.value = newValue;
   },
   { immediate: true }
 )
@@ -79,16 +82,17 @@ const { locale } = useI18n();
 
   <div class="card-course-one">
     <div class="slider-wrapper">
-    
-      <h3 class="slider-heading">{{homesection?.title || UserSetting.setting?.name }}</h3>
-      <Splide :options="splideOptions" class="splide-container"  v-if="homesection?.courses?.length >= 2">
+
+      <h3 class="slider-heading">{{ homesection?.title || UserSetting.setting?.name }}</h3>
+      <Splide :options="splideOptions" class="splide-container" v-if="homesection?.courses?.length >= 2">
         <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
           <NuxtLink :to="`/course/${course.id}`" class="card">
             <div class="image-wrapper">
               <img :src="course?.image?.img" :alt="course?.image?.alt" class="course-image" />
               <!-- <img src="../../assets/images/img1.png" alt=""> -->
               <div class="card-overlay-content">
-                <p class="card-number" v-if="course?.course_price > 0">{{ course?.course_price }} {{ course?.currency }}</p>
+                <p class="card-number" v-if="course?.course_price > 0">{{ course?.course_price }} {{ course?.currency }}
+                </p>
                 <p class="card-number" v-else>{{ $t('مجانى') }}</p>
               </div>
             </div>
@@ -97,9 +101,10 @@ const { locale } = useI18n();
               <div class="card-text" v-html="course?.description"></div>
               <div class="card-footer">
                 <span class="card-icon flex">
-                  <img :src="course.teacher?.image?.img ||UserSetting.setting?.image?.img " :alt="course?.teacher?.image?.alt">
+                  <img :src="course.teacher?.image?.img || UserSetting.setting?.image?.img"
+                    :alt="course?.teacher?.image?.alt">
                 </span>
-                <span class="card-name">{{ course?.teacher?.name || UserSetting.setting?.nameall }}</span>
+                <span class="card-name">{{ course?.teacher?.name || UserSetting.setting?.name }}</span>
               </div>
             </div>
           </NuxtLink>
@@ -112,20 +117,13 @@ const { locale } = useI18n();
     </div>
   </div>
 
-   <div class="card-course-twoo"  v-if="homesection?.courses?.length < 2">
-    <div
-
-    >
+  <div class="card-course-twoo" v-if="homesection?.courses?.length < 2">
+    <div>
       <div class="cards-grid">
-        <NuxtLink
-          v-for="card in homesection?.courses"
-          :key="card?.id"
-          :to="`/course/${card?.id}`"
-          class="card"
-        >
+        <NuxtLink v-for="card in homesection?.courses" :key="card?.id" :to="`/course/${card?.id}`" class="card">
           <div class="card-inner" dir="rtl">
             <div class="image-container">
-    
+
               <img :src="card?.image?.img || ''" alt="course image" class="card-image" />
             </div>
 
@@ -137,18 +135,17 @@ const { locale } = useI18n();
               <p class="card-text" v-html="card?.description"></p>
 
               <div class="card-content">
-                <p class="card-text1" v-if="card?.course_videos ">
+                <p class="card-text1" v-if="card?.course_videos">
                   <video1 />
                   {{ card?.course_videos }}
                   {{ $t('فيديو') }}
                 </p>
-                <p class="card-text1" v-if="card?.course_docs ">
+                <p class="card-text1" v-if="card?.course_docs">
                   <note />
                   {{ card?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                {{ console.log(card,  "card ") }}
-                <p class="card-text1" >
+                <p class="card-text1" v-if="card?.course_records">
                   <microphone />
                   {{ card?.course_records }}
                   {{ $t('ملف صوتى') }}
@@ -157,12 +154,9 @@ const { locale } = useI18n();
 
               <div class="card-footer">
                 <span class="card-icon">
-                  <img
-                  :src="card?.teacher?.image?.img"
-                  :alt="card?.teacher?.image?.alt"
-                  class="teacher-image"
-                />
-                  <span class="card-name">{{ card?.teacher?.name }}</span>
+                  <img :src="card?.teacher?.image?.img || UserSetting.setting?.image?.img"
+                    :alt="card?.teacher?.image?.alt" class="teacher-image" />
+                  <span class="card-name">{{ card?.teacher?.name || UserSetting.setting?.name }}</span>
                 </span>
                 <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
               </div>
@@ -177,11 +171,10 @@ const { locale } = useI18n();
       </div>
     </div>
   </div>
- 
+
 </template>
 
 <style scoped lang="scss">
-
 .card-course-one {
   width: 100%;
   /* max-width: 1400px; */
@@ -208,7 +201,8 @@ const { locale } = useI18n();
 
 .splide-container {
   width: 88%;
-  padding: 0 2.5rem; /* Add padding for arrows */
+  padding: 0 2.5rem;
+  /* Add padding for arrows */
 }
 
 /* Custom arrow styling */
@@ -249,7 +243,8 @@ const { locale } = useI18n();
 .image-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%;
+  /* 16:9 Aspect Ratio */
   overflow: hidden;
   min-height: 200px;
 }
@@ -317,7 +312,7 @@ const { locale } = useI18n();
 }
 
 .card-icon {
-  width: 30px;
+  width: fit-content;
   height: 30px;
   border-radius: 50%;
   overflow: hidden;
@@ -346,6 +341,7 @@ const { locale } = useI18n();
   .slider-heading {
     font-size: 1.2rem;
   }
+
   .card-title {
     font-size: 0.95rem;
   }
@@ -356,13 +352,16 @@ const { locale } = useI18n();
     font-size: 1.1rem;
     margin-bottom: 1rem;
   }
+
   .card {
     margin: 0 0.25rem;
   }
+
   :deep(.splide__arrow) {
     width: 2rem;
     height: 2rem;
   }
+
   :deep(.splide__arrow svg) {
     width: 1rem;
     height: 1rem;
@@ -373,45 +372,53 @@ const { locale } = useI18n();
   .slider-heading {
     font-size: 1rem;
   }
+
   .card-overlay-content {
     min-width: 120px;
     height: 40px;
   }
+
   .card-number {
     width: 100px;
     height: 25px;
     font-size: 12px;
   }
+
   .splide-container {
-    padding: 0 2rem; /* Adjust padding for mobile */
+    padding: 0 2rem;
+    /* Adjust padding for mobile */
   }
+
   :deep(.splide__arrow) {
     width: 1.8rem;
     height: 1.8rem;
   }
+
   :deep(.splide__arrow--prev) {
     left: -0.5rem;
   }
+
   :deep(.splide__arrow--next) {
     right: -0.5rem;
   }
 }
 
-  .splide__slide{
-
-    padding-bottom: 28px;
-      display: flex;
-    justify-content: center;
-  }
-@media (max-width:500px) {
-  
 .splide__slide {
+
+  padding-bottom: 28px;
   display: flex;
   justify-content: center;
-  padding-bottom: 28px;
-  box-sizing: border-box;
-  width: 100%; // ✅ Ensure proper width
 }
+
+@media (max-width:500px) {
+
+  .splide__slide {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 28px;
+    box-sizing: border-box;
+    width: 100%; // ✅ Ensure proper width
+  }
 }
 
 .card-footer {
@@ -430,11 +437,12 @@ const { locale } = useI18n();
 .card {
   width: 100%; // ✅ important for mobile
 }
+
 .card {
   display: flex;
   border-radius: 15px;
   background: white;
-  
+
 }
 
 @media(max-width: 768px) {
@@ -614,6 +622,7 @@ const { locale } = useI18n();
   font-family: "bold";
   // margin: 0px 10px;
   color: #000;
+  width: 100px;
 }
 
 .card-extra-content {
@@ -645,8 +654,9 @@ const { locale } = useI18n();
 .card-content {
   display: flex;
   gap: 2rem;
+
   // margin-top: 10px;
-  @media (max-width:768px){
+  @media (max-width:768px) {
     flex-direction: column;
     gap: 5px;
 
@@ -654,7 +664,7 @@ const { locale } = useI18n();
 }
 
 .card-text1 {
-  color: #737e8a; 
+  color: #737e8a;
   font-weight: 400;
   font-size: 16px;
   text-align: right;
@@ -663,7 +673,7 @@ const { locale } = useI18n();
   gap: 5px;
 
   @media (max-width:768px) {
-      font-size: 15px;
+    font-size: 15px;
   }
 }
 
@@ -672,5 +682,4 @@ const { locale } = useI18n();
   align-items: center;
   gap: 8px;
 }
-
 </style>

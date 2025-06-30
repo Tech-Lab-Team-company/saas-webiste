@@ -18,7 +18,7 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
       body: { slug: useRoute().params.slug },
     });
 
-    console.log(response , "blogs cardss");
+    // console.log(response , "blogs cardss");
     return response.data;
   } catch (err) {
     console.error("فشل في جلب التدوينة:", err);

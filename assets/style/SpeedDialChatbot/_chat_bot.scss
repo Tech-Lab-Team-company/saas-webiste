@@ -1,37 +1,49 @@
+.chat-icons {
+  position: absolute;
+  right: 0;
+  top: 0;
+  right: 0;
+  transform: translate(19%, -61%);
+  z-index: 99999;
 
-.chat-icons{   
-    position: absolute;
-    right: 0;
-    top: 0;
-    right: 0;
-    transform: translate(19%, -61%);
-
-
-    .p-button{
+  .p-button {
+    background-color: transparent;
+    border: 1px solid transparent;
+    animation: move-top-down 1s ease-in-out infinite;
+    box-shadow: 1px 3px 6px #00000057;
+    width: 80px !important;
+    height: 80px !important;
+    &:hover {
       background-color: #061147;
       border: 1px solid #061147;
-      &:hover{
-          background-color: #061147;
-          border: 1px solid #061147;
-      }
+    }
 
-      animation: move-top-down 1s ease-in-out infinite;
-      @keyframes move-top-down {
-        0% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-        100% {
-          transform: translateY(0);
-        }
+    @keyframes move-top-down {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0);
       }
     }
+  }
 }
 
-.responsive-dialog{
-  @media (max-width:768px) {
-      width: 100% !important;
+.responsive-dialog {
+  @media (max-width: 768px) {
+    // top: 14%;
+    display: flex !important;
+    top: -10%;
+    position: relative;
   }
+  @media (max-width: 768px) {
+    width: 100% !important;
+  }
+}
+
+.p-dialog-header {
+  margin-bottom: auto;
 }

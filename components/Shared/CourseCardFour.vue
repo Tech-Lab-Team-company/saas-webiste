@@ -146,8 +146,8 @@ const splideOptions = {
 /* Center single slide on small screens */
 @media (max-width: 480px) {
   .splide__track {
-    display: flex;
-    justify-content: center;
+    /* display: flex; */
+    /* justify-content: center; */
   }
   
   .splide__list {

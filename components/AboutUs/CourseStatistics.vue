@@ -41,7 +41,7 @@ const subtitle = [
 
 <template>
     <div class="course-statistics-container">
-      {{ console.log(Sections , "about sectionssss") }}
+      <!-- {{ console.log(Sections , "about sectionssss") }} -->
         <div class="course-statistics" v-for="(section, index) in Sections" :key="index">
             <div class="statistics">
                 <p>{{ subtitle[index] }}</p>

@@ -51,28 +51,6 @@ const droplist = ref(false);
 
     <nav class="header-container">
 
-    <div class="side-menu">
-
-      <IconsBars class="bars-icon" @click="droplist = !droplist" />
-
-      <div v-if="droplist" class="droplist-menu">
-        <ul class="list">
-          <NuxtLink to="/login" ><li>تسجيل الدخول</li></NuxtLink>
-          <hr class="hr" />
-          <NuxtLink to="/Auth/register" ><li>إنشاء حساب</li></NuxtLink>
-          <hr class="hr" />
-          <NuxtLink to="/"><li>الرئيسية</li></NuxtLink>
-          <hr class="hr" />
-          <NuxtLink to="/aboutus" ><li>نبذة عنا</li></NuxtLink>
-          <hr class="hr" />
-          <NuxtLink to="/course" ><li>الكورسات</li></NuxtLink>
-          <hr class="hr" />
-          <NuxtLink to="/blogs" ><li>المدونة</li></NuxtLink>
-          
-        </ul>
-      </div>
-    </div>
-
       <div class="buttons" v-if="!userStore.user">
         <NuxtLink to="/Auth/register">
           <button class="btn btn-primary btn-create">انشاء حساب</button>
@@ -138,6 +116,9 @@ const droplist = ref(false);
   &:hover{
     color: white;
   }
+  @media (max-width:768px) {
+      display: none !important;
+  }
 }
 
 .header {
@@ -163,10 +144,15 @@ li:hover {
 
 .user-info {
   display: flex;
+  // flex-wrap: wrap;
+  
   align-items: center;
   gap: 10px;
   margin-left: 15px;
   text-decoration: none;
+  @media (max-width:768px) {
+      flex-direction: column;
+  }
 
   .user-avatar {
     width: 35px;

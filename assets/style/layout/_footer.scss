@@ -8,12 +8,12 @@
     // gap: 20px;
 
     @media (max-width:768px) {
-        grid-template-columns: 1fr 1fr ;
+        grid-template-columns: 1fr 1fr !important ;
         justify-items: end;
         gap: 20px;
       }
     @media (max-width:400px) {
-        grid-template-columns: 1fr ;
+        grid-template-columns: 1fr !important ; 
         justify-items: end;
         gap: 20px;
       }

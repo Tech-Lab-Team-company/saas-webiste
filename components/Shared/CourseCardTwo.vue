@@ -163,8 +163,7 @@ const UserSetting = useSettingStore();
                   {{ card?.course_docs }}
                   {{ $t('ملف ورقي') }}
                 </p>
-                {{ console.log(card,  "card ") }}
-                <p class="card-text1" >
+                <p class="card-text1"  v-if="card?.course_records">
                   <microphone />
                   {{ card?.course_records }}
                   {{ $t('ملف صوتى') }}

@@ -18,7 +18,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
         "web-domain": getWebDomain(),
       },
     });
-    console.log(response);
+    // console.log(response);
     return response.data;
   } catch (err) {
     console.error("Failed to fetch blogs:", err);

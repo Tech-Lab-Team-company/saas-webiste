@@ -11,15 +11,15 @@ import {getWebDomain} from "~/constant/webDomain";
 const splideOptions = ref({
   type: 'loop',
   perPage: 3,
-  gap: "1rem", // Increased gap for better visibility
+  gap: "1rem", 
   pagination: false,
   perMove: 1,
   arrows: true,
   drag: true,
   dragMinThreshold: 10,
-  direction: 'rtl', // Explicit RTL direction
+  direction: 'rtl', 
   rewind: true,
-  autoWidth: false, // Ensure consistent slide width
+  autoWidth: false, 
   fixedWidth: false,
   focus: 'center',
   trimSpace: false,
@@ -107,8 +107,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Card styles */
-/* heading */
+
 .card {
   position: relative;
   transition: transform 0.3s ease-in-out;
