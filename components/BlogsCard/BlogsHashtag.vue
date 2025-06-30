@@ -18,7 +18,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
       },
       body: { hashtag_id: useRoute().params.hashtagId },
     });
-    console.log(response , "Resopnseeee");
+    // console.log(response , "Resopnseeee");
     return response.data;
   } catch (err) {
     console.error("Failed to fetch blogs:", err);
@@ -37,7 +37,7 @@ const { locale } = useI18n();
           :to="`/blogs/${card.slug}`"
           class="card"
         >
-        {{ console.log(blogscard , "blogs cards") }}
+        <!-- {{ console.log(blogscard , "blogs cards") }} -->
         <img
             :src="card.attachments?.[0]?.file || ''"
             :alt="card.attachments?.[0]?.alt || 'Default alt'"

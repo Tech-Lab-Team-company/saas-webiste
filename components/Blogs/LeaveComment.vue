@@ -27,7 +27,7 @@ const makeComment = async () => {
     email.value = "";
     message.value = "";
   } catch (e) {
-    console.log(e);
+    // console.log(e);
   }
 };
 </script>

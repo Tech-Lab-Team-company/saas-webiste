@@ -68,7 +68,9 @@ UserSettingStore.setSetting(webStatus.value!);
 <template>
   <div>
     <NuxtLayout>
-    
+      
+      <MobileNav />
+    <ChatBotButton class="chat-bot-button"/>
       <SpeedDialToast class="social-icons"/>
       <Toast />
       <NuxtPage />
@@ -79,6 +81,13 @@ UserSettingStore.setSetting(webStatus.value!);
 </template>
 
 <style scoped lang="scss">
+.chat-bot-button{
+  position: absolute;
+
+  @media (max-width:768px) {
+      display: none;
+  }
+}
 .social-icons{
   top: 94%;
   left: 4%;

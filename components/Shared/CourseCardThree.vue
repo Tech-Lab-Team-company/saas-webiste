@@ -105,15 +105,15 @@ const UserSetting = useSettingStore();
             <div class="card-body" dir="rtl">
               <h5 class="card-title">{{ course.title }}</h5>
               <div class="card-content">
-                <p class="card-text1">
+                <p class="card-text1" v-if="course.course_videos">
                   <video1 />
                   {{ course.course_videos }} فيديو
                 </p>
-                <p class="card-text1">
+                <p class="card-text1" v-if="course.course_docs">
                   <note />
                   {{ course.course_docs }} ملف ورقي
                 </p>
-                <p class="card-text1">
+                <p class="card-text1" v-if="course.course_records">
                   <microphone />
                   {{ course.course_records }} ملف صوتى
                 </p>
@@ -229,7 +229,7 @@ const UserSetting = useSettingStore();
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  // justify-content: space-between;
   padding-bottom: 10px;
   width: 100%;
   transition: transform 0.3s ease-in-out;

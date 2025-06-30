@@ -45,7 +45,6 @@ export default abstract class ServicesInterface {
   }: ServiceCallParams): Promise<{ data: any; statusCode: number }> {
     let response: AxiosResponse | undefined;
     if (showLoadingDialog) {
-      // console.log(ShowLoader.getInstance().dialogElement)
       ShowLoader.getInstance().showLoader();
 
       // TODO : Fire Loader
@@ -151,7 +150,7 @@ export default abstract class ServicesInterface {
     }
 
     if (response) {
-      console.log(`Response is not null ${response.data} - ${response.status}`);
+      // console.log(`Response is not null ${response.data} - ${response.status}`);
       return {
         data: response.data,
         statusCode: response.status,

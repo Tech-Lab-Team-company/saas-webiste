@@ -86,11 +86,11 @@ function handleSessionClick(index: number, link: string, title: string, text: st
     }
 
     else if (show === true) {
-      console.log(props.isSubscribed, "props.isSubscribed")
-      console.log(props.isPaid, "props.isPaid")
+      // console.log(props.isSubscribed, "props.isSubscribed")
+      // console.log(props.isPaid, "props.isPaid")
       if (!props.isSubscribed && props.isPaied) {
         isdisabled.value = true
-        console.log("non")
+        // console.log("non")
       }
       else if (props.isSubscribed && props.isPaied) {
         isdisabled.value = false

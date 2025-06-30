@@ -24,7 +24,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
         hashtag_id:router.currentRoute.value.params.hashtagId,
       }
     });
-    console.log(response , "ALL BOLGS");
+    // console.log(response , "ALL BOLGS");
     return response.data;
   } catch (err) {
     console.error("Failed to fetch blogs:", err);

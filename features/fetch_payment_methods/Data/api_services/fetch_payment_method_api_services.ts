@@ -17,7 +17,7 @@ class FetchPaymentMethodApiService extends ServicesInterface {
   }
 
   async applyService(params: Params): Promise<{ data: any; statusCode: number }> {
-    console.log(CrudType.POST)
+    // console.log(CrudType.POST)
     return await super.call({
       url: ApiNames.Instance.paymentmethods,
       type: CrudType.POST,

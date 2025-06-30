@@ -13,6 +13,10 @@
             .splide__arrow--prev{
                 right: -50px;
                 border-radius: 20px;
+                @media (max-width:768px) {
+                    right: -2px;
+                    
+                }
             } 
         }
     }

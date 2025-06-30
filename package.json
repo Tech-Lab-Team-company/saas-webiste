@@ -14,6 +14,7 @@
     "@cloudinary/vue": "^1.13.1",
     "@googlemaps/js-api-loader": "^1.16.8",
     "@justinribeiro/lite-youtube": "^1.7.1",
+    "@lottiefiles/dotlottie-vue": "^0.7.2",
     "@nuxt/devtools": "^2.3.2",
     "@nuxt/http": "^0.6.4",
     "@nuxt/image": "^1.10.0",

@@ -2,6 +2,7 @@
 import ChatBotMessagesParams from '~/features/ChatBotMessages/Core/Params/chat_bot_messages_params'
 import type ChatBotMessagesModel from '~/features/ChatBotMessages/Data/models/chat_bot_messages_model'
 import ChatBotMessageController from '~/features/ChatBotMessages/presentation/controllers/chat_bot_message_controller'
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 
 const ChatText = ref()
 const MessageIndex = ref(1)
@@ -14,25 +15,27 @@ const props = defineProps({
 })
 const botId = ref(props.bot)
 
-
-
 const BotMessages = ref<ChatBotMessagesModel>()
 const loading = ref(false)
-const SendMessage = async () => {
-    // Set loading to true when starting the request
-    loading.value = true;
 
+const SendMessage = async () => {
+    if (!ChatText.value || ChatText.value.trim() === '') {
+        return;
+    }
+
+    loading.value = true;
+    const Message = ref( ChatText.value)
+    ChatText.value = ""
     Messages.value.push({
-        msg: ChatText.value,
+        msg: Message.value,
         index: MessageIndex.value++
     })
 
-    const chatBotMessageParams = new ChatBotMessagesParams(botId.value, ChatText.value)
+    const chatBotMessageParams = new ChatBotMessagesParams(botId.value, Message.value)
     const chatBotMessageController = ChatBotMessageController.getInstance();
 
     try {
         const state = await chatBotMessageController.ChatBotsMessages(chatBotMessageParams);
-
         if (state.value.data) {
             BotMessages.value = state.value.data;
             Messages.value.push({
@@ -47,20 +50,26 @@ const SendMessage = async () => {
     }
 
     ChatText.value = ""
-    console.log(Messages.value)
+    // console.log(Messages.value)
 }
 
 watch(() => props.bot, (newValue) => {
     botId.value = newValue
+    Messages.value = [
+        {
+            msg: "",
+            index: MessageIndex
+        }
+    ]
 })
 </script>
 
 <template>
     <div class="chat-container">
-
+        <DotLottieVue v-if="Messages.length == 1" autoplay loop src="/lottie/chatbot.json" />
         <div class="messages-container">
             <p v-for="(message, index) in Messages.filter(m => m.msg.trim() !== '')" v-html="message.msg" :key="index"
-                :class="message.index % 2 === 0 ? 'received-message' : 'sent-message'" >
+                :class="message.index % 2 === 0 ? 'received-message' : 'sent-message'">
             </p>
             <div class="loading-box" v-if="loading">
                 <span class="loding-dot">.</span>
@@ -70,7 +79,8 @@ watch(() => props.bot, (newValue) => {
         </div>
 
         <div class="chat-input">
-            <InputText class="input-text" type="text" v-model="ChatText" />
+            <InputText class="input-text" type="text" v-model="ChatText" @keydown.enter="SendMessage"
+                placeholder="Type your message and press Enter..." />
             <i class="pi pi-send" @click="SendMessage"></i>
         </div>
     </div>
@@ -81,10 +91,11 @@ watch(() => props.bot, (newValue) => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    
+
     .messages-container {
         // background-image: url('../../public/images/background.png');
         // background-color: red;
+
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -157,8 +168,6 @@ watch(() => props.bot, (newValue) => {
         border: 1px solid #cbd5e1;
         border-radius: 10px;
         width: 100%;
-
-
     }
 
     .chat-input {
@@ -169,7 +178,6 @@ watch(() => props.bot, (newValue) => {
         .input-text {
 
             &:focus {
-
                 outline: #cbd5e1;
                 border: 1px solid #cbd5e1;
             }

@@ -56,7 +56,7 @@ const ChooseMethod = (method: Number) => {
     SelectedPaymentMethod.value = false
 
   }
-  console.log(SelectedPaymentMethod.value)
+  // console.log(SelectedPaymentMethod.value)
 }
 
 watch(() => PaymentMethod.value,

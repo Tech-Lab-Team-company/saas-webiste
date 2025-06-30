@@ -32,7 +32,7 @@ watch(() => props.CourseData, (newValue) => {
 }, {immediate: true});
 
 const router = useRouter();
-console.log(router.currentRoute.value.params.id)
+// console.log(router.currentRoute.value.params.id)
 
 const userStore = useUserStore()
 
