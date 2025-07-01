@@ -22,6 +22,9 @@ class FetchChatBotApiService extends ServicesInterface {
       url: ApiNames.Instance.fetchchatbot,
       type: CrudType.POST,
       params: params,
+      headers: {
+        'web-domain': 'student',
+      },
     })
   }
 }
