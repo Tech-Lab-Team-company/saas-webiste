@@ -8,7 +8,6 @@ import type HomeFirstSection from "~/types/home_first_section";
 const props = defineProps<{
   HomeSections: HomeFirstSection[];
 }>();
-const { locale } = useI18n();
 
 const UserSetting = useSettingStore();
 

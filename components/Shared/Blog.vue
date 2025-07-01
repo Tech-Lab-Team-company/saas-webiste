@@ -5,36 +5,52 @@ import { ref, onMounted } from 'vue';
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import StagesTitle from '../Home/home/StagesTitle.vue'
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
-// Make options reactive and better structured
-const splideOptions = ref({
-  type: 'loop',
-  perPage: 3,
-  gap: "1rem", 
-  pagination: false,
-  perMove: 1,
-  arrows: true,
-  drag: true,
-  dragMinThreshold: 10,
-  direction: 'rtl', 
-  rewind: true,
-  autoWidth: false, 
-  fixedWidth: false,
-  focus: 'center',
-  trimSpace: false,
-  breakpoints: {
-    1024: {
-      perPage: 2,
+const containerRef = ref(null)
+
+const swiper = useSwiper(containerRef, {
+  effect: 'creative',
+  // loop: true,
+  autoplay: {
+    delay: 5000,
+  },
+  creativeEffect: {
+    prev: {
+      shadow: true,
+      translate: [0, 0, -400],
     },
-    590: {
-      perPage: 1,
+    next: {
+      shadow: true,
+      translate: [0, 0, -400],
     },
   },
-});
+  breakpoints: {
+    1200: {
 
-const BlogsData = ref<HomeFirstSection[] | null>(null);
-const {locale} = useI18n();
+      slidesPerView: 3,
+      spaceBetween: '1rem',
+    },
+    992: {
+      slidesPerView: 2,
+      spaceBetween: "1rem"
+    },
+    768: {
+      slidesPerView: 2,
+      spaceBetween: "0.8rem"
+    },
+    576: {
+      slidesPerView: 1,
+      spaceBetween: "0.5rem",
+
+    }
+  }
+})
+
+onMounted(() => {
+  console.log(swiper.instance)
+})
+
 const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
   const response = await $fetch<{
     data: HomeFirstSection[];
@@ -58,34 +74,31 @@ onMounted(() => {
     splideRef.value.splide.refresh();
   }
 });
+
+const UserSetting = useSettingStore();
 </script>
 
 <template>
   <div class="main-blog-container">
-  <div class="Blog" dir="rtl" v-if="Blogs?.length > 0">
-    <div class="slider-wrapper pt-md">
-      <div class="stage-container">
-        <div class="stages student-stages">
-          <StagesTitle
-            :maintitle="`المدونه`"
-            :title="Blogs?.title"
-            :subtitle="Blogs?.subtitle"
-          />
+    <div class="Blog" dir="rtl" v-if="Blogs?.length > 0">
+      <div class="slider-wrapper pt-md">
+        <div class="stage-container">
+          <div class="stages student-stages">
+            <StagesTitle :maintitle="`المدونه`" :title="Blogs?.title" :subtitle="Blogs?.subtitle" />
+          </div>
         </div>
       </div>
-
-      <Splide 
-        ref="splideRef"
-        :options="splideOptions" 
-        class="splide-container"
-        v-if="Blogs?.length"
-      >
-        <SplideSlide v-for="(blog, index) in Blogs" :key="index">
+    </div>
+  </div>
+  <div class="blogs-main-section" v-if="Blogs?.length > 0">
+    <ClientOnly>
+      <swiper-container ref="containerRef">
+        <swiper-slide v-for="(blog, idx) in Blogs" :key="idx" style="margin-left: auto;">
           <NuxtLink :to="`/blogs/${blog.slug}`" class="card">
-            <img :src="blog.attachments[0].file" alt="Card image" class="course-image"/>
+            <img :src="blog.attachments[0].file" style="object-fit: cover;" alt="Card image" class="course-image" />
             <div class="card-body">
               <div class="card-header">
-                <hr/>
+                <hr />
                 <div class="flex">
                   <h5 class="card-title" v-html="blog.title"></h5>
                   <div class="card-date">
@@ -99,15 +112,20 @@ onMounted(() => {
               </div>
             </div>
           </NuxtLink>
-        </SplideSlide>
-      </Splide>
-    </div>
-  </div>
+        </swiper-slide>
+      </swiper-container>
+    </ClientOnly>
+
+    <button class="right-arrow" @click="swiper.next()">
+      <IconsArrowRight />
+    </button>
+    <button class="left-arrow" @click="swiper.prev()">
+      <IconsArrowLeft />
+    </button>
   </div>
 </template>
 
-<style scoped>
-
+<style scoped lang="scss">
 .card {
   position: relative;
   transition: transform 0.3s ease-in-out;
@@ -129,10 +147,24 @@ onMounted(() => {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-direction: row-reverse;
+
+  // @media(max-width: 768px) {
+  //   flex-direction: column;
+  //   align-items: flex-end;
+  //   justify-content: center;
+  // }
 }
 
-.card-header .flex{
+.card-header .flex {
   width: 350px;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  // @media(max-width: 768px) {
+  //   flex-direction: column;
+  //   align-items: flex-start;
+  //   justify-content: flex-start;
+  // }
 }
 
 .card-header hr {
@@ -149,11 +181,9 @@ onMounted(() => {
   gap: 10px;
   padding-right: 10px;
   padding-left: 10px;
-  background: linear-gradient(
-      360deg,
+  background: linear-gradient(360deg,
       rgba(255, 185, 73, 0.5) -102%,
-      #ffffff 48%
-  );
+      #ffffff 48%);
   font-family: "medium";
   font-weight: 700;
   font-size: 18px;
@@ -217,6 +247,7 @@ onMounted(() => {
   height: 100%;
   padding-bottom: 30px;
 }
+
 @media (max-width: 768px) {
   .splide-container {
     width: 90%;
@@ -287,6 +318,7 @@ onMounted(() => {
   /* height: calc(var(--line-height) * 2em); */
   line-height: var(--line-height);
   --line-height: 1.5;
+  text-align: right;
 }
 
 
@@ -294,6 +326,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-direction: row-reverse;
 }
 
 .card-footer p {

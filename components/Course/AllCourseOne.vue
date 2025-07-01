@@ -9,40 +9,26 @@ const { locale } = useI18n();
 const UserSetting = useSettingStore();
 </script>
 <template>
-  
+
   <!-- <pre>{{ props.HomeSections }}</pre> -->
   <div class="card-course">
-    <div
-      class="cards-wrapper"
-    >
+    <div class="cards-wrapper">
       <div class="cards-grid">
-        <NuxtLink
-          v-for="card in props.HomeSections"           
-          :key="card.id"
-          :to="`/course/${card.id}`"
-          class="card"
-          
-          :style="{ backgroundImage: `url(${card.image.img|| UserSetting.setting?.image?.img})` }"
-        >
-          <!-- <div class="image-container">
-  
-              <img :src="card.image.img || ''" alt="course image" class="card-image" />
-            </div> -->
+        <NuxtLink v-for="card in props.HomeSections" :key="card.id" :to="`/course/${card.id}`" class="card"
+          :style="{ backgroundImage: `url(${card.image.img || UserSetting.setting?.image?.img})` }">
+
           <div class="card-body" dir="rtl">
             <div class="card-header">
               <h5 class="card-title">{{ card.title }}</h5>
-              <p class="card-number" v-if="card.course_price > 0 && !(card.is_subscribed)">{{ card.course_price }} {{ card?.currency }}</p>
-               <p class="salary" v-else-if="card?.is_subscribed">تم شراء الكورس</p>
-              <p class="card-number" v-else>{{$t('مجانى') }}</p>
+              <p class="card-number" v-if="card.course_price > 0 && !(card.is_subscribed)">{{ card.course_price }} {{
+                card?.currency }}</p>
+              <p class="salary" v-else-if="card?.is_subscribed">تم شراء الكورس</p>
+              <p class="card-number" v-else>{{ $t('مجانى') }}</p>
             </div>
             <p class="card-text" v-html="card.description"></p>
             <div class="card-footer">
               <span class="card-icon">
-                <img
-                  :src="card.teacher?.image?.img"
-                  :alt="card.teacher?.image?.alt"
-                  class="teacher-image"
-                />
+                <img :src="card.teacher?.image?.img" :alt="card.teacher?.image?.alt" class="teacher-image" />
               </span>
               <span class="card-name">{{ card.teacher?.name }}</span>
             </div>
@@ -58,18 +44,15 @@ const UserSetting = useSettingStore();
 </template>
 
 <style scoped lang="scss">
-
-
-
 .card-footer {
-    .card-icon 
-    {
-    .teacher-image{
+  .card-icon {
+    .teacher-image {
       max-width: 50px;
     }
   }
 
 }
+
 .cards-wrapper {
   // display: flex;
   flex-direction: column;
@@ -77,6 +60,7 @@ const UserSetting = useSettingStore();
   justify-content: center;
   padding: 20px;
 }
+
 .cards-heading {
   font-size: 25px;
   color: #222;
@@ -94,16 +78,17 @@ const UserSetting = useSettingStore();
   width: 80%;
   margin-left: auto;
   margin-right: auto;
-  justify-items: start; 
+  justify-items: start;
   direction: rtl;
 }
 
-@media(max-width:768px){
+@media(max-width:768px) {
   .cards-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-@media(max-width:500px){
+
+@media(max-width:500px) {
   .cards-grid {
     grid-template-columns: repeat(1, 1fr);
   }
@@ -116,7 +101,7 @@ const UserSetting = useSettingStore();
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   height: 320px;
-  width: 100%; 
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -126,6 +111,7 @@ const UserSetting = useSettingStore();
   background-size: cover;
   background-position: center;
 }
+
 .card:hover {
   transform: translateY(-4px);
 }
@@ -175,7 +161,7 @@ const UserSetting = useSettingStore();
   text-align: right;
   color: #ffffff;
   margin: 0;
-  font-family: "bold",serif;
+  font-family: "bold", serif;
 }
 
 .card-number {
@@ -186,7 +172,7 @@ const UserSetting = useSettingStore();
   padding: 4px 5px;
   font-weight: 500;
   font-size: 14px;
-  font-family: "regular",serif;
+  font-family: "regular", serif;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,7 +184,7 @@ const UserSetting = useSettingStore();
   font-size: 1rem;
   text-align: right;
   border-bottom: 1px solid #dde1e6;
-  font-family: "regular",serif;
+  font-family: "regular", serif;
   margin: 10px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -208,6 +194,7 @@ const UserSetting = useSettingStore();
   height: calc(var(--line-height) * 2em);
   line-height: var(--line-height);
   --line-height: 1.5;
+
   * {
     font-size: 1rem;
   }
@@ -225,7 +212,7 @@ const UserSetting = useSettingStore();
   letter-spacing: 0%;
   text-align: right;
   color: white;
-  font-family: "bold",serif;
+  font-family: "bold", serif;
   margin: 0px 10px;
 }
 
