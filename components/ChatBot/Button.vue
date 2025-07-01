@@ -67,10 +67,12 @@ watch(() => window.innerWidth, (newValue) => {
     }
 })
 
+const userSetting = useSettingStore();
+
 </script>
 
 <template>
-    <SpeedDial class="chat-icons" :model="items" :direction="SpeedDialDirection" :style="SppedDialStyle">
+    <SpeedDial class="chat-icons" :model="items" :direction="SpeedDialDirection" :style="SppedDialStyle" v-if="userSetting.setting?.chatbot == 1" >
         <template #icon>
             <DotLottieVue autoplay loop src="/lottie/ai.json" />
         </template>

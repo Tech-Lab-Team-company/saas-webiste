@@ -56,16 +56,6 @@ const FetchExamQuestions = async () => {
 };
 
 
-// const sendData = async (status: string) => {
-//     const questionAnswerParams = new QuestionAnswerParams(
-//         Number(router.currentRoute.value.params.exam),
-//         null,
-//         null
-//     );
-//     const questionAnswerController = QuestionAnswerController.getInstance()
-//         const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams || null, status || " " );
-// }
-
 const startTimer = (endTime: number) => {
   console.log(endTime, "endtime");
   timerInterval = setInterval(() => {

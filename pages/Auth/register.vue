@@ -1,16 +1,14 @@
 <script setup lang="ts">
-    const route = useRoute();
-    // console.log(route.path);
 
     definePageMeta({
         layout: 'auth' 
     });
-  
 
 </script>
 
 <template>
-    <RegisterForm />
+
+        <RegisterForm />
 </template>
 
 <style scoped lang="scss">

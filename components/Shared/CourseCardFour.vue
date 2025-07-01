@@ -114,6 +114,7 @@ const splideOptions = {
   font-weight: 800;
   vertical-align: middle;
   font-family: "bold";
+  margin-top: 20px;
 }
 
 .slider-paragraph {

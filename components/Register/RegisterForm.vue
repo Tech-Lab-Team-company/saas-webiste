@@ -34,8 +34,8 @@ const validatePassword = () => {
   if (!password.value) {
     passwordError.value = "كلمة المرور مطلوبة";
   } else if (!passwordRegex.test(password.value)) {
-    passwordError.value =
-      "كلمة المرور يجب أن تكون أكثر من 8 أحرف وتحتوي على رموز مثل (/*#@)";
+    passwordError.value =""
+      // "كلمة المرور يجب أن تكون أكثر من 8 أحرف وتحتوي على رموز مثل (/*#@)";
   } else {
     passwordError.value = "";
   }

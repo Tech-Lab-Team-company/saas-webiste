@@ -116,7 +116,7 @@ const UserSetting = useSettingStore();
       </swiper-container>
     </ClientOnly>
 
-    <button class="right-arrow" @click="swiper.next()">
+    <button class="right-arrow" @click="swiper.next()" >
       <IconsArrowRight />
     </button>
     <button class="left-arrow" @click="swiper.prev()">

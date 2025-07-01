@@ -3,20 +3,26 @@
   width: 100%;
   margin-top: 10px;
   padding-bottom: 30px;
-  .course-style-two {
-    
   
-    
+  .course-style-two {
     swiper-slide {
       a {
         height: 300px;
+        width: 100%;
+        display: block; 
+        min-height:400px ;
       }
     }
 
     .card-container {
       position: relative;
       padding: 0;
-      
+      height: 300px; 
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden; 
+      display: flex; 
+      flex-direction: column; 
 
       .course-image-container {
         width: 100%;
@@ -24,60 +30,119 @@
         position: absolute;
         top: 0;
         left: 0;
+        z-index: 1; 
 
         img {
           object-fit: cover;
           width: 100%;
-          max-height: 150px;
+          height: 100%; 
           border-radius: 20px;
-          height: 100%;
         }
       }
+
       .course-details {
+        position: absolute; 
+        bottom: 0; 
+        left: 0;
+        right: 0;
         z-index: 100;
         display: flex;
         flex-direction: column;
         color: white;
         width: 100%;
-        background-color: rgba(0, 0, 0, 0.719);
-        margin-top: auto;
-        padding: 10px;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.8) 0%,
+          rgba(0, 0, 0, 0.6) 50%,
+          rgba(0, 0, 0, 0.2) 80%,
+          transparent 100%
+        ); 
+        padding: 20px 15px 15px 15px; 
+        border-radius: 0 0 20px 20px; 
+
         .course-header {
           width: 100%;
+
           .course-title-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
             width: 100%;
+            margin-bottom: 10px; // Add space between title and description
+
             @media (max-width: 768px) {
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              gap: 10px; // Add gap for mobile
             }
 
             .course-title {
-                @media (max-width: 768px) {
-                        text-align: center;
-                }
+              font-size: 18px;
+              font-weight: 700;
+              margin: 0; // Remove default margins
+              line-height: 1.3;
+
+              @media (max-width: 768px) {
+                text-align: center;
+                font-size: 16px;
+              }
             }
+
             .course-price {
               display: flex;
               align-items: center;
               flex-direction: row-reverse;
               gap: 3px;
-              // flex-wrap: wrap;
               font-size: 16px;
-              font-weight: 400;
+              font-weight: 600;
               background-color: #ffb949;
               border-radius: 50px;
-              padding: 5px 10px;
+              padding: 8px 12px;
               color: white;
+              white-space: nowrap; // Prevent price from wrapping
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Add subtle shadow
+
+              @media (max-width: 768px) {
+                font-size: 14px;
+                padding: 6px 10px;
+              }
             }
           }
 
           .course-description {
             color: white;
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 0;
+            opacity: 0.9;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; // Limit to 2 lines
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+
+            @media (max-width: 768px) {
+              font-size: 13px;
+              -webkit-line-clamp: 1; // Limit to 1 line on mobile
+            }
           }
+        }
+      }
+
+      // Hover effect for better interaction
+      &:hover {
+        transform: translateY(-2px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+        .course-details {
+          background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.9) 0%,
+            rgba(0, 0, 0, 0.7) 50%,
+            rgba(0, 0, 0, 0.3) 80%,
+            transparent 100%
+          );
         }
       }
     }

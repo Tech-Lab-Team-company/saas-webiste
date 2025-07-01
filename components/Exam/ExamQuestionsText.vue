@@ -38,7 +38,6 @@ const SendEmit = () => {
 const selected = ref([])
 
 const router = useRouter()
-console.log(Answer.value, "Answer")
 const toast = useToast();
 
 const sendData = async (status: string) => {
@@ -52,9 +51,7 @@ const sendData = async (status: string) => {
     if (Number(RemainingTimeMinutes.value) > 0 && selected.value[QuestionIndex.value] !== undefined) {
         const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams || null, status || " " );
     }
-    // if(!(selected.value[QuestionIndex.value])){
-    //      toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب اختيار إجابة', life: 3000 });
-    // }
+  
 }
 
 
@@ -131,9 +128,18 @@ watch(() => props.remainingTimeMinutes,
             <div class="questions">
                 <div class="question" v-for="(answer, index) in questionDetails?.questions[QuestionIndex].answers"
                     :key="index">
-                    <label :for="`answer-${answer.id}`" @click="SelectedAnswer[QuestionIndex] = `${answer.id}`"
+                    <label  :for="`answer-${answer.id}`" @click="SelectedAnswer[QuestionIndex] = `${answer.id}`"
                         :class="SelectedAnswer[QuestionIndex] == `${answer.id}` ? `selected` : ``"
                         v-html="answer?.answer"></label>
+                        
+                        <!-- <img v-else 
+                        :src="answer?.image" 
+                        width="150" height="150" 
+                        :for="`answer-${answer.id}`" 
+                        @click="SelectedAnswer[QuestionIndex] = `${answer.id}`"
+                        :class="SelectedAnswer[QuestionIndex] == `${answer.id}` ? `selected-img` : ``"
+                        /> -->
+
                     <input class="answer" v-model="selected[QuestionIndex]" type="radio" :value="answer.id"
                         name="answer" :id="`answer-${answer.id}`">
                 </div>
@@ -154,12 +160,12 @@ watch(() => props.remainingTimeMinutes,
                 <RightArrowIcon />
             </button>
         </div>
-        <div class="next-btn finish-btn" v-if="QuestionIndex == questionDetails?.questions.length - 1">
-            <button v-if="QuestionDetails?.allow_shuffle" class="back-btn" @click="DeacreseIndes">
+        <div class="next-btn finish-btn" v-if="QuestionIndex == questionDetails?.questions.length - 1  ">
+            <button v-if="QuestionDetails?.allow_shuffle && QuestionDetails?.questions.length > 1" class="back-btn" @click="DeacreseIndes" >
                 <LeftArrowIcon />
                 {{ $t('السابق') }}
             </button>
-            <button :class="QuestionDetails?.allow_shuffle == 0 ?`w-full`:``" @click="EndExam">{{ $t('إنهاء الامتحان ') }}</button>
+            <button :class="QuestionDetails?.allow_shuffle == 0 || QuestionDetails?.questions.length < 2 ?`w-full`:``" @click="EndExam">{{ $t('إنهاء الامتحان ') }}</button>
         
         </div>
     </div>
@@ -167,6 +173,12 @@ watch(() => props.remainingTimeMinutes,
 
 
 <style scoped lang="scss">
+.questions{
+   flex-wrap:wrap;
+}
+.selected-img{
+    border: 5px solid #ffb949;
+}
 .w-full{
     width: 100% !important ;
 }

@@ -1,7 +1,7 @@
 @import "../fonts";
 
 .main-container {
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   margin-bottom: 20px;
 
   .container {
@@ -16,14 +16,17 @@
     position: relative;
     @media (max-width: 786px) {
       flex-direction: column;
+      padding: 10px;
     }
-
 
     .image-container {
       position: relative;
       animation: fadein 2s ease-out;
       // animation-iteration-count: infinite;
       transition: all 0.3 linear;
+      @media (max-width: 768px) {
+        padding: 0 !important;
+      }
 
       @keyframes fadein {
         from {
@@ -45,8 +48,7 @@
         transform: translateY(-50%);
       }
 
-      .row-video{
-        
+      .row-video {
       }
     }
 
@@ -75,7 +77,9 @@
         align-items: end;
         width: 400px;
         @media (max-width: 600px) {
-          width: 250px;
+          width: 80%;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         .main-title {
@@ -87,7 +91,7 @@
 
         .sub-title {
           text-align: end;
-          color: #565E68;
+          color: #565e68;
           // width: 550px;
           font-size: 20px;
           margin-top: 10px;
@@ -103,14 +107,9 @@
         margin-top: 15px;
         padding: 10px;
         background-color: #032855;
-
       }
-
-
     }
-
   }
-
 
   .vid-container {
     position: relative;
@@ -138,7 +137,11 @@
 
       .layer {
         position: absolute;
-        background-image: linear-gradient(to left, rgba(0, 0, 0, 0.785), rgba(6, 17, 71, 0.102));
+        background-image: linear-gradient(
+          to left,
+          rgba(0, 0, 0, 0.785),
+          rgba(6, 17, 71, 0.102)
+        );
         top: 0;
         left: 0;
         width: 100%;
@@ -147,7 +150,6 @@
         scale: 1.2;
         border-radius: 15px;
         z-index: 1;
-
       }
 
       video {
@@ -177,7 +179,6 @@
       // overflow: hidden;
       gap: 20px;
 
-
       animation: Videsdetailsfadein 2s ease-out;
       @keyframes Videsdetailsfadein {
         from {
@@ -188,7 +189,6 @@
         }
       }
 
-
       .vid-title {
         display: flex;
         flex-direction: column;
@@ -197,7 +197,7 @@
         gap: 10px;
 
         .title {
-          color: #FFB949;
+          color: #ffb949;
           text-align: end;
         }
 
@@ -211,9 +211,7 @@
 
         .vid-sub-title {
           color: white;
-
         }
-
       }
 
       button {
@@ -224,10 +222,7 @@
         margin-left: auto;
         background-color: #032855;
       }
-
     }
-
-
   }
 
   .home-buttons {
@@ -235,7 +230,6 @@
     display: flex;
     justify-content: center;
     gap: 5px;
-
 
     button {
       position: relative;
@@ -247,18 +241,16 @@
         width: 16px;
         height: 5px;
         border-radius: 6px;
-        background-color: #FF931E26;
+        background-color: #ff931e26;
       }
 
       &.active::after {
-        background-color: #FFB949;
+        background-color: #ffb949;
       }
 
       &.prev-btn::after {
         transform: translateX(25px);
       }
-
-
     }
   }
 }
@@ -283,12 +275,12 @@
     width: 25px;
     height: 5px;
     background-color: #ffb949;
-    opacity: .3;
+    opacity: 0.3;
     transform: scale(1);
     border-radius: 5px;
   }
   &::part(bullet-active) {
-    display:block !important;
+    display: block !important;
     width: 25px;
     height: 5px;
     background-color: #ffb949;
