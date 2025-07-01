@@ -1,23 +1,14 @@
 <script setup lang="ts">
-import { Splide, SplideSlide } from "@splidejs/vue-splide";
-import "@splidejs/vue-splide/css";
 import microphone from "@/public/icons/microphone.vue";
 import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
-import { baseUrl } from "~/constant/baseUrl";
-import type HomeFirstSection from "~/types/home_first_section";
-import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
-import AllCourseTwo from "../Course/AllCourseTwo.vue";
-import { ref, watch, onMounted, nextTick, onBeforeUnmount } from "vue";
-import { useI18n } from "vue-i18n";
-import SplideCore from "@splidejs/splide";
+import type HomeSection from "~/types/home_section_interface";
 
 const props = defineProps<{
-  HomeSections: {};
+  HomeSections: HomeSection;
 }>();
 
 const homesection = ref(props.HomeSections);
-const { locale } = useI18n();
 
 watch(
   () => props.HomeSections,
@@ -26,163 +17,98 @@ watch(
   },
   { immediate: true }
 );
+const containerRef = ref(null)
 
-const splideOptions = {
-  type: "slide",
-  rewind: false,
-  perPage: 3,
-  perMove: 1,
-  gap: "1rem",
-  pagination: false,
-  arrows: true,
-  drag: true,
-  dragMinThreshold: {
-    mouse: 10,
-    touch: 10,
+const swiper = useSwiper(containerRef, {
+  effect: 'creative',
+  // loop: true,
+  autoplay: {
+    delay: 5000,
   },
-  flickPower: 100,
-  flickMaxPages: 1,
-  observeResize: true,
-  classes: {
-    arrows: 'splide__arrows slider-arrows',
-    arrow: 'splide__arrow slider-arrow',
-    prev: 'splide__arrow--prev slider-prev',
-    next: 'splide__arrow--next slider-next',
+  creativeEffect: {
+    prev: {
+      shadow: true,
+      translate: [0, 0, -400],
+    },
+    next: {
+      shadow: true,
+      translate: [0, 0, -400],
+    },
   },
   breakpoints: {
-    1200: { perPage: 3, gap: "1rem" },
-    992: { perPage: 2, gap: "0.8rem" },
-    768: { perPage: 2, gap: "0.6rem" },
+    1200: {
+
+      slidesPerView: 3,
+      spaceBetween: '1rem',
+    },
+    992: {
+      slidesPerView: 2,
+      spaceBetween: "1rem"
+    },
+    768: {
+      slidesPerView: 2,
+      spaceBetween: "0.8rem"
+    },
     576: {
-      perPage: 1,
-      gap: "0.5rem",
-      padding: { left: "2.5rem", right: "2.5rem" },
-    },
-    400: {
-      perPage: 1,
-      gap: "0.4rem",
-      padding: { left: "2rem", right: "2rem" },
-    },
-  },
-};
+      slidesPerView: 1,
+      spaceBetween: "0.5rem",
 
-let splideInstance: SplideCore | null = null;
-
-const refreshSlider = () => {
-  splideInstance?.refresh?.();
-};
-
-onMounted(async () => {
-  await nextTick();
-  const el = document.querySelector(".splide-container") as HTMLElement;
-  if (el) {
-    splideInstance = new SplideCore(el, splideOptions);
-    splideInstance.mount();
+    }
   }
-  window.addEventListener("resize", refreshSlider);
-});
+})
 
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", refreshSlider);
-  splideInstance?.destroy?.();
-});
+
 const UserSetting = useSettingStore();
 </script>
 
 <template>
-  <div class="card-course-three courses-card">
-    <div class="slider-wrapper">
-      <h3 class="slider-heading">{{ homesection?.title }}</h3>
-      <Splide :options="splideOptions" class="splide-container" v-if="homesection?.courses?.length >= 2">
-        <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
-          <NuxtLink :to="`/course/${course.id}`" class="card">
-            <div class="image-container">
-              <img :src="course.image.img" :alt="course.image.alt" class="course-image" />
-              <p class="overlay-text" v-if="course.course_price > 0">{{ course.course_price }} {{ course?.currency }}</p>
-              <p class="overlay-text" v-else>{{ $t('مجانى') }}</p>
-            </div>
-
-            <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ course.title }}</h5>
-              <div class="card-content">
-                <p class="card-text1" v-if="course.course_videos">
+  <h3 class="slider-heading" style="margin-top: 10px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
+  <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-three">
+    {{ console.log(homesection?.courses, 'courses') }}
+    <ClientOnly>
+      <swiper-container ref="containerRef">
+        <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">
+          <NuxtLink :to="`/course/${slide?.id}`">
+            <div class="card-container">
+              <div class="course-image-container">
+                <NuxtImg :src="slide?.image?.img || UserSetting.setting?.image.img" :alt="slide?.image?.alt" />
+              </div>
+              <div class="course-header">
+                <p class="course-title">{{ slide?.title }}</p>
+                <div class="course-data">
+                  <p class="data-content" v-if="slide.course_videos">
+                  <p><span>{{ slide.course_videos }}</span> <span>فيديو</span></p>
                   <video1 />
-                  {{ course.course_videos }} فيديو
-                </p>
-                <p class="card-text1" v-if="course.course_docs">
+                  </p>
+                  <p class="data-content" v-if="slide.course_docs">
+                  <p><span>{{ slide.course_docs }}</span> <span>ملف ورقي</span></p>
                   <note />
-                  {{ course.course_docs }} ملف ورقي
-                </p>
-                <p class="card-text1" v-if="course.course_records">
+                  </p>
+                  <p class="data-content" v-if="slide.course_records">
+                  <p><span>{{ slide.course_records }} </span><span>ملف صوتى</span></p>
                   <microphone />
-                  {{ course.course_records }} ملف صوتى
-                </p>
+                  </p>
+
+                </div>
+                <p class="course-description" v-html="slide?.description"></p>
               </div>
-              <div class="card-footer">
-                <div class="card-text" v-html="course?.description"></div>
-              </div>
+
             </div>
           </NuxtLink>
-        </SplideSlide>
-      </Splide>
-    </div>
+        </swiper-slide>
+      </swiper-container>
+    </ClientOnly>
+
+    <button class="right-arrow" @click="swiper.next()">
+      <IconsArrowRight />
+    </button>
+    <button class="left-arrow" @click="swiper.prev()">
+      <IconsArrowLeft />
+    </button>
   </div>
 
 
-    <div class="card-course-twoo" v-if="homesection?.courses?.length < 2">
-    <div>
-      <div class="cards-grid">
-        <NuxtLink v-for="card in homesection?.courses" :key="card?.id" :to="`/course/${card?.id}`" class="card">
-          <div class="card-inner" dir="rtl">
-            <div class="image-container">
-
-              <img :src="card?.image?.img || ''" alt="course image" class="card-image" />
-            </div>
-
-            <div class="card-body">
-              <div class="card-header">
-                <h5 class="card-title">{{ card?.title }}</h5>
-              </div>
-
-              <p class="card-text" v-html="card?.description"></p>
-
-              <div class="card-content">
-                <p class="card-text1" v-if="card?.course_videos">
-                  <video1 />
-                  {{ card?.course_videos }}
-                  {{ $t('فيديو') }}
-                </p>
-                <p class="card-text1" v-if="card?.course_docs">
-                  <note />
-                  {{ card?.course_docs }}
-                  {{ $t('ملف ورقي') }}
-                </p>
-                <p class="card-text1" v-if="card?.course_records">
-                  <microphone />
-                  {{ card?.course_records }}
-                  {{ $t('ملف صوتى') }}
-                </p>
-              </div>
-
-              <div class="card-footer">
-                <span class="card-icon">
-                  <img :src="card?.teacher?.image?.img || UserSetting.setting?.image?.img"
-                    :alt="card?.teacher?.image?.alt" class="teacher-image" />
-                  <span class="card-name">{{ card?.teacher?.name || UserSetting.setting?.name }}</span>
-                </span>
-                <p class="card-number">{{ card?.course_price }} {{ card?.currency }}</p>
-              </div>
-
-              <div class="card-extra-content">
-                <Arrroww />
-                <p>{{ $t('ابدا الان') }}</p>
-              </div>
-            </div>
-          </div>
-        </NuxtLink>
-      </div>
-    </div>
-  </div>
+  <SharedSingleCourseCard v-if="homesection?.courses?.length < 2" :HomeSections="homesection" />
 </template>
 
 <style scoped lang="scss">
@@ -246,8 +172,9 @@ const UserSetting = useSettingStore();
   width: 100%;
   padding: 6px;
 }
+
 .image-container img {
-height: 100%;
+  height: 100%;
 }
 
 .course-image {
@@ -296,7 +223,8 @@ height: 100%;
   margin: 15px 0;
   flex-wrap: wrap;
   gap: 10px;
-  @media(max-width:768px){
+
+  @media(max-width:768px) {
     gap: 5px;
   }
 }

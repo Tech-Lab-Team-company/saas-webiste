@@ -53,7 +53,7 @@ const SpeedDialDirection = ref('left')
 const SppedDialStyle = computed(() => {
     if (window.innerWidth <= 768) {
         SpeedDialDirection.value = 'left'
-    return {  top: 'calc(90% - 1rem)', right: '2rem', 'z-index': '999', position: 'fixed' };
+    return {  top: 'calc(90% - 1rem)', right: '2rem', 'z-index': '999 ', position: 'fixed' };
     }
     return { top: 'calc(96% - 1rem)', right: '5rem', 'z-index': '999', position: 'fixed' };
 });
@@ -75,7 +75,7 @@ watch(() => window.innerWidth, (newValue) => {
             <DotLottieVue autoplay loop src="/lottie/ai.json" />
         </template>
         <template #item>
-            <div class="chat-bots-container">
+            <div class="chat-bots-container" v-if="visible == false">
                 <p @click="openPosition('bottomright', item.id); SelectedChatBotName = item.name" severity="secondary"
                     v-for="(item, index) in ChatBots" :key="index">{{ item.name }}</p>
             </div>
