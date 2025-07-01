@@ -36,7 +36,7 @@ class HeaderHandler {
     // }
     headers['Accept-Language'] = "ar";
     headers['Content-Type'] = 'application/json';
-    headers['web-domain'] = "student";
+    headers['web-domain'] = getWebDomain();
     headers['Accept'] = 'application/json';
 
 
