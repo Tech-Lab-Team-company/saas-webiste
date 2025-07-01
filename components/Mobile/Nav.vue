@@ -166,7 +166,7 @@ function updateNavVisibility() {
   position: absolute;
   color: var(--primary-color);
   font-weight: 400;
-  font-size: 0.65em;
+  font-size: 0.8em;
   letter-spacing: 0.05em;
   transition: 0.5s;
   opacity: 0;

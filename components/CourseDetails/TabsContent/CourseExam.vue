@@ -50,11 +50,9 @@ const currentTime = new Date();
 
   <div class="course-exam-container" v-for="(exam , index) in CardDetails" :key="index">
 
-    <!-- <Nuxt-link  v-if="!(exam?.is_finished)" :to="`/course/${router.currentRoute.value.params.id}/${exam.id}`">  -->
-    {{ console.log(exam ,"exammmm") }}
-   <a
+   <NuxtLink
    v-if="!(exam?.is_finished)"
-  :href="isDisabled || exam?.is_finished ? null : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
+  :to="isDisabled || exam?.is_finished ? null : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
   @click.prevent="(isDisabled || exam?.is_finished) && $event.preventDefault()"
 >
   <div class="btns">
@@ -77,7 +75,7 @@ const currentTime = new Date();
       {{ $t('ابدأ الامتحان') }}
     </button>
   </div>
-</a>
+</NuxtLink>
     <div v-else-if="exam?.is_finished" class="exam-rate">
       <p class="rating" v-if="exam.degree_type == 2" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
       <p class="rating" v-if="exam.degree_type == 1" :class="(exam.mark / exam.exam_mark)* 100 < 50 ? 'failed' : ''"> {{ ((exam.mark / exam.exam_mark)* 100).toFixed(2) }} %</p>

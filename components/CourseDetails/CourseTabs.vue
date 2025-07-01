@@ -156,7 +156,7 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
               :CourseStatus="CardData?.allow_status"
           />
         </div>
-        <div v-if="tab_value === 'exams'">
+        <div class="course-exams" v-if="tab_value === 'exams'">
           <CourseDetailsTabsContentCourseExam
               :CourseData="CardData?.exams"
               :CourseStatus="CardData?.allow_status"
@@ -181,6 +181,12 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
     top: 0;
     left: 0;
         z-index: 99;
+}
+
+.course-exams{
+  display: flex;
+  flex-direction: column-reverse;
+
 }
 </style>
 

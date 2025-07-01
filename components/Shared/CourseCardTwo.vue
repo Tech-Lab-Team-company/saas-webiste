@@ -77,7 +77,7 @@ const UserSetting = useSettingStore();
           <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">
             <NuxtLink :to="`/course/${slide?.id}`">
               <div class="card-container"
-                :style="{ backgroundImage: `url(${slide?.image?.img || UserSetting.setting?.image.img})`, backgroundSize: 'cover' }">
+                :style="{ backgroundImage: `url(${slide?.image?.img || UserSetting.setting?.image.img})`, backgroundSize: 'cover' ,backgroundPosition: 'center center' }">
                 <div class="course-details">
                   <div class="course-header">
                     <div class="course-title-container">

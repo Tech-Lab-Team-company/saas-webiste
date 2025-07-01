@@ -5,7 +5,6 @@
          <AuthSidebar class="auth-sidebar" />
           <div>
             <slot class="auth-sidebar-home"></slot>
-            <!-- <GlobalMainDialog /> -->
           </div>
     </div>
   </template>
@@ -21,14 +20,23 @@ import AuthSidebar from '~/components/AuthLayout/AuthSidebar.vue';
     width: 100%;
     display: grid;
     grid-template-columns: 74% 26%;
+     @media (max-width: 768px) {
+           grid-template-columns:100%;
+        }
 
     .auth-sidebar{
         order: 1;
+        @media (max-width: 768px) {
+          display: none;
+        }
     }
 
     .auth-sidebar-home{
       
         text-align: right;
+          @media (max-width: 768px) {
+         width:100%
+        }
     }
   }
   

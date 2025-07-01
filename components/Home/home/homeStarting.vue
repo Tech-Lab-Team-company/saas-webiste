@@ -69,36 +69,66 @@ const isVideo = (url) => {
   const extension = url.split('.').pop().toLowerCase();
   return videoExtensions.includes(extension);
 };
+
+const toggleSubtitle = (slideId: number) => {
+  if (expandedSlides.value.has(slideId)) {
+    expandedSlides.value.delete(slideId);
+  } else {
+    expandedSlides.value.add(slideId);
+  }
+};
+
+// Check if subtitle is expanded
+const isExpanded = (slideId: number) => {
+  return expandedSlides.value.has(slideId);
+};
+
+// Truncate text to specified length
+const truncateText = (text: string, maxLength: number = 100) => {
+  if (!text) return '';
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+};
+
+// Check if text needs truncation
+const needsTruncation = (text: string, maxLength: number = 100) => {
+  return text && text.length > maxLength;
+};
+const expandedSlides = ref<Set<number>>(new Set());
 </script>
 
 
 <template>
   <div class="main-container">
     <ClientOnly>
-      <!-- Loading state -->
       <div v-if="pending" class="loading">{{ $t('جاري التحميل...') }}</div>
-      <!-- Error state -->
       <div v-else-if="error" class="error">{{ $t('فشل في تحميل السلايدر.') }}</div>
-      <!-- Slider -->
       <swiper-container class="header-home-section" v-else ref="containerRef">
         <swiper-slide v-for="slide in sliders" :key="slide.id">
           <div v-if="isImage(slide?.media?.img)" class="container">
             <div class="image-container">
               <BackgoundCircle class="background"/>
-              <!-- <img :src="slide.media.img" :alt="slide.media.alt" /> -->
               <img v-if="isImage(slide?.media?.img)" class="row-img" :src="slide?.media?.img"/>
-              <!-- <video v-else-if="isVideo(slide?.media?.img)" class="row-video"  autoplay>
-                  <source :src="slide?.media?.img" type="video/mp4">
-                  Your browser does not support the video tag.
-              </video>
-              <img  v-else="isImage(slide?.media?.img)"  class="row-img" :src="slide?.media?.img"/> -->
+
             </div>
-            <div class="details">
+          <div class="details">
               <div class="title">
                 <p class="main-title">{{ slide.title }}</p>
-                <p class="sub-title">{{ slide.subtitle }}</p>
+                <div class="subtitle-container" >
+                  <p class="sub-title" :class="{ 'expanded': isExpanded(slide.id) }">
+                    {{ isExpanded(slide.id) ? slide.subtitle : truncateText(slide.subtitle) }}
+                  </p>
+                  <p class=" sub-title-expanded"  >
+                    {{ slide.subtitle }}
+                  </p>
+                  <button 
+                    v-if="needsTruncation(slide.subtitle)"
+                    @click="toggleSubtitle(slide.id)"
+                    class="show-more-btn"
+                  >
+                    {{ isExpanded(slide.id) ? $t('عرض أقل') : $t('عرض المزيد') }}
+                  </button>
+                </div>
               </div>
-              <!-- <button class="btn btn-primary">ابــــدأ الآن</button> -->
             </div>
           </div>
           <div v-else class="vid-container">
@@ -112,7 +142,21 @@ const isVideo = (url) => {
               <div class="vid-title">
                 <p class="title">{{ slide.text }}</p>
                 <p class="vid-main-title">{{ slide.title }}</p>
-                <p class="vid-sub-title">{{ slide.subtitle }}</p>
+                <div class="subtitle-container">
+                  <p class="vid-sub-title" :class="{ 'expanded': isExpanded(slide.id) }">
+                    {{ isExpanded(slide.id) ? slide.subtitle : truncateText(slide.subtitle) }}
+                  </p>
+                  <p class=" sub-title-expanded"  >
+                    {{ slide.subtitle }}
+                  </p>
+                  <button 
+                    v-if="needsTruncation(slide.subtitle)"
+                    @click="toggleSubtitle(slide.id)"
+                    class="show-more-btn vid-show-more"
+                  >
+                    {{ isExpanded(slide.id) ? $t('عرض أقل') : $t('عرض المزيد') }}
+                  </button>
+                </div>
               </div>
               <!-- <button class="btn btn-primary">{{ $t('ابــــدأ الآن') }}</button> -->
             </div>
@@ -129,10 +173,38 @@ const isVideo = (url) => {
 </template>
 
 
-<style scoped>
+<style scoped lang="scss">
 .row-video {
   position: absolute;
   border-radius: 15px;
+}
+
+.show-more-btn{
+  background:none !important;
+  color:black !important;
+  text-decoration:underline !important;
+  width:fit-content !important;
+  @media(min-width:768px){
+    display:none !important;
+  }
+}
+.sub-title{
+    @media(min-width:768px){
+    display:none !important;
+  }
+
+  
+}
+.sub-title-expanded{
+          text-align: end;
+          color: #565e68;
+          // width: 550px;
+          font-size: 20px;
+          margin-top: 10px;
+          line-height: 1.6;
+    @media(max-width:768px){
+    display:none !important;
+  }
 }
 
 </style>

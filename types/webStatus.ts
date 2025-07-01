@@ -29,6 +29,7 @@ export default interface WebStatus {
     join_option_status:number;
     app_store:string;
     play_store:string;
+    chatbot:number;
 
 }
 
