@@ -1,7 +1,6 @@
-Course Card One 
+Course Card One
 
 <script setup lang="ts">
-import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
@@ -10,6 +9,50 @@ import AllCourseTwo from "../Course/AllCourseTwo.vue";
 import type HomeSection from "~/types/home_section_interface";
 
 
+const containerRef = ref(null)
+
+const swiper = useSwiper(containerRef, {
+  effect: 'creative',
+  // loop: true,
+  autoplay: {
+    delay: 5000,
+  },
+  creativeEffect: {
+    prev: {
+      shadow: true,
+      translate: [0, 0, -400],
+    },
+    next: {
+      shadow: true,
+      translate: [0, 0, -400],
+    },
+  },
+  breakpoints: {
+    1200: {
+
+      slidesPerView: 3,
+      spaceBetween: '1rem',
+    },
+    992: {
+      slidesPerView: 2,
+      spaceBetween: "1rem"
+    },
+    768: {
+      slidesPerView: 2,
+      spaceBetween: "0.8rem"
+    },
+    576: {
+      slidesPerView: 1,
+      spaceBetween: "0.5rem",
+      // arrows: true,
+      // drag: true
+    }
+  }
+})
+
+onMounted(() => {
+  console.log(swiper.instance)
+})
 
 const props = defineProps<{
   HomeSections: HomeSection;
@@ -74,48 +117,42 @@ watch(
   { immediate: true }
 )
 
-const { locale } = useI18n();
 
 </script>
 
 <template>
-
-  <div class="card-course-one">
-    <div class="slider-wrapper">
-
-      <h3 class="slider-heading">{{ homesection?.title || UserSetting.setting?.name }}</h3>
-      <Splide :options="splideOptions" class="splide-container" v-if="homesection?.courses?.length >= 2">
-        <SplideSlide v-for="(course, index) in homesection?.courses" :key="index">
-          <NuxtLink :to="`/course/${course.id}`" class="card">
-            <div class="image-wrapper">
-              <img :src="course?.image?.img" :alt="course?.image?.alt" class="course-image" />
-              <!-- <img src="../../assets/images/img1.png" alt=""> -->
-              <div class="card-overlay-content">
-                <p class="card-number" v-if="course?.course_price > 0">{{ course?.course_price }} {{ course?.currency }}
-                </p>
-                <p class="card-number" v-else>{{ $t('مجانى') }}</p>
-              </div>
+  <h3 class="slider-heading">{{ homesection?.title || UserSetting.setting?.name }}</h3>
+  <div v-if="homesection?.courses?.length >= 2" class="course-style-one">
+    {{ console.log(homesection?.courses, 'courses') }}
+    <ClientOnly>
+      <swiper-container ref="containerRef">
+        <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">
+          <div class="card-container">
+            <div class="course-image-container">
+              <NuxtImg :src="slide?.image?.img || UserSetting.setting?.image.img" :alt="slide?.image?.alt" />
             </div>
-            <div class="card-body" dir="rtl">
-              <h5 class="card-title">{{ course?.title }}</h5>
-              <div class="card-text" v-html="course?.description"></div>
-              <div class="card-footer">
-                <span class="card-icon flex">
-                  <img :src="course.teacher?.image?.img || UserSetting.setting?.image?.img"
-                    :alt="course?.teacher?.image?.alt">
-                </span>
-                <span class="card-name">{{ course?.teacher?.name || UserSetting.setting?.name }}</span>
-              </div>
+            <div class="course-header">
+              <p class="course-title">{{ slide?.title }}</p>
+              <p class="course-description" v-html="slide?.description"></p>
             </div>
-          </NuxtLink>
-        </SplideSlide>
-      </Splide>
+            <!-- <hr class="course-hr" /> -->
+            <div class="course-teacher">
+              <p class="teacher-name">{{ slide?.teacher?.name || UserSetting?.setting?.name }}</p>
+              <img class="teacher-img" :src="slide?.teacher?.image?.img || UserSetting?.setting?.image?.img" :alt="slide?.teacher?.image?.alt || ''">
+            </div>
+          </div>
+        </swiper-slide>
+      </swiper-container>
+    </ClientOnly>
 
-      <div class="btns">
-
-      </div>
-    </div>
+    <button class="right-arrow" @click="swiper.next()">
+      <IconsArrowRight />
+    </button>
+    <button class="left-arrow" @click="swiper.prev()">
+      <IconsArrowLeft />
+    </button>
   </div>
+
 
   <div class="card-course-twoo" v-if="homesection?.courses?.length < 2">
     <div>
@@ -175,260 +212,141 @@ const { locale } = useI18n();
 </template>
 
 <style scoped lang="scss">
-.card-course-one {
-  width: 100%;
-  /* max-width: 1400px; */
-  margin: 0 auto;
-  padding: 0 1rem;
+.course-style-one {
+  width: 83%;
+  margin-left: auto;
+  margin-right: auto;
   position: relative;
-}
 
-.slider-wrapper {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  margin-top: 20px;
-
-
-}
-
-.slider-heading {
-  text-align: right;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  color: #032855;
-}
-
-.splide-container {
-  width: 88%;
-  padding: 0 2.5rem;
-  /* Add padding for arrows */
-}
-
-/* Custom arrow styling */
-:deep(.splide__arrow) {
-  background: #032855;
-  opacity: 1;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
-:deep(.splide__arrow svg) {
-  fill: white;
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-:deep(.splide__arrow--prev) {
-  left: -1rem;
-}
-
-:deep(.splide__arrow--next) {
-  right: -1rem;
-}
-
-.card {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: white;
-  margin: 0 0.5rem;
-}
-
-.image-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%;
-  /* 16:9 Aspect Ratio */
-  overflow: hidden;
-  min-height: 200px;
-}
-
-.course-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.card-overlay-content {
-  position: absolute;
-  bottom: 0;
-  left: -150px;
-  background: #fff;
-  border-top-right-radius: 20px;
-  border-bottom-left-radius: 1px;
-  border-bottom-right-radius: 1px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 10px 15px;
-  z-index: 3;
-  transition: left 0.4s ease, opacity 0.4s ease;
-  opacity: 0;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 140px;
-  height: 50px;
-}
-
-.card:hover .card-overlay-content {
-  left: 0;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.card-number {
-  background: #032855;
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 400;
-  font-family: "regular";
-  text-align: center;
-  width: 120px;
-  height: 30px;
-}
-
-.card-body {
-  padding: 1rem;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  margin-top: auto;
-}
-
-.card-icon {
-  width: fit-content;
-  height: 30px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-left: 0.5rem;
-}
-
-.card-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.card-name {
-  font-size: 0.875rem;
-  color: #032855;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .slider-heading {
-    font-size: 1.3rem;
-  }
-}
-
-@media (max-width: 992px) {
-  .slider-heading {
-    font-size: 1.2rem;
-  }
-
-  .card-title {
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .slider-heading {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
-
-  .card {
-    margin: 0 0.25rem;
-  }
-
-  :deep(.splide__arrow) {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  :deep(.splide__arrow svg) {
-    width: 1rem;
-    height: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .slider-heading {
-    font-size: 1rem;
-  }
-
-  .card-overlay-content {
-    min-width: 120px;
-    height: 40px;
-  }
-
-  .card-number {
-    width: 100px;
-    height: 25px;
-    font-size: 12px;
-  }
-
-  .splide-container {
-    padding: 0 2rem;
-    /* Adjust padding for mobile */
-  }
-
-  :deep(.splide__arrow) {
-    width: 1.8rem;
-    height: 1.8rem;
-  }
-
-  :deep(.splide__arrow--prev) {
-    left: -0.5rem;
-  }
-
-  :deep(.splide__arrow--next) {
-    right: -0.5rem;
-  }
-}
-
-.splide__slide {
-
-  padding-bottom: 28px;
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width:500px) {
-
-  .splide__slide {
+  swiper-slide {
     display: flex;
     justify-content: center;
-    padding-bottom: 28px;
-    box-sizing: border-box;
-    width: 100%; // ✅ Ensure proper width
+    align-items: center;
+    font-size: 18px;
+    height: 42vh;
+    // height: 500px;
+    font-size: 4rem;
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
   }
-}
 
-.card-footer {
-  .card-icon {
-    .teacher-image {
-      max-width: 50px;
+
+  .card-container {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 20px;
+    background: white;
+    border: 1px solid #DDE1E6;
+    ////////
+    // justify-content: space-between;
+
+    .course-hr{
+      width: 100%;
+      border: 0;
+      height: 1px;
+      background-color: #DDE1E6;
+    }
+
+    .course-image-container {
+
+      width: 100%;
+      height: 150px;
+      img {
+        object-fit: cover;
+        width: 100%;
+        max-height: 150px;
+        border-radius: 20px;
+        height: 100%;
+
+      }
+    }
+
+    .course-header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      gap: 20px;
+      // height: 200px;
+      overflow: hidden;
+
+
+      .course-title {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .course-description {
+        font-size: 16px;
+        font-weight: 400;
+        // height: 200px;
+        color: #656B78;
+        height: calc(1.5 * 3em);
+        -webkit-line-clamp: 3;
+        width: 100%;
+
+
+      }
+
+    }
+
+    .course-teacher {
+      display: flex;
+      text-align: right;
+      font-size: 20px;
+      font-weight: 700;
+      justify-content: flex-end;
+      align-items: center;
+      margin-left: auto;
+      border-top: 1px solid #DDE1E6;
+      padding-top: 10px;
+      width: 100%;
+
+
+      img {
+        width: 50px;
+        border-radius: 50%;
+      }
+    }
+
+  }
+
+  .right-arrow {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+
+    svg {
+      width: 35px;
+      height: 35px;
+    }
+  }
+
+  .left-arrow {
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+
+    svg {
+      width: 35px;
+      height: 35px;
     }
   }
 
 }
+
+
+
+
 
 .card-course-twoo {
   width: 100%;

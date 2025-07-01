@@ -6,6 +6,10 @@
   transform: translate(19%, -61%);
   z-index: 99999;
 
+  @media(max-width:768px){
+    z-index: 99999 !important;
+  }
+
   .p-button {
     background-color: transparent;
     border: 1px solid transparent;

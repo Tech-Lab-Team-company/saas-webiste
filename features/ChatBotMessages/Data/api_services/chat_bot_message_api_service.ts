@@ -22,6 +22,9 @@ class ChatBotMessagesApiService extends ServicesInterface {
       url: ApiNames.Instance.chatbotmessages,
       type: CrudType.POST,
       params: params,
+      headers: {
+        'web-domain': 'student',
+      },
     })
   }
 }
