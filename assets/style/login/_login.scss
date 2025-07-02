@@ -4,11 +4,14 @@
   display: flex;
   justify-content: center;
   padding: 0 20px;
-  // margin-left: 40px;
-  @media (max-width: 800px) {
+  gap: 40px;
+
+  @media (max-width: 768px) {
     flex-direction: column;
+    gap: 0;
   }
 
+  background-image: url(../../public//images/background.png);
   &.auth-register-container {
     background-image: url(../../public//images/background.png);
   }
@@ -51,7 +54,6 @@
     }
   }
 
-  gap: 40px;
   .pass-forgit {
     gap: 80px;
   }
@@ -70,6 +72,11 @@
       // width: fit-content;
       // height: fit-content;
       width: 450px;
+      @media (max-width:768px) {
+          width: 90%;
+          margin-left: auto;
+          margin-right: auto;
+      }
     }
   }
 
@@ -80,10 +87,11 @@
     gap: 10px;
     margin-top: auto;
     margin-bottom: auto;
-    // margin-left: 40px;
     position: relative;
-    // background-image: url('../../public/images/Component15.png');
-    // width: 30%;
+    @media(max-width:768px){
+      margin: 0;
+      padding-bottom: 50px;
+    }
 
     .side {
       position: absolute;
@@ -112,6 +120,9 @@
     h3 {
       font-size: 22px;
       z-index: 3;
+      @media (max-width:768px) {
+          text-align: center;
+      }
     }
 
     img {
@@ -135,21 +146,27 @@
       text-align: center;
       z-index: 3;
 
+      @media (max-width:768px) {
+        width: 100%;
+        
+      }
+
       &.pass-code {
         width: 70%;
       }
     }
 
     .btns {
-    //   display: flex;
-    //   flex-direction: column;
       gap: 10px;
-    //   width: 80%;
       margin-top: 25px;
       z-index: 3;
       margin-left: auto;
       margin-right: auto;
       width: 500px;
+      @media (max-width: 768px) {
+        margin-top: 0;
+        
+      }
 
       &.btns-home {
         width: 100%;
@@ -254,6 +271,9 @@
       margin-top: 25px;
       width: 50%;
       z-index: 10;
+      @media(max-width:768px){
+        width: 90%;
+      }
 
       &.inputs-pass {
         width: 80%;
@@ -341,6 +361,11 @@
         align-items: center;
         // text-align: right;
 
+        @media (max-width:768px) {
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
         .remember-me {
           display: flex;
           align-items: center;

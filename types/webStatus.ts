@@ -30,6 +30,12 @@ export default interface WebStatus {
     app_store:string;
     play_store:string;
     chatbot:number;
-
+    country_code:string;
+    email_required:boolean;
+    allow_parent_name:boolean;
+    allow_parent_phone:boolean;
+    address_required:boolean;
+    allow_student_education:boolean;
+    
 }
 

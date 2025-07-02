@@ -44,7 +44,8 @@ const { locale } = useI18n()
         <div class="auth-info-container" 
             :class="[
                 route.path == `/Auth/register` || route.path == `/auth/register` ? 'active' : '',
-                route.path == `/Auth/varifyotp`   || route.path == `/Auth/categories` ||  route.path == `/Auth/education` ? 'entered' : '',
+                route.path == `/Auth/varifyotp`   || route.path == `/Auth/categories` ||  route.path == `/Auth/education` ||
+                route.path == `/auth/varifyotp`   || route.path == `/auth/categories` ||  route.path == `/auth/education`? 'entered' : '',
             ]">
 
             <div class="auth-text">
@@ -56,8 +57,8 @@ const { locale } = useI18n()
         
         <div class="auth-info-container" 
             :class="[
-                route.path === `/Auth/varifyotp` ? 'active' : '',
-                route.path === `/Auth/education` || route.path === `/Auth/categories` ? 'entered' : '' ,
+                route.path === `/Auth/varifyotp` || route.path === `/auth/varifyotp` ? 'active' : '',
+                route.path === `/Auth/education` || route.path === `/Auth/categories` || route.path === `/auth/education` || route.path === `/auth/categories`? 'entered' : '' ,
             ]"
         >
         
@@ -69,8 +70,8 @@ const { locale } = useI18n()
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === `/Auth/education` ? 'active' : '',
-                route.path === `/Auth/categories` ? 'entered' : '',
+                route.path === `/Auth/education` || route.path === `/auth/education` ? 'active' : '',
+                route.path === `/Auth/categories` || route.path === `/auth/categories` ? 'entered' : '',
             ]">
             
             <div class="auth-text">
@@ -81,8 +82,8 @@ const { locale } = useI18n()
         </div>
         <div class="auth-info-container" 
             :class="[
-                route.path === `/Auth/categories` ? 'active' : '',
-            ]">
+                route.path === `/Auth/categories` || route.path === `/auth/categories` ? 'active' : '',
+                ]">
 
             <div class="auth-text">
                 <p>{{ $t('بنجاح') }}</p>

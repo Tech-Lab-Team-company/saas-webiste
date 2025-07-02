@@ -8,7 +8,7 @@ import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import SquareIcon from "~/public/icons/squareIcon.vue";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
 
 const { data: GraduationParty } = await useAsyncData("GraduationParty", async () => {
@@ -31,80 +31,149 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
 });
 
 
-const splideOptions = {
-  type: "loop",
-  perPage: 3,
-  perMove: 1,
-  gap: "1.5rem",
-  pagination: false,
-  arrows: true,
-  drag: true,
+const containerRef = ref(null)
+const swiper = useSwiper(containerRef, {
+  effect: 'creative',
+  loop: true,
+  autoplay: {
+    delay: 5000,
+  },
+  creativeEffect: {
+    prev: {
+      shadow: true,
+      translate: [0, 0, -400],
+    },
+    next: {
+      shadow: true,
+      translate: [0, 0, -400],
+    },
+  },
   breakpoints: {
     1200: {
-      perPage: 3,
-      gap: "1.5rem"
+
+      slidesPerView: 3,
+      spaceBetween: '2rem',
     },
     992: {
-      perPage: 2,
-      gap: "1rem"
+      slidesPerView: 2,
+      spaceBetween: "1rem"
     },
     768: {
-      perPage: 2,
-      gap: "0.8rem"
+      slidesPerView: 2,
+      spaceBetween: "0.8rem"
     },
     576: {
-      perPage: 1,
-      gap: "0.5rem",
-      arrows: true,
-      drag: true
+      slidesPerView: 1,
+      spaceBetween: "0.5rem",
+
     }
   }
-};
-
+})
 
 </script>
 
 <template>
   <div class="card-course-three">
-    <div class="slider-wrapper">
-      <h3 class="slider-heading">{{ GraduationParty?.title }}</h3>
-      <p class="description-text">{{ GraduationParty?.description }}</p>
-      <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(image, index) in GraduationParty?.media" :key="index">
-          <NuxtLink :to="image?.link || '#'">  
-            <div class="image-container card">
-              <img :src="image?.file" :alt="image.alt" class="course-image" />
+    <h3 class="slider-heading">{{ GraduationParty?.title }}</h3>
+    <p class="description-text">{{ GraduationParty?.description }}</p>
+
+    <div class="graduation-party-container">
+      
+
+
+      <ClientOnly>
+      <swiper-container ref="containerRef">
+        <swiper-slide v-for="(image, idx) in GraduationParty?.media" :key="idx">
+            <NuxtLink :to="image?.link || '#'">
+            <div class="image-conatiner">
+              <img :src="image?.file" :alt="image.alt"  />
             </div>
-          </NuxtLink>  
-        </SplideSlide>
-    </Splide>
-</div>
-    <SquareIcon class="dots-icons-one"/>
-    <SquareIcon class="dots-icons-two"/>
+          </NuxtLink>
+        </swiper-slide>
+      </swiper-container>
+    </ClientOnly>
+
+    <button class="right-arrow" @click="swiper.next()">
+      <IconsArrowRight />
+    </button>
+    <button class="left-arrow" @click="swiper.prev()">
+      <IconsArrowLeft />
+    </button>
+
+    </div>
+
+    
+    <SquareIcon class="dots-icons-one" />
+    <SquareIcon class="dots-icons-two" />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
-.dots-icons-one{
+  .right-arrow {
     position: absolute;
-     top: 100%;
-    transform: translateY(-80%);
-    left: 4%;
-    z-index: -1;
-}
-.dots-icons-two{
-    position: absolute;
+    right: -40px;
     top: 50%;
-    transform: translateY(-80%);
-    right: 4%;
-    z-index: -1;
+    transform: translateY(-50%);
+    z-index: 999;
+
+    svg {
+      width: 35px;
+      height: 35px;
+    }
+  }
+
+  .left-arrow {
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 999;
+
+    svg {
+      width: 35px;
+      height: 35px;
+    }
+  }
+.image-conatiner{
+
+  img{
+    border-radius: 20px;
+    aspect-ratio: 2/ 1.5 ;
+    border: 1px solid #dde1e6;
+  }
+
 }
-.description-text{
-    margin: 0;
-    padding-bottom: 10px;
-    color: #909DAD;
+
+.graduation-party-container{
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
 }
+.dots-icons-one {
+  position: absolute;
+  top: 100%;
+  transform: translateY(-80%);
+  left: 4%;
+  z-index: -1;
+}
+
+.dots-icons-two {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-80%);
+  right: 4%;
+  z-index: -1;
+}
+
+.description-text {
+  margin: 0;
+  padding-bottom: 10px;
+  color: #909DAD;
+  text-align: center;
+}
+
 .card-course-three {
   width: 100%;
   /* max-width: 1400px; */
@@ -192,7 +261,7 @@ const splideOptions = {
 
 .card-body {
   padding: 20px;
-      /* background-color: gray;
+  /* background-color: gray;
     border-radius: 10px; */
 }
 
@@ -276,7 +345,7 @@ const splideOptions = {
   .slider-heading {
     font-size: 32px;
   }
-  
+
   .course-image {
     height: 200px;
   }
@@ -287,17 +356,17 @@ const splideOptions = {
     font-size: 28px;
     /* margin-bottom: 15px; */
   }
-  
+
   .card-title {
     font-size: 18px;
     line-height: 26px;
   }
-  
+
   .card-text,
   .card-text1 {
     font-size: 15px;
   }
-  
+
   :deep(.splide__arrow) {
     width: 2.5rem;
     height: 2.5rem;
@@ -308,25 +377,25 @@ const splideOptions = {
   .slider-heading {
     /* font-size: 24px; */
   }
-  
+
   .splide-container {
     padding: 0 2.5rem 25px;
   }
-  
+
   .card-body {
     padding: 15px;
   }
-  
+
   .course-image {
     height: 180px;
   }
-  
+
   .overlay-text {
     font-size: 13px;
     width: 90px;
     padding: 5px 10px;
   }
-  
+
   :deep(.splide__arrow) {
     width: 2.2rem;
     height: 2.2rem;
@@ -338,42 +407,42 @@ const splideOptions = {
     font-size: 20px;
     /* margin-bottom: 10px; */
   }
-  
+
   .splide-container {
     padding: 0 2rem 20px;
   }
-  
+
   .card-title {
     font-size: 16px;
     line-height: 24px;
   }
-  
+
   .card-text,
   .card-text1 {
     font-size: 14px;
   }
-  
+
   .course-image {
     height: 160px;
   }
-  
+
   .overlay-text {
     font-size: 12px;
     width: 80px;
     padding: 4px 8px;
   }
-  
+
   .card-content {
     flex-direction: column;
     gap: 8px;
     margin: 10px 0;
   }
-  
+
   :deep(.splide__arrow) {
     width: 2rem;
     height: 2rem;
   }
-  
+
   :deep(.splide__arrow svg) {
     width: 1.2rem;
     height: 1.2rem;

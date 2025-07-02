@@ -59,7 +59,7 @@ watch(
 </script>
 
 <template>
-  <h3 class="slider-heading" style="margin-top: 10px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
+  <h3 class="slider-heading" style="margin-top: 25px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
   <div v-if="homesection?.courses?.length >= 2" class="course-style-one">
     <ClientOnly>
       <swiper-container ref="containerRef">

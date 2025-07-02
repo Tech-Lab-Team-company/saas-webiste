@@ -19,7 +19,8 @@ export default class UserModel {
   public youtube?: string;
   public linkedin?: string;
   public whatsapp?: string;
-  public userInfo?:UserInfo
+  public userInfo?:UserInfo;
+  public category_id?:Number
 
 
   constructor(
@@ -41,7 +42,8 @@ export default class UserModel {
     youtube?: string,
     linkedin?: string,
     whatsapp?: string,
-    userInfo?: UserInfo
+    userInfo?: UserInfo,
+    category_id?: Number
   ) {
     this.id = id;
     this.name = name;
@@ -62,6 +64,7 @@ export default class UserModel {
     this.linkedin = linkedin;
     this.whatsapp = whatsapp;
     this.userInfo = userInfo;
+    this.category_id = category_id;
   }
 
   static fromMap(map: { [key: string]: any }): UserModel {
@@ -84,7 +87,8 @@ export default class UserModel {
       map["youtube"],
       map["linkedin"],
       map["whatsapp"],
-      map["user_info"] ? UserInfo.fromMap(map["user_info"]) : undefined
+      map["user_info"] ? UserInfo.fromMap(map["user_info"]) : undefined,
+      map["category_id"],
     );
   }
 }

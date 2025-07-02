@@ -26,9 +26,9 @@ const FetchChatBots = async () => {
     }
 }
 
-onMounted(() => {
-    FetchChatBots();
-})
+// onMounted(() => {
+//     FetchChatBots();
+// })
 
 const position = ref('center');
 const visible = ref(false);
@@ -72,7 +72,7 @@ const userSetting = useSettingStore();
 </script>
 
 <template>
-    <SpeedDial class="chat-icons" :model="items" :direction="SpeedDialDirection" :style="SppedDialStyle" v-if="userSetting.setting?.chatbot == 1" >
+    <SpeedDial @click="FetchChatBots" class="chat-icons" :model="items" :direction="SpeedDialDirection" :style="SppedDialStyle" v-if="userSetting.setting?.chatbot == 1" >
         <template #icon>
             <DotLottieVue autoplay loop src="/lottie/ai.json" />
         </template>

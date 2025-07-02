@@ -48,7 +48,7 @@ const userStore = useUserStore()
 
 
 const FetchEducationStages = async () => {
-  const educationStagesParams = new EducationStagesParams(userStore?.user?.type);
+  const educationStagesParams = new EducationStagesParams(userStore?.user?.category_id);
   const educationStagesController = EducationStagesController.getInstance();
   const state = await educationStagesController.FetchEducationStages(educationStagesParams);
 
@@ -174,7 +174,7 @@ const FetchStage = async ()=>{
 const selectedStage = ref<number | null>(null);
 const Stages = ref<TitleModel[]>([]);
 const FetchSubjects =async ()=>{
-  const educationBasicSubjectsParams = new EducationBasicSubjectsParams(userStore.user?.type , selectedStage.value);
+  const educationBasicSubjectsParams = new EducationBasicSubjectsParams(userStore.user?.category_id , selectedStage.value);
   const educationBasicSubjectsController = EducationBasicSubjectsController.getInstance();
 
   const state = await educationBasicSubjectsController.FetchEducationBasicSubjects(educationBasicSubjectsParams);
@@ -208,7 +208,7 @@ const SendBasicData = async()=>{
         <div class="login-input">
            <select class="student-select" 
            disabled
-          :value="userStore.user?.type == 1 ? StudentCategoryEnum.base : userStore.user?.type == 2 ? StudentCategoryEnum.university : StudentCategoryEnum.general"
+          :value="userStore.user?.category_id == 1 ? StudentCategoryEnum.base : userStore.user?.category_id == 2 ? StudentCategoryEnum.university : StudentCategoryEnum.general"
           >
             <option  :value="StudentCategoryEnum.base">اساسى</option>
             <option :value="StudentCategoryEnum.university">جامعى</option>
@@ -219,7 +219,7 @@ const SendBasicData = async()=>{
       </div>
 
 
-      <div class="inputs" v-if="userStore.user?.type == 2">
+      <div class="inputs" v-if="userStore.user?.category_id == 2">
         <div class="login-input">
           <select class="student-select" v-model="EducationCategory" @change="FetchUniversityEducationLevel">
             <option value="" disabled selected>نوع التعليم</option>
@@ -231,7 +231,7 @@ const SendBasicData = async()=>{
       </div>
 
 
-      <div class="inputs" v-if="userStore.user?.type == 1">
+      <div class="inputs" v-if="userStore.user?.category_id == 1">
         <div class="login-input">
           <label :class="{'select-placeholder': !BasicEducationCategory , 'hidden':BasicEducationCategory}">نوع التعليم</label>
           <select class="student-select" v-model="BasicEducationCategory" @change="FetchEduciationLevels">
@@ -246,7 +246,7 @@ const SendBasicData = async()=>{
 
 
 
-      <div class="inputs" v-if=" userStore.user?.type == 2">
+      <div class="inputs" v-if=" userStore.user?.category_id == 2">
         <div class="login-input">
           <select class="student-select" @change="FetchColleges">
             <option value="" disabled selected>جامعة</option>
@@ -256,7 +256,7 @@ const SendBasicData = async()=>{
           <RegisterBook class="login-call-icon" />
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.type == 2">
+      <div class="inputs" v-if=" userStore.user?.category_id == 2">
         <div class="login-input">
           <select class="student-select" @change="FetchCollegesDeprtment">
             <option value="" disabled selected>الكلية</option>
@@ -267,7 +267,7 @@ const SendBasicData = async()=>{
           <RegisterBook class="login-call-icon" />
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.type == 2">
+      <div class="inputs" v-if=" userStore.user?.category_id == 2">
         <div class="login-input">
           <select class="student-select" @change="FetchCollegesDeprtmentDivisions">
             <option value="" disabled selected>القسم</option>
@@ -276,7 +276,7 @@ const SendBasicData = async()=>{
           <RegisterBook class="login-call-icon" />
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.type == 2">
+      <div class="inputs" v-if=" userStore.user?.category_id == 2">
         <div class="login-input">
           <select class="student-select">
             <option value="" disabled selected>المستوى</option>
@@ -289,7 +289,7 @@ const SendBasicData = async()=>{
 
 
 
-      <div class="inputs" v-if=" userStore.user?.type == 1 && BasicEducationCategory">
+      <div class="inputs" v-if=" userStore.user?.category_id == 1 && BasicEducationCategory">
         <div class="login-input">
           <label :class="{'select-placeholder': !selectedLevel , 'hidden':selectedLevel}">المرحلة</label>
           <select class="student-select" v-model="selectedLevel" @change="FetchStage">
@@ -300,7 +300,7 @@ const SendBasicData = async()=>{
         </div>
       </div>
 
-      <div class="inputs" v-if=" userStore.user?.type == 1 && selectedLevel">
+      <div class="inputs" v-if=" userStore.user?.category_id == 1 && selectedLevel">
         <div class="login-input">
           <label :class="{'select-placeholder': !selectedStage , 'hidden':selectedStage}">الصف</label>
           <select class="student-select" v-model="selectedStage" @change="FetchSubjects">
@@ -310,7 +310,7 @@ const SendBasicData = async()=>{
           <RegisterBook class="login-call-icon" />
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.type == 1 && selectedStage">
+      <div class="inputs" v-if=" userStore.user?.category_id == 1 && selectedStage">
         <div class="login-input">
           <label :class="{'select-placeholder': !selectedBasicSubject , 'hidden':selectedBasicSubject}">المادة</label>
           <select class="student-select" v-model="selectedBasicSubject" >
@@ -324,21 +324,21 @@ const SendBasicData = async()=>{
 
 
 
-      <div class="btns btns-home" @click="SendUniversityData"  v-if="userStore.user?.type == 2">
+      <div class="btns btns-home" @click="SendUniversityData"  v-if="userStore.user?.category_id == 2">
         <button class="login-btn" >
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
         </button>
 
       </div>
-      <div class="btns btns-home" @click="SendGeneralData" v-if="userStore.user?.type == 3">
+      <div class="btns btns-home" @click="SendGeneralData" v-if="userStore.user?.category_id == 3">
         <button class="login-btn" >
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
         </button>
 
       </div>
-      <div class="btns btns-home" @click="SendBasicData" v-if="userStore.user?.type == 1">
+      <div class="btns btns-home" @click="SendBasicData" v-if="userStore.user?.category_id == 1">
         <button class="login-btn" >
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
