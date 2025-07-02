@@ -1,6 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
 export default defineNuxtConfig({
+  // app:{
+  //   head:{
+  //     link:[
+  //       { rel: 'icon', type: 'image/x-icon', href: `${useSettingStore().setting?.image?.img}` },
+  //     ]
+  //   }
+  // },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   ssr: false,
