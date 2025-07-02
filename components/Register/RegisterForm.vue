@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import callIcon from "../../public/icons/callIcon.vue";
-import MapIcon from "../../public/icons/map.vue";
-import city from "../../public/icons/city.vue";
-import national from "../../public/icons/national.vue";
+// import MapIcon from "../../public/icons/map.vue";
+// import city from "../../public/icons/city.vue";
+// import national from "../../public/icons/national.vue";
 import student from "../../public/icons/student.vue";
 import LockIcon from "../../public/icons/LockIcon.vue";
 import sms from "../../public/icons/sms.vue";
@@ -11,8 +11,8 @@ import userEdit from "../../public/icons/userEdit.vue";
 import { ref } from "vue";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import RegisterController from "~/features/RegisterFeature/presentation/controllers/register_controller";
-import FetchCountriesParams from "~/features/FetchCountriesFeature/Core/Params/fetch_countries_params";
-import FetchCountriesController from "~/features/FetchCountriesFeature/presentation/controllers/fetch_countries_controller";
+// import FetchCountriesParams from "~/features/FetchCountriesFeature/Core/Params/fetch_countries_params";
+// import FetchCountriesController from "~/features/FetchCountriesFeature/presentation/controllers/fetch_countries_controller";
 import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_model";
 import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
 import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
@@ -185,9 +185,10 @@ const settingStore = useSettingStore();
               </template>
 
               <template #option="slotProps">
-                <div class="flex items-center"  >
+                <div class="flex items-center "  >
                   <span>{{ slotProps.option.flag }}</span>
-                  <div>{{ slotProps.option.dial_code }}</div>
+                  <span>{{ slotProps.option.name }}</span>
+                  <div>({{ slotProps.option.dial_code }})</div>
                 </div>
               </template>
 

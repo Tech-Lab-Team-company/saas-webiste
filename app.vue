@@ -23,7 +23,15 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
   });
   return response.data;
 });
-
+const SettingStore = useSettingStore()
+const changeFavicon = (iconPath) => {
+  useHead({
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: iconPath }
+    ]
+  })
+}
+changeFavicon(`${SettingStore?.setting?.image?.img}`)
 
 // const { data: PaymentMethod } = await useAsyncData("paymentmethod", async () => {
 //   const response = await $fetch<{
