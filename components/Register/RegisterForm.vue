@@ -16,7 +16,7 @@ import FetchCountriesController from "~/features/FetchCountriesFeature/presentat
 import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_model";
 import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
 import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
-import countries from "~/public/countries.json";
+import countries from "~/data/countries.json";
 
 const showTermsDialog = ref(false);
 const isTermsAccepted = ref(false);
