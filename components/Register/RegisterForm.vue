@@ -201,8 +201,6 @@ const settingStore = useSettingStore();
           <callIcon class="login-call-icon" />
         </div>
 
-
-
         <div class="login-input">
           <label :class="{ 'select-placeholder': !studentType, 'hidden': studentType }">نوع الطالب</label>
           <select class="student-select" v-model="studentType" required>
