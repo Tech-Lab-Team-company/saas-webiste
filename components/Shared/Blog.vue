@@ -27,7 +27,6 @@ const swiper = useSwiper(containerRef, {
   },
   breakpoints: {
     1200: {
-
       slidesPerView: 3,
       spaceBetween: '1rem',
     },
@@ -42,7 +41,6 @@ const swiper = useSwiper(containerRef, {
     576: {
       slidesPerView: 1,
       spaceBetween: "0.5rem",
-
     }
   }
 })
@@ -92,8 +90,8 @@ const UserSetting = useSettingStore();
   </div>
   <div class="blogs-main-section" v-if="Blogs?.length > 0">
     <ClientOnly>
-      <swiper-container ref="containerRef">
-        <swiper-slide v-for="(blog, idx) in Blogs" :key="idx" style="margin-left: auto;">
+      <swiper-container ref="containerRef" class="swiper-with-padding">
+        <swiper-slide v-for="(blog, idx) in Blogs" :key="idx" class="slide-with-margin">
           <NuxtLink :to="`/blogs/${blog.slug}`" class="card">
             <img :src="blog.attachments[0].file" style="object-fit: cover;" alt="Card image" class="course-image" />
             <div class="card-body">
@@ -126,14 +124,40 @@ const UserSetting = useSettingStore();
 </template>
 
 <style scoped lang="scss">
+// Fix for swiper container to show card shadows/borders
+.swiper-with-padding {
+  padding: 20px 10px 30px 10px; // Add padding to show shadows
+  overflow: visible; // Allow shadows to be visible
+}
+
+.slide-with-margin {
+  margin-bottom: 20px; // Add margin to prevent shadow clipping
+}
+
+.blogs-main-section {
+  padding-bottom: 40px; // Add extra padding to the main section
+  overflow: visible; // Ensure visibility of overflowing elements
+}
+
 .card {
   position: relative;
   transition: transform 0.3s ease-in-out;
-  margin-top: 20px;
+  margin: 10px; // Add margin around cards
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: calc(100% - 20px); // Adjust height to account for margins
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  width: calc(100% - 20px); // Adjust width to account for margins
 }
 
 .card:hover {
-  transform: translateY(10px);
+  transform: translateY(-10px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); // Enhanced shadow on hover
 }
 
 .slider-wrapper {
@@ -148,23 +172,12 @@ const UserSetting = useSettingStore();
   gap: 10px;
   align-items: center;
   flex-direction: row-reverse;
-
-  // @media(max-width: 768px) {
-  //   flex-direction: column;
-  //   align-items: flex-end;
-  //   justify-content: center;
-  // }
 }
 
 .card-header .flex {
   width: 350px;
   flex-direction: row-reverse;
   flex-wrap: wrap;
-  // @media(max-width: 768px) {
-  //   flex-direction: column;
-  //   align-items: flex-start;
-  //   justify-content: flex-start;
-  // }
 }
 
 .card-header hr {
@@ -176,6 +189,7 @@ const UserSetting = useSettingStore();
 }
 
 .slider-heading {
+  margin-top: 25px;
   width: 227px;
   height: 25px;
   gap: 10px;
@@ -254,26 +268,10 @@ const UserSetting = useSettingStore();
   }
 }
 
-
-
 .splide-slide {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-/* card */
-.card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  height: 90%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: 10px;
-  width: 92%;
 }
 
 .card img {
@@ -301,7 +299,6 @@ const UserSetting = useSettingStore();
   height: calc(var(--line-height) * 1em);
   line-height: var(--line-height);
   --line-height: 1.5;
-
 }
 
 .card-text {
@@ -315,12 +312,10 @@ const UserSetting = useSettingStore();
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* height: calc(var(--line-height) * 2em); */
   line-height: var(--line-height);
   --line-height: 1.5;
   text-align: right;
 }
-
 
 .card-footer {
   display: flex;
@@ -346,9 +341,7 @@ const UserSetting = useSettingStore();
 }
 
 /* splide buttons */
-
 .splide__arrow--prev {
-  /* left: -30px; */
   right: -30px;
 }
 
@@ -361,5 +354,17 @@ const UserSetting = useSettingStore();
   height: 100%;
   object-fit: cover;
   border: 1px solid #ccc;
+}
+
+// Additional responsive adjustments
+@media (max-width: 768px) {
+  .swiper-with-padding {
+    padding: 15px 5px 25px 5px;
+  }
+  
+  .card {
+    margin: 8px;
+    width: calc(100% - 16px);
+  }
 }
 </style>

@@ -59,10 +59,10 @@ function updateNavVisibility() {
     <ul>
       <li v-for="(item, index) in menuItems" :key="index" :class="{ list: true, active: isActive(item.route) }">
         <router-link v-if="!item.isLogout" :to="item.route">
+          <span class="text">{{ item.text }}</span>
           <span class="icon">
             <i :class="`pi ${item.icon}`"></i>
           </span>
-          <span class="text">{{ item.text }}</span>
         </router-link>
         <a v-else href="#" @click.prevent="handleLogout">
           <span class="icon">
@@ -169,7 +169,7 @@ function updateNavVisibility() {
   font-size: 0.8em;
   letter-spacing: 0.05em;
   transition: 0.5s;
-  opacity: 0;
+  opacity: 1;
   transform: translateY(20px);
 }
 
