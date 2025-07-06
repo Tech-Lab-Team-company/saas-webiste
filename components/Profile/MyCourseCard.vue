@@ -233,7 +233,7 @@ watch(
 }
 
 .card-number {
-  background: #ffb949;
+  background: var(--secondary-color);
   width: 100px;
   border-radius: 20px;
   text-align: center;
@@ -258,7 +258,7 @@ watch(
   transform: translate(-50%, -50%);
   padding: 4px;
   border-radius: 20px;
-  background: #ffb949;
+  background: var(--secondary-color);
   width: 95px;
   height: 35px;
   font-family: "bold";
@@ -337,7 +337,7 @@ watch(
 
 .progress {
   height: 100%;
-  background-color: #ffb949;
+  background-color: var(--secondary-color);
   transition: width 0.3s ease;
 }
 

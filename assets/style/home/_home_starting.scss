@@ -197,7 +197,7 @@
         gap: 10px;
 
         .title {
-          color: #ffb949;
+          color: var(--secondary-color);
           text-align: end;
         }
 
@@ -245,7 +245,7 @@
       }
 
       &.active::after {
-        background-color: #ffb949;
+        background-color: var(--secondary-color);
       }
 
       &.prev-btn::after {
@@ -274,7 +274,7 @@
     display: block !important;
     width: 25px;
     height: 5px;
-    background-color: #ffb949;
+    background-color: var(--secondary-color);
     opacity: 0.3;
     transform: scale(1);
     border-radius: 5px;
@@ -283,7 +283,7 @@
     display: block !important;
     width: 25px;
     height: 5px;
-    background-color: #ffb949;
+    background-color: var(--secondary-color);
     border-radius: 5px;
   }
 }

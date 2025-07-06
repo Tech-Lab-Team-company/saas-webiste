@@ -15,7 +15,7 @@
     .abotus-hr {
       border: none;
       height: 2px;
-      background-image: linear-gradient(to left, #ffb949, #f6f6f6);
+      background-image: linear-gradient(to left, var(--secondary-color), #f6f6f6);
     }
   }
 
@@ -156,7 +156,7 @@
     }
 
     .aboutus-circle-steps {
-      background-color: #ffb9490d;
+      background-color: var(--secondary-color)0d;
       width: 420px;
       height: 420px;
       border-radius: 50%;

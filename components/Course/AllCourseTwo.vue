@@ -4,6 +4,7 @@ import microphone from "@/public/icons/microphone.vue";
 import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
 import type HomeFirstSection from "~/types/home_first_section";
+import Loder from "../Loader/Loder.vue";
 
 const props = defineProps<{
   HomeSections: HomeFirstSection[];
@@ -18,6 +19,10 @@ const UserSetting = useSettingStore();
 </script>
 
 <template>
+  <!-- {{ props.HomeSections }} -->
+       <div class="page-loader" v-if="props.HomeSections.length < 1"  >
+      <Loder />
+    </div>
   <div class="card-course-twoo">
     <div>
       <div class="cards-grid">
@@ -61,7 +66,7 @@ const UserSetting = useSettingStore();
                 </span>
                 <p class="card-number" v-if="card?.course_price > 0 && !(card?.is_subscribed)">{{ card?.course_price }} {{ card?.currency }}</p>
                 <p class="card-number" v-else-if="card?.course_price == 0">{{ $t('مجانى') }}</p>
-                <p v-else></p>
+                <p v-else ></p>
               </div>
 
               <div class="card-extra-content">
@@ -78,6 +83,15 @@ const UserSetting = useSettingStore();
 
 
 <style scoped lang="scss">
+.page-loader{
+  height: 100vh;
+  width: 100%;
+      position: absolute;
+    background-color: #000000c9;
+    top: 0;
+    left: 0;
+        z-index: 99;
+}
 .card-footer {
   .card-icon {
     .teacher-image {
@@ -216,7 +230,7 @@ const UserSetting = useSettingStore();
 }
 
 .card-number {
-  background: #ffb949;
+  background: var(--secondary-color);
   width: 100px;
   border-radius: 20px;
   text-align: center;

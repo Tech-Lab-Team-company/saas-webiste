@@ -1,3 +1,4 @@
+@import "../variables";
 .course-content-container {
   border: none;
   width: 70%;
@@ -20,7 +21,7 @@
       padding: 15px;
       // background-color: white;
       margin-top: 10px;
-      color: #061147;
+      color: var(--primary-color);
       font-size: 17px;
 
 

@@ -60,7 +60,7 @@
             font-size: 19px;
             border-radius: 10px;
             text-align: center;
-            background-image: linear-gradient(to top,#ffb94954 30%,#ffffff8d 80%);
+            background-image: linear-gradient(to top,var(--secondary-color)54 30%,#ffffff8d 80%);
             margin-top: 20px;
         }
 
@@ -131,7 +131,7 @@
                 
                 
                 &.selected{
-                    background-color: #ffb94917;
+                    background-color: var(--secondary-color)17;
                     border-color: #FFB949;
                 }
             }

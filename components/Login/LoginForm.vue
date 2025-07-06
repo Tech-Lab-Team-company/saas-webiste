@@ -7,7 +7,7 @@ const router = useRouter()
 const email = ref<string>("");
 const password = ref<string>("");
 
-const loginController = v.getInstance();
+const loginController = LoginController.getInstance();
 
 const login = async () => {
   await loginController.login(
@@ -19,7 +19,7 @@ const login = async () => {
 </script>
 
 <template>
-  <form   @submit.prevent="login" class="login-form">
+  <form @keydown.enter="login"   @submit.prevent="login" class="login-form">
     <NuxtLink to="/" class="back-link">
       <svg
         width="9"

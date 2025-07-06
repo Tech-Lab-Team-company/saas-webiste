@@ -43,6 +43,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
             
           
            await userStore.setUser(this.state.value.data);
+           console.log('login')
           await router.push("/");
 
           }

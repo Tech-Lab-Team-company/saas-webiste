@@ -266,7 +266,7 @@ const UpdateData = async () => {
   .button{
     display: flex;
     .btn-save-changes{
-      background-color:#ffb949;
+      background-color:var(--secondary-color);
       color:white;
       padding: 10px 20px;
       border-radius: 10px;

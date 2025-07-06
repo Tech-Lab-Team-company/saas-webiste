@@ -1,5 +1,6 @@
+@import "../variables";
 .p-accordionpanel:not(.p-disabled).p-accordionpanel-active .p-accordionheader{
-    color: #061147 !important;
+    color: var(--primary-color) !important;
     font-size: 22px !important;
 }
 

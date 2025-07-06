@@ -45,13 +45,13 @@ const JoinCourse = async () => {
     });
     const coursesPaymentController = CoursesPaymentController.getInstance();
     const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
-    if(state.value){
+    if (state.value) {
         emit('Changestatus')
     }
 }
 const PaymentStore = usePaymentStore()
 
-
+const userStore = useUserStore();
 
 </script>
 
@@ -104,9 +104,13 @@ const PaymentStore = usePaymentStore()
                 <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
                 <PaymentDialog :status="status" class="payment-dialog"
                     v-if="CardDetails?.CoursePrice != 0 && PaymentStore?.Payment?.length > 0" />
-                <button class="payment-btn" @click="JoinCourse" v-if="status != 1 && CardDetails?.CoursePrice != 0">
+                <button class="payment-btn" @click="JoinCourse"
+                    v-if="status != 1 && CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed">
                     طلب الانضمام
                 </button>
+                <button v-if="status == 1 && userStore.user" disabled class="btn-disabled">فى
+                    انتظار قبول
+                    الطلب</button>
             </div>
 
         </div>
@@ -200,4 +204,12 @@ const PaymentStore = usePaymentStore()
     height: fit-content;
     overflow-y: auto;
 }
+
+  .btns {
+    button {
+      &.btn-disabled {
+        background-color: gainsboro;
+      }
+    }
+  }
 </style>

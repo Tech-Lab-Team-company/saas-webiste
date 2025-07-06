@@ -134,7 +134,7 @@ li {
 }
 
 li:hover {
-  color: #ffb949;
+  color: var(--secondary-color);
   cursor: pointer;
 }
 

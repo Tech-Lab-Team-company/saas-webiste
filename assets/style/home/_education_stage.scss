@@ -57,7 +57,7 @@
             width: fit-content;
             // padding: 3px;
             text-align: center;
-            background-image: linear-gradient(to top ,#ffb94931 0% 10%,#ffb94912 30% 50% ,#FFFFFF 80%  100% );
+            background-image: linear-gradient(to top ,var(--secondary-color)31 0% 10%,var(--secondary-color)12 30% 50% ,#FFFFFF 80%  100% );
             margin: auto;
             color: #FFB949;
             width: 227px;
@@ -72,7 +72,7 @@
             line-height: 100%;
             letter-spacing: 0%;
             text-align: center;
-            color: #ffb949;
+            color: var(--secondary-color);
             z-index: 50;
             &.question-title{
                 

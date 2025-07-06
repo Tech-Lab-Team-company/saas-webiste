@@ -1,3 +1,4 @@
+@import"../variables";
 .btn-secondary {
   display: flex;
   align-items: center;
@@ -97,7 +98,7 @@
     border: 1px solid #d7d7d75b;
 
     &:hover {
-      background-color: #ffb949;
+      background-color: var(--secondary-color);
       color: white;
       border: none;
       outline: none;

@@ -401,7 +401,7 @@ const StageYearBtn = ref<boolean>(false)
 
 <style setup lang="scss">
 .active-btn{
-  background-color: #ffb949;
+  background-color: var(--secondary-color);
   color: white !important;
   
 }
