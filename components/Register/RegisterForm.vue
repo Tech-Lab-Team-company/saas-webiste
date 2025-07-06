@@ -18,6 +18,8 @@ import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
 import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 import countries from "~/data/countries.json";
 
+const UserSetting = useSettingStore();
+
 const showTermsDialog = ref(false);
 const isTermsAccepted = ref(false);
 const showPassword = ref(false);
@@ -26,7 +28,7 @@ const password = ref("");
 const confirmPassword = ref("");
 const passwordError = ref("");
 const confirmPasswordError = ref("");
-const selectedCountry = ref();
+const selectedCountry = ref(UserSetting?.setting?.country_code);
 
 
 const router = useRouter();
@@ -67,12 +69,11 @@ const studentType = ref(0);
 const license_accept = ref(0);
 const Education_Type = ref(0)
 
-const UserSetting = useSettingStore();
 const PhoneCode = ref(UserSetting?.setting?.country_code);
 
 
 const CheckData = async () => {
-
+console.log(selectedCountry?.value , "code")
   const registerParams = new RegisterParams(FirstName.value,
     SecondName.value || null,
     StudentAddress.value || null,
@@ -82,7 +83,7 @@ const CheckData = async () => {
     password.value,
     confirmPassword.value,
     Education_Type.value,
-    selectedCountry?.value?.dial_code,
+    selectedCountry?.value,
     studentType.value)
 
   const registerController = RegisterController.getInstance();
