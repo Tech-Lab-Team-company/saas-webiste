@@ -32,7 +32,9 @@ const { data: stages } = await useAsyncData("stages", async () => {
 
 const stageYears = ref<Stages[]>([]);
 const SelectedStage = ref<number>() //level
+const ActiveStage =ref(false)
 const fetchStageYears = async (stageId: number , stagetitle:string) => {
+  ActiveStage.value = !ActiveStage.value;
   const response = await $fetch<{
     data: Stages[];
     message: string;
@@ -45,9 +47,17 @@ const fetchStageYears = async (stageId: number , stagetitle:string) => {
       "web-domain": getWebDomain(),
     },
   });
-  SelectedStage.value = stageId;
-  SelectedStageTitle.value = stagetitle;
-  stageYears.value = response.data;
+  if(ActiveStage.value ){
+    SelectedStage.value = stageId;
+    SelectedStageTitle.value = stagetitle;
+    stageYears.value = response.data;
+  }
+  else{
+    SelectedStage.value = null;
+    SelectedStageTitle.value = null;
+    stageYears.value = null;
+  }
+    
   SendData();
 };
 
@@ -234,10 +244,20 @@ const SendData = () => {
 };
 
 const SelectedYearId = ref<number>()
+const ActiveStageYear = ref<boolean>(false)
 const updateStageYear = (stageYearId:number , stageYearTitle:string)=>{
+  ActiveStageYear.value = !ActiveStageYear.value
   console.log(stageYearId);
-  SelectedYearId.value = stageYearId;
-  SelectedStageYearTitle.value = stageYearTitle;
+  if(ActiveStageYear.value ){
+    
+    SelectedYearId.value = stageYearId;
+    SelectedStageYearTitle.value = stageYearTitle;
+  }
+  else{
+    SelectedYearId.value = null;
+    SelectedStageYearTitle.value = null;
+
+  }
   SendData();
   router.push(`/course`)
 }

@@ -111,12 +111,12 @@ const expandedSlides = ref<Set<number>>(new Set());
                 :slides-per-view="1"
                 :space-between="50"
                 :autoplay="{
-                    delay: 2000,
+                    delay: 3000,
                     disableOnInteraction: false,
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
                 }"
-                :speed="1000"
+                :speed="500"
                 :free-mode-momentum="false"
                 >
         <swiper-slide v-for="slide in sliders" :key="slide.id">

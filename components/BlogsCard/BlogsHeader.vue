@@ -33,9 +33,10 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 });
 </script>
 <template>
+  
   <div class="blogs-page-articles-cards" dir="rtl" >
     <div class="Blog">
-      <div class="cards-container" v-if="blogscard?.length < 0">
+      <div class="cards-container" v-if="blogscard?.length > 0">
         <NuxtLink
           v-for="(card, index) in blogscard"
           :key="index"
