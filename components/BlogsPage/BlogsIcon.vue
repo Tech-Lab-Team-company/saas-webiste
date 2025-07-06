@@ -61,7 +61,7 @@ const cards = [
   font-weight: 400;
   font-size: 26px;
   margin-bottom: 10px;
-  color: #ffb949;
+  color: var(--secondary-color);
 }
 
 .blogs-icon-container {

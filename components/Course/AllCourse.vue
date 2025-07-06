@@ -8,6 +8,7 @@ import { useFiltersStore } from '~/stores/courses_filter';
 import {getWebDomain} from "~/constant/webDomain";
 import CoursesFilterParams from "~/features/CoursesFilter/Core/Params/courses_filter_params";
 import CoursesFilterController from "~/features/CoursesFilter/presentation/controllers/courses_filter_controller";
+import Loder from "../Loader/Loder.vue";
 
 const filtersStore = useFiltersStore();
 
@@ -29,6 +30,7 @@ const StageYearTitle =   ref(filtersStore.SelectedStageYearTitle);
 
 
 const CoursesFilter = ref<CoursesFilterModel[]>([]);
+const token: string | undefined = userStore?.user?.apiToken;
 const fetchCourses = async () => {
   const response = await $fetch<{
     data: CoursesFilterModel[];
@@ -50,9 +52,10 @@ const fetchCourses = async () => {
         university_subject_id: SubjectId.value,
     },
     headers: {
-      // 'Authorization': `Bearer ${userStore?.user?.apiToken}`,
       "Accept-Language": "ar",
       "web-domain": getWebDomain(),
+      'Authorization' : 'Bearer ' + token,
+      
     },
   });
 
@@ -60,6 +63,15 @@ const fetchCourses = async () => {
 
 };
 
+// const fetchCourses = async () => {
+//   const coursesFilterParams = new CoursesFilterParams(CategoryId.value ,1,EduicationType.value,StageId.value,StageYearId.value,null,UniversityId.value,CollegeId.value,DepartmentId.value,DivisionId.value,SubjectId.value)
+//   const coursesFilterController = CoursesFilterController.getInstance() ;
+//   const response = await coursesFilterController.CoursesFilter(coursesFilterParams);
+//   if(response.value.data){
+//     CoursesFilter.value = response.value.data
+//   }
+
+// }
 
 
 const CourseFilterData = (data)=>{
@@ -100,6 +112,9 @@ watch(()=>filtersStore,
 )
 </script>
 <template>
+    <div class="page-loader" v-if="!CoursesFilter"  >
+      <Loder />
+    </div>
   
 
   <div class="aa">
@@ -138,6 +153,16 @@ watch(()=>filtersStore,
 </template>
 
 <style scoped lang="scss">
+
+.page-loader{
+  height: 100vh;
+  width: 100%;
+      position: absolute;
+    background-color: #000000c9;
+    top: 0;
+    left: 0;
+        z-index: 99;
+}
 .stages{
   background-color: #f6f6f6 !important;
 padding-bottom: 20px;
@@ -194,8 +219,8 @@ margin-top:20px
   height: 43px;
 
   &.active {
-    background-color: #ffb949;
-    border: 2px solid #ffb949;
+    background-color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
     width: 43px;
     height: 43px;
   }

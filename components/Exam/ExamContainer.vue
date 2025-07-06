@@ -325,7 +325,7 @@ hr {
 }
 
 .card-number {
-  color: #ffb949;
+  color: var(--secondary-color);
   width: 100px;
   border-radius: 20px;
   text-align: center;

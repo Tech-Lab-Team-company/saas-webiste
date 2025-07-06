@@ -17,6 +17,13 @@
     display: grid;
     gap: 10px;
     grid-template-columns: repeat(6, 1fr);
-    // 64% 35%
+
+    @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 }
 </style>

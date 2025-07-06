@@ -36,6 +36,5 @@ export default interface WebStatus {
     allow_parent_phone:boolean;
     address_required:boolean;
     allow_student_education:boolean;
-    
 }
 

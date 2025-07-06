@@ -112,7 +112,7 @@ const userSetting = useSettingStore();
     gap: 10px;
 
     p {
-        background-color: #061147;
+        background-color: var(--primary-color);
         color: white;
         border-radius: 10px;
         padding: 7px;

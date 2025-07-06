@@ -1,4 +1,3 @@
-    
 <script lang="ts" setup>
 import LoginParams from '~/features/LoginFeature/Core/Params/login_params';
 import callIcon from '../../public/icons/callIcon.vue';
@@ -10,21 +9,24 @@ definePageMeta({
     layout: 'login' 
 });
 
-
 const Credential = ref('');
 const LoginPassword = ref('');
 
+const LoginData = () => {
+    const loginParams = new LoginParams(Credential.value, LoginPassword.value);
+    const loginController = LoginController.getInstance();
+    loginController.login(loginParams, router);
+}
 
-const LoginData = ()=>{
-    const loginParams = new LoginParams(Credential.value,LoginPassword.value);
-    const loginController =  LoginController.getInstance();
-    loginController.login(loginParams,router);
+// Handle Enter key press
+const handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+        LoginData();
+    }
 }
 
 const UserSettingStore = useSettingStore();
-
 </script>
-
 
 <template>
 <div class="login-container">
@@ -40,11 +42,21 @@ const UserSettingStore = useSettingStore();
 
     <div class="inputs">
         <div class="login-input">
-            <input type="text" placeholder="رقم الهاتف" v-model="Credential">
+            <input 
+                type="text" 
+                placeholder="رقم الهاتف" 
+                v-model="Credential"
+                @keydown="handleKeyPress"
+            >
             <callIcon class="login-call-icon"/>
         </div>
         <div class="login-input">
-            <input type="password" placeholder="كلمه المرور" v-model="LoginPassword">
+            <input 
+                type="password" 
+                placeholder="كلمه المرور" 
+                v-model="LoginPassword"
+                @keydown="handleKeyPress"
+            >
             <LockIcon class="login-call-icon"/>
         </div>
        
@@ -66,5 +78,4 @@ const UserSettingStore = useSettingStore();
 </div>
 </template>
 
-
-<style scoped></style>                
+<style scoped></style>

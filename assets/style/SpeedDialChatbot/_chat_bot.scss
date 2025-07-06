@@ -18,8 +18,8 @@
     width: 80px !important;
     height: 80px !important;
     &:hover {
-      background-color: #061147;
-      border: 1px solid #061147;
+      background-color: var(--primary-color);
+      border: 1px solid var(--primary-color);
     }
 
     @keyframes move-top-down {

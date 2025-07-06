@@ -242,7 +242,7 @@ const UserSetting = useSettingStore();
 }
 
 .card-number {
-  background: #ffb949;
+  background: var(--secondary-color);
   width: 100px;
   border-radius: 20px;
   text-align: center;

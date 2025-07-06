@@ -204,7 +204,7 @@ const UserSetting = useSettingStore();
   line-height: 100%;
   letter-spacing: 0%;
   text-align: center;
-  color: #ffb949;
+  color: var(--secondary-color);
 }
 
 .slider-heading1 {

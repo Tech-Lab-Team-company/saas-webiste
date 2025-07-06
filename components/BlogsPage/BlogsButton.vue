@@ -74,7 +74,7 @@ const cards = [
   justify-content: center;
   width: 160px;
   height: 50px;
-  background: #ffb949;
+  background: var(--secondary-color);
   border-radius: 10px;
   cursor: pointer;
 }

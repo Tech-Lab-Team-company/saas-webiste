@@ -48,7 +48,8 @@ const sendData = async (status: string) => {
         selected.value[QuestionIndex.value]
     );
     const questionAnswerController = QuestionAnswerController.getInstance()
-    if (Number(RemainingTimeMinutes.value) > 0 && selected.value[QuestionIndex.value] !== undefined) {
+    if ( selected.value[QuestionIndex.value] !== undefined) {
+        console.log("SubmitQuestionAnswer");
         const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams || null, status || " " );
     }
   
@@ -88,11 +89,12 @@ const EndExam = () => {
     else if (QuestionIndex.value < (questionDetails.value?.questions?.length ?? 0) - 1) {
         QuestionIndex.value++
            if(!(selected.value[QuestionIndex.value])){
-         toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب اختيار إجابة', life: 3000 });
-    }
+                toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب اختيار إجابة', life: 3000 });
+            }
     }
     SendEmit();
     // router.push(``)
+    router.push(`/course/${router.currentRoute.value.params.id}`)
 }
 
 
@@ -177,7 +179,7 @@ watch(() => props.remainingTimeMinutes,
    flex-wrap:wrap;
 }
 .selected-img{
-    border: 5px solid #ffb949;
+    border: 5px solid var(--secondary-color);
 }
 .w-full{
     width: 100% !important ;

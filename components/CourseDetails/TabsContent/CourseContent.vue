@@ -265,7 +265,7 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
   align-items: center;
   gap: 5px;
   position: relative;
-  // justify-content: space-between;
+  justify-content: space-between;
   width: 100%;
 }
 

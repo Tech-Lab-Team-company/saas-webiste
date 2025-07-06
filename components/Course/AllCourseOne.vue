@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { baseUrl } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
+import Loder from "../Loader/Loder.vue";
 const props = defineProps<{
   HomeSections: CoursesFilterModel[];
 }>();
@@ -9,6 +10,9 @@ const { locale } = useI18n();
 const UserSetting = useSettingStore();
 </script>
 <template>
+      <div class="page-loader" v-if="props.HomeSections.length < 1"  >
+      <Loder />
+    </div>
 
   <!-- <pre>{{ props.HomeSections }}</pre> -->
   <div class="card-course">
@@ -44,6 +48,15 @@ const UserSetting = useSettingStore();
 </template>
 
 <style scoped lang="scss">
+.page-loader{
+  height: 100vh;
+  width: 100%;
+      position: absolute;
+    background-color: #000000c9;
+    top: 0;
+    left: 0;
+        z-index: 99;
+}
 .card-footer {
   .card-icon {
     .teacher-image {
@@ -165,7 +178,7 @@ const UserSetting = useSettingStore();
 }
 
 .card-number {
-  background: #ffb949;
+  background: var(--secondary-color);
   // width: 100px;
   border-radius: 20px;
   text-align: center;

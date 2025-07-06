@@ -1,28 +1,26 @@
-
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
     <div class="prfile-home">
-       
-            <ProfilePasswordUpdate />
-            <ProfileSidebar />
-      
+        <ProfilePasswordUpdate />
+        <ProfileSidebar />
     </div>
-
 </template>
 
 <style scoped lang="scss">
-
-.prfile-home{
+.prfile-home {
     margin-top: 50px;
     width: 100%;
     text-align: right;
     display: grid;
     gap: 10px;
-    grid-template-columns: repeat(6 , 1fr) ;
-    // 64% 35%
+    grid-template-columns: repeat(6, 1fr);
+    @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 0;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 }
-
 </style>

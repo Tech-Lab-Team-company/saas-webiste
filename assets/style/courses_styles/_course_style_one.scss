@@ -146,10 +146,14 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 999;
-
+    
     svg {
       width: 35px;
       height: 35px;
+    }
+    @media (max-width:768px) {
+      right: -32px;
+      
     }
   }
 
@@ -159,6 +163,10 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 999;
+      @media (max-width:768px) {
+      left: -32px;
+      
+    }
 
     svg {
       width: 35px;
