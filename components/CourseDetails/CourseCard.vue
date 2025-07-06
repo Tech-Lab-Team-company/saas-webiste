@@ -33,7 +33,7 @@ watch(() => props.status, (newValue) => {
 const userSetting = useSettingStore();
 
 const router = useRouter();
-
+const toast = useToast();
 const emit = defineEmits(['Changestatus'])
 const JoinCourse = async () => {
     // router.currentRoute.value.params.id
@@ -44,7 +44,12 @@ const JoinCourse = async () => {
         Receipt: null
     });
     const coursesPaymentController = CoursesPaymentController.getInstance();
-    const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
+    if(userStore.user) {
+        const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
+    }
+    else{
+        toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+    }
     if (state.value) {
         emit('Changestatus')
     }

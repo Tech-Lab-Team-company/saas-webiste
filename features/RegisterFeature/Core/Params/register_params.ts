@@ -47,21 +47,24 @@ export default class RegisterParams implements Params {
   }
 
   toMap(): { [p: string]: any } {
-    return {
-      name: this.name,
-      second_name: this.second_name,
-      address: this.address,
-      email: this.email,
-      phone: this.phone,
-      second_phone: this.second_phone,
-      password: this.password,
-      password_confirmation: this.confirmPassword,
-      category_id: this.educationType,
-      country_code: this.countryCode,
-      gender: this.gender,
-      
-    };
+    const data: { [p: string]: any } = {};
+    data["name"] = this.name;
+    if(this.second_name)data["second_name"] = this.second_name;
+    if(this.address)data["address"] = this.address;
+    if(this.email)data["email"] = this.email;
+    if(this.phone)data["phone"] = this.phone;
+    if(this.second_phone)data["second_phone"] = this.second_phone;
+    if(this.password)data["password"] = this.password;
+    data["password_confirmation"] = this.confirmPassword;
+    if(this.educationType)data["category_id"] = this.educationType;
+    if(this.countryCode)data["country_code"] = this.countryCode;
+    if(this.gender)data["gender"] = this.gender;
+ 
+    return data;
+   
   }
 }
+
+      
 
 
