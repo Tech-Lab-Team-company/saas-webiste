@@ -54,7 +54,7 @@ export default class RegisterParams implements Params {
     if(this.email)data["email"] = this.email;
     if(this.phone)data["phone"] = this.phone;
     if(this.second_phone)data["second_phone"] = this.second_phone;
-    if(this.password)data["password"] = this.password;
+    data["password"] = this.password;
     data["password_confirmation"] = this.confirmPassword;
     if(this.educationType)data["category_id"] = this.educationType;
     if(this.countryCode)data["country_code"] = this.countryCode;
