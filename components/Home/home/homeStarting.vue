@@ -8,14 +8,16 @@ import type { SwiperHome } from '~/types/swiperhome';
 import { register } from 'swiper/element/bundle';
 import { getWebDomain } from "~/constant/webDomain"; // For web components
 
-const containerRef = ref<HTMLElement | null>(null);
+const containerRef = ref(null);
 const swiper_position = ref('next');
-
 const _swiper = useSwiper(containerRef, {
   effect: "fade",
   loop: true,
   autoplay: {
-    delay: 2000,
+    delay: 500,
+    disableOnInteraction: false,
+    pauseOnMouseEnter: false,
+    reverseDirection: false,
   },
   pagination: {
     el: ".swiper-pagination",
@@ -23,6 +25,8 @@ const _swiper = useSwiper(containerRef, {
     type: "bullets",
     dynamicBullets: true,
   },
+  speed: 1000,
+  allowTouchMove: true,
 });
 
 // Register Swiper web components
@@ -102,7 +106,19 @@ const expandedSlides = ref<Set<number>>(new Set());
     <ClientOnly>
       <div v-if="pending" class="loading">{{ $t('جاري التحميل...') }}</div>
       <div v-else-if="error" class="error">{{ $t('فشل في تحميل السلايدر.') }}</div>
-      <swiper-container class="header-home-section" v-else ref="containerRef">
+      <swiper-container class="header-home-section"  :loop="true"
+                ref="containerRef"
+                :slides-per-view="1"
+                :space-between="50"
+                :autoplay="{
+                    delay: 2000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: false,
+                    stopOnLastSlide: false
+                }"
+                :speed="1000"
+                :free-mode-momentum="false"
+                >
         <swiper-slide v-for="slide in sliders" :key="slide.id">
           <!-- isImage(slide?.media?.img) -->
           <div v-if="slide?.style == 1" class="container">
@@ -138,14 +154,14 @@ const expandedSlides = ref<Set<number>>(new Set());
 
 
 
-          <div v-else class="vid-container" >
+          <div v-else class="vid-container">
             <div class="video" v-if="isVideo(slide?.media?.img)">
               <div class="layer"></div>
               <video autoplay muted loop>
                 <source :src="slide.media.img" type="video/mp4">
               </video>
             </div>
-              <img v-else class=" video" :src="slide?.media?.img" />
+            <img v-else class=" video" :src="slide?.media?.img" />
             <div class="vid-details">
               <div class="vid-title">
                 <p class="title">{{ slide.text }}</p>
@@ -182,17 +198,18 @@ const expandedSlides = ref<Set<number>>(new Set());
 
 
 <style scoped lang="scss">
-.video-image-section{
+.video-image-section {
   position: absolute;
   position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+  top: 50%;
+  transform: translateY(-50%);
 
-    video{
-      border-radius: 10px;
-    }
+  video {
+    border-radius: 10px;
+  }
 }
-.row-img{
+
+.row-img {
   width: 60%;
   height: 50%;
 }
