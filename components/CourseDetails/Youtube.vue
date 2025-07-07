@@ -11,6 +11,7 @@ import {
   ScrubberControl,
   Poster,
   DefaultSettings,
+  FullscreenControl,
   ClickToPlay,
 } from '@vime/vue-next';
 import { ref } from 'vue';
@@ -67,6 +68,7 @@ const videoId = getYoutubeVideoId(props.video)
           <VolumeControl />
           <ScrubberControl />
           <SettingsControl />
+          <FullscreenControl />
           <!--          <button @click="TogglePip" class="pip-button">PIP</button>-->
         </Controls>
         <Poster />
