@@ -192,7 +192,7 @@ const searchGoogleAddress = async () => {
     // Wait for all Promises to resolve
     searchAddress.value = await Promise.all(searchAddressPromises);
     showSearchAddress.value = true;
-    console.log(searchAddress.value);
+    // console.log(searchAddress.value);
   } catch (error) {
     console.error("Error searching Google address:", error);
   }

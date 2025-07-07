@@ -13,7 +13,7 @@ watch(
   () => props.initialImage,
   (newValue) => {
     if (newValue) {
-      console.log(newValue);
+      // console.log(newValue);
       imgUrl.value = newValue;
       image.value = null;
     }

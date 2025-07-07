@@ -15,7 +15,7 @@ const { data: fqs } = await useAsyncData("fqs", async () => {
       "web-domain": getWebDomain(),
     },
   });
-  console.log(response);
+  // console.log(response);
 
   return response.data;
 });

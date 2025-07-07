@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import {useUserStore} from "~/stores/user";
+import Youtube from "~/components/CourseDetails/Youtube.vue";
 
 const props = defineProps({
   CourseVideoLink: {
@@ -40,8 +41,10 @@ const playVideo = ref(false)
 
 <template>
   <div class="course-video-container">
+    <Youtube :video="embedVideoLink" v-if="fileType === 'youtube'" />
+
     <iframe
-        v-if="fileType === 'youtube' || fileType === 'pdf'"
+        v-else-if="fileType === 'pdf'"
         width="100%"
         height="600"
         :src="embedVideoLink"

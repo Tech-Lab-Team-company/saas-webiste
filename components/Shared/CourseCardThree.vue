@@ -64,7 +64,6 @@ const UserSetting = useSettingStore();
 <template>
   <h3 class="slider-heading" style="margin-top: 10px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
   <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-three">
-    {{ console.log(homesection?.courses, 'courses') }}
     <ClientOnly>
       <swiper-container ref="containerRef">
         <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">

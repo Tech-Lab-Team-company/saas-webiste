@@ -111,7 +111,7 @@ const viewListingDetails = async () => {
   await viewListingDetailsController.viewListingDetails(
     new ViewListingDetailsParams(useRoute().params.id as string),
   );
-  console.log(viewListingDetailsController.state.value);
+  // console.log(viewListingDetailsController.state.value);
 };
 
 onMounted(async () => {
