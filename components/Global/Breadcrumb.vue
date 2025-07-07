@@ -3,7 +3,7 @@ import getLastSegment from "~/base/persention/utils/get_path_from_route";
 
 const route = useRoute();
 
-console.log(route.path);
+// console.log(route.path);
 
 const props = defineProps({
   title: {

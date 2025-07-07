@@ -120,7 +120,7 @@
 
         }
 
-        console.log(AllSelectedAnswer.value)
+        // console.log(AllSelectedAnswer.value)
 
     }
 

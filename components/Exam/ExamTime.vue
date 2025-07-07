@@ -57,7 +57,7 @@ const FetchExamQuestions = async () => {
 
 
 const startTimer = (endTime: number) => {
-  console.log(endTime, "endtime");
+  // console.log(endTime, "endtime");
   timerInterval = setInterval(() => {
     const now = Date.now();
     const diff = endTime - now;

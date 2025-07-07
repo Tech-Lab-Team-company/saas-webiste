@@ -85,7 +85,7 @@ const removeExistingFilter = (key: string) => {
 // Filter functions
 const filterStatus = async (e: Event) => {
   const status = parseInt((e.target as HTMLInputElement).value);
-  console.log("Selected Status:", status); // Debugging line
+  // console.log("Selected Status:", status); // Debugging line
   selectedStatus.value = status;
 
   // Remove existing status filter
@@ -94,7 +94,7 @@ const filterStatus = async (e: Event) => {
   // Add new status filter
   let statusText = "";
   if (status === 1) {
-    console.log("Open"); // Debugging line
+    // console.log("Open"); // Debugging line
     statusText = $t("Open");
   } else if (status === 2) {
     statusText = $t("Closed");
@@ -326,7 +326,7 @@ const fetchCategories = async () => {
       new FetchCategoriesParams(1, 100),
     )
   ).value.data!;
-  console.log(categories.value);
+  // console.log(categories.value);
 };
 
 onMounted(async () => {

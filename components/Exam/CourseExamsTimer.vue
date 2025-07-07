@@ -5,7 +5,7 @@ const route = useRoute()
 const examId = route.query.id
 const Starttime = route.query.time
 
-console.log(examId, Starttime , "examId, Starttime")
+// console.log(examId, Starttime , "examId, Starttime")
 
 
 

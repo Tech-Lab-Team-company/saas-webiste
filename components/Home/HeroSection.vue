@@ -16,7 +16,7 @@ const searchListing = async () => {
       await navigateTo(`/listing`);
     }
   } catch (e) {
-    console.log(e);
+    // console.log(e);
   }
 };
 

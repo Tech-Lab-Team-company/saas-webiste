@@ -41,7 +41,7 @@ const router = useRouter()
 const toast = useToast();
 
 const sendData = async (status: string) => {
-    console.log(selected.value[QuestionIndex.value])
+    // console.log(selected.value[QuestionIndex.value])
     const questionAnswerParams = new QuestionAnswerParams(
         Number(router.currentRoute.value.params.exam),
         Number(questionDetails?.value?.questions[QuestionIndex.value]?.id),
@@ -49,7 +49,7 @@ const sendData = async (status: string) => {
     );
     const questionAnswerController = QuestionAnswerController.getInstance()
     if ( selected.value[QuestionIndex.value] !== undefined) {
-        console.log("SubmitQuestionAnswer");
+        // console.log("SubmitQuestionAnswer");
         const state = await questionAnswerController.SubmitQuestionAnswer(questionAnswerParams || null, status || " " );
     }
   

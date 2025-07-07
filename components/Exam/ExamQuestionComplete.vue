@@ -41,7 +41,7 @@
         
         else if(QuestionIndex.value < questions.value.length - 1){
             QuestionIndex.value++
-            console.log(TextComplete.value)
+            // console.log(TextComplete.value)
         }
 
         SendEmit();
