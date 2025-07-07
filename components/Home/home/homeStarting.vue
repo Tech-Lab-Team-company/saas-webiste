@@ -116,7 +116,7 @@ const expandedSlides = ref<Set<number>>(new Set());
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
                 }"
-                :speed="500"
+                :speed="1000"
                 :free-mode-momentum="false"
                 >
         <swiper-slide v-for="slide in sliders" :key="slide.id">
