@@ -179,6 +179,7 @@ const UserSetting = useSettingStore();
   font-family: "regular", serif;
   text-align: right;
   width: 87%;
+  text-align: right;
 }
 
 .cards-grid {

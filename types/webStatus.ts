@@ -37,4 +37,4 @@ export default interface WebStatus {
     address_required:boolean;
     allow_student_education:boolean;
 }
-
+w

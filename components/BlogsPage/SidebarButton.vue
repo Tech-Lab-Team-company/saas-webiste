@@ -61,7 +61,7 @@ const { locale } = useI18n();
   gap: 10px;
 }
 .sidebar-button {
-  width: 85px;
+  width: fit-content;
   height: fit-content;
   border-radius: 5px;
   padding: 10px;

@@ -195,6 +195,7 @@ margin-top:20px
   font-weight: 400;
   font-family: "regular";
   margin: 0;
+  text-align: right;
 }
 
 .toggle {
