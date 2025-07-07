@@ -38,7 +38,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
 <div class="login-form">
     <img class="background-circle" src="../../public/images/Component15.png" alt="">
 
-    <img :src="UserSettingStore.setting.image.img" width="150px" alt="logo">
+    <img :src="UserSettingStore.setting?.image?.img" width="150px" alt="logo">
     <h3>{{ $t('مرحبا بك فى منصتنا التعليمية') }}</h3>
     <p>{{ $t('تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.') }}</p>
 
@@ -53,7 +53,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
                 >
                 <callIcon class="login-call-icon"/>
             </div>
-            <div class="phone-code">
+            <div class="phone-code" v-if="UserSettingStore?.setting?.country_code_required">
 
                 <Select :defaultValue="{ dial_code: `${UserSettingStore?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
                 placeholder="Select a Country" class="w-full md:w-56">

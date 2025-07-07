@@ -41,7 +41,7 @@ const sendotp =()=>{
     <div class="login-form">
    
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
-        <img :src="UserSettingStore.setting.image.img" width="150px" alt="logo">
+        <img :src="UserSettingStore.setting?.image?.img" width="150px" alt="logo">
         <h3>{{ $t('نسيت كلمة المرور') }}</h3>
         <p>{{ $t('ادخل البريد الالكترونى الذى سوف نرسل اليك كود استرجاع كلمه المرور عليه') }}</p>
 
@@ -51,7 +51,7 @@ const sendotp =()=>{
                     <input type="text" placeholder="رقم الهاتف" v-model="phoneNumber">
                     <callIcon class="login-call-icon"/>
                 </div>
-                <div class="phone-code">
+                <div class="phone-code" v-if="UserSettingStore?.setting?.country_code_required">
 
                     <Select :defaultValue="{ dial_code: `${UserSettingStore?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
                     placeholder="Select a Country" class="w-full md:w-56">

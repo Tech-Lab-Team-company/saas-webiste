@@ -171,7 +171,7 @@ const settingStore = useSettingStore();
             <input type="tel" placeholder="رقم الهاتف" v-model="FirstphoneNumber" />
             <callIcon class="login-call-icon" />
           </div>
-          <div class="phone-code">
+          <div class="phone-code" v-if="settingStore?.setting?.country_code_required">
 
             <Select :defaultValue="{ dial_code: `${UserSetting?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
               placeholder="Select a Country" class="w-full md:w-56">
