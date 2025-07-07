@@ -3,14 +3,16 @@ import LoginParams from '~/features/LoginFeature/Core/Params/login_params';
 import callIcon from '../../public/icons/callIcon.vue';
 import LockIcon from '../../public/icons/LockIcon.vue';
 import LoginController from '~/features/LoginFeature/presentation/controllers/login_controller';
+import countries from "~/data/countries.json";
 
 const router = useRouter();
 definePageMeta({
     layout: 'login' 
 });
-
+const UserSettingStore = useSettingStore();
 const Credential = ref('');
 const LoginPassword = ref('');
+const selectedCountry = ref(UserSettingStore?.setting?.country_code);
 
 const LoginData = () => {
     const loginParams = new LoginParams(Credential.value, LoginPassword.value);
@@ -25,7 +27,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
     }
 }
 
-const UserSettingStore = useSettingStore();
+
 </script>
 
 <template>
@@ -41,14 +43,40 @@ const UserSettingStore = useSettingStore();
     <p>{{ $t('تعطي صفحة تسجيل الدخول الأولوية لأمن المستخدم، وتقدم تجربة سلسة تضمن الوصول السريع والمريح إلى مجموعة من فوائد النظام.') }}</p>
 
     <div class="inputs">
-        <div class="login-input">
-            <input 
-                type="text" 
-                placeholder="رقم الهاتف" 
-                v-model="Credential"
-                @keydown="handleKeyPress"
-            >
-            <callIcon class="login-call-icon"/>
+        <div class="phone">
+            <div class="login-input">
+                <input 
+                    type="text" 
+                    placeholder="رقم الهاتف" 
+                    v-model="Credential"
+                    @keydown="handleKeyPress"
+                >
+                <callIcon class="login-call-icon"/>
+            </div>
+            <div class="phone-code">
+
+                <Select :defaultValue="{ dial_code: `${UserSettingStore?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
+                placeholder="Select a Country" class="w-full md:w-56">
+
+                <template #value="slotProps">
+                    <div v-if="slotProps.value" class="flex items-center">
+                    <div>{{ slotProps.value.dial_code }} {{ slotProps.value.flag }}</div>
+                    </div>
+                    <span v-else>
+                    {{ slotProps.placeholder }}
+                    </span>
+                </template>
+
+                <template #option="slotProps">
+                    <div class="flex items-center "  >
+                    <span>{{ slotProps.option.flag }}</span>
+                    <span>{{ slotProps.option.name }}</span>
+                    <div>({{ slotProps.option.dial_code }})</div>
+                    </div>
+                </template>
+
+                </Select>
+            </div>
         </div>
         <div class="login-input">
             <input 
@@ -78,4 +106,17 @@ const UserSettingStore = useSettingStore();
 </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.phone{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 10px;
+
+    .login-input{
+        width:100%;
+
+    }
+}
+</style>

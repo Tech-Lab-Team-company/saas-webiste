@@ -28,6 +28,21 @@ const { data: studentopinionssection } = await useAsyncData("studentopinionssect
   return response.data[response.data.length - 1];
 });
 
+const isImage = (url) => {
+  if (!url) return false;
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  const extension = url.split('.').pop().toLowerCase();
+  return imageExtensions.includes(extension);
+};
+
+// Check if URL is a video
+const isVideo = (url) => {
+  if (!url) return false;
+  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+  const extension = url.split('.').pop().toLowerCase();
+  return videoExtensions.includes(extension);
+};
+
 
 const cards = [
   {
@@ -90,7 +105,11 @@ const splideOptions = {
 
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
-          <img :src="card.file" :alt="card.alt" class="slider-image" />
+
+          <img v-if="isImage(card.file)" :src="card.file" :alt="card.alt" class="slider-image" />
+          <video v-if="isVideo(card.file)"  class="slider-image" >
+            <source :src="card.file" >
+          </video>
         </SplideSlide>
       </Splide>
     </div>
