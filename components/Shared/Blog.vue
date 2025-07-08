@@ -90,7 +90,7 @@ const UserSetting = useSettingStore();
   </div>
   <div class="blogs-main-section" v-if="Blogs?.length > 0">
     <ClientOnly>
-      <swiper-container ref="containerRef" class="swiper-with-padding">
+      <swiper-container ref="containerRef" class="swiper-with-padding" dir="rtl">
         <swiper-slide v-for="(blog, idx) in Blogs" :key="idx" class="slide-with-margin">
           <NuxtLink :to="`/blogs/${blog.slug}`" class="card">
             <img :src="blog.attachments[0].file" style="object-fit: cover;" alt="Card image" class="course-image" />
