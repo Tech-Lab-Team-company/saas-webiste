@@ -13,6 +13,8 @@ export default class ExamsModel {
   public isFinished: boolean;
   public Mark: number;
   public Subject: TitleModel[];
+  public degree_type: number;
+
 
 
 
@@ -27,6 +29,7 @@ export default class ExamsModel {
     isFinished: boolean,
     Mark: number,
     Subject: TitleModel[],
+    degree_type: number,
 
 
   ) {
@@ -39,6 +42,7 @@ export default class ExamsModel {
     this.isFinished = isFinished;
     this.Mark = Mark;
     this.Subject = Subject;
+    this.degree_type = degree_type;
  
   }
 
@@ -54,6 +58,7 @@ export default class ExamsModel {
       map["is_finished"],
       map["mark"],
       map["subject"],
+      map["degree_type"],
 
     );
   }

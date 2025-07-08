@@ -171,12 +171,12 @@ const UserSetting = useSettingStore();
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-direction: row-reverse;
+  flex-direction: row;
 }
 
 .card-header .flex {
   width: 350px;
-  flex-direction: row-reverse;
+  flex-direction: row;
   flex-wrap: wrap;
 }
 
@@ -321,7 +321,7 @@ const UserSetting = useSettingStore();
   display: flex;
   align-items: center;
   gap: 1rem;
-  flex-direction: row-reverse;
+  flex-direction: row;
 }
 
 .card-footer p {

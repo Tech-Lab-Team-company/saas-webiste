@@ -22,16 +22,22 @@ const items = [
 
 const SppedDialStyle = computed(() => {
     if (window.innerWidth <= 768) {
-        
         return { top: 'calc(82% - 2rem)', left: '1.2rem', 'z-index': '999', position: 'fixed' };
     }
-    return { top: 'calc(94% - 2rem)', left: '1rem', 'z-index': '9999', position: 'fixed' };
+    return { top: 'calc(83% - 2rem)', left: '1rem', 'z-index': '9999', position: 'fixed' };
 });
+
+watch(() => window.innerWidth,
+    (newValue) => {
+        if (newValue <= 768) {
+            return { top: 'calc(82% - 2rem)', left: '1.2rem', 'z-index': '999', position: 'fixed' };
+        }
+        return { top: 'calc(94% - 2rem)', left: '1rem', 'z-index': '9999', position: 'fixed' };
+    })
 </script>
 
 <template>
-    <SpeedDial :model="items" direction="right"
-        :style="SppedDialStyle">
+    <SpeedDial :model="items" direction="right" :style="SppedDialStyle">
         <template #icon>
             <i class="pi pi-cloud"></i>
         </template>
@@ -39,6 +45,4 @@ const SppedDialStyle = computed(() => {
 
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
