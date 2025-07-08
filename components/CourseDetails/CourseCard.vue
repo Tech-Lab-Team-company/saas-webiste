@@ -129,6 +129,9 @@ const userStore = useUserStore();
 <style scoped lang="scss">
 .card-text-footer {
     gap: 50px;
+    @media(max-width:768px){
+        gap: 10px;
+    }
 }
 
 .card-content {
@@ -151,6 +154,9 @@ const userStore = useUserStore();
         display: flex;
         flex-direction: row-reverse;
         gap: 6px;
+        @media(max-width:768px){
+            width: 110px;
+        }
 
     }
 

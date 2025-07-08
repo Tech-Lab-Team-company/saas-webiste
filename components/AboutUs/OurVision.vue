@@ -38,14 +38,14 @@ const userSetting = useSettingStore();
       <div class="aboutus-vid-container">
         <div class="aboutus-vid" v-if="aboutusVision?.media?.[0]?.file">
            <video
+           autoplay
                 width="100%"
                 height="100%"
                 :src="aboutusVision?.media?.[0]?.file"
                 frameborder="0"
                 allowfullscreen
                 loop
-                autoplay
-       
+                
               ></video>
         </div>
         <div class="aboutus-vid" v-else>
