@@ -30,14 +30,13 @@
 
 //Helpers
 @import "./helpers/imports";
- 
+
 // Layout
 @import "./layout/imports";
 
 // Courses
 @import "./courses/imports";
 @import "./cardcourse/imports";
-
 
 // Home
 @import "./home/imports";
@@ -70,94 +69,68 @@
 // .card-course-three,
 @import "slider/slider";
 
-@import "accordion/accordion" ;
-@import "SpeedDialChatbot/chat_bot" ;
-@import "courses_styles/imports" ;
+@import "accordion/accordion";
+@import "SpeedDialChatbot/chat_bot";
+@import "courses_styles/imports";
 
 @import "./vmStyle";
 
-
-.p-speeddial-button.p-speeddial-rotate{
-    width:75px !important;
-    height  :75px !important;
+.p-speeddial-button.p-speeddial-rotate {
+  width: 75px !important;
+  height: 75px !important;
 }
-.p-button-sm.p-button-icon-only.p-button-rounded{
-    width: 3rem;
-    height: 3rem;
+.p-button-sm.p-button-icon-only.p-button-rounded {
+  width: 3rem;
+  height: 3rem;
 }
 .course-body-details svg path {
-  stroke: #8C8896
+  stroke: #8c8896;
 }
-.p-button-sm .p-button-icon{
-    font-size: 20px;
+.p-button-sm .p-button-icon {
+  font-size: 20px;
 }
 
-// swiper-container{
-
-//     .swiper-initialized::part(container){
-        
-//         .swiper-wrapper{
-//             flex-direction: row-reverse;
-//         }
-        
-//     }
-    
-// }
-// .course-style-one{
-
-//     swiper-container{
-//         &::part(container){
-
-            
-//             .swiper {
-                
-//                 .swiper-wrapper{
-//                     display: flex;
-//                     flex-direction: row-reverse !important;
-//                 }
-//             }
-//         }
-        
-//     }
-// }
-
-
-
+.swiper-wrapper {
+  ::part(wrapper) {
+    display: flex;
+    flex-direction: row-reverse !important;
+  }
+}
 .video-player-pip {
-    position: fixed;
-    bottom: 20px; /* Adjust this value to position the player */
-    right: 20px; /* Adjust this value to position the player */
-    width: 300px; /* Set a fixed width */
-    height: auto; /* Height will adjust based on content */
-    z-index: 9999; /* Ensure it's above other content */
-    border-radius: 10px; /* Optional: rounded corners */
-    overflow: hidden; /* Hide overflow if needed */
-    resize: horizontal;
-    //transition: 0.2s ease-in-out;
+  position: fixed;
+  bottom: 20px; /* Adjust this value to position the player */
+  right: 20px; /* Adjust this value to position the player */
+  width: 300px; /* Set a fixed width */
+  height: auto; /* Height will adjust based on content */
+  z-index: 9999; /* Ensure it's above other content */
+  border-radius: 10px; /* Optional: rounded corners */
+  overflow: hidden; /* Hide overflow if needed */
+  resize: horizontal;
+  //transition: 0.2s ease-in-out;
 }
 
 .video-player {
-    display: flex;
-    width: 100% !important; /* Full width of the container */
-    height: 100% !important; /* Maintain aspect ratio */
-    //transition: 0.2s ease-in-out;
+  display: flex;
+  width: 100% !important; /* Full width of the container */
+  height: 100% !important; /* Maintain aspect ratio */
+  //transition: 0.2s ease-in-out;
 }
 
 .content {
-    width: 80%; /* Full width of the container */
-    height: 100%; /* Maintain aspect ratio */
-    margin: 0 auto;
+  width: 80%; /* Full width of the container */
+  height: 100%; /* Maintain aspect ratio */
+  margin: 0 auto;
 }
 
 .image_loading {
-    width: 100px; /* Set a loading image size */
-    height: auto; /* Maintain aspect ratio */
+  width: 100px; /* Set a loading image size */
+  height: auto; /* Maintain aspect ratio */
 }
 .pip-button {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 10px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 10px;
 }

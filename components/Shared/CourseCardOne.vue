@@ -63,10 +63,10 @@ watch(
 <template>
   <h3 class="slider-heading" style="margin-top: 25px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
   <div v-if="homesection?.courses?.length >= 2" class="course-style-one">
-    <ClientOnly>
-      <swiper-container ref="containerRef">
+    <ClientOnly >
+      <swiper-container ref="containerRef" >
         <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">
-          <NuxtLink :to="`/course/${slide?.id}`">
+          <NuxtLink :to="`/course/${slide?.id}`" >
             <div class="card-container">
               <div class="course-image-container">
                 <NuxtImg :src="slide?.image?.img || UserSetting.setting?.image.img" :alt="slide?.image?.alt" />

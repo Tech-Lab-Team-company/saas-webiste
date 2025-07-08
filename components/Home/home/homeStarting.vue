@@ -13,20 +13,13 @@ const swiper_position = ref('next');
 const _swiper = useSwiper(containerRef, {
   effect: "fade",
   loop: true,
-  autoplay: {
-    delay: 500,
-    disableOnInteraction: false,
-    pauseOnMouseEnter: false,
-    reverseDirection: false,
-  },
   pagination: {
     el: ".swiper-pagination",
     clickable: true,
     type: "bullets",
     dynamicBullets: true,
   },
-  speed: 1000,
-  allowTouchMove: true,
+
 });
 
 // Register Swiper web components
@@ -111,12 +104,11 @@ const expandedSlides = ref<Set<number>>(new Set());
                 :slides-per-view="1"
                 :space-between="50"
                 :autoplay="{
-                    delay: 7000,
+                    delay: 5000,
                     disableOnInteraction: false,
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
                 }"
-                :speed="500"
                 >
         <swiper-slide v-for="slide in sliders" :key="slide.id">
           <!-- isImage(slide?.media?.img) -->

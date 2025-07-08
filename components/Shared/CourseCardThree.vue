@@ -65,7 +65,7 @@ const UserSetting = useSettingStore();
   <h3 class="slider-heading" style="margin-top: 10px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
   <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-three">
     <ClientOnly>
-      <swiper-container ref="containerRef">
+      <swiper-container ref="containerRef" dir="rtl">
         <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">
           <NuxtLink :to="`/course/${slide?.id}`">
             <div class="card-container">
