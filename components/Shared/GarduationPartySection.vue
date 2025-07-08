@@ -84,11 +84,11 @@ const swiper = useSwiper(containerRef, {
       <ClientOnly>
       <swiper-container ref="containerRef">
         <swiper-slide v-for="(image, idx) in GraduationParty?.media" :key="idx">
-            <NuxtLink :to="image?.link || '#'">
+            <a target="_blank" :href="image?.link || '#'">
             <div class="image-conatiner">
               <img :src="image?.file" :alt="image.alt"  />
             </div>
-          </NuxtLink>
+          </a>
         </swiper-slide>
       </swiper-container>
     </ClientOnly>
@@ -141,6 +141,7 @@ const swiper = useSwiper(containerRef, {
     border-radius: 20px;
     aspect-ratio: 2/ 1.5 ;
     border: 1px solid #dde1e6;
+    width: 100%;
   }
 
 }

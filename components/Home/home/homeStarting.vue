@@ -111,13 +111,12 @@ const expandedSlides = ref<Set<number>>(new Set());
                 :slides-per-view="1"
                 :space-between="50"
                 :autoplay="{
-                    delay: 3000,
+                    delay: 5000,
                     disableOnInteraction: false,
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
                 }"
-                :speed="1000"
-                :free-mode-momentum="false"
+                :speed="500"
                 >
         <swiper-slide v-for="slide in sliders" :key="slide.id">
           <!-- isImage(slide?.media?.img) -->

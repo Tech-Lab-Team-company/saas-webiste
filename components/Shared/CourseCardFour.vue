@@ -7,7 +7,7 @@ import img4 from "@/assets/images/img4.png";
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
 const { data: studentopinionssection } = await useAsyncData("studentopinionssection", async () => {
   const response = await $fetch<{
@@ -97,7 +97,7 @@ const splideOptions = {
 <template>
   <div class="card-course-four">
     <div class="slider-wrapper flex" dir="ltr">
-     
+
       <h1 class="slider-heading" style="margin-top: 25px;">{{ studentopinionssection?.title }}</h1>
       <p class="slider-paragraph">
         {{ studentopinionssection?.description }}
@@ -106,17 +106,18 @@ const splideOptions = {
       <Splide :options="splideOptions" class="splide-container">
         <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
 
-          <img v-if="isImage(card.file)" :src="card.file" :alt="card.alt" class="slider-image" />
-          <video v-if="isVideo(card.file)"  class="slider-image" >
-            <source :src="card.file" >
-          </video>
+          <a :href="card?.link || '#'" target="_blank">
+            <img :src="card.file" :alt="card.alt" class="slider-image" />
+          </a>
+          <!-- <video autoplay loop muted  v-if="isVideo(card.file)" class="slider-image">
+            <source :src="card.file">
+          </video> -->
         </SplideSlide>
       </Splide>
     </div>
   </div>
 </template>
 <style>
-
 .slider-wrapper {
   display: flex;
   flex-direction: column;
@@ -159,9 +160,15 @@ const splideOptions = {
 }
 
 .slider-image {
-  width: 300px;
+  /* width: 300px; */
+  width: 100%;
   height: 212px;
+  border-radius: 15px;
 }
+
+/* .splide__slide{
+  width: 50%;
+} */
 
 /* Center single slide on small screens */
 @media (max-width: 480px) {
@@ -169,11 +176,11 @@ const splideOptions = {
     /* display: flex; */
     /* justify-content: center; */
   }
-  
+
   .splide__list {
     justify-content: center;
   }
-  
+
   .splide__slide {
     display: flex;
     justify-content: center;
