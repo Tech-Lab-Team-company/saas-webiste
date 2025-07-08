@@ -111,7 +111,7 @@ const expandedSlides = ref<Set<number>>(new Set());
                 :slides-per-view="1"
                 :space-between="50"
                 :autoplay="{
-                    delay: 5000,
+                    delay: 7000,
                     disableOnInteraction: false,
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
