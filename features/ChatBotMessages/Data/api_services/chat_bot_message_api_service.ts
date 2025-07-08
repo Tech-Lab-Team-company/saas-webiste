@@ -23,7 +23,7 @@ class ChatBotMessagesApiService extends ServicesInterface {
       type: CrudType.POST,
       params: params,
       headers: {
-        'web-domain': 'student',
+        'web-domain': 'student.azcourses.tech',
       },
     })
   }

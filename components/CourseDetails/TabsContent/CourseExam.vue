@@ -14,13 +14,13 @@ const props = defineProps({
     type: Object as () => ExamsModel | null,
     default: null
   },
-    CourseStatus:{
+  CourseStatus: {
     type: Number,
   },
-    isPaid:{
+  isPaid: {
     type: Boolean,
   },
-    isSubscribed:{
+  isSubscribed: {
     type: Boolean,
   },
 });
@@ -29,7 +29,7 @@ const CardDetails = ref(props.CourseData);
 
 watch(() => props.CourseData, (newValue) => {
   CardDetails.value = newValue;
-}, {immediate: true});
+}, { immediate: true });
 
 const router = useRouter();
 // console.log(router.currentRoute.value.params.id)
@@ -37,10 +37,10 @@ const router = useRouter();
 const userStore = useUserStore()
 
 const isDisabled = computed(() => {
-  return !userStore.user || ( props.isPaid &&!(props.isSubscribed));
+  return !userStore.user || (props.isPaid && !(props.isSubscribed));
 });
 const { locale } = useI18n();
-const currentTime = new Date(); 
+const currentTime = new Date();
 
 
 
@@ -48,37 +48,29 @@ const currentTime = new Date();
 
 <template>
 
-  <div class="course-exam-container" v-for="(exam , index) in CardDetails" :key="index">
+  <div class="course-exam-container" v-for="(exam, index) in CardDetails" :key="index">
 
-   <NuxtLink
-   v-if="!(exam?.is_finished)"
-  :to="isDisabled || exam?.is_finished ? null : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
-  @click.prevent="(isDisabled || exam?.is_finished) && $event.preventDefault()"
->
-  <div class="btns">
-    <button
-      v-if="(new Date(exam.end_time).getTime() - currentTime.getTime()) < 0"
-      disabled
-      class="disabled"
-    >
-      {{ $t('انتهى الوقت') }}
-    </button>
+    <NuxtLink v-if="!(exam?.is_finished)"
+      :to="isDisabled || exam?.is_finished ? null : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
+      @click.prevent="(isDisabled || exam?.is_finished) && $event.preventDefault()">
+      <div class="btns">
+        <button v-if="(new Date(exam.end_time).getTime() - currentTime.getTime()) < 0" disabled class="disabled">
+          {{ $t('انتهى الوقت') }}
+        </button>
 
-    <button
-      v-else
-      :disabled="isDisabled"
-      :class="[
-        props.isPaid && !props.isSubscribed ? 'disabled' : '',
-        userStore.user ? '' : 'disabled',
-      ]"
-    >
-      {{ $t('ابدأ الامتحان') }}
-    </button>
-  </div>
-</NuxtLink>
+        <button v-else :disabled="isDisabled" :class="[
+          props.isPaid && !props.isSubscribed ? 'disabled' : '',
+          userStore.user ? '' : 'disabled',
+        ]">
+          {{ $t('ابدأ الامتحان') }}
+        </button>
+      </div>
+    </NuxtLink>
     <div v-else-if="exam?.is_finished" class="exam-rate">
-      <p class="rating" v-if="exam.degree_type == 2" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{ exam.exam_mark }}</p>
-      <p class="rating" v-if="exam.degree_type == 1" :class="(exam.mark / exam.exam_mark)* 100 < 50 ? 'failed' : ''"> {{ ((exam.mark / exam.exam_mark)* 100).toFixed(2) }} %</p>
+      <p class="rating" v-if="exam.degree_type == 2" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{
+        exam.exam_mark }}</p>
+      <p class="rating" v-if="exam.degree_type == 1" :class="(exam.mark / exam.exam_mark) * 100 < 50 ? 'failed' : ''"> {{
+        ((exam.mark / exam.exam_mark) * 100).toFixed(2) }} %</p>
     </div>
 
 
@@ -86,17 +78,17 @@ const currentTime = new Date();
       <div class="exam-title">
         <p>({{ exam?.subject.title }})</p>
         <span>{{ exam.title }}</span>
-        <blacknotes/>
+        <blacknotes />
       </div>
 
       <div class="exam-date-container">
         <div class="exam-title exam-date">
           <p>{{ exam.date }} </p>
-          <calendaricon class="exam-icon"/>
+          <calendaricon class="exam-icon" />
         </div>
         <div class="exam-title exam-date">
           <p>{{ String(exam.start_time).slice(11, 20) }} </p>
-          <clockicon class="exam-icon"/>
+          <clockicon class="exam-icon" />
         </div>
       </div>
 
@@ -107,7 +99,7 @@ const currentTime = new Date();
 </template>
 
 <style scoped>
-.disabled{
+.disabled {
   opacity: 0.8;
   cursor: not-allowed;
 }

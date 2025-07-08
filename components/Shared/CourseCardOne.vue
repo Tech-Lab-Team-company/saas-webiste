@@ -16,6 +16,8 @@ const swiper = useSwiper(containerRef, {
   autoplay: {
     delay: 5000,
   },
+   direction: 'horizontal',
+  
   creativeEffect: {
     prev: {
       shadow: true,

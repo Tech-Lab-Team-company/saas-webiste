@@ -27,7 +27,7 @@ const UserSettingStore = useSettingStore();
 
             <div class="btns">
                 <nuxt-link class="nuxt-link-btn" to="/login/loginhome"><button class="login-btn">{{ $t('تسجيل الدخول') }}</button></nuxt-link>
-                <nuxt-link class="nuxt-link-btn" to="/auth/register"> <button class="create-account-btn">{{ $t('انشاء حساب') }}</button></nuxt-link>
+                <nuxt-link class="nuxt-link-btn" to="/Auth/register"> <button class="create-account-btn">{{ $t('انشاء حساب') }}</button></nuxt-link>
 
 
 <!--                <div class="btn-or">-->
