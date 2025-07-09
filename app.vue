@@ -7,9 +7,9 @@ import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
 import FetchPaymentMethodsParams from "./features/fetch_payment_methods/Core/Params/fetch_payment_methods_params";
 import FetchPaymentMethodController from "./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
 // import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
-const UserStore  = useUserStore();
+const UserStore = useUserStore();
 const { data: webStatus, pending } = await useAsyncData("webStatus", async () => {
   const response = await $fetch<{
     data: WebStatus;
@@ -21,6 +21,18 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
       "web-domain": getWebDomain(),
     },
   });
+
+  const DefaultPrimaryColor = '#061147'
+  const DefaultSecondColor = '#ffb949'
+
+  const PrimaryColor = response?.data?.primary_color || DefaultPrimaryColor;
+  const SecondColor = response?.data?.secondary_color || DefaultSecondColor;
+  const style = document.createElement("style");
+  style.innerHTML = `:root { --primary-color: ${PrimaryColor }; --secondary-color: ${SecondColor }; }`;
+  document.head.appendChild(style);
+
+
+
   return response.data;
 });
 const SettingStore = useSettingStore()
@@ -54,14 +66,14 @@ const FetchPaymentMethod = async () => {
   const paymentMethod = new FetchPaymentMethodsParams(1);
   const fetchPaymentMethodController = FetchPaymentMethodController.getInstance();
   const state = await fetchPaymentMethodController.FetchPaymentMthod(paymentMethod);
-  if(state.value.data){
+  if (state.value.data) {
     PaymentStore.setPayment(state.value.data);
   }
 }
 
 onMounted(
-  ()=>{
-    if(UserStore?.user){
+  () => {
+    if (UserStore?.user) {
 
       FetchPaymentMethod();
     }
@@ -79,27 +91,28 @@ UserSettingStore.setSetting(webStatus.value!);
 <template>
   <div>
     <NuxtLayout>
-      
+
       <MobileNav />
-    <ChatBotButton class="chat-bot-button"/>
-      <SpeedDialToast class="social-icons"/>
+      <ChatBotButton class="chat-bot-button" />
+      <SpeedDialToast class="social-icons" />
       <Toast />
       <NuxtPage />
       <MainDialog v-if="!pending" />
-       <!-- <LoaderDialog  v-if="!pending"/> -->
+      <!-- <LoaderDialog  v-if="!pending"/> -->
     </NuxtLayout>
   </div>
 </template>
 
 <style scoped lang="scss">
-.chat-bot-button{
+.chat-bot-button {
   position: absolute;
 
   @media (max-width:768px) {
-      display: none;
+    display: none;
   }
 }
-.social-icons{
+
+.social-icons {
   top: 94%;
   left: 4%;
   z-index: 1000;
@@ -107,4 +120,3 @@ UserSettingStore.setSetting(webStatus.value!);
   cursor: pointer;
 }
 </style>
-
