@@ -54,7 +54,7 @@ const fetchCourses = async () => {
     headers: {
       "Accept-Language": "ar",
       "web-domain": getWebDomain(),
-      // 'Authorization' : 'Bearer ' + token,
+      'Authorization' : 'Bearer ' + token,
       
     },
   });

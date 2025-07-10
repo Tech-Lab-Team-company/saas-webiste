@@ -146,9 +146,12 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
                 :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
                 @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video);">
                 <div class="session-name">
-                  <LockIcon v-if="!session?.web_show_video" />
-                  <p>{{ session?.title }} </p>
-                  <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
+                  <div class="session-name">
+
+                    <LockIcon v-if="!session?.web_show_video" />
+                    <p>{{ session?.title }} </p>
+                    <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
+                  </div>
                 </div>
                 <div>
                 </div>

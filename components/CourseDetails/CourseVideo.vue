@@ -2,6 +2,7 @@
 
 import {useUserStore} from "~/stores/user";
 import Youtube from "~/components/CourseDetails/Youtube.vue";
+import AudioPlayer from "./TabsContent/AudioPlayer.vue";
 
 const props = defineProps({
   CourseVideoLink: {
@@ -51,12 +52,18 @@ const playVideo = ref(false)
         frameborder="0"
         allowfullscreen
     ></iframe>
-    <audio
+
+
+    <!--<audio
         v-else-if="fileType === 'audio'"
         controls
         :src="CourseVideoLink?.videoLink"
         style="width: 100%;"
-    ></audio>
+    ></audio> -->
+     <AudioPlayer v-else-if="fileType === 'audio'" :src="CourseVideoLink?.videoLink" />
+
+
+
     <div v-else>
       <p>Unsupported file type</p>
     </div>

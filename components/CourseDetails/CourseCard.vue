@@ -21,13 +21,13 @@ const props = defineProps({
 });
 
 const CardDetails = ref(props.CourseData);
-const status = ref(props.status);
+const Status = ref(props.status);
 
 watch(() => props.CourseData, (newValue) => {
     CardDetails.value = newValue;
 }, { immediate: true });
 watch(() => props.status, (newValue) => {
-    status.value = newValue;
+    Status.value = newValue;
 }, { immediate: true });
 
 const userSetting = useSettingStore();
@@ -46,17 +46,19 @@ const JoinCourse = async () => {
     const coursesPaymentController = CoursesPaymentController.getInstance();
     if(userStore.user) {
         const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
+
     }
     else{
         toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
     }
-    if (state.value) {
+    if (Status.value) {
         emit('Changestatus')
     }
 }
 const PaymentStore = usePaymentStore()
 
 const userStore = useUserStore();
+
 
 </script>
 
@@ -107,15 +109,21 @@ const userStore = useUserStore();
             <div class="btns btns-container">
 
                 <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
-                <PaymentDialog :status="status" class="payment-dialog"
-                    v-if="CardDetails?.CoursePrice != 0 && PaymentStore?.Payment?.length > 0" />
+                <PaymentDialog :status="Status" class="payment-dialog"
+                    v-if="CardDetails?.CoursePrice != 0 && PaymentStore?.Payment" />
+
+
                 <button class="payment-btn" @click="JoinCourse"
-                    v-if="status != 1 && CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed">
+                    v-if="Status != 1 && CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed && userSetting?.setting?.join_option_status == 1">
                     طلب الانضمام
                 </button>
-                <button v-if="status == 1 && userStore.user" disabled class="btn-disabled">فى
+
+                {{ console.log(userSetting.setting?.join_option_status ,'asdsadsad') }}
+                <button v-if="Status == 1 && userStore.user && (!CardDetails?.is_subscribed && CardDetails?.is_paid) && userSetting?.setting?.join_option_status == 1" disabled class="btn-disabled">فى
                     انتظار قبول
                     الطلب</button>
+
+
             </div>
 
         </div>
