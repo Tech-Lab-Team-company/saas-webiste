@@ -12,6 +12,7 @@ import { useUserStore } from "~/stores/user";
 import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons_model';
 import { ContentTypeEnum } from "~/components/CourseDetails/Enum/content_type_enum";
 import LockIcon from '~/public/icons/LockIcon.vue';
+import { IconsBook } from '#components';
 const props = defineProps({
   CourseData: {
     type: Object as () => LessonsModel | null,
@@ -53,6 +54,7 @@ const typeIconMap: Record<ContentTypeEnum, any> = {
   [ContentTypeEnum.VIDEO_PDF]: CourseVideoIcon,
   [ContentTypeEnum.AUDIO_PDF]: microphoneicon,
   [ContentTypeEnum.GENERALSESSION]: coursenotesicon,
+  [ContentTypeEnum.EXAM]: IconsBook
 };
 
 function getIconByType(type: ContentTypeEnum) {
@@ -94,6 +96,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
     else if (show === true) {
       if (!props.isSubscribed && props.isPaied) {
         isdisabled.value = true
+        toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب شراء الكورس اولا ', life: 3000 });
         // console.log("non")
       }
       else if (props.isSubscribed && props.isPaied) {
@@ -117,13 +120,23 @@ const visible = ref(false);
 const UserSetting = useUserStore();
 const router = useRouter()
 const ExamTime = ref()
-const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:number , IsFinished:boolean)=>{
-    const start = new Date(StartTime).getTime();
-    const end = new Date(EndTime).getTime();
-    ExamTime.value = Math.floor((end - start) / 1000 / 60);
-    if(!IsFinished && ExamTime.value > 0){
-      router.push(`/course/${CourseId}/timer?id=${examId}&time=${StartTime}`)
-    }
+const GotoExam = (examId: number, StartTime: string, EndTime: string, CourseId: number, IsFinished: boolean) => {
+  const start = new Date(StartTime).getTime();
+  const end = new Date(EndTime).getTime();
+  ExamTime.value = Math.floor((end - start) / 1000 / 60);
+  if (!IsFinished && ExamTime.value > 0) {
+    router.push(`/course/${CourseId}/timer?id=${examId}&time=${StartTime}`)
+  }
+}
+const handelExam = (isFinished:boolean)=>{
+  if( (isFinished || !userStore?.user || (UserSetting.setting?.join_option_status != 2)
+      || (props.isPaied == true && props?.isSubscribed == false))){
+
+    toast.add({ severity: 'info', summary: 'تنبيه', detail: ' يجب شراء الكورس اولا ', life: 3000 })
+  }else{
+
+  }
+ 
 }
 </script>
 
@@ -133,7 +146,7 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
     <AccordionPanel :value="index == 0 ? '0' : index" class="course-content-panel"
       v-for="(lesson, index) in CardDetails" :key="index" :class="{ 'active': activePanels.includes(index) }">
       <AccordionHeader class="course-content-header ">{{ lesson?.title }}</AccordionHeader>
-      <AccordionContent class="course-class-body"  v-for="(session, thirdindex) in lesson?.sessions">
+      <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
         <div class="course-body-details" :key="thirdindex"
           :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
           @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video)">
@@ -146,20 +159,27 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
           </div>
 
         </div>
-             <div  class="course-body-details course-exam"  v-if="session?.exam"
-               @click="GotoExam(session?.exam?.id , session?.exam?.start_time ,session?.exam?.end_time , CourseId  , session?.exam?.is_finished)"
-               >
-                <div class="session-name">
-                  <p>{{ session?.exam?.title }} </p>
-                  <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
-                  <div v-else>
-                      <div class="exam-rate">
-                        <p class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''"> {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}</p>
-                        <p class="rating" v-if="session?.exam.degree_type == 1" :class="(session?.exam.mark / session?.exam.exam_mark)* 100 < 50 ? 'failed' : ''"> {{ ((session?.exam.mark / session?.exam.exam_mark)* 100).toFixed(2) }} %</p>
-                      </div>
-                  </div>
-                </div>
+        <div class="course-body-details course-exam" v-if="session?.exam"
+          @click="GotoExam(session?.exam?.id, session?.exam?.start_time, session?.exam?.end_time, CourseId, session?.exam?.is_finished)">
+          <div class="session-name" :class="{
+            'disabled': session?.exam?.is_finished || !userStore?.user || (UserSetting.setting?.join_option_status != 2)
+              || (isPaid == true && isSubscribed == false)
+          }" 
+          @click="handelExam(session?.exam?.is_finished)">
+
+            <p>{{ session?.exam?.title }} (امتحان) </p>
+            <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
+            <div v-else>
+              <div class="exam-rate">
+                <p class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''">
+                  {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}</p>
+                <p class="rating" v-if="session?.exam.degree_type == 1"
+                  :class="(session?.exam.mark / session?.exam.exam_mark) * 100 < 50 ? 'failed' : ''"> {{
+                    ((session?.exam.mark / session?.exam.exam_mark) * 100).toFixed(2) }} %</p>
               </div>
+            </div>
+          </div>
+        </div>
       </AccordionContent>
     </AccordionPanel>
   </Accordion>
@@ -208,24 +228,35 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
 .course-body-details {
   position: relative;
   justify-content: space-between;
+
+  .disabled {
+    pointer-events: none;
+    // opacity: 0.5;
+    cursor: not-allowed;
+
+  }
+
   @media (max-width:768px) {
-      flex-direction: column;
+    flex-direction: column;
   }
 }
 
-.disabled {
-  pointer-events: none;
-  opacity: 0.5;
-  cursor: not-allowed;
 
-}
 
+// course-exam
 .session-name {
+  // display: flex;
+  // align-items: center;
+  // gap: 5px;
+  // position: relative;
   display: flex;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-  @media(max-width:768px){
+  justify-content: space-between;
+  gap: 21px;
+  flex-direction: row-reverse;
+  width: 100%;
+
+
+  @media(max-width:768px) {
     flex-direction: column;
   }
 }
@@ -239,5 +270,15 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
   box-shadow: 3px 3px 3px 0 #00000038;
   padding: 0.7rem;
   border-radius: 10px;
+
+
+
+  &:has(.disabled) {
+    cursor: not-allowed !important;
+    // opacity: 0.5 !important;
+    pointer-events: none !important;
+  }
+
+
 }
 </style>

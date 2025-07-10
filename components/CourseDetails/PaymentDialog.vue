@@ -23,7 +23,12 @@ const updateFiles = async (files: File[]) => {
 };
 
 const AddPayment = async () => {
-  const coursePaymentParams = new CoursesPaymentParams(Number(router.currentRoute.value.params.id), PaymentMethod.value, PhoneNumber.value, Image.value);
+  const coursePaymentParams = new CoursesPaymentParams({
+    CourseId: Number(router.currentRoute.value.params.id),
+    PaymentMethod: PaymentMethod.value,
+    Account: PhoneNumber.value,
+    Receipt: Image.value
+  });
   const coursesPaymentController = CoursesPaymentController.getInstance();
   const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
   if (state.value.message) {

@@ -143,6 +143,27 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
         <p>{{ session?.title }} </p>
         <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
       </div>
+
+
+          <!-- <div class="course-body-details course-exam" v-if="session?.exam"
+          @click="GotoExam(session?.exam?.id, session?.exam?.start_time, session?.exam?.end_time, CourseId, session?.exam?.is_finished)">
+          <div class="session-name" :class="{
+            'disabled': session?.exam?.is_finished || !userStore?.user || (UserSetting.setting?.join_option_status != 2)
+              || (isPaid == true && isSubscribed == false)
+          }">
+            <p>{{ session?.exam?.title }} (امتحان) </p>
+            <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
+            <div v-else>
+              <div class="exam-rate">
+                <p class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''">
+                  {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}</p>
+                <p class="rating" v-if="session?.exam.degree_type == 1"
+                  :class="(session?.exam.mark / session?.exam.exam_mark) * 100 < 50 ? 'failed' : ''"> {{
+                    ((session?.exam.mark / session?.exam.exam_mark) * 100).toFixed(2) }} %</p>
+              </div>
+            </div>
+          </div>
+        </div> -->
       <!-- {{ console.log(session.exam , "session.exam") }}
       <div class="course-body-details course-exam" v-if="session?.exam"
         @click="GotoExam(session?.exam?.id, session?.exam?.start_time, session?.exam?.end_time, CourseId, session?.exam?.is_finished)">
