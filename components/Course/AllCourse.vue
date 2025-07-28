@@ -28,38 +28,45 @@ const StageYearTitle =   ref(filtersStore.SelectedStageYearTitle);
    const userStore = useUserStore(); 
 
 
-
+const is_loading = ref(false);
 const CoursesFilter = ref<CoursesFilterModel[]>([]);
 const token: string | undefined = userStore?.user?.apiToken;
 const fetchCourses = async () => {
-  const response = await $fetch<{
-    data: CoursesFilterModel[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/filter_courses`, {
-    method: "POST",
-    body: { 
-        category_id: CategoryId.value,
-        type: 1,
-        education_type_id: EduicationType.value,
-        stage_id: StageId.value,
-        year_id: StageYearId.value,
-        subject_id:null ,
-        university_id: UniversityId.value,
-        college_id: CollegeId.value,
-        department_id: DepartmentId.value,
-        division_id: DivisionId.value,
-        university_subject_id: SubjectId.value,
-    },
-    headers: {
-      "Accept-Language": "ar",
-      "web-domain": getWebDomain(),
-      'Authorization' : 'Bearer ' + token,
-      
-    },
-  });
-
-  CoursesFilter.value = response.data;
+ is_loading.value = true; // Start loading
+  try {
+    const response = await $fetch<{
+      data: CoursesFilterModel[];
+      message: string;
+      status: number;
+    }>(`${baseUrl}/filter_courses`, {
+      method: "POST",
+      body: { 
+          category_id: CategoryId.value,
+          type: 1,
+          education_type_id: EduicationType.value,
+          stage_id: StageId.value,
+          year_id: StageYearId.value,
+          subject_id:null ,
+          university_id: UniversityId.value,
+          college_id: CollegeId.value,
+          department_id: DepartmentId.value,
+          division_id: DivisionId.value,
+          university_subject_id: SubjectId.value,
+      },
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain": getWebDomain(),
+        'Authorization' : 'Bearer ' + token,
+      },
+    });
+    
+    CoursesFilter.value = response.data;
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    // Handle error if needed
+  } finally {
+    is_loading.value = false; // Stop loading regardless of success/failure
+  }
 
 };
 
@@ -112,7 +119,7 @@ watch(()=>filtersStore,
 )
 </script>
 <template>
-    <div class="page-loader" v-if="!CoursesFilter"  >
+    <div class="page-loader" v-if="is_loading"  >
       <Loder />
     </div>
   
@@ -138,6 +145,7 @@ watch(()=>filtersStore,
     </div>
 
     <!-- {{  console.log(CoursesFilter , "response.data")  }} -->
+    {{ console.log(CoursesFilter , "CourseFilter")  }}
     <div v-if="selectedToggle === 'one'">
       <CourseAllCourseOne :HomeSections="CoursesFilter " />
     </div>

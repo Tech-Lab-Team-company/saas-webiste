@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const homesection = ref(props.HomeSections)
 const UserSetting = useSettingStore();
+
 </script>
 
 <template>
@@ -47,7 +48,7 @@ const UserSetting = useSettingStore();
             </div>
             <hr class="hr-footer">
             <div class="start-course">
-                <Arrroww />
+                <Arrroww class="arrroww-icon"/>
                 <p>{{ $t('ابدا الان') }}</p>
             </div>
         </div>

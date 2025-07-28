@@ -38,8 +38,8 @@ class HeaderHandler {
     headers['Content-Type'] = 'application/json';
     headers['web-domain'] = getWebDomain();
     headers['Accept'] = 'application/json';
-
-
+    headers['Access-Control-Allow-Origin'] = '*';
+    
     return headers;
   }
 }
