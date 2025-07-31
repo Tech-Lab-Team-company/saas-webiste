@@ -22,6 +22,8 @@
     .image-container {
       position: relative;
       animation: fadein 2s ease-out;
+      padding: 0 !important;
+      margin: 0 !important;
       // animation-iteration-count: infinite;
       transition: all 0.3 linear;
       @media (max-width: 768px) {
@@ -39,13 +41,15 @@
 
       .background {
         width: 400px;
+        display: none
       }
 
       img {
-        position: absolute;
-        width: 500px;
-        top: 50%;
-        transform: translateY(-50%);
+        //position: absolute;
+        width: 450px;
+        object-fit: scale-down;
+        //top: 50%;
+        //transform: translateY(-50%);
       }
 
       .row-video {
@@ -115,16 +119,13 @@
     position: relative;
 
     .video {
-      border-radius: 15px;
-      width: 90%;
+      width: 100%;
       margin: auto;
       overflow: hidden;
-      height: 650px;
+      height: 60vh;
       position: relative;
-      margin-top: 50px;
-
       animation: fadein 2s ease-out;
-      transition: all 0.3 linear;
+      transition: all 0.3s linear;
 
       @keyframes fadein {
         from {
@@ -256,6 +257,7 @@
 }
 
 .header-home-section {
+  height: 60vh;
   .swiper-pagination-lock {
     display: block !important;
   }

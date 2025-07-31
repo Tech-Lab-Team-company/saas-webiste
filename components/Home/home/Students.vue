@@ -46,7 +46,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
         </div>
     </div>
     
-    <div class="gallery-container  ">
+    <div class="gallery-container">
         <ClientOnly >
             <swiper-container 
             :loop="true"
@@ -60,7 +60,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
                 }"
-                :speed="1000"
+                :speed="5000"
                 :free-mode="true"
                 :free-mode-momentum="false"
 

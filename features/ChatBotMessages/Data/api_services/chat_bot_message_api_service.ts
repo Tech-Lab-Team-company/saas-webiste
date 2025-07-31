@@ -2,6 +2,7 @@ import { ApiNames } from '~/base/core/networkStructure/apiNames'
 import ServicesInterface from '~/base/Data/ApiService/api_service_interface'
 import { CrudType } from '~/base/core/Params/call_params_interface'
 import type Params from '~/base/core/Params/params'
+import {getWebDomain} from "~/constant/webDomain";
 
 class ChatBotMessagesApiService extends ServicesInterface {
   private static instance: ChatBotMessagesApiService
@@ -23,7 +24,7 @@ class ChatBotMessagesApiService extends ServicesInterface {
       type: CrudType.POST,
       params: params,
       headers: {
-        'web-domain': 'student.azcourses.tech',
+        'web-domain': getWebDomain(),
       },
     })
   }

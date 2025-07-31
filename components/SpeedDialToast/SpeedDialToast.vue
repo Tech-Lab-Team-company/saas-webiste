@@ -24,7 +24,7 @@ const SppedDialStyle = computed(() => {
     if (window.innerWidth <= 768) {
         return { top: 'calc(82% - 2rem)', left: '1.2rem', 'z-index': '999', position: 'fixed' };
     }
-    return { top: 'calc(83% - 2rem)', left: '1rem', 'z-index': '9999', position: 'fixed' };
+    return { top: 'calc(93% - 2rem)', left: '1rem', 'z-index': '9999', position: 'fixed' };
 });
 
 watch(() => window.innerWidth,

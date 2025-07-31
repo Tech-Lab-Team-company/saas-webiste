@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BackgoundCircle from '~/public/icons/BackgoundCircle.vue';
 import { ref, onMounted } from 'vue';
-import EducationStages from './EducationStages.vue';
+// import EducationStages from './EducationStages.vue';
 import Students from './Students.vue';
 import { baseUrl } from '~/constant/baseUrl';
 import type { SwiperHome } from '~/types/swiperhome';
@@ -100,16 +100,17 @@ const expandedSlides = ref<Set<number>>(new Set());
       <div v-if="pending" class="loading">{{ $t('جاري التحميل...') }}</div>
       <div v-else-if="error" class="error">{{ $t('فشل في تحميل السلايدر.') }}</div>
       <swiper-container class="header-home-section"  :loop="true"
-                ref="containerRef"
-                :slides-per-view="1"
-                :space-between="50"
-                :autoplay="{
-                    delay: 5000,
-                    disableOnInteraction: false,
-                    pauseOnMouseEnter: false,
-                    stopOnLastSlide: false
-                }"
-                >
+          ref="containerRef"
+          :slides-per-view="1"
+          :space-between="50"
+          :autoplay="{
+              delay: 5000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false,
+              stopOnLastSlide: false
+          }"
+          :speed="5000"
+          >
         <swiper-slide v-for="slide in sliders" :key="slide.id">
           <!-- isImage(slide?.media?.img) -->
           <div v-if="slide?.style == 1" class="container">
@@ -182,7 +183,7 @@ const expandedSlides = ref<Set<number>>(new Set());
 
 
   </div>
-  <EducationStages />
+<!--  <EducationStages />-->
   <Students />
 
 </template>
