@@ -128,13 +128,13 @@ const droplist = ref(false);
 }
 
 li {
-  font-family: "bold";
+  font-family: "bold",serif;
   font-weight: 800;
   font-size: 22px;
 }
 
 li:hover {
-  color: var(--secondary-color);
+  color: var(--primary-color);
   cursor: pointer;
 }
 

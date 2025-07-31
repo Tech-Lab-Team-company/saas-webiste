@@ -21,7 +21,7 @@
     width: fit-content;
     color: white;
     text-align: center;
-    font-family: "regular";
+    font-family: "regular", serif;
   }
 
   .header-container {
@@ -97,10 +97,13 @@
         .nav-link{
           font-size: 18px;
           color: #565E68;
-          font-family: "regular";
+          font-family: "regular", serif;
+          &:hover{
+            color: var(--primary-color);
+          }
 
           &.active{
-            color: #2525AD;
+            color: var(--primary-color);
           }
 
         }

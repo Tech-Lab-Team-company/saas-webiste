@@ -163,33 +163,6 @@ const setting = computed(() => settingStore.setting);
 
 }
 
-.social-media-icons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 30px;
-  flex-wrap: wrap;
-
-  a{
-
-    @media(max-width:1000px){
-      width: 40px;
-    }
-
-    .social-icon {
-      width: 37px;
-      padding: 7px;
-      /* width: 48px; */
-      background-color: rgba(37, 37, 173, 0.0509803922);
-      height: 40px;
-      border-radius: 31px;
-  
-      
-    }
-  }
-
- 
-
-}
 .col{
   &.logo-col{
     display:flex;
