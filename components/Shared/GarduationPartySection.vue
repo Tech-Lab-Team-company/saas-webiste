@@ -27,78 +27,66 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
     },
   });
 
-  return response.data[response.data.length - 1];
+  
+  return response.data;
 });
 
 
-const containerRef = ref(null)
-const swiper = useSwiper(containerRef, {
+const containerRefs = ref([]) // Array of refs for each swiper
+const swipers = ref([])       // Array to store swiper instances
+
+const getSwiperOptions = () => ({
   effect: 'creative',
+  perPage: 3, // Show 3 slides at a time
+  gap: '2rem',
   loop: true,
-  autoplay: {
-    delay: 5000,
-  },
+  autoplay: { delay: 5000 },
   creativeEffect: {
-    prev: {
-      shadow: true,
-      translate: [0, 0, -400],
-    },
-    next: {
-      shadow: true,
-      translate: [0, 0, -400],
-    },
+    prev: { shadow: true, translate: [0, 0, -400] },
+    next: { shadow: true, translate: [0, 0, -400] },
   },
   breakpoints: {
-    1200: {
-
-      slidesPerView: 3,
-      spaceBetween: '2rem',
-    },
-    992: {
-      slidesPerView: 2,
-      spaceBetween: "1rem"
-    },
-    768: {
-      slidesPerView: 2,
-      spaceBetween: "0.8rem"
-    },
-    576: {
-      slidesPerView: 1,
-      spaceBetween: "0.5rem",
-
-    }
+    1200: { slidesPerView: 3, spaceBetween: 32 ,perPage: 3, gap: '2rem' },
+    992: { slidesPerView: 2, spaceBetween: 16, perPage: 2, gap: '1rem' },
+    768: { slidesPerView: 2, spaceBetween: 8 ,perPage: 2, gap: '0.8rem' },
+    576: { slidesPerView: 1, spaceBetween: 4 }
   }
+});
+
+onMounted(() => {
+  GraduationParty.value?.forEach((_, idx) => {
+    if (containerRefs.value[idx]) {
+      swipers.value[idx] = useSwiper(containerRefs.value[idx], getSwiperOptions())
+    }
+  })
 })
 
+// Methods to control each swiper
+const nextSlide = (idx) => {
+  swipers.value[idx]?.next()
+}
+const prevSlide = (idx) => {
+  swipers.value[idx]?.prev()
+}
 </script>
 
 <template>
-  <div class="card-course-three">
-    <h3 class="slider-heading">{{ GraduationParty?.title }}</h3>
-    <p class="description-text">{{ GraduationParty?.description }}</p>
+  <div class="card-course-three" v-for="(section , idnex) in  GraduationParty" :key="idnex">
+    <h3 class="slider-heading">{{ section?.title }}</h3>
+    <p class="description-text">{{ section?.description }}</p>
 
     <div class="graduation-party-container">
       
 
-
-      <ClientOnly>
-      <swiper-container ref="containerRef">
-        <swiper-slide v-for="(image, idx) in GraduationParty?.media" :key="idx">
-            <a target="_blank" :href="image?.link || '#'">
+      <Splide :options="getSwiperOptions()">
+        <SplideSlide v-for="(image, idx) in section?.media" :key="idx">
+          <a target="_blank" :href="image?.link || '#'">
             <div class="image-conatiner">
-              <img :src="image?.file" :alt="image.alt"  />
+              <img :src="image?.file" :alt="image.alt" />
             </div>
           </a>
-        </swiper-slide>
-      </swiper-container>
-    </ClientOnly>
-
-    <button class="right-arrow" @click="swiper.next()">
-      <IconsArrowRight />
-    </button>
-    <button class="left-arrow" @click="swiper.prev()">
-      <IconsArrowLeft />
-    </button>
+        </SplideSlide>
+      </Splide>
 
     </div>
 

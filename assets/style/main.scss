@@ -140,3 +140,18 @@
 //   opacity: 0.5 !important;
 //   pointer-events: none !important;
 // }
+
+.splide__arrow--next{
+  right: -80px;
+  border-radius: 50%;
+}
+
+.splide__arrow--prev{
+  
+  left: -80px;
+}
+
+.splide__arrow{
+  
+  border-radius: 50%;
+}
