@@ -26,7 +26,7 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
       type: SectionTypeEnum.GraduationParty,
     },
   });
-
+  
   return response.data[response.data.length - 1];
 });
 
@@ -80,11 +80,11 @@ const swiper = useSwiper(containerRef, {
     <div class="graduation-party-container">
       
 
-
+<!-- ?id=${exam.id}&time=${exam.start_time} -->
       <ClientOnly>
       <swiper-container ref="containerRef">
         <swiper-slide v-for="(image, idx) in GraduationParty?.media" :key="idx">
-            <a target="_blank" :href="image?.link || '#'">
+            <a target="_blank" :href="`/courses/?year_id=${image.year_id}$division_id=${image.division_id}`">
             <div class="image-conatiner">
               <img :src="image?.file" :alt="image.alt"  />
             </div>
