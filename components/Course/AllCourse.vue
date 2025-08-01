@@ -24,6 +24,10 @@ const StageYearId =   ref(filtersStore.SelectedStageYear);
 const StageTitle =   ref(filtersStore.SelectedStageTitle);
 const StageYearTitle =   ref(filtersStore.SelectedStageYearTitle);
 
+const route = useRoute()
+const Year_id = route.query.year_id
+const Division_id = route.query.division_id
+
 
    const userStore = useUserStore(); 
 
@@ -45,12 +49,12 @@ const fetchCourses = async () => {
           type: 1,
           education_type_id: EduicationType.value,
           stage_id: StageId.value,
-          year_id: StageYearId.value,
+          year_id: Number(Year_id) || StageYearId.value,
           subject_id:null ,
           university_id: UniversityId.value,
           college_id: CollegeId.value,
           department_id: DepartmentId.value,
-          division_id: DivisionId.value,
+          division_id:Number(Division_id) || DivisionId.value,
           university_subject_id: SubjectId.value,
       },
       headers: {
