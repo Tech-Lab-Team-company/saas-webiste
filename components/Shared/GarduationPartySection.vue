@@ -80,7 +80,7 @@ const prevSlide = (idx) => {
 
       <Splide :options="getSwiperOptions()">
         <SplideSlide v-for="(image, idx) in section?.media" :key="idx">
-          <a target="_blank" :href="image?.link || '#'">
+           <a target="_blank" :href="`/course?year_id=${image.year_id}&division_id=${image.division_id}`">
             <div class="image-conatiner">
               <img :src="image?.file" :alt="image.alt" />
             </div>
