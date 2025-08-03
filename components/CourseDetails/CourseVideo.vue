@@ -37,21 +37,45 @@ const embedVideoLink = computed(() => {
 });
 
 const playVideo = ref(false)
+
+
+const pdfIframe = ref<HTMLIFrameElement | null>(null);
+
+function openFullscreen() {
+  const iframe = pdfIframe.value;
+  if (iframe) {
+    if (iframe.requestFullscreen) {
+      iframe.requestFullscreen();
+    } else if ((iframe as any).webkitRequestFullscreen) {
+      (iframe as any).webkitRequestFullscreen();
+    } else if ((iframe as any).msRequestFullscreen) {
+      (iframe as any).msRequestFullscreen();
+    }
+  }
+}
 </script>
 
 
 <template>
+
   <div class="course-video-container">
     <Youtube :video="embedVideoLink" v-if="fileType === 'youtube'" />
 
-    <iframe
-        v-else-if="fileType === 'pdf'"
-        width="100%"
-        height="600"
-        :src="embedVideoLink"
-        frameborder="0"
-        allowfullscreen
-    ></iframe>
+    <div class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
+      <iframe
+          ref="pdfIframe"
+          width="100%"
+          height="600"
+          :src="embedVideoLink"
+          frameborder="0"
+          allowfullscreen
+      ></iframe>
+      <div class="flex justify-end">
+        <button class="btn-primary" @click="openFullscreen">
+          تكبير الشاشة
+        </button>
+      </div>
+    </div>
 
 
     <!--<audio

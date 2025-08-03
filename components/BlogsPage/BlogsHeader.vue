@@ -171,7 +171,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
 font-weight: 400;
 font-size: 18px;
-color:#FFB949
+color:var(--secondary-color)
 
 }
 /*end blogs-page-articles-cards */

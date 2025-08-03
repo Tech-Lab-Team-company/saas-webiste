@@ -45,7 +45,7 @@ export default class SubmitEducationDataController extends ControllerInterface<U
         // await FetchMyReviewsController.getInstance().fetchMyReviews(
         //   new FetchMyReviewParams(1, 10),
         // /Auth/categories
-        await router.push("/auth/categories");
+        await router.push("/");
 
         // );
       } else {

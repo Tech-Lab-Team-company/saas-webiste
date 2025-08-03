@@ -4,6 +4,7 @@
   border: 1px solid var(--primary-color);
   color: var(--white-color);
   border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,8 +26,9 @@
     }
   }
   &:hover {
-    background-color: transparent;
-    color: var(--primary-color);
+    background-color: transparent !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
     transition: 0.7s ease-in-out;
   }
 

@@ -291,14 +291,14 @@ const StageYearBtn = ref<boolean>(false)
            :class="{'active-btn':CategryId===1}"
           v-if="settingStore.setting?.categories?.includes(1)"
         >
-          {{ $t('تعليم اساسي') }}
+          {{ $t('basic_education') }}
         </button>
         <button 
           class="btn btn-secondary btn-stages"
           @click="showUniversities = !showUniversities; showStages = false ;CategryId=2"
           v-if="settingStore.setting?.categories?.includes(2)"
         >
-          {{ $t('تعليم جامعي') }}
+          {{ $t('university_education') }}
         </button>
       </div>
 

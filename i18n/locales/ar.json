@@ -41,5 +41,19 @@
   "back_to_home": "الرجوع إلى الصفحة الرئيسية",
   "restaurant": "مطعم",
   "date": "التاريخ",
-  "encyclopedia": "الموسوعة"
+  "encyclopedia": "الموسوعة",
+  "content": "المحتوى",
+  "exams": "الامتحانات",
+  "live_sessions": "بث مباشر",
+  "homework": "الواجب المنزلي",
+  "external_links": "روابط خارجية",
+  "paper_file": "ملف ورقي",
+  "video_file": "ملف فيديو",
+  "audio_file": "ملف صوتي",
+  "free": "مجانى",
+  "buying_course_done": "تم شراء الكورس",
+  "start_now": "ابدأ الآن",
+  "all_courses": "جميع الكورسات",
+  "basic_education": "التعليم الأساسي",
+  "university_education": "التعليم الجامعي"
 }

@@ -32,7 +32,7 @@
 
         hr{
             width: 70%;
-            border-color: #FFB9494D;
+            border-color: var(--secondary-color)4D;
             margin-left: auto;
             margin-right: auto;
         }
@@ -56,7 +56,7 @@
                 font-family: "regular", serif;
                 font-weight: 700;
                 &.active-tab{
-                    border-bottom: 2px solid #FF931E;
+                    border-bottom: 2px solid var(--secondary-color);
                 }
             }
         }  
@@ -86,6 +86,17 @@
     margin-top: 20px;
     margin-bottom: 20px;
     overflow: hidden;
+    .tabs-container {
+        .tabs-header {
+            .tab-title {
+                svg {
+                    path {
+                        stroke: var(--secondary-color);
+                    }
+                }
+            }
+        }
+    }
 }
 
 .right-dots {
@@ -117,7 +128,7 @@
 
 hr {
     width: 90%; /* More responsive width */
-    border-color: #FFB9494D;
+    border-color: var(--secondary-color)4D;
     margin-left: auto;
     margin-right: auto;
 }
@@ -145,7 +156,7 @@ hr {
 }
 
 .tab-title.active-tab {
-    border-bottom: 2px solid #FF931E;
+    border-bottom: 2px solid var(--secondary-color);
 }
 
 .tabs-content {

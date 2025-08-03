@@ -148,11 +148,20 @@
 }
 
 .splide__arrow--prev{
-  
   left: -80px;
 }
 
 .splide__arrow{
-  
   border-radius: 50%;
+}
+
+.social-icons {
+  top: 94%;
+  left: 4%;
+  z-index: 1000;
+  position: fixed;
+  cursor: pointer;
+  .pi {
+    font-size: 1.5rem
+  }
 }

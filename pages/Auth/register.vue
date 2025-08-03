@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
-    definePageMeta({
-        layout: 'auth' 
-    });
+definePageMeta({
+  layout: 'auth'
+});
 
 </script>
 
 <template>
 
-        <RegisterForm />
+  <RegisterForm/>
 </template>
 
 <style scoped lang="scss">

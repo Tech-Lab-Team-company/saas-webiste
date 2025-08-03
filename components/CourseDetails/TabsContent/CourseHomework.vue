@@ -62,7 +62,6 @@ watch(() => props.CourseData, (newValue) => {
   
 <template>
     <div class="homework-card">
-        {{ console.log(CardDetails , "before") }}
         <Accordion value="0" >
             <template #collapseicon>
                 <p class="collapse-text">{{ $t('اعرض تفاصيل الواجب') }}</p>
@@ -70,7 +69,6 @@ watch(() => props.CourseData, (newValue) => {
             <template #expandicon>
                 <p class="collapse-text">{{ $t('اعرض تفاصيل الواجب') }}</p>
             </template>
-            {{ console.log(CardDetails , "after") }}
             <AccordionPanel expandIcon="title" class="panels" :value="index" v-for="(homework , index) in CardDetails" :key="index">
                 <AccordionHeader class="panel-header">
      

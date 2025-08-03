@@ -60,7 +60,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                     pauseOnMouseEnter: false,
                     stopOnLastSlide: false
                 }"
-                :speed="5000"
+                :speed="7000"
                 :free-mode="true"
                 :free-mode-momentum="false"
 

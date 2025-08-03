@@ -69,7 +69,7 @@
     &.p-accordionpanel-active {
       .course-content-header {
         border: none;
-        background-color: #FFB949;
+        background-color: var(--secondary-color);
         color: white;
         border-radius: 5px;
       }
@@ -94,7 +94,7 @@
         width: 100%;
         border: none;
         height: 1px;
-        background-image: linear-gradient(to left, #FF931E 0% 20%, #FFF4E9 75%);
+        background-image: linear-gradient(to left, var(--secondary-color) 0% 20%, #FFF4E9 75%);
       }
 
 
@@ -167,9 +167,9 @@
 }
 
 // .p-accordionpanel-active{
-//     background-color: #FFB949;
+//     background-color: var(--secondary-color);
 //     .p-accordionheader{
-//         background-color: #FFB949;
+//         background-color: var(--secondary-color);
 //     }
 // }
 

@@ -101,7 +101,7 @@
     
                     &.selected{
                         border:5px dashed ;
-                        border-color: #FFB949;
+                        border-color: var(--secondary-color);
                     }
                 }
             }
@@ -133,7 +133,7 @@
                 
                 &.selected{
                     background-color: var(--secondary-color)17;
-                    border-color: #FFB949;
+                    border-color: var(--secondary-color);
                 }
             }
 
@@ -142,13 +142,13 @@
                     // padding: 10px 30px;
                     &.selected{
                         background: none;
-                        border-color: #FFB949;
+                        border-color: var(--secondary-color);
                         position: relative;
 
                         &::before{
                             content: '';
                             position: absolute;
-                            background-color:#FFB949 ;
+                            background-color:var(--secondary-color) ;
                             top: 0px;
                             left: 0px;
                             width: 20px;
@@ -176,7 +176,7 @@
             margin-left: auto;
             margin-right: auto;
             margin-top: 20px;
-            background-color: #FFB949;
+            background-color: var(--secondary-color);
             color: white;
             font-size: 20px;
             font-weight: 500;
@@ -204,7 +204,7 @@
             gap: 10px;
             width: 25%;
             margin-top: 20px;
-            background-color: #FFB949;
+            background-color: var(--secondary-color);
             color: white;
             font-size: 20px;
             font-weight: 500;

@@ -120,13 +120,13 @@
                     width: 100%;
                     border: none;
                     height: 2px;
-                    background-image: linear-gradient(to left, #FFB949 , #FFFFFF );
+                    background-image: linear-gradient(to left, var(--secondary-color) , #FFFFFF );
                 }
                 .homework-left-hr{
                     width: 100%;
                     border: none;
                     height: 2px;
-                    background-image: linear-gradient(to right, #FFB949 , #FFFFFF );
+                    background-image: linear-gradient(to right, var(--secondary-color) , #FFFFFF );
                 }
             }
             .homework-upload{
@@ -160,7 +160,7 @@
                 display: flex;
                 justify-content: flex-start;
                 .submit-image{
-                    background-color: #FFB949;
+                    background-color: var(--secondary-color);
                     color: white;
                     width: 40%;
                     padding: 10px;

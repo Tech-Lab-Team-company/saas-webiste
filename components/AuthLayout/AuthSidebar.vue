@@ -49,8 +49,8 @@ const { locale } = useI18n()
             ]">
 
             <div class="auth-text">
-                <p>{{ $t('معلوماتك الشخصيه') }}</p>
-                <p>{{ $t('يرجى تقديم معلوماتك التفصيلية') }}</p>
+                <p>معلوماتك الشخصيه</p>
+                <p>يرجى تقديم معلوماتك التفصيلية</p>
             </div>
             <AuthProfile class="auth-icon" />
         </div>
@@ -63,8 +63,8 @@ const { locale } = useI18n()
         >
         
             <div class="auth-text">
-                <p>{{ $t('تحقق من صندوق الوارد الخاص بك') }}</p>
-                <p>{{ $t('تحقق من الرموز المرسلة إلى صندوق الوارد الخاص بك') }}</p>
+                <p>تحقق من صندوق الوارد الخاص بك</p>
+                <p>تحقق من الرموز المرسلة إلى صندوق الوارد الخاص بك</p>
             </div>
             <AuthMail class="auth-icon" />
         </div>
@@ -75,22 +75,22 @@ const { locale } = useI18n()
             ]">
             
             <div class="auth-text">
-                <p>{{ $t('مرحلتك التعليمية') }}</p>
-                <p>{{ $t('يرجى تقديم معلومات دراستك التفصيلية') }}</p>
+                <p>مرحلتك التعليمية</p>
+                <p>يرجى تقديم معلومات دراستك التفصيلية</p>
             </div>
             <AuthStage class="auth-icon" />
         </div>
-        <div class="auth-info-container" 
-            :class="[
-                route.path === `/Auth/categories` || route.path === `/auth/categories` ? 'active' : '',
-                ]">
+<!--        <div class="auth-info-container" -->
+<!--            :class="[-->
+<!--                route.path === `/Auth/categories` || route.path === `/auth/categories` ? 'active' : '',-->
+<!--                ]">-->
 
-            <div class="auth-text">
-                <p>{{ $t('بنجاح') }}</p>
-                <p>{{ $t('يمكنك متابعه رحلتك فى منصتنا الان') }}</p>
-            </div>
-            <AuthRight class="auth-icon" />
-        </div>
+<!--            <div class="auth-text">-->
+<!--                <p>بنجاح</p>-->
+<!--                <p>يمكنك متابعه رحلتك فى منصتنا الان</p>-->
+<!--            </div>-->
+<!--            <AuthRight class="auth-icon" />-->
+<!--        </div>-->
     </div>
 
 </template>

@@ -65,7 +65,7 @@ const { data: fqs } = await useAsyncData("fqs", async () => {
   font-weight: 500;
 }
 hr {
-  border: 1px solid #ff931e;
+  border: 1px solid var(--secondary-color);
   margin: 20px 0;
 }
 

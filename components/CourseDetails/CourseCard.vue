@@ -78,25 +78,25 @@ const userStore = useUserStore();
             <hr />
             <div class="card-text-footer">
                 <p class="salary" v-if="CardDetails?.CoursePrice != 0 && !(CardDetails?.is_subscribed)"> <span>{{
-                    $t(`${CardDetails?.currency}`) }}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
-                <p class="salary" v-else-if="CardDetails?.is_subscribed">تم شراء الكورس</p>
+                    CardDetails?.currency }}</span><span>{{ CardDetails?.CoursePrice }} </span></p>
+                <p class="salary" v-else-if="CardDetails?.is_subscribed">{{ $t("buying_course_done") }}</p>
 
-                <p class="salary" v-else>{{ $t('مجانى') }} </p>
+                <p class="salary" v-else>{{ $t('free') }} </p>
                 <div class="card-content">
                     <p class="card-text1" v-if="CardDetails?.course_videos">
                         <video1 />
                         {{ CardDetails?.course_videos }}
-                        {{ $t('فيديو') }}
+                        {{ $t('video') }}
                     </p>
                     <p class="card-text1" v-if="CardDetails?.course_docs">
                         <note />
                         {{ CardDetails?.course_docs }}
-                        {{ $t('ملف ورقي') }}
+                        {{ $t('paper_file') }}
                     </p>
                     <p class="card-text1" v-if="CardDetails?.course_records">
                         <microphone />
                         {{ CardDetails?.course_records }}
-                        {{ $t('ملف صوتى') }}
+                        {{ $t('audio_file') }}
                     </p>
                 </div>
                 <div class="card-profile">

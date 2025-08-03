@@ -131,7 +131,7 @@ watch(()=>filtersStore,
   <div class="aa">
     <div class="header-toggle">
     
-      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('جميع الكورسات') }} {{ StageTitle ?  `(${StageTitle} - ${StageYearTitle ? StageYearTitle:''})` : `` }}</p>
+      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('all_courses') }} {{ StageTitle ?  `(${StageTitle} - ${StageYearTitle ? StageYearTitle:''})` : `` }}</p>
       <div class="toggle">
         <div
           :class="['toggle-icon', { active: selectedToggle === 'two' }]"

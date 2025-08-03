@@ -184,7 +184,7 @@ const UserSetting = useSettingStore();
   width: 10%;
   height: 3px;
   border-radius: 4px;
-  background: #ff931e;
+  background: var(--secondary-color);
   border: none;
 }
 

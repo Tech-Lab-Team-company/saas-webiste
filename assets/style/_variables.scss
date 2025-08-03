@@ -5,7 +5,8 @@
   --third-color: #0b1741;
   --primary-color-opacity-50: rgba(30, 58, 142, 0.5);
   --primary-hover: rgba(233, 236, 248, 0.5);
-  --secondary-color: #ffb949;
+  --secondary-color: var(--secondary-color);
+  --white-color: #fff;
   --lighter-color:#B2BBC6;
   --light-hover: #A3ADBB;
   --light-active: #909DAD;

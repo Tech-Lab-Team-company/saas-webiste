@@ -202,7 +202,7 @@ onUnmounted(() => {
 
   .active-bar {
     position: absolute;
-    background-image: linear-gradient(to left, #D38911, #FFB949);
+    background-image: linear-gradient(to left, #D38911, var(--secondary-color));
     right: 0;
     width: 10.5%;
     height: 100%;

@@ -104,6 +104,8 @@ function handleSessionClick(index: number, link: string, title: string, text: st
         selectedSessionIndex.value = index;
         sendactivetab(0, link, title, text);
         visible.value = false;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       else if ((!props.isPaied)) {
         isdisabled.value = false

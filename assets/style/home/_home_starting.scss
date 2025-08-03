@@ -46,7 +46,8 @@
 
       img {
         //position: absolute;
-        width: 450px;
+        height: 250px;
+        aspect-ratio: 1;
         object-fit: scale-down;
         //top: 50%;
         //transform: translateY(-50%);
@@ -242,7 +243,7 @@
         width: 16px;
         height: 5px;
         border-radius: 6px;
-        background-color: #ff931e26;
+        background-color: var(--secondary-color)26;
       }
 
       &.active::after {

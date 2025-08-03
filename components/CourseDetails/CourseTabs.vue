@@ -77,7 +77,7 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
 
   </div>
 
-  <div class="course-tabs"  >
+  <div class="course-tabs" >
     <RightDots class="right-dots"/>
     <RightDots class="left-dots"/>
 
@@ -85,23 +85,23 @@ const Data = (data: { activetabvalue: number, link: string, title: string, descr
       <div class="tabs-header">
         <div class="tab-title" v-if="CardData?.homeworks?.length" @click="tab_value = 'homework'" :class="tab_value === 'homework' ? 'active-tab' : ''">
           <homeworkicon/>
-          <p>{{ $t('الواجب المنزلي') }}</p>
+          <p>{{ $t('homework') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.lives?.length" @click="tab_value = 'live'" :class="tab_value === 'live' ? 'active-tab' : ''">
           <wifiIcon/>
-          <p>{{ $t('بث مباشر ') }}</p>
+          <p>{{ $t('live_sessions') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.externalLinks?.length" @click="tab_value = 'urls'" :class="tab_value === 'urls' ? 'active-tab' : ''">
           <exterinalurls/>
-          <p>{{ $t('روابط خارجيه ') }}</p>
+          <p>{{ $t('external_links') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.exams?.length" @click="tab_value = 'exams'" :class="tab_value === 'exams' ? 'active-tab' : ''">
           <examsicon/>
-          <p>{{ $t('الامتحانات ') }}</p>
+          <p>{{ $t('exams') }}</p>
         </div>
         <div class="tab-title" v-if="CardData?.units" @click="tab_value = 'content'" :class="tab_value === 'content' ? 'active-tab' : ''">
           <ContentIcon/>
-          <p>{{ $t('المحتوى ') }}</p>
+          <p>{{ $t('content') }}</p>
         </div>
       </div>
 

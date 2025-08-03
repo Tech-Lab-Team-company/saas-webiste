@@ -135,7 +135,7 @@ const prevSlide = (idx) => {
 }
 
 .graduation-party-container{
-  width: 80%;
+  width: 95%;
   margin-left: auto;
   margin-right: auto;
   position: relative;

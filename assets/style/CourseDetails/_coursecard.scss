@@ -1,171 +1,174 @@
-.card-container{
-    background-color: #F6F6F6;
-    margin-top: 20px;
-    padding: 20px;
+.card-container {
+  background-color: #F6F6F6;
+  margin-top: 20px;
+  padding: 20px;
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  .card-text {
     display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 25px;
+    @media (max-width: 768px) {
+      gap: 0;
+
+    }
     // justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+    // gap: 20px;
+    // align-items: flex-end;
 
-    .card-text{
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        gap: 25px;
-        @media (max-width:768px) {
-            gap:0;
-            
-        }
-        // justify-content: space-between;
-        // gap: 20px;
-        // align-items: flex-end;
+    .card-text-title {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+      position: relative;
 
-        .card-text-title{
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 10px;
-            position: relative;
+      .icon {
+        position: absolute;
+        left: 50%;
+        top: 100%;
+        transform: translate(-50%, -50%);
 
-            .icon{
-                position: absolute;
-                left: 50%;
-                top: 100%;
-                transform: translate(-50% , -50%);
+      }
 
-            }
-
-            .card-text-subject-title{
-                background-color: #FF931E0D;
-                color: #FFB949;
-                padding: 6px;
-                border-radius: 20px;
-                font-weight: 500;
-            }
-
-            .card-text-main-title{
-                font-weight: 700;
-                font-size: 18px;
-                text-align: right; 
-            }
-        }
-
-        .card-text-description{
-
-            text-align: right;
-            margin-top: 15px;
-            padding: 0 10px;
-            color: #6F777B;
-            font-weight: 500;
-            // width: 600px;
-            margin-left: auto;
-            font-size: 18px;
-            line-height: 150%;
-            // max-width: 600px;
-
-
-
-
-        }
-
-        hr{
-            border-color:  #d9dbde27;
-            width: 50%;
-            margin-left: auto;
-            margin-right: 10px;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-
-        .card-text-footer{
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-      
-            padding: 0 10px;
-            font-weight: 800;
-
-            @media(max-width:768px){
-                flex-direction: column;
-                align-items: flex-end;
-            }
-           
-           
-            .card-profile{
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                width: 100%;
-                justify-content: flex-end;
-                width: fit-content;
-    min-width: 120px;
-        
-                
-                img{
-                    width: 30px;
-                }
-            }
-
-            .salary{
-                color:#FFB949;
-                font-size: 23px;
-                // width: 100%;
-                display: flex;
-                justify-content: flex-start;
-                // min-width: 130px;
-                @media(max-width:768px){
-                    justify-content: flex-end;
-
-
-                }
-                
-                
-
-                span{
-                    font-size: 26px;
-                    font-weight: 500;
-
-                    @media (max-width:1000px) {
-                            font-size: 20px;
-                    }
-                }
-            }
-        }
-
-        .btns{
-            button{
-                width: 100%;
-                background-color: #FFB949;
-                color:white;
-                margin-top:20px;
-                padding: 10px;
-                border-radius: 15px;
-
-                &.payment-btn{
-                    width: 100%;
-                }
-            }
-        }
-
-
-    }
-
-
-
-    .card-video{
-        
-        overflow: hidden;
-        width: 500px;
+      .card-text-subject-title {
+        background-color: var(--secondary-color) 0D;
+        color: var(--secondary-color);
+        padding: 6px;
         border-radius: 20px;
-        height: 250px;
+        font-weight: 500;
+      }
 
-        img{
-            width: 100%;
-            // margin-left: auto;
-            // margin-right: auto;
-        }
+      .card-text-main-title {
+        font-weight: 700;
+        font-size: 18px;
+        text-align: right;
+      }
     }
+
+    .card-text-description {
+
+      text-align: right;
+      margin-top: 15px;
+      padding: 0 10px;
+      color: #6F777B;
+      font-weight: 500;
+      // width: 600px;
+      margin-left: auto;
+      font-size: 18px;
+      line-height: 150%;
+      // max-width: 600px;
+
+
+    }
+
+    hr {
+      border-color: #d9dbde27;
+      width: 50%;
+      margin-left: auto;
+      margin-right: 10px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .card-text-footer {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+
+      padding: 0 10px;
+      font-weight: 800;
+
+      @media(max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .card-content {
+        .card-text1 {
+          svg {
+            path {
+              stroke: var(--secondary-color);
+            }
+          }
+        }
+      }
+
+
+      .card-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        justify-content: flex-end;
+        max-width: 120px;
+        img {
+          width: 30px;
+        }
+      }
+
+      .salary {
+        color: var(--secondary-color);
+        font-size: 23px;
+        // width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        // min-width: 130px;
+        @media(max-width: 768px) {
+          justify-content: flex-end;
+
+
+        }
+
+
+        span {
+          font-size: 26px;
+          font-weight: 500;
+
+          @media (max-width: 1000px) {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+
+    .btns {
+      button {
+        width: 100%;
+        background-color: var(--secondary-color);
+        color: white;
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 15px;
+
+        &.payment-btn {
+          width: 100%;
+        }
+      }
+    }
+
+
+  }
+
+
+  .card-video {
+
+    overflow: hidden;
+    width: 500px;
+    border-radius: 20px;
+    height: 250px;
+
+    img {
+      width: 100%;
+      // margin-left: auto;
+      // margin-right: auto;
+    }
+  }
 
 }

@@ -185,7 +185,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   width: 41px;
   height: 3px;
   border-radius: 4px;
-  background: #ff931e;
+  background: var(--secondary-color);
   border: none;
 }
 

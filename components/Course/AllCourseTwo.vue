@@ -52,7 +52,7 @@ const UserSetting = useSettingStore();
             <hr class="hr-footer">
             <div class="start-course">
                 <Arrroww />
-                <p>{{ $t('ابدا الان') }}</p>
+                <p>{{ $t('start_now') }}</p>
             </div>
         </div>
 

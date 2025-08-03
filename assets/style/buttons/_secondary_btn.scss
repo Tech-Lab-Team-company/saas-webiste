@@ -4,9 +4,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  background-color: var(--white-color);
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
+  background-color: transparent !important;
+  border: 1px solid var(--primary-color) !important;
+  color: var(--primary-color) !important;
   transition: 0.7s ease-in-out;
   cursor: pointer;
   text-transform: capitalize;
@@ -17,8 +17,9 @@
   }
 
   &:hover {
-    background-color: var(--primary-color);
-    color: var(--white-color);
+    background-color: var(--primary-color) !important;
+    color: var(--white-color) !important;
+    border: 1px solid var(--primary-color) !important;
     transition: 0.7s ease-in-out;
     .lock {
       color: var(--white-color) !important;

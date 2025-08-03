@@ -23,7 +23,7 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
   });
 
   const DefaultPrimaryColor = '#061147'
-  const DefaultSecondColor = '#ffb949'
+  const DefaultSecondColor = 'var(--secondary-color)'
 
   const PrimaryColor = response?.data?.primary_color || DefaultPrimaryColor;
   const SecondColor = response?.data?.secondary_color || DefaultSecondColor;

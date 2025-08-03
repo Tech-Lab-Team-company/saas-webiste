@@ -162,7 +162,7 @@ watch(() => PaymentMethod.value,
     font-size: 20px;
     font-weight: 600;
     color: white;
-    background-color: #FFB949;
+    background-color: var(--secondary-color);
   }
 
 }

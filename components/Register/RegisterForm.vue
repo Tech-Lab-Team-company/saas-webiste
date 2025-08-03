@@ -153,7 +153,7 @@ const settingStore = useSettingStore();
           <userEdit class="login-call-icon" />
         </div>
         <div class="login-input" v-if="settingStore?.setting?.allow_parent_name">
-          <input type="text" placeholder="الاسم الثانى * " v-model="SecondName" />
+          <input type="text" placeholder="اسم ولي الامر * " v-model="SecondName" />
           <userEdit class="login-call-icon" />
         </div>
         <div class="login-input" v-if="settingStore?.setting?.address_required">
@@ -199,7 +199,7 @@ const settingStore = useSettingStore();
 
 
         <div class="login-input" v-if="settingStore?.setting?.allow_parent_phone">
-          <input type="tel" placeholder=" رقم الهاتف الثانى" v-model="SecondphoneNumber" />
+          <input type="tel" placeholder=" رقم هاتلف ولي الامر" v-model="SecondphoneNumber" />
           <callIcon class="login-call-icon" />
         </div>
 

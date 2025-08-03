@@ -15,6 +15,7 @@ import {
   ClickToPlay,
 } from '@vime/vue-next';
 import { ref } from 'vue';
+import { useSettingStore } from "~/stores/setting";
 
 // Props
 const props = defineProps<{ video: string }>();
@@ -45,6 +46,8 @@ function getYoutubeVideoId(url: string): string | null {
 }
 
 const videoId = getYoutubeVideoId(props.video)
+
+const settingStore = useSettingStore();
 </script>
 
 <template>
@@ -53,7 +56,7 @@ const videoId = getYoutubeVideoId(props.video)
     <Player
         theme="dark"
         id="myVideo"
-        :style="`--vm-player-theme: #ffb949`"
+        :style="`--vm-player-theme: var(--secondary-color)`"
         class="content"
     >
       <Youtube
@@ -74,7 +77,7 @@ const videoId = getYoutubeVideoId(props.video)
         <Poster />
         <ClickToPlay />
         <LoadingScreen>
-          <img src="https://saas.crazyidea.online/uploads/teachers/606761749586788.png" class="image_loading" alt="logo" />
+          <img :src="settingStore.setting?.image?.img" class="image_loading" alt="logo" />
         </LoadingScreen>
       </Ui>
       <div class="tapSidesToSeek">
