@@ -13,6 +13,12 @@ import {getWebDomain} from "~/constant/webDomain";
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
 const showUniversities = ref(false);
+const props = defineProps({
+  with_text: {
+    type: Boolean,
+    default: true
+  }
+});
 
 const { data: stages } = await useAsyncData("stages", async () => {
   const response = await $fetch<{
@@ -269,6 +275,13 @@ const CategoryBtn = ref<boolean>(false)
 const StageBtn = ref<boolean>(false)
 const StageYearBtn = ref<boolean>(false)
 
+const TextShow = ref(props.with_text)
+watch(()=>props.with_text,
+(NewValue)=>{
+TextShow.value = NewValue
+})
+
+
 </script>
 
 <template>
@@ -280,6 +293,7 @@ const StageYearBtn = ref<boolean>(false)
 
     <div class="stages stages-dot">
       <StagesTitle
+       v-if="TextShow"
         :maintitle="`المراحل التعليميه`"
         :subtitle="`اكتشف كل مرحلة في رحلتك التعليمية، من الأساسيات إلى التخصصات المتقدمة`"
       />

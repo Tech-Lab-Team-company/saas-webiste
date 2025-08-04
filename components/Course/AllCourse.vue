@@ -45,7 +45,7 @@ const fetchCourses = async () => {
     }>(`${baseUrl}/filter_courses`, {
       method: "POST",
       body: { 
-          category_id: CategoryId.value,
+          category_id: (Year_id ? 1 : Division_id ? 2 : CategoryId.value) ||  CategoryId.value,
           type: 1,
           education_type_id: EduicationType.value,
           stage_id: StageId.value,
@@ -159,6 +159,7 @@ watch(()=>filtersStore,
   </div>
   <HomeHomeEducationStages 
   @UpdateData="CourseFilterData"
+  :with_text="false"
   class="stages"
   />
 
