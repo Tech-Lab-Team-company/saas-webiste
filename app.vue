@@ -73,10 +73,10 @@ const FetchPaymentMethod = async () => {
 
 onMounted(
   () => {
-    if (UserStore?.user) {
+    // if (UserStore?.user) {
 
       FetchPaymentMethod();
-    }
+    // }
   }
 )
 

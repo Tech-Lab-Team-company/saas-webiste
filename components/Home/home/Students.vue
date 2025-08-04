@@ -52,7 +52,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
             :loop="true"
                 ref="containerRef"
                 class="gallery-track"
-                :slides-per-view="4"
+                :slides-per-view="6"
                 :space-between="50"
                 :autoplay="{
                     delay: 0,

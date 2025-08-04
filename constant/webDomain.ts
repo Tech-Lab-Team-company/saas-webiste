@@ -16,3 +16,4 @@ export function getWebDomain(): string {
 // hrarabians.org
 // islam-salama.techlabeg.com
 // almaherinenglish.com
+// hadybazeed.com

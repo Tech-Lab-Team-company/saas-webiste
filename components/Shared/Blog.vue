@@ -114,7 +114,7 @@ const UserSetting = useSettingStore();
       </swiper-container>
     </ClientOnly>
 
-    <button class="right-arrow" @click="swiper.next()" >
+    <button class="right-arrow" @click="swiper.next()"  >
       <IconsArrowRight />
     </button>
     <button class="left-arrow" @click="swiper.prev()">
@@ -152,6 +152,7 @@ const UserSetting = useSettingStore();
   flex-direction: column;
   justify-content: space-between;
   padding-bottom: 10px;
+  // width: calc(100% - 20px); // Adjust width to account for margins
   width: calc(100% - 20px); // Adjust width to account for margins
 }
 

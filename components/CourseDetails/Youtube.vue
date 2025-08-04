@@ -48,22 +48,29 @@ function getYoutubeVideoId(url: string): string | null {
 const videoId = getYoutubeVideoId(props.video)
 
 const settingStore = useSettingStore();
+const VideoBlurScreen = ref(true)
+
+// function playVideo() {
+//   if (playerInstance.value) {
+//     playerInstance.value.play();
+//     VideoBlurScreen.value = false;
+//   }
+// }
 </script>
 
 <template>
   <br>
   <div :class="isPiP ? 'video-player-pip' : 'video-player'">
-    <Player
-        theme="dark"
-        id="myVideo"
-        :style="`--vm-player-theme: var(--secondary-color)`"
-        class="content"
-    >
-      <Youtube
-          :showFullscreenControl="false"
-          :videoId="videoId!"
-          @vmReady="onPlayerReady"
-      />
+    <Player theme="dark" id="myVideo" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
+      @click="VideoBlurScreen = !VideoBlurScreen" @vmPlay="VideoBlurScreen = false" @vmPause="VideoBlurScreen = true"
+      :paused="VideoBlurScreen">
+      <div @click="VideoBlurScreen = false" v-if="VideoBlurScreen" class="overlay">
+        <img :src="settingStore.setting?.image?.img" class="logo-image" alt="">
+        <!-- <IconsPlay class="play-icon" @click="VideoBlurScreen = false" /> -->
+        <!-- <i class="pi pi-play "></i> -->
+      </div>
+
+      <Youtube :showFullscreenControl="false" :videoId="videoId!" @vmReady="onPlayerReady" />
       <Ui>
         <DefaultSettings />
         <Controls>
@@ -90,5 +97,33 @@ const settingStore = useSettingStore();
 </template>
 
 <style scoped>
+.overlay {
+  background-color: rgb(0, 0, 0);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  cursor: pointer;
+}
 
+.play-icon {
+  width: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  top: 0;
+  transform: translateY(-10%);
+  cursor: pointer;
+}
+
+.logo-image {
+  width: 327px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  cursor: pointer;
+  
+}
 </style>
