@@ -5,7 +5,7 @@ import toggletwo from "~/public/icons/toggletwo.vue";
 import { baseUrl } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 import { useFiltersStore } from '~/stores/courses_filter';
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 import CoursesFilterParams from "~/features/CoursesFilter/Core/Params/courses_filter_params";
 import CoursesFilterController from "~/features/CoursesFilter/presentation/controllers/courses_filter_controller";
 import Loder from "../Loader/Loder.vue";
@@ -14,29 +14,29 @@ const filtersStore = useFiltersStore();
 
 const CategoryId = ref(filtersStore.CategryId);
 const EduicationType = ref(filtersStore.SelectedEductionType);
-const UniversityId =  ref(filtersStore.SelectedUniversity);
-const CollegeId =   ref(filtersStore.SelectedCollege);
+const UniversityId = ref(filtersStore.SelectedUniversity);
+const CollegeId = ref(filtersStore.SelectedCollege);
 const DepartmentId = ref(filtersStore.SelectedCollegeDepartment);
 const DivisionId = ref(filtersStore.SelectedCollegeDepartmentDivision);
-const SubjectId =   ref(filtersStore.SelectedSubject);
-const StageId =   ref(filtersStore.SelectedStage);
-const StageYearId =   ref(filtersStore.SelectedStageYear);
-const StageTitle =   ref(filtersStore.SelectedStageTitle);
-const StageYearTitle =   ref(filtersStore.SelectedStageYearTitle);
+const SubjectId = ref(filtersStore.SelectedSubject);
+const StageId = ref(filtersStore.SelectedStage);
+const StageYearId = ref(filtersStore.SelectedStageYear);
+const StageTitle = ref(filtersStore.SelectedStageTitle);
+const StageYearTitle = ref(filtersStore.SelectedStageYearTitle);
 
 const route = useRoute()
 const Year_id = route.query.year_id
 const Division_id = route.query.division_id
 
 
-   const userStore = useUserStore(); 
+const userStore = useUserStore();
 
 
 const is_loading = ref(false);
 const CoursesFilter = ref<CoursesFilterModel[]>([]);
 const token: string | undefined = userStore?.user?.apiToken;
 const fetchCourses = async () => {
- is_loading.value = true; // Start loading
+  is_loading.value = true; // Start loading
   try {
     const response = await $fetch<{
       data: CoursesFilterModel[];
@@ -44,26 +44,26 @@ const fetchCourses = async () => {
       status: number;
     }>(`${baseUrl}/filter_courses`, {
       method: "POST",
-      body: { 
-          category_id: (Year_id ? 1 : Division_id ? 2 : CategoryId.value) ||  CategoryId.value,
-          type: 1,
-          education_type_id: EduicationType.value,
-          stage_id: StageId.value,
-          year_id: Number(Year_id) || StageYearId.value,
-          subject_id:null ,
-          university_id: UniversityId.value,
-          college_id: CollegeId.value,
-          department_id: DepartmentId.value,
-          division_id:Number(Division_id) || DivisionId.value,
-          university_subject_id: SubjectId.value,
+      body: {
+        category_id: (Year_id ? 1 : Division_id ? 2 : CategoryId.value) || CategoryId.value,
+        type: 1,
+        education_type_id: EduicationType.value,
+        stage_id: StageId.value,
+        year_id: Number(Year_id) || StageYearId.value,
+        subject_id: null,
+        university_id: UniversityId.value,
+        college_id: CollegeId.value,
+        department_id: DepartmentId.value,
+        division_id: Number(Division_id) || DivisionId.value,
+        university_subject_id: SubjectId.value,
       },
       headers: {
         "Accept-Language": "ar",
         "web-domain": getWebDomain(),
-        'Authorization' : 'Bearer ' + token,
+        'Authorization': 'Bearer ' + token,
       },
     });
-    
+
     CoursesFilter.value = response.data;
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -85,7 +85,7 @@ const fetchCourses = async () => {
 // }
 
 
-const CourseFilterData = (data)=>{
+const CourseFilterData = (data) => {
   CategoryId.value = data.CategryId
   EduicationType.value = data.SelectedEductionType
   UniversityId.value = data.SelectedUniversity
@@ -95,8 +95,8 @@ const CourseFilterData = (data)=>{
   SubjectId.value = data.SelectedSubject
   StageId.value = data.SelectedStage
   StageYearId.value = data.SelectedStageYear
-  StageTitle.value=data.SelectedStageTitle
-  StageYearTitle.value=data.SelectedStageYearTitle
+  StageTitle.value = data.SelectedStageTitle
+  StageYearTitle.value = data.SelectedStageYearTitle
   fetchCourses();
 }
 
@@ -107,86 +107,77 @@ onMounted(() => {
 
 
 
-const props = defineProps(['showUniversities' , 'showStages'])
+const props = defineProps(['showUniversities', 'showStages'])
 
 
 
 const selectedToggle = ref();
 
-watch(()=>filtersStore,
-()=>{
-  StageTitle.value = filtersStore.SelectedStageTitle
-  StageYearTitle.value = filtersStore.SelectedStageYearTitle
-}
+watch(() => filtersStore,
+  () => {
+    StageTitle.value = filtersStore.SelectedStageTitle
+    StageYearTitle.value = filtersStore.SelectedStageYearTitle
+  }
 
 
 )
 </script>
 <template>
-    <div class="page-loader" v-if="is_loading"  >
-      <Loder />
-    </div>
-  
+  <div class="page-loader" v-if="is_loading">
+    <Loder />
+  </div>
+
 
   <div class="aa">
     <div class="header-toggle">
-    
-      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('all_courses') }} {{ StageTitle ?  `(${StageTitle} - ${StageYearTitle ? StageYearTitle:''})` : `` }}</p>
+
+      <p class="cards-heading">{{ CoursesFilter.length }} {{ $t('all_courses') }} {{ StageTitle ? `(${StageTitle} -
+        ${StageYearTitle ? StageYearTitle : ''})` : `` }}</p>
       <div class="toggle">
-        <div
-          :class="['toggle-icon', { active: selectedToggle === 'two' }]"
-          @click="selectedToggle = 'two'"
-        >
+        <div :class="['toggle-icon', { active: selectedToggle === 'two' }]" @click="selectedToggle = 'two'">
           <toggletwo />
         </div>
-        <div
-          :class="['toggle-icon', { active: selectedToggle === 'one' }]"
-          @click="selectedToggle = 'one'"
-        >
+        <div :class="['toggle-icon', { active: selectedToggle === 'one' }]" @click="selectedToggle = 'one'">
           <toggleone />
         </div>
       </div>
     </div>
 
     <!-- {{  console.log(CoursesFilter , "response.data")  }} -->
-    {{ console.log(CoursesFilter , "CourseFilter")  }}
+    {{ console.log(CoursesFilter, "CourseFilter") }}
     <div v-if="selectedToggle === 'one'">
-      <CourseAllCourseOne :HomeSections="CoursesFilter " />
+      <CourseAllCourseOne :HomeSections="CoursesFilter" />
     </div>
     <div v-else>
       <CourseAllCourseTwo :HomeSections="CoursesFilter" />
     </div>
   </div>
-  <HomeHomeEducationStages 
-  @UpdateData="CourseFilterData"
-  :with_text="false"
-  class="stages"
-  />
+  <HomeHomeEducationStages @UpdateData="CourseFilterData" :with_text="false" class="stages" />
 
 </template>
 
 <style scoped lang="scss">
-
-.page-loader{
+.page-loader {
   height: 100vh;
   width: 100%;
-      position: absolute;
-    background-color: #000000c9;
-    top: 0;
-    left: 0;
-        z-index: 99;
+  position: absolute;
+  background-color: #000000c9;
+  top: 0;
+  left: 0;
+  z-index: 99;
 }
-.stages{
+
+.stages {
   background-color: #f6f6f6 !important;
-padding-bottom: 20px;
-margin-top:20px
-  
+  padding-bottom: 20px;
+  margin-top: 20px
 }
+
 .aa {
   background-color: #f6f6f6 !important;
   width: 100%;
-      margin-bottom: 24px;
-    padding-bottom: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
   // margin-top: 30px;
 }
 
@@ -200,6 +191,8 @@ margin-top:20px
   width: 90%;
   margin-left: auto;
   margin-right: auto;
+  z-index: 10000;
+  position: relative;
 }
 
 .cards-heading {
