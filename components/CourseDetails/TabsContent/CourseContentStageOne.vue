@@ -134,15 +134,14 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
 
   <div v-if="CourseData?.length > 0" :key="index" v-for="(session, index) in CourseData">
 
-
     <div class="course-body-details"
       :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
       @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text, session?.web_show_video)">
       <component :is="getIconByType(session?.type)" />
       <div class="session-name">
-        <LockIcon v-if="!session?.web_show_video" />
-        <p>{{ session?.title }} </p>
         <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
+        <p>{{ session?.title }} </p>
+        <LockIcon v-if="!session?.web_show_video" />
       </div>
 
 
