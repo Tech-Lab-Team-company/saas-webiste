@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { Splide, SplideSlide } from "@splidejs/vue-splide";
-import "@splidejs/vue-splide/css";
-// import microphone from "@/public/icons/microphone.vue";
-// import note from "@/public/icons/note.vue";
-// import video1 from "~/public/icons/video1.vue";
+import { ref, onMounted } from 'vue'
+import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
 import { baseUrl } from "~/constant/baseUrl";
-import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
-import SquareIcon from "~/public/icons/squareIcon.vue";
 import { getWebDomain } from "~/constant/webDomain";
-
+import type HomeFirstSection from "~/types/home_first_section";
+import SquareIcon from '~/public/icons/squareIcon.vue';
 
 const { data: GraduationParty } = await useAsyncData("GraduationParty", async () => {
   const response = await $fetch<{
@@ -27,414 +23,278 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
     },
   });
 
-  
+
   return response.data;
 });
 
+// Sample data
+// const slides = ref([
+//   { title: 'Slide 1', description: 'This is the first slide' },
+//   { title: 'Slide 2', description: 'This is the second slide' },
+//   { title: 'Slide 3', description: 'This is the third slide' },
+//   { title: 'Slide 4', description: 'This is the fourth slide' },
+//   { title: 'Slide 5', description: 'This is the fifth slide' },
+// ])
 
-const containerRefs = ref([]) // Array of refs for each swiper
-const swipers = ref([])       // Array to store swiper instances
+const swiperRef = ref(null)
+let swiperInstance = null
 
-const getSwiperOptions = () => ({
-  effect: 'creative',
-  perPage: 3, // Show 3 slides at a time
-  gap: '2rem',
-  loop: true,
-  autoplay: { delay: 5000 },
-  creativeEffect: {
-    prev: { shadow: true, translate: [0, 0, -400] },
-    next: { shadow: true, translate: [0, 0, -400] },
-  },
-  breakpoints: {
-    1200: { slidesPerView: 3, spaceBetween: 32 ,perPage: 3, gap: '2rem' },
-    992: { slidesPerView: 2, spaceBetween: 16, perPage: 2, gap: '1rem' },
-    768: { slidesPerView: 2, spaceBetween: 8 ,perPage: 2, gap: '0.8rem' },
-    576: { slidesPerView: 1, spaceBetween: 4 }
+// Swiper event handlers
+const onSwiper = (swiper) => {
+  swiperInstance = swiper
+  console.log('Swiper initialized:', swiper)
+}
+
+const onSlideChange = (swiper) => {
+  console.log('Slide changed to:', swiper.activeIndex)
+}
+
+// Control functions
+const startAutoplay = () => {
+  if (swiperInstance && swiperInstance.autoplay) {
+    swiperInstance.autoplay.start()
   }
-});
+}
+
+const stopAutoplay = () => {
+  if (swiperInstance && swiperInstance.autoplay) {
+    swiperInstance.autoplay.stop()
+  }
+}
+
+const nextSlide = () => {
+  if (swiperInstance) {
+    swiperInstance.slideNext()
+  }
+}
+
+const prevSlide = () => {
+  if (swiperInstance) {
+    swiperInstance.slidePrev()
+  }
+}
 
 onMounted(() => {
-  GraduationParty.value?.forEach((_, idx) => {
-    if (containerRefs.value[idx]) {
-      swipers.value[idx] = useSwiper(containerRefs.value[idx], getSwiperOptions())
-    }
-  })
+  // Additional setup if needed
+  console.log('Component mounted')
 })
-
-// Methods to control each swiper
-const nextSlide = (idx) => {
-  swipers.value[idx]?.next()
-}
-const prevSlide = (idx) => {
-  swipers.value[idx]?.prev()
-}
 </script>
-
 <template>
-  <div class="card-course-three" v-for="(section , idnex) in  GraduationParty" :key="idnex">
+  <div class="swiper-container-wrapper" v-for="(section, idnex) in GraduationParty" :key="idnex">
     <h3 class="slider-heading">{{ section?.title }}</h3>
     <p class="description-text">{{ section?.description }}</p>
-
-    <div class="graduation-party-container">
-      
-
-      <Splide :options="getSwiperOptions()">
-        <SplideSlide v-for="(image, idx) in section?.media" :key="idx">
-           <a  :href="`/course?year_id=${image.year_id}&division_id=${image.division_id}`">
+    <swiper-container ref="swiperRef" :slides-per-view="3" :space-between="3" :loop="true" :autoplay="{
+      delay: 3000,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+      reverseDirection: false,
+    }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    }" :pagination="{
+      el: '.swiper-pagination',
+      clickable: true,
+      dynamicBullets: true,
+    }" :breakpoints="{
+      120: {
+        slidesPerView: 1,
+        spaceBetween: 20
+      },
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 20
+      },
+      768: {
+        slidesPerView: 2,
+        spaceBetween: 30
+      },
+      1024: {
+        slidesPerView: 3,
+        spaceBetween: 30
+      }
+    }" @swiper="onSwiper" @slideChange="onSlideChange">
+      <swiper-slide v-for="(image, index) in section.media" :key="index">
+        <div class="slide-content">
+          <a :href="`/course?year_id=${image.year_id}&division_id=${image.division_id}`">
             <div class="image-conatiner">
               <img :src="image?.file" :alt="image.alt" />
             </div>
           </a>
-        </SplideSlide>
-      </Splide>
+        </div>
+      </swiper-slide>
+    </swiper-container>
 
-    </div>
+    <!-- Custom Navigation Buttons -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
 
-    
+    <!-- Custom Pagination -->
+    <div class="swiper-pagination"></div>
+
     <SquareIcon class="dots-icons-one" />
     <SquareIcon class="dots-icons-two" />
+
   </div>
 </template>
 
-<style scoped lang="scss">
 
-  .right-arrow {
-    position: absolute;
-    right: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 999;
 
-    svg {
-      width: 35px;
-      height: 35px;
-    }
-  }
-
-  .left-arrow {
-    position: absolute;
-    left: -40px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 999;
-
-    svg {
-      width: 35px;
-      height: 35px;
-    }
-  }
-.image-conatiner{
-
-  img{
-    border-radius: 20px;
-    aspect-ratio: 2/ 1.5 ;
-    border: 1px solid #dde1e6;
-    width: 100%;
-  }
-
+<style scoped>
+.description-text {
+  text-align: center;
 }
 
-.graduation-party-container{
-  width: 95%;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-}
 .dots-icons-one {
   position: absolute;
-  top: 100%;
+  top: 88%;
   transform: translateY(-80%);
-  left: 4%;
+  left: -4%;
   z-index: -1;
 }
 
 .dots-icons-two {
   position: absolute;
-  top: 50%;
+  top: 44%;
   transform: translateY(-80%);
-  right: 4%;
+  right: -7%;
   z-index: -1;
 }
 
-.description-text {
-  margin: 0;
-  padding-bottom: 10px;
-  color: #909DAD;
-  text-align: center;
-}
-
-.card-course-three {
-  width: 100%;
-  /* max-width: 1400px; */
-  margin: 0 auto;
-  padding: 0 1rem;
+.swiper-container-wrapper {
   position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.slider-wrapper {
+swiper-container {
+  width: 100%;
+  height: 500px;
+  /* padding-bottom: 50px; */
+}
+
+swiper-slide {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  width: 100%;
-}
-
-.slider-heading {
-  font-size: 35px;
-  color: #222;
-  text-align: center;
-  /* margin-bottom: 20px; */
-  font-weight: 800;
-  line-height: 200%;
-  letter-spacing: 0%;
-  vertical-align: middle;
-  font-family: "bold";
-}
-
-.splide-container {
-  width: 88%;
-  height: 100%;
-  padding: 0 3rem 30px;
-}
-
-.card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: 10px;
-  width: 100%;
-  transition: transform 0.3s ease-in-out;
-  margin: 0 auto;
-  background-color: #F1F1F1;
-}
-
-.card:hover {
-  transform: translateY(-10px);
-}
-
-.image-container {
-  position: relative;
-  width: 100%;
-  padding: 6px;
-}
-
-.course-image {
-  width: 100%;
-  height: 230px;
-  object-fit: cover;
-  background-color: white;
+  align-items: center;
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  /* background-color: rgba(128, 128, 128, 0.719); */
   border-radius: 10px;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 10px;
+  width: 380px;
+  margin-right: 30px;
+  height: 70%;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-radius: 12px;
 }
 
-.overlay-text {
-  position: absolute;
-  top: 15%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-  padding: 6px 15px;
-  border-radius: 8px;
-  background: #ffffff;
-  width: 100px;
-  border-radius: 20px;
+.slide-content {
   text-align: center;
-  color: #032855;
-  font-weight: 800;
-  font-size: 14px;
-  font-family: "regular";
+  /* padding: 20px; */
+  /* border: 1px solid #000; */
+  height: 100%;
+  border-radius: 15px;
+
 }
 
-.card-body {
-  padding: 20px;
-  /* background-color: gray;
-    border-radius: 10px; */
+.slide-content a {
+  height: 100%;
+  border-radius: 15px;
+
 }
 
-.card-title {
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 30px;
-  text-align: right;
-  margin: 0;
-  font-family: "bold";
+.slide-content a .image-conatiner {
+  height: 100%;
+  border-radius: 15px;
+
 }
 
-.card-content {
+.slide-content a .image-conatiner img {
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.slide-content h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.slide-content p {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.control-buttons {
   display: flex;
-  justify-content: space-between;
-  margin: 15px 0;
-  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
+  margin-top: 20px;
 }
 
-.card-text {
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 150%;
-  letter-spacing: 0%;
-  text-align: right;
-  vertical-align: middle;
-  color: #656b78;
-  font-family: "regular";
-  margin: 10px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+.control-buttons button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.card-text1 {
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 150%;
-  letter-spacing: 0%;
-  text-align: right;
-  vertical-align: middle;
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  font-family: "regular";
+.control-buttons button:hover {
+  background-color: #0056b3;
 }
 
-.card-footer {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+/* Custom navigation buttons styling */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #007bff;
+  margin-top: 20px;
 }
 
-/* Splide arrows customization */
-:deep(.splide__arrow) {
-  background: #032855;
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Custom pagination styling */
+.swiper-pagination {
+  bottom: 10px;
+}
+
+:deep(.swiper-pagination-bullet) {
+  background-color: #007bff;
+  opacity: 0.5;
+}
+
+:deep(.swiper-pagination-bullet-active) {
   opacity: 1;
-  width: 3rem;
-  height: 3rem;
+  background-color: #007bff;
 }
 
-:deep(.splide__arrow svg) {
-  fill: white;
-  width: 1.5rem;
-  height: 1.5rem;
+.swiper-button-next {
+  right: var(--swiper-navigation-sides-offset, -16px) !important;
 }
 
-:deep(.splide__arrow--prev) {
-  left: 0;
+.swiper-button-prev {
+  right: var(--swiper-navigation-sides-offset, -16px) !important;
 }
 
-:deep(.splide__arrow--next) {
-  right: 0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-  .slider-heading {
-    font-size: 32px;
-  }
-
-  .course-image {
-    height: 200px;
+@media (max-width:768px) {
+  .swiper-button-next {
+    right: var(--swiper-navigation-sides-offset, 5px) !important;
   }
 }
 
-@media (max-width: 992px) {
-  .slider-heading {
-    font-size: 28px;
-    /* margin-bottom: 15px; */
-  }
-
-  .card-title {
-    font-size: 18px;
-    line-height: 26px;
-  }
-
-  .card-text,
-  .card-text1 {
-    font-size: 15px;
-  }
-
-  :deep(.splide__arrow) {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .slider-heading {
-    /* font-size: 24px; */
-  }
-
-  .splide-container {
-    padding: 0 2.5rem 25px;
-  }
-
-  .card-body {
-    padding: 15px;
-  }
-
-  .course-image {
-    height: 180px;
-  }
-
-  .overlay-text {
-    font-size: 13px;
-    width: 90px;
-    padding: 5px 10px;
-  }
-
-  :deep(.splide__arrow) {
-    width: 2.2rem;
-    height: 2.2rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .slider-heading {
-    font-size: 20px;
-    /* margin-bottom: 10px; */
-  }
-
-  .splide-container {
-    padding: 0 2rem 20px;
-  }
-
-  .card-title {
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  .card-text,
-  .card-text1 {
-    font-size: 14px;
-  }
-
-  .course-image {
-    height: 160px;
-  }
-
-  .overlay-text {
-    font-size: 12px;
-    width: 80px;
-    padding: 4px 8px;
-  }
-
-  .card-content {
-    flex-direction: column;
-    gap: 8px;
-    margin: 10px 0;
-  }
-
-  :deep(.splide__arrow) {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  :deep(.splide__arrow svg) {
-    width: 1.2rem;
-    height: 1.2rem;
+@media (max-width:768px) {
+  .swiper-button-prev {
+    right: var(--swiper-navigation-sides-offset, -10px) !important;
   }
 }
 </style>

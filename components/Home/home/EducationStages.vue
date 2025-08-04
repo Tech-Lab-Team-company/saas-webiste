@@ -10,6 +10,8 @@ import { useFiltersStore } from '~/stores/courses_filter';
 import { useSettingStore } from "~/stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
 
+const settingStore = useSettingStore();
+
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
 const showUniversities = ref(false);
@@ -206,7 +208,8 @@ const SelectSubject = (typeId: number) => {
   SendData();
 }
 
-const CategryId = ref(filtersStore.CategryId)
+const CategryId = ref((settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(1) ) ? 1: 
+    (settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(2) ) ? 2 :filtersStore.CategryId)
 
 
 watch(
@@ -221,6 +224,7 @@ const SelectedStageTitle = ref<string>()
 const SelectedStageYearTitle = ref<string>()
 
 const SendData = () => {
+  console.log(CategryId.value , "CategryId.value")
   filtersStore.updateFilters({
     CategryId: CategryId.value,
     SelectedEductionType: SelectedEducationTypeId.value,
@@ -249,6 +253,9 @@ const SendData = () => {
   })
 };
 
+onMounted(() => {
+  SendData();
+})
 const SelectedYearId = ref<number>()
 const ActiveStageYear = ref<boolean>(false)
 const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
@@ -268,7 +275,6 @@ const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
   router.push(`/course`)
 }
 
-const settingStore = useSettingStore();
 
 
 const CategoryBtn = ref<boolean>(false)
@@ -298,10 +304,11 @@ watch(() => props.with_text,
       <div class="stages-buttons flex flex-row gap-4 justify-start mt-4">
         <button class="btn btn-secondary btn-stages"
           @click="showStages = !showStages; showUniversities = false; CategryId = 1; CategoryBtn = true"
-          :class="{ 'active-btn': CategryId === 1 }" v-if="settingStore.setting?.categories?.includes(1)">
+          :class="{ 'active-btn': CategryId === 1 || (settingStore.setting?.categories.length > 1 && settingStore.setting?.categories?.includes(1))}" v-if="settingStore.setting?.categories?.includes(1)">
           {{ $t('basic_education') }}
         </button>
         <button class="btn btn-secondary btn-stages"
+        :class="{ 'active-btn': CategryId === 2 || (settingStore.setting?.categories.length > 1 && settingStore.setting?.categories?.includes(2))}"
           @click="showUniversities = !showUniversities; showStages = false; CategryId = 2"
           v-if="settingStore.setting?.categories?.includes(2)">
           {{ $t('university_education') }}
@@ -309,8 +316,8 @@ watch(() => props.with_text,
       </div>
 
       <!-- التعليم الأساسي -->
-      <div v-if="showStages" class="stages-buttons mt-4 flex flex-wrap gap-3">
-        <template v-if="stages">
+      <div v-if="showStages || CategryId == 1 ||CategryId == 2" class="stages-buttons mt-4 flex flex-wrap gap-3">
+        <template v-if="stages ">
           <button v-for="stage in stages" :key="`basic-${stage.id}`"
             class="btn btn-secondary btn-stages btn-stages-education "
             :class="{ 'active-btn': SelectedStage === stage.id }"
