@@ -7,8 +7,8 @@ import type Stages from "~/types/stages";
 import type Universitiey from "~/types/universitey";
 import { baseUrl } from "~/constant/baseUrl";
 import { useFiltersStore } from '~/stores/courses_filter';
-import {useSettingStore} from "~/stores/setting";
-import {getWebDomain} from "~/constant/webDomain";
+import { useSettingStore } from "~/stores/setting";
+import { getWebDomain } from "~/constant/webDomain";
 
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
@@ -38,8 +38,8 @@ const { data: stages } = await useAsyncData("stages", async () => {
 
 const stageYears = ref<Stages[]>([]);
 const SelectedStage = ref<number>() //level
-const ActiveStage =ref(false)
-const fetchStageYears = async (stageId: number , stagetitle:string) => {
+const ActiveStage = ref(false)
+const fetchStageYears = async (stageId: number, stagetitle: string) => {
   ActiveStage.value = !ActiveStage.value;
   const response = await $fetch<{
     data: Stages[];
@@ -53,24 +53,24 @@ const fetchStageYears = async (stageId: number , stagetitle:string) => {
       "web-domain": getWebDomain(),
     },
   });
-  if(ActiveStage.value ){
+  if (ActiveStage.value) {
     SelectedStage.value = stageId;
     SelectedStageTitle.value = stagetitle;
     stageYears.value = response.data;
   }
-  else{
+  else {
     SelectedStage.value = null;
     SelectedStageTitle.value = null;
     stageYears.value = null;
   }
-    
+
   SendData();
 };
 
 const universitieyTypes = ref<Universitiey[]>([]);
 const universities = ref<Universitiey[]>([]);
 
-const { data:universitiey } = await useAsyncData("universitiey", async () => {
+const { data: universitiey } = await useAsyncData("universitiey", async () => {
   const response = await $fetch<{
     data: Universitiey[];
     message: string;
@@ -201,16 +201,16 @@ const fetchSubjects = async (typeId: number) => {
 const router = useRouter();
 
 const SelectedSubject = ref(filtersStore.SelectedSubject)
-const SelectSubject = (typeId: number)=>{
-    SelectedSubject.value = typeId
-    SendData();
+const SelectSubject = (typeId: number) => {
+  SelectedSubject.value = typeId
+  SendData();
 }
 
 const CategryId = ref(filtersStore.CategryId)
 
 
 watch(
-  ()=>CategryId.value,
+  () => CategryId.value,
   (newValue) => {
     SendData()
   }
@@ -229,12 +229,12 @@ const SendData = () => {
     SelectedCollegeDepartment: SelectedCollegeDepartment.value,
     SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
     SelectedSubject: SelectedSubject.value,
-    SelectedStage:SelectedStage.value,
-    SelectedStageYear:SelectedYearId.value,
-    SelectedStageTitle:SelectedStageTitle.value,
-    SelectedStageYearTitle:SelectedStageYearTitle.value
+    SelectedStage: SelectedStage.value,
+    SelectedStageYear: SelectedYearId.value,
+    SelectedStageTitle: SelectedStageTitle.value,
+    SelectedStageYearTitle: SelectedStageYearTitle.value
   });
-  emit('UpdateData' ,{
+  emit('UpdateData', {
     CategryId: CategryId.value,
     SelectedEductionType: SelectedEducationTypeId.value,
     SelectedUniversity: SelectedUniversity.value,
@@ -242,24 +242,24 @@ const SendData = () => {
     SelectedCollegeDepartment: SelectedCollegeDepartment.value,
     SelectedCollegeDepartmentDivision: SelectedCollegeDepartmentDivision.value,
     SelectedSubject: SelectedSubject.value,
-    SelectedStage:SelectedStage.value,
-    SelectedStageYear:SelectedYearId.value,
-    SelectedStageTitle:SelectedStageTitle.value,
-    SelectedStageYearTitle:SelectedStageYearTitle.value
+    SelectedStage: SelectedStage.value,
+    SelectedStageYear: SelectedYearId.value,
+    SelectedStageTitle: SelectedStageTitle.value,
+    SelectedStageYearTitle: SelectedStageYearTitle.value
   })
 };
 
 const SelectedYearId = ref<number>()
 const ActiveStageYear = ref<boolean>(false)
-const updateStageYear = (stageYearId:number , stageYearTitle:string)=>{
+const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
   ActiveStageYear.value = !ActiveStageYear.value
   console.log(stageYearId);
-  if(ActiveStageYear.value ){
-    
+  if (ActiveStageYear.value) {
+
     SelectedYearId.value = stageYearId;
     SelectedStageYearTitle.value = stageYearTitle;
   }
-  else{
+  else {
     SelectedYearId.value = null;
     SelectedStageYearTitle.value = null;
 
@@ -276,10 +276,10 @@ const StageBtn = ref<boolean>(false)
 const StageYearBtn = ref<boolean>(false)
 
 const TextShow = ref(props.with_text)
-watch(()=>props.with_text,
-(NewValue)=>{
-TextShow.value = NewValue
-})
+watch(() => props.with_text,
+  (NewValue) => {
+    TextShow.value = NewValue
+  })
 
 
 </script>
@@ -292,26 +292,18 @@ TextShow.value = NewValue
     </div>
 
     <div class="stages stages-dot">
-      <StagesTitle
-       v-if="TextShow"
-        :maintitle="`المراحل التعليميه`"
-        :subtitle="`اكتشف كل مرحلة في رحلتك التعليمية، من الأساسيات إلى التخصصات المتقدمة`"
-      />
+      <StagesTitle v-if="TextShow" :maintitle="`المراحل التعليميه`"
+        :subtitle="`اكتشف كل مرحلة في رحلتك التعليمية، من الأساسيات إلى التخصصات المتقدمة`" />
 
       <div class="stages-buttons flex flex-row gap-4 justify-start mt-4">
-        <button
-          class="btn btn-secondary btn-stages"
-          @click="showStages = !showStages; showUniversities = false; CategryId=1 ;CategoryBtn=true"
-           :class="{'active-btn':CategryId===1}"
-          v-if="settingStore.setting?.categories?.includes(1)"
-        >
+        <button class="btn btn-secondary btn-stages"
+          @click="showStages = !showStages; showUniversities = false; CategryId = 1; CategoryBtn = true"
+          :class="{ 'active-btn': CategryId === 1 }" v-if="settingStore.setting?.categories?.includes(1)">
           {{ $t('basic_education') }}
         </button>
-        <button 
-          class="btn btn-secondary btn-stages"
-          @click="showUniversities = !showUniversities; showStages = false ;CategryId=2"
-          v-if="settingStore.setting?.categories?.includes(2)"
-        >
+        <button class="btn btn-secondary btn-stages"
+          @click="showUniversities = !showUniversities; showStages = false; CategryId = 2"
+          v-if="settingStore.setting?.categories?.includes(2)">
           {{ $t('university_education') }}
         </button>
       </div>
@@ -319,13 +311,10 @@ TextShow.value = NewValue
       <!-- التعليم الأساسي -->
       <div v-if="showStages" class="stages-buttons mt-4 flex flex-wrap gap-3">
         <template v-if="stages">
-          <button
-            v-for="stage in stages"
-            :key="`basic-${stage.id}`"
+          <button v-for="stage in stages" :key="`basic-${stage.id}`"
             class="btn btn-secondary btn-stages btn-stages-education "
-            :class="{'active-btn':SelectedStage === stage.id}"
-            @click="fetchStageYears(stage.id , stage.title);StageBtn=true"
-          >
+            :class="{ 'active-btn': SelectedStage === stage.id }"
+            @click="fetchStageYears(stage.id, stage.title); StageBtn = true">
             {{ stage.title }}
           </button>
         </template>
@@ -333,13 +322,10 @@ TextShow.value = NewValue
 
       <div class="stages-years">
         <template v-if="stageYears">
-          <button
-            v-for="year in stageYears"
-            :key="`secondary-${year.id}`"
+          <button v-for="year in stageYears" :key="`secondary-${year.id}`"
             class="btn btn-secondary btn-stages btn-stages-education"
-            @click="updateStageYear(year.id , year.title);StageYearBtn=true"
-             :class="{'active-btn':SelectedStageYearTitle === year.title}"
-          >
+            @click="updateStageYear(year.id, year.title); StageYearBtn = true"
+            :class="{ 'active-btn': SelectedStageYearTitle === year.title }">
             {{ year.title }}
           </button>
         </template>
@@ -348,23 +334,15 @@ TextShow.value = NewValue
       <!-- التعليم الجامعي -->
       <div v-if="showUniversities" class="stages-buttons mt-4 flex flex-wrap gap-3">
         <template v-if="universitiey">
-          <button
-            v-for="type in universitiey"
-            :key="`type-${type.id}`"
-            class="btn btn-secondary btn-stages btn-stages-education"
-            @click="fetchUniversities(type.id)"
-          >
-          {{ type.title }}
-        </button>
-      </template>
-      
-      <template v-if="universities">
-        <button
-        v-for="university in universities"
-        :key="`university-${university.id}`"
-        class="btn btn-secondary btn-stages btn-stages-education"
-        @click="fetchColleges(university.id)"
-        >
+          <button v-for="type in universitiey" :key="`type-${type.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education" @click="fetchUniversities(type.id)">
+            {{ type.title }}
+          </button>
+        </template>
+
+        <template v-if="universities">
+          <button v-for="university in universities" :key="`university-${university.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education" @click="fetchColleges(university.id)">
             {{ university.title }}
           </button>
         </template>
@@ -374,23 +352,15 @@ TextShow.value = NewValue
 
       <div v-if="showUniversities" class="stages-buttons mt-4 flex flex-wrap gap-3">
         <template v-if="Colleges">
-          <button
-            v-for="type in Colleges"
-            :key="`type-${type.id}`"
-            class="btn btn-secondary btn-stages btn-stages-education"
-            @click="fetchCollegeDepartment(type.id)"
-          >
-          {{ type.title }}
-        </button>
-      </template>
-      
-      <template v-if="CollegesDepartments">
-        <button
-        v-for="type in CollegesDepartments"
-        :key="`university-${type.id}`"
-        class="btn btn-secondary btn-stages btn-stages-education"
-        @click="fetchCollegeDepartmentDivision(type.id)"
-        >
+          <button v-for="type in Colleges" :key="`type-${type.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education" @click="fetchCollegeDepartment(type.id)">
+            {{ type.title }}
+          </button>
+        </template>
+
+        <template v-if="CollegesDepartments">
+          <button v-for="type in CollegesDepartments" :key="`university-${type.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education" @click="fetchCollegeDepartmentDivision(type.id)">
             {{ type.title }}
           </button>
         </template>
@@ -399,27 +369,19 @@ TextShow.value = NewValue
 
       <div v-if="showUniversities" class="stages-buttons mt-4 flex flex-wrap gap-3">
         <template v-if="CollegesDepartmentsDivisions">
-          <button
-            v-for="type in CollegesDepartmentsDivisions"
-            :key="`type-${type.id}`"
-            class="btn btn-secondary btn-stages btn-stages-education"
-            @click="fetchSubjects(type.id)"
-          >
-          {{ type.title }}
-        </button>
-      </template>
-      
-      <template class="subjects-btns" v-if="Subjects">
-       <Nuxt-link  to="/course">
-         <button
-        v-for="type in Subjects"
-        :key="`university-${type.id}`"
-        class="btn btn-secondary btn-stages btn-stages-education"
-        @click="SelectSubject(type.id)"
-        >
+          <button v-for="type in CollegesDepartmentsDivisions" :key="`type-${type.id}`"
+            class="btn btn-secondary btn-stages btn-stages-education" @click="fetchSubjects(type.id)">
             {{ type.title }}
           </button>
-        </Nuxt-link>
+        </template>
+
+        <template class="subjects-btns" v-if="Subjects">
+          <Nuxt-link to="/course">
+            <button v-for="type in Subjects" :key="`university-${type.id}`"
+              class="btn btn-secondary btn-stages btn-stages-education" @click="SelectSubject(type.id)">
+              {{ type.title }}
+            </button>
+          </Nuxt-link>
         </template>
       </div>
 
@@ -434,19 +396,21 @@ TextShow.value = NewValue
 </template>
 
 <style setup lang="scss">
-.active-btn{
+.active-btn {
   background-color: var(--secondary-color);
   color: white !important;
-  
-}
-.stages-years{
-  margin-top:20px;
-  display: flex;
-  flex-direction: row;
-  gap:10px
 
 }
-.subjects-btns{
+
+.stages-years {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.subjects-btns {
   display: flex;
   align-items: center;
 }

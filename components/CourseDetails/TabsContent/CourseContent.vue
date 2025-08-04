@@ -118,13 +118,25 @@ const UserSetting = useUserStore();
 
 
 const ExamTime = ref()
+const isFinished = ref(false)
 const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:number , IsFinished:boolean)=>{
     const start = new Date(StartTime).getTime();
     const end = new Date(EndTime).getTime();
+    const CurrentTime = new Date();
     ExamTime.value = Math.floor((end - start) / 1000 / 60);
     if(!IsFinished && ExamTime.value > 0){
       router.push(`/course/${CourseId}/timer?id=${examId}&time=${StartTime}`)
     }
+    if(end-  CurrentTime.getTime() < 0){
+      isFinished.value = true
+      console.log(isFinished.value , "isfinished")
+      console.log(end-  CurrentTime.getTime() , "end-  CurrentTime.getTime()")
+    }
+    else{
+      isFinished.value = false
+
+    }
+   
 }
 </script>
 
@@ -149,7 +161,7 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
                 :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
                 @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video);">
                 <div class="session-name">
-                  <div class="session-name">
+                  <div class="session-name session-name3">
 
                     <LockIcon v-if="!session?.web_show_video" />
                     <p>{{ session?.title }} </p>
@@ -161,10 +173,11 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
                 <component :is="getIconByType(session?.type)" />
               </div>
 
-               <div  class="course-body-details course-exam"  v-if="session?.exam"
+               <div  class="course-body-details course-exam"  v-if="session?.exam   "
+               :class="((new Date(session?.exam?.end_time).getTime() - new Date().getTime() > 0) ) ? '':'disabled'"
                @click="GotoExam(session?.exam?.id , session?.exam?.start_time ,session?.exam?.end_time , CourseId  , session?.exam?.is_finished)"
                >
-                <div class="session-name">
+                <div class="session-name" :class="((new Date(session?.exam?.end_time).getTime() - new Date().getTime() > 0) ) ? '':'disabled'">
                   <p>{{ session?.exam?.title }} </p>
                   <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
                   <div v-else>
@@ -207,6 +220,17 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
 
 
 <style scoped lang="scss">
+.session-name3{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px !important; 
+}
+.disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
     .exam-rate{
 

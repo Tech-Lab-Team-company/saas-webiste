@@ -76,7 +76,7 @@ const VideoBlurScreen = ref(true)
         <Controls>
           <PlaybackControl />
           <VolumeControl />
-          <ScrubberControl />
+          <ScrubberControl @click="VideoBlurScreen = true" />
           <SettingsControl />
           <FullscreenControl />
           <!--          <button @click="TogglePip" class="pip-button">PIP</button>-->
@@ -118,12 +118,13 @@ const VideoBlurScreen = ref(true)
 }
 
 .logo-image {
-  width: 327px;
+  width: 300px;
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
   cursor: pointer;
+  border-radius: 20px;
   
 }
 </style>

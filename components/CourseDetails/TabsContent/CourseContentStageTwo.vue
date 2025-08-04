@@ -131,10 +131,11 @@ const GotoExam = (examId: number, StartTime: string, EndTime: string, CourseId: 
   }
 }
 const handelExam = (isFinished:boolean)=>{
-  if( (isFinished || !userStore?.user || (UserSetting.setting?.join_option_status != 2)
+  if( (isFinished || !userStore?.user 
       || (props.isPaied == true && props?.isSubscribed == false))){
 
     toast.add({ severity: 'info', summary: 'تنبيه', detail: ' يجب شراء الكورس اولا ', life: 3000 })
+    return ;
   }else{
 
   }
@@ -154,18 +155,18 @@ const handelExam = (isFinished:boolean)=>{
           @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video)">
 
           <component :is="getIconByType(session?.type)" />
-          <div class="session-name">
-            <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
-            <p>{{ session?.title }} </p>
+          <div class="session-name session-name2">
             <LockIcon v-if="!session?.web_show_video" />
+            <p>{{ session?.title }} </p>
+            <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
           </div>
 
         </div>
         <div class="course-body-details course-exam" v-if="session?.exam"
           @click="GotoExam(session?.exam?.id, session?.exam?.start_time, session?.exam?.end_time, CourseId, session?.exam?.is_finished)">
           <div class="session-name" :class="{
-            'disabled': session?.exam?.is_finished || !userStore?.user || (UserSetting.setting?.join_option_status != 2)
-              || (isPaid == true && isSubscribed == false)
+            'disabled': session?.exam?.is_finished || !userStore?.user 
+              || (isPaied == true && isSubscribed == false)
           }" 
           @click="handelExam(session?.exam?.is_finished)">
 
@@ -206,6 +207,12 @@ const handelExam = (isFinished:boolean)=>{
 
 
 <style scoped lang="scss">
+.session-name2{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
 .empty-content {
   margin-left: auto;
   margin-right: auto;
