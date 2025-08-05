@@ -181,17 +181,14 @@ swiper-slide {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
   color: white;
   padding: 10px;
   font-weight: bold;
-  border-radius: 10px;
   width: 380px;
   margin-right: 30px;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
-  aspect-ratio: 16/9;
 }
 
 .slide-content {
@@ -201,22 +198,22 @@ swiper-slide {
 }
 
 .slide-content a {
-  height: 100%;
+  //height: 100%;
   border-radius: 15px;
 }
 
 .slide-content a .image-conatiner {
-  height: 100%;
+  //height: 100%;
   border-radius: 15px;
-  border: 10px solid rgba(128, 128, 128, 0.404);
+  //border: 10px solid rgba(128, 128, 128, 0.404);
 }
 
 .slide-content a .image-conatiner img {
   object-fit: cover;
-  aspect-ratio: 16/9;
+  //aspect-ratio: 16/9;
   border-radius: 15px;
   width: 100%;
-  height: 100%;
+  //height: 100%;
 }
 
 .slide-content h3 {

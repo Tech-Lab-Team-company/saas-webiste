@@ -154,13 +154,14 @@ stopOnLastSlide: false
 
 
           <div v-else class="vid-container">
+            <div class="background-vid-container" :style="{ backgroundImage: `url(${slide.media.img})` }"></div>
             <div class="video" v-if="isVideo(slide?.media?.img)">
               <div class="layer"></div>
               <video autoplay muted loop>
                 <source :src="slide.media.img" type="video/mp4">
               </video>
             </div>
-            <img v-else class=" video" :src="slide?.media?.img"/>
+            <img v-else class="video" :src="slide?.media?.img"/>
             <div class="vid-details">
               <div class="vid-title">
                 <p class="title">{{ slide.text }}</p>
