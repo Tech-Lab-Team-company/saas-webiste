@@ -160,6 +160,13 @@ onMounted(() => {
   z-index: -1;
 }
 
+@media(max-width:768px) {
+  .dots-icons-two {
+    right: 0%;
+  }
+
+}
+
 .swiper-container-wrapper {
   position: relative;
   width: 100%;
@@ -257,6 +264,15 @@ swiper-slide {
   font-size: 30px;
   font-weight: 900;
   margin-top: 20px;
+}
+
+@media(max-width:768px) {
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none;
+  }
+
 }
 
 .swiper-button-next:after,

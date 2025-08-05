@@ -49,10 +49,9 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
     <div class="gallery-container">
         <ClientOnly >
             <swiper-container 
-            :loop="true"
+                :loop="true"
                 ref="containerRef"
                 class="gallery-track"
-                :slides-per-view="6"
                 :space-between="50"
                 :autoplay="{
                     delay: 0,
@@ -63,6 +62,26 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                 :speed="7000"
                 :free-mode="true"
                 :free-mode-momentum="false"
+                :breakpoints="{
+                    320: {
+                        slidesPerView: 1,
+                    },
+                    480: {
+                        slidesPerView: 2,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                    },
+                    1024: {
+                        slidesPerView: 4,
+                    },
+                    1280: {
+                        slidesPerView: 5,
+                    },
+                    1536: {
+                        slidesPerView: 6,
+                    },
+                }"
 
             >
             <swiper-slide v-for="image in homefirstsection?.media" >
