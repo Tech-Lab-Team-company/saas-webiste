@@ -140,8 +140,12 @@ stopOnLastSlide: false
                     {{ isExpanded(slide.id) ? "عرض أقل" : "عرض المزيد" }}
                   </button>
                   <div class="flex gap-sm">
+                  <NuxtLink to="/login" class="btn-link">
                     <button class="btn btn-secondary">تسجيل الدخول</button>
+                  </NuxtLink>
+                  <NuxtLink to="/Auth/register" class="btn-link">
                     <button class="btn btn-primary">انشاء حساب</button>
+                  </NuxtLink>
                   </div>
                 </div>
               </div>
@@ -192,6 +196,14 @@ stopOnLastSlide: false
 
 
 <style scoped lang="scss">
+.btn-link{
+  width: 100%;
+  
+  button{
+    width: 100%;
+
+  }
+}
 .video-image-section {
   position: absolute;
   position: absolute;

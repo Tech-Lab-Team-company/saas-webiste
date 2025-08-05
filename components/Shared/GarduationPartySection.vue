@@ -156,7 +156,7 @@ onMounted(() => {
   position: absolute;
   top: 44%;
   transform: translateY(-80%);
-  right: -7%;
+  right: 0;
   z-index: -1;
 }
 
@@ -191,6 +191,7 @@ swiper-slide {
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
+  aspect-ratio: 16/9;
 }
 
 .slide-content {
@@ -207,11 +208,15 @@ swiper-slide {
 .slide-content a .image-conatiner {
   height: 100%;
   border-radius: 15px;
+  border: 10px solid rgba(128, 128, 128, 0.404);
 }
 
 .slide-content a .image-conatiner img {
-  object-fit: scale-down;
+  object-fit: cover;
+  aspect-ratio: 16/9;
   border-radius: 15px;
+  width: 100%;
+  height: 100%;
 }
 
 .slide-content h3 {
@@ -283,11 +288,11 @@ swiper-slide {
 }
 
 .swiper-button-next {
-  right: var(--swiper-navigation-sides-offset, -16px) !important;
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
 }
 
 .swiper-button-prev {
-  right: var(--swiper-navigation-sides-offset, -22px) !important;
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
 }
 
 @media (max-width:768px) {
@@ -298,7 +303,7 @@ swiper-slide {
 
 @media (max-width:768px) {
   .swiper-button-prev {
-    right: var(--swiper-navigation-sides-offset, -10px) !important;
+    right: var(--swiper-navigation-sides-offset, -5px) !important;
   }
 }
 </style>

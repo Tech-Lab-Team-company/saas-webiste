@@ -404,7 +404,7 @@ watch(() => props.with_text,
 
 <style setup lang="scss">
 .active-btn {
-  background-color: var(--secondary-color);
+  background-color: var(--secondary-color) !important;
   color: white !important;
 
 }
