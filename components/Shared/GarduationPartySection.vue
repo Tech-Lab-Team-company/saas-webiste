@@ -176,7 +176,6 @@ onMounted(() => {
 
 swiper-container {
   width: 100%;
-  height: 500px;
   /* padding-bottom: 50px; */
 }
 
@@ -193,7 +192,6 @@ swiper-slide {
   border-radius: 10px;
   width: 380px;
   margin-right: 30px;
-  height: 70%;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
@@ -221,8 +219,7 @@ swiper-slide {
 }
 
 .slide-content a .image-conatiner img {
-  height: 100%;
-  object-fit: cover;
+  object-fit: scale-down;
   border-radius: 15px;
 }
 
