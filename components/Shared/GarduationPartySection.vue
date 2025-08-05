@@ -253,7 +253,9 @@ swiper-slide {
 /* Custom navigation buttons styling */
 .swiper-button-next,
 .swiper-button-prev {
-  color: #007bff;
+  color: #9D9D9D;
+  font-size: 30px;
+  font-weight: 900;
   margin-top: 20px;
 }
 
@@ -283,7 +285,7 @@ swiper-slide {
 }
 
 .swiper-button-prev {
-  right: var(--swiper-navigation-sides-offset, -16px) !important;
+  right: var(--swiper-navigation-sides-offset, -22px) !important;
 }
 
 @media (max-width:768px) {

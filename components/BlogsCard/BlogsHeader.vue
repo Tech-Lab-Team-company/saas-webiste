@@ -145,7 +145,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
 .card img {
   width: 100%;
   height: 230px;
-  /* object-fit: cover; */
+  object-fit: cover;
   border: 1px solid #ccc;
 }
 
