@@ -78,17 +78,7 @@ useHead({
           <div class="overlay"></div>
         </div>
       </SwiperSlide>
-      <!--      <SwiperSlide>-->
-      <!--        <div class="slide">-->
-      <!--          <NuxtImg-->
-      <!--            src="/hero-image-3.png"-->
-      <!--            alt="login swiper image"-->
-      <!--            class="slide-img w-full"-->
-      <!--            format="webp"-->
-      <!--          />-->
-      <!--          <div class="overlay"></div>-->
-      <!--        </div>-->
-      <!--      </SwiperSlide>-->
+
     </Swiper>
     <div class="container info-container mx-auto px-8">
       <div class="info">
