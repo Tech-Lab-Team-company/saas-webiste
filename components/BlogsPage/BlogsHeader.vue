@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type BlogsDetails from "~/types/blogsdetails";
 import { baseUrl } from "~/constant/baseUrl";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
 const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   try {
@@ -30,7 +30,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
 
 <template>
-  
+
   <div class="blogs-page-articles-cards" dir="rtl">
     <!-- تكرار المدونات باستخدام v-for -->
     <!-- لم يعد هناك تكرار لأن البيانات كائن واحد -->
@@ -46,7 +46,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
             <p class="sidebar-text" v-html="blogdetails.subtitle"></p> -->
           </div>
         </div>
-        <div class="blogs-name">
+        <div class="blogs-name" v-if="blogdetails.date">
           <div class="blog-name-icon">
             <!-- إذا كنت ترغب في إضافة المزيد من الأيقونات هنا -->
             <!-- <component :is="card.icon1" class="sidebar-icon" /> -->
@@ -62,6 +62,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
     </div>
     <div>
       <p class="blogs-description" v-html="blogdetails?.subtitle"></p>
+      <p class="blogs-description" v-html="blogdetails?.description "></p>
     </div>
 
     <!-- الكومنتات مضافة هنا كما طلبت -->
@@ -75,7 +76,6 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
 
 <style scoped>
-
 .blogs-page-articles-cards {
   border-radius: 18px;
   height: auto;
@@ -85,33 +85,39 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   width: 95%;
 }
 
-.sidebar-date{
+.sidebar-date {
   display: flex;
   align-items: center;
   font-size: 16px;
 }
 
-.blogs-description{
+.blogs-description {
   margin-top: 20px;
 }
-.sidebar-text{
+
+.sidebar-text {
   font-size: 16px;
 
 }
 
-.blogs-image-banner{
+.blogs-image-banner {
   width: 100%;
   /* height: 300px;
   border-radius: 18px;
   overflow: hidden;
   margin: 10px 0; */
 }
-.blogs-image-banner img{
+
+.blogs-image-banner img {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
   max-height: 550px;
+  border-radius: 20px;
+  border: 10px solid #80808042;
+  object-fit: cover;
 }
+
 .blogs-page-articles-cards {
   border-radius: 18px;
   height: auto;
@@ -123,6 +129,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   /* justify-content: space-between; */
   width: 95%;
 }
+
 .blogs-header {
   font-family: "regular";
   font-weight: 500;
@@ -132,13 +139,15 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   margin: 0 10px;
 }
 
-.blogs-header .sidebar-page-articles-card{
+.blogs-header .sidebar-page-articles-card {
   max-width: 500px;
 }
+
 .blogs-header hr {
   border: 1px solid #ebebeb;
   margin: 10px 0;
 }
+
 .sidebar-page-articles-card-info {
   /* display: grid;
   align-items: center;
@@ -147,12 +156,14 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   align-items: center;
   gap: 20px;
 }
+
 .blogs-name {
   display: flex;
   align-items: center;
   margin: 10px 0;
   gap: 10px;
 }
+
 .blog-name-icon {
   display: flex;
   align-items: center;
@@ -162,17 +173,19 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
   font-size: 20px;
   color: #8c8896;
 }
+
 .sidebar-icon {
   width: 20px;
   height: 20px;
 }
+
 .sidebar-text {
   font-family: "regular";
 
-font-weight: 400;
-font-size: 18px;
-color:var(--secondary-color)
-
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--secondary-color)
 }
+
 /*end blogs-page-articles-cards */
 </style>
