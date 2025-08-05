@@ -3,12 +3,12 @@
 .main-container {
   background-color: #f5f5f5;
   margin-bottom: 20px;
-  @media (min-width:768px) {
+  @media (max-width:1200px) {
     aspect-ratio: 16 /9;
     // height: 60vh;
     
   }
-  @media (max-width:768px) {
+  @media (min-width:1200px) {
     height: 60vh;
     
   }
