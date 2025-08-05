@@ -28,6 +28,7 @@
       @media (min-width: 768px) {
         min-width: 98%;
         height: 94%;
+        width: 100%;
       }
 
       .course-hr {
@@ -152,6 +153,9 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 999;
+    @media (max-width:500px) {
+        display: none;
+    }
     
     svg {
       width: 35px;
@@ -171,8 +175,10 @@
     z-index: 999;
       @media (max-width:768px) {
       left: -32px;
+      display: none;
       
     }
+    
 
     svg {
       width: 35px;
