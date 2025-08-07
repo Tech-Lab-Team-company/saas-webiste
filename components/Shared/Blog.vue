@@ -99,7 +99,7 @@ const UserSetting = useSettingStore();
                 <hr />
                 <div class="flex">
                   <h5 class="card-title" v-html="blog.title"></h5>
-                  <div class="card-date">
+                  <div class="card-date" v-if="blog.date">
                     <p>{{ blog.date }}</p>
                   </div>
                 </div>

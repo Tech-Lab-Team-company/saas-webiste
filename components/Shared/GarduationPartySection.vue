@@ -175,6 +175,10 @@ onMounted(() => {
 
 swiper-container {
   width: 100%;
+
+  /* height: 500px; */
+  /* padding-bottom: 50px; */
+
 }
 
 swiper-slide {

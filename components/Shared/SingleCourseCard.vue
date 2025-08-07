@@ -17,7 +17,7 @@ const UserSetting = useSettingStore();
 </script>
 
 <template>
-    <div class="single-course-card" style="margin-top: 25px;" v-if="homesection?.courses?.length < 2"
+    <div class="single-course-card" style="padding-bottom: 40px;" v-if="homesection?.courses?.length < 2"
         v-for="(card, index) in homesection?.courses" :key="index">
         <NuxtLink :to="`/course/${card?.id}`">
         <div class="course-data">
