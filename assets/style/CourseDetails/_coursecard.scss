@@ -10,7 +10,7 @@
   .card-text {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 65%;
     gap: 25px;
     @media (max-width: 768px) {
       gap: 0;
@@ -160,10 +160,9 @@
   .card-video {
 
     overflow: hidden;
-    width: 500px;
+    width: 35%;
     border-radius: 20px;
-    height: 250px;
-
+    aspect-ratio: 16 / 9;
     img {
       width: 100%;
       // margin-left: auto;

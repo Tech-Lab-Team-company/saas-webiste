@@ -4,6 +4,14 @@
   background-color: #f5f5f5;
   margin-bottom: 20px;
 
+  max-height: 80vh;
+  //@media (max-width:1200px) {
+  //  aspect-ratio: 16 /9;
+  //}
+  //@media (min-width:1200px) {
+  //  height: 60vh;
+  //}
+
   .container {
     margin-top: 50px;
     display: flex;
@@ -123,9 +131,28 @@
 
   .vid-container {
     position: relative;
-
-    .video {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    .background-vid-container {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      height: 100%;
       width: 100%;
+      background-repeat: no-repeat;
+      background-size: cover;
+      filter: blur(8px);
+      -webkit-filter: blur(8px);
+    }
+    .video {
+      height: 100%;
+      //min-width: 80%;
+      //max-height: 80vh;
+      aspect-ratio: 16 / 9;
       margin: auto;
       overflow: hidden;
       height: 60vh;
@@ -263,7 +290,13 @@
 }
 
 .header-home-section {
-  height: 60vh;
+
+  max-height: 80vh;
+  // height: 60vh;
+  // aspect-ratio: 16/9;
+  * {
+    max-height: 80vh;
+  }
   .swiper-pagination-lock {
     display: block !important;
   }
