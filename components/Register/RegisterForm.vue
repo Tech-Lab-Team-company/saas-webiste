@@ -199,7 +199,7 @@ const settingStore = useSettingStore();
 
 
         <div class="login-input" v-if="settingStore?.setting?.allow_parent_phone">
-          <input type="tel" placeholder=" رقم هاتلف ولي الامر" v-model="SecondphoneNumber" />
+          <input type="tel" placeholder=" رقم هاتف ولي الامر" v-model="SecondphoneNumber" />
           <callIcon class="login-call-icon" />
         </div>
 
@@ -269,7 +269,8 @@ const settingStore = useSettingStore();
         <!-- <NuxtLink to="/Auth/emailcode" @click="CheckData"> -->
         <div class="btns btns-home" @click="CheckData">
           <button class="login-btn">
-            التحقق من بريدك الإلكتروني </button>
+            التالى
+          </button>
         </div>
         <!-- </NuxtLink> -->
         <!-- <NuxtLink to="/Auth/email" ><div class="btns btns-home">
