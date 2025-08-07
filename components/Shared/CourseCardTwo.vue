@@ -70,6 +70,7 @@ const UserSetting = useSettingStore();
   <div class="course-style-two-container">
 
     <h3 class="slider-heading" style="margin-top: 25px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
+    
     <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-two">
       <ClientOnly>
         <swiper-container ref="containerRef">

@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { Splide, SplideSlide } from "@splidejs/vue-splide";
-import "@splidejs/vue-splide/css";
-import img2 from "@/assets/images/img2.png";
-import img3 from "@/assets/images/img3.png";
-import img4 from "@/assets/images/img4.png";
+import { ref, onMounted } from 'vue'
+import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
@@ -28,171 +25,285 @@ const { data: studentopinionssection } = await useAsyncData("studentopinionssect
   return response.data[response.data.length - 1];
 });
 
-const isImage = (url) => {
-  if (!url) return false;
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
-  const extension = url.split('.').pop().toLowerCase();
-  return imageExtensions.includes(extension);
-};
+const swiperRef = ref(null)
+let swiperInstance = null
 
-// Check if URL is a video
-const isVideo = (url) => {
-  if (!url) return false;
-  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
-  const extension = url.split('.').pop().toLowerCase();
-  return videoExtensions.includes(extension);
-};
+// Swiper event handlers
+const onSwiper = (swiper) => {
+  swiperInstance = swiper
+  console.log('Swiper initialized:', swiper)
+}
 
+const onSlideChange = (swiper) => {
+  console.log('Slide changed to:', swiper.activeIndex)
+}
 
-const cards = [
-  {
-    img: img4,
-  },
-  {
-    img: img2,
-  },
-  {
-    img: img3,
-  },
-  {
-    img: img4,
-  },
-  {
-    img: img4,
-  },
-];
+// Control functions
+const startAutoplay = () => {
+  if (swiperInstance && swiperInstance.autoplay) {
+    swiperInstance.autoplay.start()
+  }
+}
 
-const splideOptions = {
-  perPage: 5,
-  perMove: 1,
-  gap: "10px",
-  pagination: false,
-  arrows: false,
-  breakpoints: {
-    1200: {
-      perPage: 4,
-    },
-    900: {
-      perPage: 3,
-    },
-    600: {
-      perPage: 2,
-    },
-    480: {
-      perPage: 1,
-      focus: 'center', // Center the single slide
-    },
-  },
-  autoplay: true,
-  interval: 3000,
-  pauseOnHover: false,
-  pauseOnFocus: false,
-  resetProgress: false,
-  speed: 1000,
-  drag: true,
-  cloneStatus: true,
-  drag: false,
-};
+const stopAutoplay = () => {
+  if (swiperInstance && swiperInstance.autoplay) {
+    swiperInstance.autoplay.stop()
+  }
+}
+
+const nextSlide = () => {
+  if (swiperInstance) {
+    swiperInstance.slideNext()
+  }
+}
+
+const prevSlide = () => {
+  if (swiperInstance) {
+    swiperInstance.slidePrev()
+  }
+}
+
+onMounted(() => {
+  // Additional setup if needed
+  console.log('Component mounted')
+})
 </script>
+
 <template>
-  <div class="card-course-four">
-    <div class="slider-wrapper flex" dir="ltr">
+  <div class="swiper-container-wrapper">
+    <Panel class="panel">
+      <template #header>
+        <h3 class="slider-heading">{{ studentopinionssection?.title }}</h3>
+        <p class="description-text">{{ studentopinionssection?.description }}</p>
+      </template>
+      <swiper-container dir="rtl" :ref="`swiperRef`" :slides-per-view="3" :space-between="3" :loop="true" :autoplay="{
+        delay: 3000,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true,
+        reverseDirection: false,
+      }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
+        nextEl: `.swiper-button-next`,
+        prevEl: `.swiper-button-prev`,
+      }" :pagination="{
+        el: `.swiper-pagination`,
+        clickable: true,
+        dynamicBullets: true,
+      }" :breakpoints="{
+        120: {
+          slidesPerView: 1,
+          spaceBetween: 5
+        },
+        320: {
+          slidesPerView: 3,
+          spaceBetween: 5
+        },
+        768: {
+          slidesPerView: 5,
+          spaceBetween: 10
+        },
+        1024: {
+          slidesPerView: 5,
+          spaceBetween: 10
+        }
+      }" @swiper="onSwiper" @slideChange="onSlideChange">
+        <swiper-slide v-for="(card, index) in studentopinionssection?.media" :key="index">
+          <div class="slide-content">
+            <a :href="card?.link || '#'" target="_blank">
+              <img :src="card.file" :alt="card.alt" class="slider-image" />
+            </a>
+          </div>
+        </swiper-slide>
+      </swiper-container>
+    </Panel>
 
-      <h1 class="slider-heading" style="margin-top: 25px;">{{ studentopinionssection?.title }}</h1>
-      <p class="slider-paragraph">
-        {{ studentopinionssection?.description }}
-      </p>
 
-      <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
 
-          <a :href="card?.link || '#'" target="_blank">
-            <img :src="card.file" :alt="card.alt" class="slider-image" />
-          </a>
-          <!-- <video autoplay loop muted  v-if="isVideo(card.file)" class="slider-image">
-            <source :src="card.file">
-          </video> -->
-        </SplideSlide>
-      </Splide>
-    </div>
+    <SquareIcon class="dots-icons-one" />
+    <SquareIcon class="dots-icons-two" />
+
   </div>
 </template>
-<style>
-.slider-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
+
+<style scoped>
+.panel{
+  margin-top: 10px;
+  box-shadow: 10px 10px 10px #0000002b;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+
 }
 
 .slider-heading {
-  font-size: 35px;
-  color: #222;
+  width: 100%;
   text-align: center;
-  margin-bottom: 5px;
-  font-weight: 800;
-  vertical-align: middle;
-  font-family: "bold";
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.description-text {
+  text-align: center;
+}
+
+.dots-icons-one {
+  position: absolute;
+  top: 88%;
+  transform: translateY(-80%);
+  left: -4%;
+  z-index: -1;
+}
+
+.dots-icons-two {
+  position: absolute;
+  top: 44%;
+  transform: translateY(-80%);
+  right: 0;
+  z-index: -1;
+}
+
+@media(max-width:768px) {
+  .dots-icons-two {
+    right: 0%;
+  }
+}
+
+.swiper-container-wrapper {
+  position: relative;
+  width: 90%;
+  /* //max-width: 1200px; */
+  margin: 0 auto;
   margin-top: 20px;
 }
 
-.slider-paragraph {
-  font-weight: 400;
-  font-size: 20px;
-  vertical-align: middle;
-  color: #737e8a;
-  font-family: "regular";
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.splide-container {
-  width: 86%;
-  height: 100%;
-  padding-bottom: 30px;
-}
-
-.splide-slide {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.slider-image {
-  /* width: 300px; */
+swiper-container {
   width: 100%;
-  height: 212px;
+}
+
+swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  width: 380px;
+  margin-right: 30px;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-radius: 12px;
+}
+
+.slide-content {
+  text-align: center;
+  height: 100%;
   border-radius: 15px;
 }
 
-/* .splide__slide{
-  width: 50%;
-} */
+.slide-content a {
+  //height: 100%;
+  border-radius: 15px;
+}
 
-/* Center single slide on small screens */
-@media (max-width: 480px) {
-  .splide__track {
-    /* display: flex; */
-    /* justify-content: center; */
-  }
+.slide-content a .image-conatiner {
+  //height: 100%;
+  border-radius: 15px;
+  //border: 10px solid rgba(128, 128, 128, 0.404);
+}
 
-  .splide__list {
-    justify-content: center;
-  }
+.slide-content a .image-conatiner img {
+  object-fit: cover;
+  //aspect-ratio: 16/9;
+  border-radius: 15px;
+  width: 100%;
+  //height: 100%;
+}
 
-  .splide__slide {
-    display: flex;
-    justify-content: center;
+.slide-content h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.slide-content p {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.control-buttons button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.control-buttons button:hover {
+  background-color: #0056b3;
+}
+
+/* Custom navigation buttons styling */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #9D9D9D;
+  font-size: 30px;
+  font-weight: 900;
+  margin-top: 20px;
+}
+
+@media(max-width:768px) {
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none;
   }
 }
 
-/* splide buttons */
-.splide__arrow--prev {
-  left: -60px;
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 20px;
+  font-weight: bold;
 }
 
-.splide__arrow--next {
-  right: -20px;
+/* Custom pagination styling */
+.swiper-pagination {
+  bottom: 10px;
+}
+
+:deep(.swiper-pagination-bullet) {
+  background-color: #007bff;
+  opacity: 0.5;
+}
+
+:deep(.swiper-pagination-bullet-active) {
+  opacity: 1;
+  background-color: #007bff;
+}
+
+.swiper-button-next {
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
+}
+
+.swiper-button-prev {
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
+}
+
+@media (max-width:768px) {
+  .swiper-button-next {
+    right: var(--swiper-navigation-sides-offset, 5px) !important;
+  }
+}
+
+@media (max-width:768px) {
+  .swiper-button-prev {
+    right: var(--swiper-navigation-sides-offset, -5px) !important;
+  }
 }
 </style>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import type HomeSection from "~/types/home_section_interface";
+import Panel from 'primevue/panel';
 
 const containerRef = ref(null)
 const props = defineProps<{
@@ -94,6 +95,7 @@ watch(
       <IconsArrowLeft />
     </button>
   </div>
+
   <SharedSingleCourseCard v-if="homesection?.courses?.length < 2" :HomeSections="homesection" />
   
 
