@@ -140,8 +140,12 @@ stopOnLastSlide: false
                     {{ isExpanded(slide.id) ? "عرض أقل" : "عرض المزيد" }}
                   </button>
                   <div class="flex gap-sm">
+                  <NuxtLink to="/login" class="btn-link">
                     <button class="btn btn-secondary">تسجيل الدخول</button>
+                  </NuxtLink>
+                  <NuxtLink to="/Auth/register" class="btn-link">
                     <button class="btn btn-primary">انشاء حساب</button>
+                  </NuxtLink>
                   </div>
                 </div>
               </div>
@@ -150,13 +154,14 @@ stopOnLastSlide: false
 
 
           <div v-else class="vid-container">
+            <div class="background-vid-container" :style="{ backgroundImage: `url(${slide.media.img})` }"></div>
             <div class="video" v-if="isVideo(slide?.media?.img)">
               <div class="layer"></div>
               <video autoplay muted loop>
                 <source :src="slide.media.img" type="video/mp4">
               </video>
             </div>
-            <img v-else class=" video" :src="slide?.media?.img"/>
+            <img v-else class="video" :src="slide?.media?.img"/>
             <div class="vid-details">
               <div class="vid-title">
                 <p class="title">{{ slide.text }}</p>
@@ -192,6 +197,14 @@ stopOnLastSlide: false
 
 
 <style scoped lang="scss">
+.btn-link{
+  width: 100%;
+  
+  button{
+    width: 100%;
+
+  }
+}
 .video-image-section {
   position: absolute;
   position: absolute;

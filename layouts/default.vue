@@ -3,7 +3,7 @@
 <template>
   <div>
     <LayoutsHeader />
-    <Banner />
+    <Banner v-if="route.path != '/'" />
     <slot />
     <LayoutsFooter />
   </div>
@@ -11,6 +11,8 @@
 
 <script lang="ts" setup>
 import Banner from '~/components/Global/banner.vue';
+
+const route = useRoute();
 
 
 

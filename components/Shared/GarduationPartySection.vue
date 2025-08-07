@@ -23,18 +23,8 @@ const { data: GraduationParty } = await useAsyncData("GraduationParty", async ()
     },
   });
 
-
   return response.data;
 });
-
-// Sample data
-// const slides = ref([
-//   { title: 'Slide 1', description: 'This is the first slide' },
-//   { title: 'Slide 2', description: 'This is the second slide' },
-//   { title: 'Slide 3', description: 'This is the third slide' },
-//   { title: 'Slide 4', description: 'This is the fourth slide' },
-//   { title: 'Slide 5', description: 'This is the fifth slide' },
-// ])
 
 const swiperRef = ref(null)
 let swiperInstance = null
@@ -79,41 +69,53 @@ onMounted(() => {
   console.log('Component mounted')
 })
 </script>
+
 <template>
-  <div class="swiper-container-wrapper" v-for="(section, idnex) in GraduationParty" :key="idnex">
+  <div class="swiper-container-wrapper" v-for="(section, index) in GraduationParty" :key="index">
     <h3 class="slider-heading">{{ section?.title }}</h3>
     <p class="description-text">{{ section?.description }}</p>
-    <swiper-container ref="swiperRef" :slides-per-view="3" :space-between="3" :loop="true" :autoplay="{
-      delay: 3000,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: true,
-      reverseDirection: false,
-    }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    }" :pagination="{
-      el: '.swiper-pagination',
-      clickable: true,
-      dynamicBullets: true,
-    }" :breakpoints="{
-      120: {
-        slidesPerView: 1,
-        spaceBetween: 20
-      },
-      320: {
-        slidesPerView: 1,
-        spaceBetween: 20
-      },
-      768: {
-        slidesPerView: 2,
-        spaceBetween: 30
-      },
-      1024: {
-        slidesPerView: 3,
-        spaceBetween: 30
-      }
-    }" @swiper="onSwiper" @slideChange="onSlideChange">
-      <swiper-slide v-for="(image, index) in section.media" :key="index">
+    <swiper-container 
+      :ref="`swiperRef`" 
+      :slides-per-view="3" 
+      :space-between="3" 
+      :loop="true" 
+      :autoplay="{
+        delay: 3000,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true,
+        reverseDirection: false,
+      }" 
+      :modules="[Autoplay, Pagination, Navigation, EffectFade]" 
+      :navigation="{
+        nextEl: `.swiper-button-next-${index}`,
+        prevEl: `.swiper-button-prev-${index}`,
+      }" 
+      :pagination="{
+        el: `.swiper-pagination-${index}`,
+        clickable: true,
+        dynamicBullets: true,
+      }" 
+      :breakpoints="{
+        120: {
+          slidesPerView: 1,
+          spaceBetween: 20
+        },
+        320: {
+          slidesPerView: 1,
+          spaceBetween: 20
+        },
+        768: {
+          slidesPerView: 2,
+          spaceBetween: 30
+        },
+        1024: {
+          slidesPerView: 3,
+          spaceBetween: 30
+        }
+      }" 
+      @swiper="onSwiper" 
+      @slideChange="onSlideChange">
+      <swiper-slide v-for="(image, slideIndex) in section.media" :key="slideIndex">
         <div class="slide-content">
           <a :href="`/course?year_id=${image.year_id}&division_id=${image.division_id}`">
             <div class="image-conatiner">
@@ -124,20 +126,18 @@ onMounted(() => {
       </swiper-slide>
     </swiper-container>
 
-    <!-- Custom Navigation Buttons -->
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
+    <!-- Custom Navigation Buttons with unique classes -->
+    <div :class="`swiper-button-prev swiper-button-prev-${index}`"></div>
+    <div :class="`swiper-button-next swiper-button-next-${index}`"></div>
 
-    <!-- Custom Pagination -->
-    <div class="swiper-pagination"></div>
+    <!-- Custom Pagination with unique class -->
+    <div :class="`swiper-pagination swiper-pagination-${index}`"></div>
 
     <SquareIcon class="dots-icons-one" />
     <SquareIcon class="dots-icons-two" />
 
   </div>
 </template>
-
-
 
 <style scoped>
 .description-text {
@@ -156,7 +156,7 @@ onMounted(() => {
   position: absolute;
   top: 44%;
   transform: translateY(-80%);
-  right: -7%;
+  right: 0;
   z-index: -1;
 }
 
@@ -164,36 +164,32 @@ onMounted(() => {
   .dots-icons-two {
     right: 0%;
   }
-
 }
 
 .swiper-container-wrapper {
   position: relative;
-  width: 100%;
-  max-width: 1200px;
+  width: 90%;
+  //max-width: 1200px;
   margin: 0 auto;
 }
 
 swiper-container {
   width: 100%;
+
   /* height: 500px; */
   /* padding-bottom: 50px; */
+
 }
 
 swiper-slide {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  /* background-color: rgba(128, 128, 128, 0.719); */
-  border-radius: 10px;
   color: white;
   padding: 10px;
   font-weight: bold;
-  border-radius: 10px;
   width: 380px;
   margin-right: 30px;
-  height: 70%;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
@@ -201,29 +197,27 @@ swiper-slide {
 
 .slide-content {
   text-align: center;
-  /* padding: 20px; */
-  /* border: 1px solid #000; */
   height: 100%;
   border-radius: 15px;
-
 }
 
 .slide-content a {
-  height: 100%;
+  //height: 100%;
   border-radius: 15px;
-
 }
 
 .slide-content a .image-conatiner {
-  height: 100%;
+  //height: 100%;
   border-radius: 15px;
-
+  //border: 10px solid rgba(128, 128, 128, 0.404);
 }
 
 .slide-content a .image-conatiner img {
-  height: 100%;
   object-fit: cover;
+  //aspect-ratio: 16/9;
   border-radius: 15px;
+  width: 100%;
+  //height: 100%;
 }
 
 .slide-content h3 {
@@ -267,12 +261,10 @@ swiper-slide {
 }
 
 @media(max-width:768px) {
-
   .swiper-button-next,
   .swiper-button-prev {
     display: none;
   }
-
 }
 
 .swiper-button-next:after,
@@ -297,11 +289,11 @@ swiper-slide {
 }
 
 .swiper-button-next {
-  right: var(--swiper-navigation-sides-offset, -16px) !important;
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
 }
 
 .swiper-button-prev {
-  right: var(--swiper-navigation-sides-offset, -22px) !important;
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
 }
 
 @media (max-width:768px) {
@@ -312,7 +304,7 @@ swiper-slide {
 
 @media (max-width:768px) {
   .swiper-button-prev {
-    right: var(--swiper-navigation-sides-offset, -10px) !important;
+    right: var(--swiper-navigation-sides-offset, -5px) !important;
   }
 }
 </style>

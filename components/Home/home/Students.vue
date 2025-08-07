@@ -84,7 +84,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                 }"
 
             >
-            <swiper-slide v-for="image in homefirstsection?.media" >
+            <swiper-slide class="hvr-wobble-top" v-for="image in homefirstsection?.media" >
                 <img :src="image.file" :alt="image.alt">
             </swiper-slide>
             <swiper-slide v-for="image in homefirstsection?.media" >

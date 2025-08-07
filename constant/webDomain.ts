@@ -19,4 +19,3 @@ export function getWebDomain(): string {
 // hadybazeed.com
 // mrbackend.eduhubco.com
 // https://mr-eslamsalama.com/
-// https://mrbackend.eduhubco.com/
