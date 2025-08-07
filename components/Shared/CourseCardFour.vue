@@ -70,16 +70,16 @@ const splideOptions = {
   arrows: false,
   breakpoints: {
     1200: {
-      perPage: 4,
+      perPage: 5,
     },
     900: {
-      perPage: 3,
+      perPage: 4,
     },
     600: {
-      perPage: 2,
+      perPage: 3,
     },
     480: {
-      perPage: 1,
+      perPage: 2,
       focus: 'center', // Center the single slide
     },
   },
@@ -104,9 +104,9 @@ const splideOptions = {
       </p>
 
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
+        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index" >
 
-          <a :href="card?.link || '#'" target="_blank">
+          <a :href="card?.link || '#'" target="_blank" class="image-container">
             <img :src="card.file" :alt="card.alt" class="slider-image" />
           </a>
           <!-- <video autoplay loop muted  v-if="isVideo(card.file)" class="slider-image">
@@ -117,7 +117,11 @@ const splideOptions = {
     </div>
   </div>
 </template>
-<style>
+<style scoped>
+
+.image-container{
+  /* border: 1px solid #000; */
+}
 .slider-wrapper {
   display: flex;
   flex-direction: column;

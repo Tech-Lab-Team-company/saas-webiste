@@ -176,7 +176,7 @@ onMounted(() => {
 
 swiper-container {
   width: 100%;
-  height: 500px;
+  /* height: 500px; */
   /* padding-bottom: 50px; */
 }
 
