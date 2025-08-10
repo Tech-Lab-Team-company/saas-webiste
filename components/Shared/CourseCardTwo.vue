@@ -84,7 +84,7 @@ const UserSetting = useSettingStore();
                       </p>
                       <p class="course-title">{{ slide?.title }}</p>
                     </div>
-                    <p class="course-description" v-html="slide?.description"></p>
+                    <p v-if="slide?.description" class="course-description" v-html="slide?.description"></p>
                   </div>
                   <div class="course-teacher">
                     <p class="teacher-name">{{ slide?.teacher?.name || UserSetting?.setting?.name }}</p>
@@ -113,6 +113,9 @@ const UserSetting = useSettingStore();
 </template>
 
 <style scoped lang="scss">
+.course-title{
+  min-height: auto !important;
+}
 .card-course-twoo {
   width: 100%;
 }

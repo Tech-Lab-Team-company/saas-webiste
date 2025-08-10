@@ -70,6 +70,7 @@
             justify-content: space-between;
             width: 100%;
             margin-bottom: 10px; // Add space between title and description
+            flex-direction: row-reverse;
 
             @media (max-width: 768px) {
               flex-direction: column;
