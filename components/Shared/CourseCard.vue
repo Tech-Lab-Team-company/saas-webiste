@@ -3,7 +3,7 @@
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from "~/types/home_first_section";
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
 const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () => {
   const response = await $fetch<{
@@ -26,8 +26,8 @@ const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () 
   const SecondSectionFilter = response.data.filter(section => section.style === 2);
   const ThirdSectionFilter = response.data.filter(section => section.style === 3);
 
-  return {FirstSectionFilter , SecondSectionFilter, ThirdSectionFilter};
-  
+  return { FirstSectionFilter, SecondSectionFilter, ThirdSectionFilter };
+
 
 });
 
@@ -35,24 +35,26 @@ const { data: HomeSections } = await useAsyncData("FirstHomeSections", async () 
 </script>
 
 <template>
-  <div >
+  <div>
     <SharedGarduationPartySection />
-    
-    <SharedCourseCardOne 
+
+    <HomeCoursesSectionOne v-for="(section, index) in HomeSections?.FirstSectionFilter" :key="index"
+      :HomeSections="section" />
+    <!-- <SharedCourseCardOne 
       v-for="(section , index) in HomeSections?.FirstSectionFilter"
       :key="index"
       :HomeSections="section"
-    />
-    <SharedCourseCardTwo 
-    v-for="(section , index) in HomeSections?.SecondSectionFilter"
-      :key="index"
-      :HomeSections="section"
-    />
-    <SharedCourseCardThree 
-        v-for="(section , index) in HomeSections?.ThirdSectionFilter"
-      :key="index"
-      :HomeSections="section"/>
-    <SharedCourseCardFour />
+    /> -->
+    <HomeCoursesSectionTwo v-for="(section, index) in HomeSections?.SecondSectionFilter" :key="index"
+      :HomeSections="section" />
+    <!-- <SharedCourseCardTwo v-for="(section, index) in HomeSections?.SecondSectionFilter" :key="index"
+      :HomeSections="section" /> -->
+    <HomeCoursesSectionThree v-for="(section, index) in HomeSections?.ThirdSectionFilter" :key="index"
+      :HomeSections="section" />
+    <!-- <SharedCourseCardThree v-for="(section, index) in HomeSections?.ThirdSectionFilter" :key="index"
+      :HomeSections="section" /> -->
+      <HomeCoursesSectionFour />
+    <!-- <SharedCourseCardFour /> -->
     <SharedBlog />
   </div>
 </template>
