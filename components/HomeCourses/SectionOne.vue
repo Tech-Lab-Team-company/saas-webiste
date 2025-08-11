@@ -208,6 +208,7 @@ const userSetting = useSettingStore();
                     min-height: 55px;
                     display: flex;
                     align-items: center;
+                    color: #000;
 
                     // Responsive title sizing
                     @media (max-width: 768px) {

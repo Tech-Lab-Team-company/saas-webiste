@@ -185,7 +185,6 @@ swiper-slide {
   padding: 10px;
   font-weight: bold;
   width: 380px;
-  margin-right: 30px;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;

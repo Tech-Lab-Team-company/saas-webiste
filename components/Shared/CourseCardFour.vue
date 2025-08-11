@@ -115,7 +115,7 @@ const splideOptions = {
     </div>
   </div>
 </template>
-<style>
+<style scoped>
 .slider-wrapper {
   display: flex;
   flex-direction: column;
@@ -177,7 +177,6 @@ swiper-slide {
   padding: 10px;
   font-weight: bold;
   width: 380px;
-  margin-right: 30px;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
