@@ -98,7 +98,7 @@ const splideOptions = {
   <div class="card-course-four">
     <div class="slider-wrapper flex" dir="ltr">
 
-      <h1 class="slider-heading" style="margin-top: 25px;">{{ studentopinionssection?.title }}</h1>
+      <h1 class="slider-heading" style="margin-top: 25px; font-size: 34px; font-weight: 800;">{{ studentopinionssection?.title }}</h1>
       <p class="slider-paragraph">
         {{ studentopinionssection?.description }}
       </p>

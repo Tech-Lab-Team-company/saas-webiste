@@ -64,7 +64,8 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
                 :free-mode-momentum="false"
                 :breakpoints="{
                     320: {
-                        slidesPerView: 1,
+                        slidesPerView: 2,
+                        spaceBetween: 5
                     },
                     480: {
                         slidesPerView: 2,
