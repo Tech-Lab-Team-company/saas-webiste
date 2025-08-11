@@ -136,6 +136,10 @@ const userSetting = useSettingStore();
         transform: scale(1);
         display: block;
         width: 100%;
+
+        img{
+            aspect-ratio: 16/12;
+        }
         // border: 5px solid rgba(128, 128, 128, 0.534);
         // box-shadow: 5px 1px 10px -1px rgba(0, 0, 0, 0.231372549);
 
