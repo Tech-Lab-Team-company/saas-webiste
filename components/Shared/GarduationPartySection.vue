@@ -74,19 +74,28 @@ onMounted(() => {
   <div class="swiper-container-wrapper" v-for="(section, index) in GraduationParty" :key="index">
     <h3 class="slider-heading">{{ section?.title }}</h3>
     <p class="description-text">{{ section?.description }}</p>
-    <swiper-container :ref="`swiperRef`" :slides-per-view="3" :space-between="3" :loop="true" :autoplay="{
-      delay: 3000,
-      disableOnInteraction: false,
-      pauseOnMouseEnter: true,
-      reverseDirection: false,
-    }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
-      nextEl: `.swiper-button-next-${index}`,
-      prevEl: `.swiper-button-prev-${index}`,
-    }" :pagination="{
+    <swiper-container 
+      :ref="`swiperRef`" 
+      :slides-per-view="3" 
+      :space-between="3" 
+      :loop="true" 
+      :autoplay="{
+        delay: 3000,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true,
+        reverseDirection: false,
+      }" 
+      :modules="[Autoplay, Pagination, Navigation, EffectFade]" 
+      :navigation="{
+        nextEl: `.swiper-button-next-${index}`,
+        prevEl: `.swiper-button-prev-${index}`,
+      }" 
+      :pagination="{
         el: `.swiper-pagination-${index}`,
         clickable: true,
         dynamicBullets: true,
-      }" :breakpoints="{
+      }" 
+      :breakpoints="{
         120: {
           slidesPerView: 1,
           spaceBetween: 20
@@ -103,7 +112,9 @@ onMounted(() => {
           slidesPerView: 3,
           spaceBetween: 30
         }
-      }" @swiper="onSwiper" @slideChange="onSlideChange">
+      }" 
+      @swiper="onSwiper" 
+      @slideChange="onSlideChange">
       <swiper-slide v-for="(image, slideIndex) in section.media" :key="slideIndex">
         <div class="slide-content">
           <a :href="`/course?year_id=${image.year_id}&division_id=${image.division_id}`">
@@ -129,13 +140,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.slider-heading {
-  text-align: center;
-  margin-block: 20px;
-  text-shadow: 8px 8px 6px #000000b3;
-  font-size: 40px;
-}
-
 .description-text {
   text-align: center;
 }
@@ -165,7 +169,7 @@ onMounted(() => {
 .swiper-container-wrapper {
   position: relative;
   width: 90%;
-  max-width: 1350px;
+  //max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -178,13 +182,14 @@ swiper-container {
 }
 
 swiper-slide {
-  /* display: flex; */
+  display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   padding: 10px;
   font-weight: bold;
   width: 380px;
+  margin-right: 30px;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
@@ -208,11 +213,9 @@ swiper-slide {
 }
 
 .slide-content a .image-conatiner img {
-  object-fit: cover;
-  aspect-ratio: 16/12;
   border-radius: 15px;
   width: 100%;
-  height: 100%;
+  /* //height: 100%; */
 }
 
 .slide-content h3 {
@@ -256,7 +259,6 @@ swiper-slide {
 }
 
 @media(max-width:768px) {
-
   .swiper-button-next,
   .swiper-button-prev {
     display: none;
