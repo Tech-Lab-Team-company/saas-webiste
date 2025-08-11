@@ -25,113 +25,103 @@ const { data: studentopinionssection } = await useAsyncData("studentopinionssect
   return response.data[response.data.length - 1];
 });
 
-const swiperRef = ref(null)
-let swiperInstance = null
+const isImage = (url) => {
+  if (!url) return false;
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+  const extension = url.split('.').pop().toLowerCase();
+  return imageExtensions.includes(extension);
+};
 
-// Swiper event handlers
-const onSwiper = (swiper) => {
-  swiperInstance = swiper
-  console.log('Swiper initialized:', swiper)
-}
+// Check if URL is a video
+const isVideo = (url) => {
+  if (!url) return false;
+  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+  const extension = url.split('.').pop().toLowerCase();
+  return videoExtensions.includes(extension);
+};
 
-const onSlideChange = (swiper) => {
-  console.log('Slide changed to:', swiper.activeIndex)
-}
 
-// Control functions
-const startAutoplay = () => {
-  if (swiperInstance && swiperInstance.autoplay) {
-    swiperInstance.autoplay.start()
-  }
-}
+const cards = [
+  {
+    img: img4,
+  },
+  {
+    img: img2,
+  },
+  {
+    img: img3,
+  },
+  {
+    img: img4,
+  },
+  {
+    img: img4,
+  },
+];
 
-const stopAutoplay = () => {
-  if (swiperInstance && swiperInstance.autoplay) {
-    swiperInstance.autoplay.stop()
-  }
-}
-
-const nextSlide = () => {
-  if (swiperInstance) {
-    swiperInstance.slideNext()
-  }
-}
-
-const prevSlide = () => {
-  if (swiperInstance) {
-    swiperInstance.slidePrev()
-  }
-}
-
-onMounted(() => {
-  // Additional setup if needed
-  console.log('Component mounted')
-})
+const splideOptions = {
+  perPage: 5,
+  perMove: 1,
+  gap: "10px",
+  pagination: false,
+  arrows: false,
+  breakpoints: {
+    1200: {
+      perPage: 4,
+    },
+    900: {
+      perPage: 3,
+    },
+    600: {
+      perPage: 2,
+    },
+    480: {
+      perPage: 1,
+      focus: 'center', // Center the single slide
+    },
+  },
+  autoplay: true,
+  interval: 3000,
+  pauseOnHover: false,
+  pauseOnFocus: false,
+  resetProgress: false,
+  speed: 1000,
+  drag: true,
+  cloneStatus: true,
+  drag: false,
+};
 </script>
 
 <template>
-  <div class="swiper-container-wrapper">
-    <Panel class="panel">
-      <template #header>
-        <h3 class="slider-heading">{{ studentopinionssection?.title }}</h3>
-        <p class="description-text">{{ studentopinionssection?.description }}</p>
-      </template>
-      <swiper-container dir="rtl" :ref="`swiperRef`" :slides-per-view="3" :space-between="3" :loop="true" :autoplay="{
-        delay: 3000,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: true,
-        reverseDirection: false,
-      }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
-        nextEl: `.swiper-button-next`,
-        prevEl: `.swiper-button-prev`,
-      }" :pagination="{
-        el: `.swiper-pagination`,
-        clickable: true,
-        dynamicBullets: true,
-      }" :breakpoints="{
-        120: {
-          slidesPerView: 1,
-          spaceBetween: 5
-        },
-        320: {
-          slidesPerView: 3,
-          spaceBetween: 5
-        },
-        768: {
-          slidesPerView: 5,
-          spaceBetween: 10
-        },
-        1024: {
-          slidesPerView: 5,
-          spaceBetween: 10
-        }
-      }" @swiper="onSwiper" @slideChange="onSlideChange">
-        <swiper-slide v-for="(card, index) in studentopinionssection?.media" :key="index">
-          <div class="slide-content">
-            <a :href="card?.link || '#'" target="_blank">
-              <img :src="card.file" :alt="card.alt" class="slider-image" />
-            </a>
-          </div>
-        </swiper-slide>
-      </swiper-container>
-    </Panel>
+  <div class="card-course-four">
+    <div class="slider-wrapper flex" dir="ltr">
 
+      <h1 class="slider-heading" style="margin-top: 25px;">{{ studentopinionssection?.title }}</h1>
+      <p class="slider-paragraph">
+        {{ studentopinionssection?.description }}
+      </p>
 
+      <Splide :options="splideOptions" class="splide-container">
+        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
 
-    <SquareIcon class="dots-icons-one" />
-    <SquareIcon class="dots-icons-two" />
-
+          <a :href="card?.link || '#'" target="_blank">
+            <img :src="card.file" :alt="card.alt" class="slider-image" />
+          </a>
+          <!-- <video autoplay loop muted  v-if="isVideo(card.file)" class="slider-image">
+            <source :src="card.file">
+          </video> -->
+        </SplideSlide>
+      </Splide>
+    </div>
   </div>
 </template>
-
-<style scoped>
-.panel{
-  margin-top: 10px;
-  box-shadow: 10px 10px 10px #0000002b;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-
+<style>
+.slider-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .slider-heading {

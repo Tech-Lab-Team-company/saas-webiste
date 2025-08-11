@@ -62,7 +62,7 @@ const UserSetting = useSettingStore();
 </script>
 
 <template>
-  <h3 class="slider-heading" style="margin-top: 10px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
+  <h3 class="slider-heading" style="margin-top: 10px;font-size: 33px;font-weight: 800;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
   <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-three">
     <ClientOnly>
       <swiper-container ref="containerRef" dir="rtl">

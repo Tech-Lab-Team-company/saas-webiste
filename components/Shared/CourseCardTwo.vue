@@ -69,11 +69,11 @@ const UserSetting = useSettingStore();
 <template>
   <div class="course-style-two-container">
 
-    <h3 class="slider-heading" style="margin-top: 25px;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
-    
+
+    <h3 class="slider-heading" style="margin-top: 25px;font-size: 34px;font-weight: 800;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
     <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-two">
       <ClientOnly>
-        <swiper-container ref="containerRef">
+        <swiper-container ref="containerRef" dir="rtl">
           <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx">
             <NuxtLink :to="`/course/${slide?.id}`">
               <div class="card-container"
@@ -85,7 +85,7 @@ const UserSetting = useSettingStore();
                       </p>
                       <p class="course-title">{{ slide?.title }}</p>
                     </div>
-                    <p class="course-description" v-html="slide?.description"></p>
+                    <p v-if="slide?.description" class="course-description" v-html="slide?.description"></p>
                   </div>
                   <div class="course-teacher">
                     <p class="teacher-name">{{ slide?.teacher?.name || UserSetting?.setting?.name }}</p>
@@ -108,11 +108,15 @@ const UserSetting = useSettingStore();
     </div>
   </div>
 
-
-  <SharedSingleCourseCard v-if="homesection?.courses?.length < 2" :HomeSections="homesection" />
+<div class="single-course-two">
+  <SharedSingleCourseCard v-if="homesection?.courses?.length < 2" :HomeSections="homesection"  />
+</div>
 </template>
 
 <style scoped lang="scss">
+.course-title{
+  min-height: auto !important;
+}
 .card-course-twoo {
   width: 100%;
 }
