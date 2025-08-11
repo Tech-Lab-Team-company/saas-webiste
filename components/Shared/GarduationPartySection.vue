@@ -80,9 +80,9 @@ onMounted(() => {
       pauseOnMouseEnter: true,
       reverseDirection: false,
     }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
-        nextEl: `.swiper-button-next-${index}`,
-        prevEl: `.swiper-button-prev-${index}`,
-      }" :pagination="{
+      nextEl: `.swiper-button-next-${index}`,
+      prevEl: `.swiper-button-prev-${index}`,
+    }" :pagination="{
         el: `.swiper-pagination-${index}`,
         clickable: true,
         dynamicBullets: true,
@@ -165,7 +165,7 @@ onMounted(() => {
 .swiper-container-wrapper {
   position: relative;
   width: 90%;
-  //max-width: 1200px;
+  max-width: 1350px;
   margin: 0 auto;
 }
 
@@ -178,7 +178,7 @@ swiper-container {
 }
 
 swiper-slide {
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   align-items: center;
   color: white;
@@ -209,10 +209,10 @@ swiper-slide {
 
 .slide-content a .image-conatiner img {
   object-fit: cover;
-  //aspect-ratio: 16/9;
+  aspect-ratio: 16/12;
   border-radius: 15px;
   width: 100%;
-  //height: 100%;
+  height: 100%;
 }
 
 .slide-content h3 {
