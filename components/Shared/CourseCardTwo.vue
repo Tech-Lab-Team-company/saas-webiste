@@ -69,6 +69,7 @@ const UserSetting = useSettingStore();
 <template>
   <div class="course-style-two-container">
 
+
     <h3 class="slider-heading" style="margin-top: 25px;font-size: 34px;font-weight: 800;">{{ homesection?.title || UserSetting.setting?.name }}</h3>
     <div v-if="homesection?.courses?.length >= 2" class="course-style-one course-style-two">
       <ClientOnly>

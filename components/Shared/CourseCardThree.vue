@@ -107,6 +107,7 @@ const UserSetting = useSettingStore();
   </div>
 
 
+
   <SharedSingleCourseCard v-if="homesection?.courses?.length < 2" :HomeSections="homesection" />
 </template>
 

@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { Splide, SplideSlide } from "@splidejs/vue-splide";
-import "@splidejs/vue-splide/css";
-import img2 from "@/assets/images/img2.png";
-import img3 from "@/assets/images/img3.png";
-import img4 from "@/assets/images/img4.png";
+import { ref, onMounted } from 'vue'
+import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
@@ -70,16 +67,16 @@ const splideOptions = {
   arrows: false,
   breakpoints: {
     1200: {
-      perPage: 5,
-    },
-    900: {
       perPage: 4,
     },
-    600: {
+    900: {
       perPage: 3,
     },
-    480: {
+    600: {
       perPage: 2,
+    },
+    480: {
+      perPage: 1,
       focus: 'center', // Center the single slide
     },
   },
@@ -94,19 +91,20 @@ const splideOptions = {
   drag: false,
 };
 </script>
+
 <template>
   <div class="card-course-four">
     <div class="slider-wrapper flex" dir="ltr">
 
-      <h1 class="slider-heading" style="margin-top: 25px; font-size: 34px; font-weight: 800;">{{ studentopinionssection?.title }}</h1>
+      <h1 class="slider-heading" style="margin-top: 25px;">{{ studentopinionssection?.title }}</h1>
       <p class="slider-paragraph">
         {{ studentopinionssection?.description }}
       </p>
 
       <Splide :options="splideOptions" class="splide-container">
-        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index" >
+        <SplideSlide v-for="(card, index) in studentopinionssection?.media" :key="index">
 
-          <a :href="card?.link || '#'" target="_blank" class="image-container">
+          <a :href="card?.link || '#'" target="_blank">
             <img :src="card.file" :alt="card.alt" class="slider-image" />
           </a>
           <!-- <video autoplay loop muted  v-if="isVideo(card.file)" class="slider-image">
@@ -118,10 +116,6 @@ const splideOptions = {
   </div>
 </template>
 <style scoped>
-
-.image-container{
-  /* border: 1px solid #000; */
-}
 .slider-wrapper {
   display: flex;
   flex-direction: column;
@@ -131,72 +125,174 @@ const splideOptions = {
 }
 
 .slider-heading {
-  font-size: 35px;
-  color: #222;
+  width: 100%;
   text-align: center;
-  margin-bottom: 5px;
-  font-weight: 800;
-  vertical-align: middle;
-  font-family: "bold";
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.description-text {
+  text-align: center;
+}
+
+.dots-icons-one {
+  position: absolute;
+  top: 88%;
+  transform: translateY(-80%);
+  left: -4%;
+  z-index: -1;
+}
+
+.dots-icons-two {
+  position: absolute;
+  top: 44%;
+  transform: translateY(-80%);
+  right: 0;
+  z-index: -1;
+}
+
+@media(max-width:768px) {
+  .dots-icons-two {
+    right: 0%;
+  }
+}
+
+.swiper-container-wrapper {
+  position: relative;
+  width: 90%;
+  /* //max-width: 1200px; */
+  margin: 0 auto;
   margin-top: 20px;
 }
 
-.slider-paragraph {
-  font-weight: 400;
-  font-size: 20px;
-  vertical-align: middle;
-  color: #737e8a;
-  font-family: "regular";
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.splide-container {
-  width: 86%;
-  height: 100%;
-  padding-bottom: 30px;
-}
-
-.splide-slide {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.slider-image {
-  /* width: 300px; */
+swiper-container {
   width: 100%;
-  height: 212px;
+}
+
+swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  width: 380px;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-radius: 12px;
+}
+
+.slide-content {
+  text-align: center;
+  height: 100%;
   border-radius: 15px;
 }
 
-/* .splide__slide{
-  width: 50%;
-} */
+.slide-content a {
+  //height: 100%;
+  border-radius: 15px;
+}
 
-/* Center single slide on small screens */
-@media (max-width: 480px) {
-  .splide__track {
-    /* display: flex; */
-    /* justify-content: center; */
-  }
+.slide-content a .image-conatiner {
+  //height: 100%;
+  border-radius: 15px;
+  //border: 10px solid rgba(128, 128, 128, 0.404);
+}
 
-  .splide__list {
-    justify-content: center;
-  }
+.slide-content a .image-conatiner img {
+  object-fit: cover;
+  //aspect-ratio: 16/9;
+  border-radius: 15px;
+  width: 100%;
+  //height: 100%;
+}
 
-  .splide__slide {
-    display: flex;
-    justify-content: center;
+.slide-content h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.slide-content p {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.control-buttons button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.control-buttons button:hover {
+  background-color: #0056b3;
+}
+
+/* Custom navigation buttons styling */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #9D9D9D;
+  font-size: 30px;
+  font-weight: 900;
+  margin-top: 20px;
+}
+
+@media(max-width:768px) {
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none;
   }
 }
 
-/* splide buttons */
-.splide__arrow--prev {
-  left: -60px;
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 20px;
+  font-weight: bold;
 }
 
-.splide__arrow--next {
-  right: -20px;
+/* Custom pagination styling */
+.swiper-pagination {
+  bottom: 10px;
+}
+
+:deep(.swiper-pagination-bullet) {
+  background-color: #007bff;
+  opacity: 0.5;
+}
+
+:deep(.swiper-pagination-bullet-active) {
+  opacity: 1;
+  background-color: #007bff;
+}
+
+.swiper-button-next {
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
+}
+
+.swiper-button-prev {
+  right: var(--swiper-navigation-sides-offset, 5px) !important;
+}
+
+@media (max-width:768px) {
+  .swiper-button-next {
+    right: var(--swiper-navigation-sides-offset, 5px) !important;
+  }
+}
+
+@media (max-width:768px) {
+  .swiper-button-prev {
+    right: var(--swiper-navigation-sides-offset, -5px) !important;
+  }
 }
 </style>

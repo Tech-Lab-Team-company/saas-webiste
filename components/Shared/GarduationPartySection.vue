@@ -74,28 +74,19 @@ onMounted(() => {
   <div class="swiper-container-wrapper" v-for="(section, index) in GraduationParty" :key="index">
     <h3 class="slider-heading">{{ section?.title }}</h3>
     <p class="description-text">{{ section?.description }}</p>
-    <swiper-container 
-      :ref="`swiperRef`" 
-      :slides-per-view="3" 
-      :space-between="3" 
-      :loop="true" 
-      :autoplay="{
-        delay: 3000,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: true,
-        reverseDirection: false,
-      }" 
-      :modules="[Autoplay, Pagination, Navigation, EffectFade]" 
-      :navigation="{
+    <swiper-container :ref="`swiperRef`" :slides-per-view="3" :space-between="3" :loop="true" :autoplay="{
+      delay: 3000,
+      disableOnInteraction: false,
+      pauseOnMouseEnter: true,
+      reverseDirection: false,
+    }" :modules="[Autoplay, Pagination, Navigation, EffectFade]" :navigation="{
         nextEl: `.swiper-button-next-${index}`,
         prevEl: `.swiper-button-prev-${index}`,
-      }" 
-      :pagination="{
+      }" :pagination="{
         el: `.swiper-pagination-${index}`,
         clickable: true,
         dynamicBullets: true,
-      }" 
-      :breakpoints="{
+      }" :breakpoints="{
         120: {
           slidesPerView: 1,
           spaceBetween: 20
@@ -112,9 +103,7 @@ onMounted(() => {
           slidesPerView: 3,
           spaceBetween: 30
         }
-      }" 
-      @swiper="onSwiper" 
-      @slideChange="onSlideChange">
+      }" @swiper="onSwiper" @slideChange="onSlideChange">
       <swiper-slide v-for="(image, slideIndex) in section.media" :key="slideIndex">
         <div class="slide-content">
           <a :href="`/course?year_id=${image.year_id}&division_id=${image.division_id}`">
@@ -140,6 +129,13 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.slider-heading {
+  text-align: center;
+  margin-block: 20px;
+  text-shadow: 8px 8px 6px #000000b3;
+  font-size: 40px;
+}
+
 .description-text {
   text-align: center;
 }
@@ -189,7 +185,6 @@ swiper-slide {
   padding: 10px;
   font-weight: bold;
   width: 380px;
-  margin-right: 30px;
   margin-top: auto;
   margin-bottom: auto;
   border-radius: 12px;
@@ -261,6 +256,7 @@ swiper-slide {
 }
 
 @media(max-width:768px) {
+
   .swiper-button-next,
   .swiper-button-prev {
     display: none;
