@@ -37,5 +37,7 @@ export default interface WebStatus {
     address_required:boolean;
     allow_student_education:boolean;
     country_code_required:boolean;
+    teachers_slider:boolean;
+    general_subjects_slider:boolean;
 }
 

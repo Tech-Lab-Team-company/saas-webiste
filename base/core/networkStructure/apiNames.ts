@@ -145,6 +145,10 @@ class ApiNames {
   public chatbotmessages = this.baseUrl + "chat";
 
   
+  public FetchGenralSubjects= this.baseUrl + "fetch_general_subjects";
+  public FetchGenralTeachers= this.baseUrl + "fetch_teachers ";
+
+  
   
   //Courses
   public fetch_courses = "fetch_my_courses";

@@ -77,49 +77,44 @@ const userSetting = useSettingStore();
 <template>
     <div class="swiper-wrapper-container" v-if="homesection?.courses.length > 1">
         <h2 class="section-one-title">{{ homesection?.title || userSetting?.setting?.name }}</h2>
-        <ClientOnly>
-            <swiper-container ref="containerRef" dir="rtl">
-                <swiper-slide v-for="(slide, idx) in homesection?.courses" :key="idx" class="custom-slide">
-                    <div class="section-one-conatiner">
-                        <NuxtLink :to="`/course/${slide?.id}`" class="card-link">
-                            <div class="section-one-image">
-                                <NuxtImg width="100%" height="300"
-                                    :src="slide?.image?.img || UserSetting.setting?.image.img"
-                                    :alt="slide?.image?.alt" />
-                            </div>
-                            <div class="course-price">
-                                <p v-if="slide?.course_price != 0">{{ slide?.course_price }}{{ userSetting?.setting?.currency || ` جنيه ` }}</p>
-                                 <p v-if="slide?.course_price == 0">{{ `مجانى` }}</p>
-                            </div>
-                            <div class="section-one-info">
-                                <p class="title-text">{{ slide?.title }}</p>
-                                <p v-html="slide?.description" class="description-text"></p>
-                            </div>
-                            <hr class="section-one-hr">
-                            <div class="course-statistics">
-                                <div class="statistics-box" v-if="slide?.course_videos">
-                                    <Video1 />
-                                    <span>{{ slide?.course_videos }} فيديو</span>
-                                </div>
-                                <div class="statistics-box" v-if="slide?.course_docs">
-                                    <Note />
-                                    <span>{{ slide?.course_docs }} ملف </span>
-                                </div>
-                                <div class="statistics-box" v-if="slide?.course_records">
-                                    <Microphone />
-                                    <span>{{ slide?.course_records }} ملف صوتى</span>
-                                </div>
-                            </div>
-                        </NuxtLink>
+
+        <div class="custom-slide">
+            <div class="section-one-conatiner" v-for="(slide, idx) in homesection?.courses" :key="idx">
+                <NuxtLink :to="`/course/${slide?.id}`" class="card-link">
+                    <div class="section-one-image">
+                        <NuxtImg width="100%" height="300" :src="slide?.image?.img || UserSetting.setting?.image.img"
+                            :alt="slide?.image?.alt" />
                     </div>
-                </swiper-slide>
-            </swiper-container>
+                    <div class="course-price">
+                        <p v-if="slide?.course_price != 0">{{ slide?.course_price }}{{ userSetting?.setting?.currency ||
+                            ` جنيه ` }}</p>
+                        <p v-if="slide?.course_price == 0">{{ `مجانى` }}</p>
+                    </div>
+                    <div class="section-one-info">
+                        <p class="title-text">{{ slide?.title }}</p>
+                        <p v-html="slide?.description" class="description-text"></p>
+                    </div>
+                    <hr class="section-one-hr">
+                    <div class="course-statistics">
+                        <div class="statistics-box" v-if="slide?.course_videos">
+                            <Video1 />
+                            <span>{{ slide?.course_videos }} فيديو</span>
+                        </div>
+                        <div class="statistics-box" v-if="slide?.course_docs">
+                            <Note />
+                            <span>{{ slide?.course_docs }} ملف </span>
+                        </div>
+                        <div class="statistics-box" v-if="slide?.course_records">
+                            <Microphone />
+                            <span>{{ slide?.course_records }} ملف صوتى</span>
+                        </div>
+                    </div>
+                </NuxtLink>
+            </div>
+        </div>
 
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-pagination"></div>
 
-        </ClientOnly>
+
     </div>
     <div class="single-card" v-if="homesection?.courses?.length < 2">
         <h2 class="section-one-title">{{ homesection?.title || userSetting?.setting?.name }}</h2>
@@ -149,6 +144,7 @@ const userSetting = useSettingStore();
         background-color: #F1F1F1;
         height: 100%;
         display: flex;
+     
 
         .card-link {
             display: flex;
@@ -296,11 +292,26 @@ const userSetting = useSettingStore();
 .custom-slide {
     padding: 0 5px;
     height: auto; // Let swiper handle the height
+    direction: rtl;
 
     @media (max-width: 640px) {
         padding: 0 10px;
     }
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:20px;
+
+    @media(max-width:768px) {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    @media(max-width:500px) {
+        grid-template-columns: 1fr !important;
+
+    }
 }
+
 
 // Ensure all swiper slides have equal height
 swiper-container {

@@ -1,0 +1,29 @@
+@import "../variables";
+@import "../mixins/flex";
+@import "../mixins/grid";
+
+.teacher-section {
+  .teacher-section-title {
+    text-align: center;
+    margin-block: $XlSize;
+    text-shadow: $XsSize3 $XsSize3 $XsSize4 #000000b3;
+    font-size: calc($XlSize3 + 10px);
+  }
+
+  .teacher-card{
+    // background-color: red;
+    position: relative;
+    .teacher-info{
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #00000031;
+        color: white;
+        font-size:$XlSize ;
+        font-weight: $BaseFontSemiBoldWeight;
+    }
+  }
+}

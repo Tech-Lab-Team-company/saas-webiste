@@ -1,0 +1,35 @@
+@import "../variables";
+@import "../mixins/flex";
+@import "../mixins/grid";
+
+.home-subjects-card{
+    @include flex-column(nowrap , center ,center);
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius:$XlSize ;
+    padding: $XlSize;
+    gap: $XsSize2;
+    box-shadow:  $XsSize2 $XsSize2 $XsSize2 #AAAAAA40;
+    cursor: pointer;
+    transition: all 0.3s linear ;
+    &:hover{
+        box-shadow:  $XsSize2 $XsSize2 $XsSize2 #aaaaaaa6;
+
+    }
+    .subject-image{
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        padding: 3px;
+        border-radius: 50%;
+    }
+    
+
+    .course-name{
+        max-height: 100px;
+        max-width: 100px;
+        text-align: center;
+        font-size: $XlSize;
+        font-weight: $BaseFontSemiBoldWeight;
+    }
+}

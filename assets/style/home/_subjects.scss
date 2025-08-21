@@ -1,0 +1,19 @@
+@import "../variables";
+@import "../mixins/flex";
+@import "../mixins/grid";
+
+.home-subjects{
+    @include grid(11 , 20px);
+    padding-inline: 20px;
+    @media(max-width:1000px){
+        @include grid(8 , 20px);
+    }
+    @media(max-width:800px){
+        @include grid(6 , 20px);
+    }
+    @media(max-width:500px){
+        @include grid(3 , 20px);
+    }
+    width: 100%;
+    justify-content: center;
+}
