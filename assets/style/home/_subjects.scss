@@ -3,16 +3,16 @@
 @import "../mixins/grid";
 
 .home-subjects{
-    @include grid(11 , 20px);
+    @include grid(6 , 20px);
     padding-inline: 20px;
     @media(max-width:1000px){
-        @include grid(8 , 20px);
+        @include grid(4 , 20px);
     }
     @media(max-width:800px){
-        @include grid(6 , 20px);
+        @include grid(3 , 20px);
     }
     @media(max-width:500px){
-        @include grid(3 , 20px);
+        @include grid(2 , 20px);
     }
     width: 100%;
     justify-content: center;
