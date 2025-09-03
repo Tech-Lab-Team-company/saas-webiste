@@ -45,7 +45,7 @@ function getYoutubeVideoId(url: string): string | null {
   return match ? match[1] : null;
 }
 
-const videoId = getYoutubeVideoId(props.video)
+const videoId = ref(getYoutubeVideoId(props.video))
 
 const settingStore = useSettingStore();
 const VideoBlurScreen = ref(true)
@@ -56,6 +56,11 @@ const VideoBlurScreen = ref(true)
 //     VideoBlurScreen.value = false;
 //   }
 // }
+watch(() => props.video, (newVal) => {
+  videoId.value = getYoutubeVideoId(newVal)
+
+})
+
 </script>
 
 <template>
@@ -70,7 +75,7 @@ const VideoBlurScreen = ref(true)
         <!-- <i class="pi pi-play "></i> -->
       </div>
 
-      <Youtube :showFullscreenControl="false" :videoId="videoId!" @vmReady="onPlayerReady" />
+      <Youtube :showFullscreenControl="false"  :key="videoId" :videoId="videoId!"  @vmReady="onPlayerReady" />
       <Ui>
         <DefaultSettings />
         <Controls>
@@ -125,6 +130,6 @@ const VideoBlurScreen = ref(true)
   left: 50%;
   cursor: pointer;
   border-radius: 20px;
-  
+
 }
 </style>

@@ -146,7 +146,7 @@ hr {
 
 .tab-title {
     display: flex;
-    flex-direction: column; /* Stack icon and text vertically on small screens */
+    // flex-direction: column;
     align-items: center;
     gap: 5px; /* Reduced gap */
     padding: 10px 5px; /* Adjusted padding */

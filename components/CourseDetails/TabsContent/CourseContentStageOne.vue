@@ -258,7 +258,12 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
   margin-bottom: 1rem;
   padding: 0.7rem;
   box-shadow: 3px 3px 3px 2px #00000038;
+}
 
+@media(max-width:768px) {
+  .course-body-details {
+    width: 90%;
+  }
 
 }
 </style>
