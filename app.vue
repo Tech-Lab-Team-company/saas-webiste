@@ -40,7 +40,7 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
 
 
 const  isEduhubDomain = computed(
-    () => getWebDomain() === "eduhub.com.eg" || getWebDomain() === "www.eduhub.com.eg"
+    () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhub.com"
 )
 
 console.log("isEduhubDomain:", isEduhubDomain.value);
