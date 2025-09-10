@@ -44,6 +44,7 @@ const  isEduhubDomain = computed(
 )
 
 console.log("isEduhubDomain:", isEduhubDomain.value);
+console.log("getWebDomain", getWebDomain())
 
 
 const SettingStore = useSettingStore()
