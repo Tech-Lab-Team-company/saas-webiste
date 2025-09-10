@@ -43,10 +43,6 @@ const  isEduhubDomain = computed(
     () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhub.com"
 )
 
-console.log("isEduhubDomain:", isEduhubDomain.value);
-console.log("getWebDomain", getWebDomain())
-
-
 const SettingStore = useSettingStore()
 const changeFavicon = (iconPath) => {
   useHead({
