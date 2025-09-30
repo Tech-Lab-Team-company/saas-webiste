@@ -131,10 +131,11 @@
 
   .vid-container {
     position: relative;
-    display: flex;
+    // display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
+    width: 100%;
     .background-vid-container {
       position: absolute;
       top: 0;
@@ -147,6 +148,10 @@
       background-size: cover;
       filter: blur(8px);
       -webkit-filter: blur(8px);
+
+      @media(min-width:768px){
+        display: none;
+      }
     }
     .video {
       height: 100%;
@@ -159,6 +164,24 @@
       position: relative;
       animation: fadein 2s ease-out;
       transition: all 0.3s linear;
+
+      &.web-image{
+        width: 100%;
+        @media (max-width:768px) {
+            display: none;
+        }
+      }
+
+      &:not(.mobil-image){
+        width: 100%;
+      }
+
+      &.mobile-image{
+        display: none;
+        @media (max-width:768px) {
+          display: block;
+        }
+      }
 
       @keyframes fadein {
         from {
@@ -291,11 +314,11 @@
 
 .header-home-section {
 
-  max-height: 80vh;
+  max-height: 60vh;
   // height: 60vh;
   // aspect-ratio: 16/9;
   * {
-    max-height: 80vh;
+    max-height: 60vh;
   }
   .swiper-pagination-lock {
     display: block !important;

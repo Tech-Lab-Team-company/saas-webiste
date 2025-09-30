@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import BackgoundCircle from '~/public/icons/BackgoundCircle.vue';
-import { ref, onMounted } from 'vue';
+import BackgoundCircle from "~/public/icons/BackgoundCircle.vue";
+import { ref, onMounted } from "vue";
 // import EducationStages from './EducationStages.vue';
-import Students from './Students.vue';
-import { baseUrl } from '~/constant/baseUrl';
-import type { SwiperHome } from '~/types/swiperhome';
-import { register } from 'swiper/element/bundle';
+import Students from "./Students.vue";
+import { baseUrl } from "~/constant/baseUrl";
+import type { SwiperHome } from "~/types/swiperhome";
+import { register } from "swiper/element/bundle";
 import { getWebDomain } from "~/constant/webDomain"; // For web components
 
 const containerRef = ref(null);
-const swiper_position = ref('next');
+const swiper_position = ref("next");
 const _swiper = useSwiper(containerRef, {
   effect: "fade",
   loop: true,
@@ -19,7 +19,6 @@ const _swiper = useSwiper(containerRef, {
     type: "bullets",
     dynamicBullets: true,
   },
-
 });
 
 // Register Swiper web components
@@ -28,17 +27,21 @@ onMounted(() => {
 });
 
 // Fetch slider data
-const { data: sliders, pending, error } = await useAsyncData('sliders', async () => {
+const {
+  data: sliders,
+  pending,
+  error,
+} = await useAsyncData("sliders", async () => {
   try {
     const response = await $fetch<{
       data: SwiperHome[];
       message: string;
       status: number;
     }>(`${baseUrl}/fetch_sliders`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept-Language': 'ar',
-        'web-domain': getWebDomain(),
+        "Accept-Language": "ar",
+        "web-domain": getWebDomain(),
       },
       body: {
         type: 3,
@@ -46,24 +49,23 @@ const { data: sliders, pending, error } = await useAsyncData('sliders', async ()
     });
     return response.data;
   } catch (err) {
-    console.error('Failed to fetch sliders:', err);
+    console.error("Failed to fetch sliders:", err);
     return [];
   }
 });
 
-
 const isImage = (url) => {
   if (!url) return false;
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
-  const extension = url.split('.').pop().toLowerCase();
+  const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp", "svg"];
+  const extension = url.split(".").pop().toLowerCase();
   return imageExtensions.includes(extension);
 };
 
 // Check if URL is a video
 const isVideo = (url) => {
   if (!url) return false;
-  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
-  const extension = url.split('.').pop().toLowerCase();
+  const videoExtensions = ["mp4", "webm", "ogg", "mov"];
+  const extension = url.split(".").pop().toLowerCase();
   return videoExtensions.includes(extension);
 };
 
@@ -82,8 +84,8 @@ const isExpanded = (slideId: number) => {
 
 // Truncate text to specified length
 const truncateText = (text: string, maxLength: number = 100) => {
-  if (!text) return '';
-  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+  if (!text) return "";
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 };
 
 // Check if text needs truncation
@@ -92,33 +94,52 @@ const needsTruncation = (text: string, maxLength: number = 100) => {
 };
 const expandedSlides = ref<Set<number>>(new Set());
 
-  const setting = useSettingStore()
+const setting = useSettingStore();
 
+const ScreenWidth = ref(window.innerWidth);
+
+watch(
+  () => window.innerWidth,
+  (newValue) => {
+    console.log(newValue);
+    ScreenWidth.value = newValue;
+  }
+);
 </script>
-
 
 <template>
   <div class="main-container">
     <ClientOnly>
       <div v-if="pending" class="loading">جاري التحميل...</div>
       <div v-else-if="error" class="error">فشل في تحميل السلايدر.</div>
-      <swiper-container class="header-home-section" :loop="true" ref="containerRef" :slides-per-view="1"
-        :space-between="50" :autoplay="{
+      <swiper-container
+        class="header-home-section"
+        :loop="true"
+        ref="containerRef"
+        :slides-per-view="1"
+        :space-between="50"
+        :autoplay="{
           delay: 7000,
           disableOnInteraction: false,
           pauseOnMouseEnter: false,
-          stopOnLastSlide: false
-        }" :speed="7000">
+          stopOnLastSlide: false,
+        }"
+        :speed="7000"
+      >
         <swiper-slide v-for="slide in sliders" :key="slide.id">
           <!-- isImage(slide?.media?.img) -->
           <div v-if="slide?.style == 1" class="container">
             <div class="image-container">
               <BackgoundCircle class="background" />
-              <img v-if="isImage(slide?.media?.img)" class="row-img" :src="slide?.media?.img" />
+              <img
+                v-if="isImage(slide?.media?.img)"
+                class="row-img"
+                :src="slide?.media?.img"
+              />
               <div v-else class="video video-image-section">
                 <div class="layer"></div>
                 <video autoplay muted loop>
-                  <source :src="slide.media.img" type="video/mp4">
+                  <source :src="slide.media.img" type="video/mp4" />
                 </video>
               </div>
             </div>
@@ -127,14 +148,24 @@ const expandedSlides = ref<Set<number>>(new Set());
               <div class="title">
                 <p class="main-title">{{ slide.title }}</p>
                 <div class="subtitle-container w-100">
-                  <p class="sub-title" :class="{ 'expanded': isExpanded(slide.id) }">
-                    {{ isExpanded(slide.id) ? slide.subtitle : truncateText(slide.subtitle) }}
+                  <p
+                    class="sub-title"
+                    :class="{ expanded: isExpanded(slide.id) }"
+                  >
+                    {{
+                      isExpanded(slide.id)
+                        ? slide.subtitle
+                        : truncateText(slide.subtitle)
+                    }}
                   </p>
-                  <p class=" sub-title-expanded">
+                  <p class="sub-title-expanded">
                     {{ slide.subtitle }}
                   </p>
-                  <button v-if="needsTruncation(slide.subtitle)" @click="toggleSubtitle(slide.id)"
-                    class="show-more-btn">
+                  <button
+                    v-if="needsTruncation(slide.subtitle)"
+                    @click="toggleSubtitle(slide.id)"
+                    class="show-more-btn"
+                  >
                     {{ isExpanded(slide.id) ? "عرض أقل" : "عرض المزيد" }}
                   </button>
                   <div class="flex gap-sm">
@@ -150,51 +181,69 @@ const expandedSlides = ref<Set<number>>(new Set());
             </div>
           </div>
 
-
           <div v-else class="vid-container">
-            <div class="background-vid-container" :style="{ backgroundImage: `url(${slide.media.img})` }"></div>
+            <div
+              class="background-vid-container"
+              :style="{
+                backgroundImage: `${
+                  ScreenWidth > 768
+                    ? `url(${slide.media.img})`
+                    : `url(${slide.media.mobile_img})`
+                }`,
+              }"
+            ></div>
             <div class="video" v-if="isVideo(slide?.media?.img)">
               <div class="layer"></div>
               <video autoplay muted loop>
-                <source :src="slide.media.img" type="video/mp4">
+                <source :src="slide.media.img" type="video/mp4" />
               </video>
             </div>
-            <img v-else class="video" :src="slide?.media?.img" />
+
+            <div v-else>
+              <img class="video web-image" :src="slide?.media?.img" />
+              <img class="video mobile-image" :src="slide?.media?.mobile_img" />
+            </div>
             <div class="vid-details">
               <div class="vid-title">
                 <p class="title">{{ slide.text }}</p>
                 <p class="vid-main-title">{{ slide.title }}</p>
                 <div class="subtitle-container w-100">
-                  <p class="vid-sub-title" :class="{ 'expanded': isExpanded(slide.id) }">
-                    {{ isExpanded(slide.id) ? slide.subtitle : truncateText(slide.subtitle) }}
+                  <p
+                    class="vid-sub-title"
+                    :class="{ expanded: isExpanded(slide.id) }"
+                  >
+                    {{
+                      isExpanded(slide.id)
+                        ? slide.subtitle
+                        : truncateText(slide.subtitle)
+                    }}
                   </p>
-                  <p class=" sub-title-expanded">
+                  <p class="sub-title-expanded">
                     {{ slide.subtitle }}
                   </p>
-                  <button v-if="needsTruncation(slide.subtitle)" @click="toggleSubtitle(slide.id)"
-                    class="show-more-btn vid-show-more">
-                    {{ isExpanded(slide.id) ? 'عرض أقل' : 'عرض المزيد' }}
+                  <button
+                    v-if="needsTruncation(slide.subtitle)"
+                    @click="toggleSubtitle(slide.id)"
+                    class="show-more-btn vid-show-more"
+                  >
+                    {{ isExpanded(slide.id) ? "عرض أقل" : "عرض المزيد" }}
                   </button>
                 </div>
               </div>
               <!-- <button class="btn btn-primary">{{ $t('ابــــدأ الآن') }}</button> -->
             </div>
           </div>
-
-
         </swiper-slide>
       </swiper-container>
     </ClientOnly>
-
-
   </div>
-  <HomeCoursesSubjectsSection v-if="setting?.setting?.general_subjects_slider" />
+  <HomeCoursesSubjectsSection
+    v-if="setting?.setting?.general_subjects_slider"
+  />
 
   <!--  <EducationStages />-->
   <Students />
-
 </template>
-
 
 <style scoped lang="scss">
 .btn-link {
@@ -202,7 +251,6 @@ const expandedSlides = ref<Set<number>>(new Set());
 
   button {
     width: 100%;
-
   }
 }
 
@@ -233,17 +281,15 @@ const expandedSlides = ref<Set<number>>(new Set());
   text-decoration: underline !important;
   width: fit-content !important;
 
-  @media(min-width: 768px) {
+  @media (min-width: 768px) {
     display: none !important;
   }
 }
 
 .sub-title {
-  @media(min-width: 768px) {
+  @media (min-width: 768px) {
     display: none !important;
   }
-
-
 }
 
 .sub-title-expanded {
@@ -254,7 +300,7 @@ const expandedSlides = ref<Set<number>>(new Set());
   margin-top: 10px;
   line-height: 1.6;
 
-  @media(max-width: 768px) {
+  @media (max-width: 768px) {
     display: none !important;
   }
 }
