@@ -11,23 +11,14 @@ import Email from "../Icons/Email.vue";
 import FetchChatBotParams from "~/features/FetchChatBot/Core/Params/fetch_chat_bot_params";
 import FetchChatBotController from "~/features/FetchChatBot/presentation/controllers/fetch_chat_bot_controller";
 import type ChatBotModel from "~/features/FetchChatBot/Data/models/chat_bot_model";
-
+import DesktopIcon from "../Icons/DesktopIcon.vue";
 
 const settingStore = useSettingStore();
 const setting = computed(() => settingStore.setting);
-
-
-
-
-
-
-
-
 </script>
 
 <template>
   <div class="grid grid-cols-1 md:grid-cols-4 footer-container">
-    
     <div class="col">
       <p class="col-title">وسائل التواصل</p>
 
@@ -95,21 +86,55 @@ const setting = computed(() => settingStore.setting);
     </div>
 
     <div class="col logo-col">
-      
-   
-
-      <NuxtImg v-if="settingStore.setting?.image?.img" :src="settingStore.setting.image.img" :alt="setting?.image?.alt"
-        format="webp" class="col-logo" />
+      <NuxtImg
+        v-if="settingStore.setting?.image?.img"
+        :src="settingStore.setting.image.img"
+        :alt="setting?.image?.alt"
+        format="webp"
+        class="col-logo"
+      />
 
       <div v-html="setting?.description" class="col-data-details"></div>
       <div class="stores-logos-container">
-        <a v-if="settingStore.setting?.app_store && settingStore.setting?.app_store != '-'" class="stores-logos-link" target="_blank" :href="settingStore.setting?.app_store">
-          <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
-          
+        <a
+          v-if="
+            settingStore.setting?.app_store &&
+            settingStore.setting?.app_store != '-'
+          "
+          class="stores-logos-link"
+          target="_blank"
+          :href="settingStore.setting?.app_store"
+        >
+          <NuxtImg
+            class="stores-logos stores-logos-apple"
+            src="/images/Download_on_the_App_Store_Badge.svg.webp"
+          />
         </a>
-        <a v-if="settingStore.setting?.play_store && settingStore.setting?.play_store != '-'" class="stores-logos-link" target="_blank" :href="settingStore.setting?.play_store">
-          <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
+        <a
+          v-if="
+            settingStore.setting?.play_store &&
+            settingStore.setting?.play_store != '-'
+          "
+          class="stores-logos-link"
+          target="_blank"
+          :href="settingStore.setting?.play_store"
+        >
+          <NuxtImg
+            class="stores-logos"
+            src="/images/en_badge_web_generic.png"
+          />
         </a>
+
+        <a
+          :href="settingStore.setting?.desktop_app"
+          download
+          v-if="settingStore.setting?.have_desktop"
+          class="desktop-link"
+        >
+        <DesktopIcon class="desktop-icon" />
+        <p>Desktop</p>
+        </a>
+
       </div>
       <div class="social-media-icons">
         <NuxtLink :to="setting?.twitter">
@@ -134,53 +159,61 @@ const setting = computed(() => settingStore.setting);
 </template>
 
 <style scoped lang="scss">
-
-.footer-container{
+.desktop-link{
+  display: flex;
+  justify-content: space-between;
+  align-items:center ;
+  gap: 5px;
+  background-color: rgba(0, 0, 0, 0.925);
+  border-radius: 5px;
+  color: white;
+  padding-inline: 20px;
+}
+.desktop-icon{
+  width:  60px;
+  height: 30px;
+}
+.footer-container {
   position: relative;
-  @media(max-width:768px){
+  @media (max-width: 768px) {
     grid-column: 1fr 1fr;
   }
 }
 
-
-
-
-
-.pi-comment{
+.pi-comment {
   font-size: 20px;
 }
-.stores-logos-container{
-  display:flex;
-  align-items:center;
+.stores-logos-container {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  .stores-logos-link{
-    width:50%;
+  .stores-logos-link {
+    width: 50%;
 
-    .stores-logos-apple{
-      width:88%;
+    .stores-logos-apple {
+      width: 88%;
     }
   }
-
 }
 
-.col{
-  &.logo-col{
-    display:flex;
+.col {
+  &.logo-col {
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap:15px;
+    gap: 15px;
     position: relative;
-    .chatbot{
-        position: absolute;
-        top: 0;
-        right: 0;
-      }
+    .chatbot {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
   }
-  .col-description{
-    .col-details{
+  .col-description {
+    .col-details {
       .email-icon {
-        background-color: #ECECF2;
+        background-color: #ececf2;
         // width: 20px;
         // height: 20px;
         padding: 6px;
@@ -189,11 +222,11 @@ const setting = computed(() => settingStore.setting);
     }
   }
 }
-.rights-hr{
+.rights-hr {
   margin-top: 1rem;
   grid-column: span 4;
 }
-.tech-lab-rights{
+.tech-lab-rights {
   width: 100%;
   grid-column: span 4;
   // @media (max-width:768px) {
@@ -207,8 +240,3 @@ const setting = computed(() => settingStore.setting);
   // }
 }
 </style>
-
-
-
-
-
