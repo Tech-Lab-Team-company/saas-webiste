@@ -224,7 +224,6 @@ const SelectedStageTitle = ref<string>()
 const SelectedStageYearTitle = ref<string>()
 
 const SendData = () => {
-  console.log(CategryId.value , "CategryId.value")
   filtersStore.updateFilters({
     CategryId: CategryId.value,
     SelectedEductionType: SelectedEducationTypeId.value,
@@ -260,7 +259,6 @@ const SelectedYearId = ref<number>()
 const ActiveStageYear = ref<boolean>(false)
 const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
   ActiveStageYear.value = !ActiveStageYear.value
-  console.log(stageYearId);
   if (ActiveStageYear.value) {
 
     SelectedYearId.value = stageYearId;

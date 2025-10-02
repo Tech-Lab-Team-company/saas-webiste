@@ -1,0 +1,123 @@
+@import "../new_vars";
+@import "../mixins/flex";
+@import "../mixins/grid";
+
+.error-page {
+  background-color: rgba(0, 0, 0, 0.774);
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+
+  .Circles {
+    // position: relative;
+    width: 100%;
+    height: 100%;
+
+    .error-circle {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      animation: randomMove 12s infinite cubic-bezier(0.42, 0, 0.58, 1); // smooth ease-in-out
+      //   will-change: transform, top, left;
+
+      &:nth-child(1) {
+        animation-delay: 0s;
+        animation-duration: 10s;
+        opacity: 0.1;
+        border-radius: 60px;
+      }
+      &:nth-child(2) {
+        animation-delay: 4s;
+        animation-duration: 12s;
+        opacity: 0.3;
+        border-radius: 15px;
+      }
+      &:nth-child(3) {
+        animation-delay: 6s;
+        animation-duration: 11s;
+        opacity: 0.1;
+        border-radius: 15px;
+      }
+      &:nth-child(4) {
+        animation-delay: 8s;
+        animation-duration: 13s;
+        opacity: 0.3;
+        border-radius: 15px;
+      }
+    }
+
+    @keyframes randomMove {
+      0% {
+        top: 10%;
+        left: 10%;
+      }
+      20% {
+        top: -20%;
+        left: 40%;
+      }
+      40% {
+        top: 0%;
+        left: -10%;
+      }
+      60% {
+        top: 60%;
+        left: -30%;
+      }
+      80% {
+        top: 40%;
+        left: 30%;
+      }
+      100% {
+        top: 10%;
+        left: 10%;
+      }
+    }
+  }
+
+  .content {
+    z-index: 10000;
+    height: 100vh;
+    // @include flex-column(nowrap, center, center);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: calc($XlSize3 + 3px);
+    z-index: 999;
+
+    .title {
+      font-size: calc($XlSize4 + 25px);
+      color: white;
+      font-weight: $BaseFontWeightBold;
+      text-align: center;
+      z-index: 999;
+    }
+
+    .subtitle {
+      font-size: $MdSize;
+      color: white;
+      font-weight: $BaseFontWeightBold;
+      text-align: center;
+      max-width: 681px;
+      z-index: 999;
+    }
+
+    a {
+      width: 30%;
+      z-index: 1000;
+
+      .home-btn {
+        z-index: 1000;
+        font-family: "Regular";
+        width: 100%;
+        @include flex-row(nowrap, space-between, center);
+        background-color: white;
+        padding: $XsSize2 $MdSize;
+        border-radius: calc($XlSize3 + 9px);
+        color: $primary-color;
+        font-size: $MdSize;
+        font-weight: $BaseFontSemiBoldWeight;
+      }
+    }
+  }
+}

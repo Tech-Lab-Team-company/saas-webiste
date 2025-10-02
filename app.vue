@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { baseUrl } from "~/constant/baseUrl";
 import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
@@ -8,9 +7,16 @@ import FetchPaymentMethodsParams from "./features/fetch_payment_methods/Core/Par
 import FetchPaymentMethodController from "./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
 // import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 import { getWebDomain } from "~/constant/webDomain";
+import Error from "./error.vue";
+import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 
+const router = useRouter();
 const UserStore = useUserStore();
-const { data: webStatus, pending } = await useAsyncData("webStatus", async () => {
+const {
+  data: webStatus,
+  pending,
+  error,
+} = await useAsyncData("webStatus", async () => {
   const response = await $fetch<{
     data: WebStatus;
     message: string;
@@ -21,63 +27,55 @@ const { data: webStatus, pending } = await useAsyncData("webStatus", async () =>
       "web-domain": getWebDomain(),
     },
   });
+  // console.log(error.value, "error");
 
   // console.log("WebStatus:", getWebDomain());
 
-  const DefaultPrimaryColor = '#061147'
-  const DefaultSecondColor = 'var(--secondary-color)'
+  const DefaultPrimaryColor = "#061147";
+  const DefaultSecondColor = "var(--secondary-color)";
 
   const PrimaryColor = response?.data?.primary_color || DefaultPrimaryColor;
   const SecondColor = response?.data?.secondary_color || DefaultSecondColor;
   const style = document.createElement("style");
-  style.innerHTML = `:root { --primary-color: ${PrimaryColor }; --secondary-color: ${SecondColor }; }`;
+  style.innerHTML = `:root { --primary-color: ${PrimaryColor}; --secondary-color: ${SecondColor}; }`;
   document.head.appendChild(style);
-
-
-
   return response.data;
 });
 
+const isEduhubDomain = computed(
+  () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhub.com"
+);
 
-const  isEduhubDomain = computed(
-    () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhub.com"
-)
-
-const SettingStore = useSettingStore()
+const SettingStore = useSettingStore();
 const changeFavicon = (iconPath) => {
   useHead({
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: iconPath }
-    ]
-  })
-}
-changeFavicon(`${SettingStore?.setting?.image?.img}`)
+    link: [{ rel: "icon", type: "image/x-icon", href: iconPath }],
+  });
+};
+changeFavicon(`${SettingStore?.setting?.image?.img}`);
 
-const PaymentStore = usePaymentStore()
+const PaymentStore = usePaymentStore();
 const FetchPaymentMethod = async () => {
   const paymentMethod = new FetchPaymentMethodsParams(1);
-  const fetchPaymentMethodController = FetchPaymentMethodController.getInstance();
-  const state = await fetchPaymentMethodController.FetchPaymentMthod(paymentMethod);
+  const fetchPaymentMethodController =
+    FetchPaymentMethodController.getInstance();
+  const state = await fetchPaymentMethodController.FetchPaymentMthod(
+    paymentMethod
+  );
   if (state.value.data) {
     PaymentStore.setPayment(state.value.data);
   }
-}
+};
 
-onMounted(
-    () => {
-      // if (UserStore?.user) {
+onMounted(() => {
+  // if (UserStore?.user) {
 
-      FetchPaymentMethod();
-      // }
-    }
-)
-
+  FetchPaymentMethod();
+  // }
+});
 
 const UserSettingStore = useSettingStore();
 UserSettingStore.setSetting(webStatus.value!);
-
-
-
 </script>
 
 <template>
@@ -91,15 +89,21 @@ UserSettingStore.setSetting(webStatus.value!);
     </div>
     <!-- Main content -->
     <div class="container">
-      <img src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/logo.png" alt="EduHUB Logo" class="logo">
+      <img
+        src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/logo.png"
+        alt="EduHUB Logo"
+        class="logo"
+      />
       <h1>Coming Soon</h1>
       <p>The Future of E-Learning is Here</p>
     </div>
     <a href="tel:+201119342223" class="whatsapp">
-      <img src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/whatsapp.png" alt="whatsapp">
+      <img
+        src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/whatsapp.png"
+        alt="whatsapp"
+      />
     </a>
   </div>
-
 
   <div v-else>
     <NuxtLayout>
@@ -107,9 +111,10 @@ UserSettingStore.setSetting(webStatus.value!);
       <ChatBotButton class="chat-bot-button" />
       <SpeedDialToast class="social-icons" />
       <Toast />
-      <NuxtPage />
+      <NuxtPage v-if="!error" />
+      <Error v-if="error" />
       <MainDialog v-if="!pending" />
-      <!-- <LoaderDialog  v-if="!pending"/> -->
+      <!-- <LoaderDialog v-if="!pending" /> -->
     </NuxtLayout>
   </div>
 </template>
@@ -118,7 +123,7 @@ UserSettingStore.setSetting(webStatus.value!);
 .chat-bot-button {
   position: absolute;
 
-  @media (max-width:768px) {
+  @media (max-width: 768px) {
     display: none;
   }
 }
@@ -137,8 +142,8 @@ UserSettingStore.setSetting(webStatus.value!);
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #000000, #1A1A1A);
-  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #000000, #1a1a1a);
+  font-family: "Poppins", sans-serif;
   color: #fff;
   overflow: hidden;
   position: relative;
@@ -165,27 +170,37 @@ UserSettingStore.setSetting(webStatus.value!);
 }
 .bg-circles span:nth-child(1) {
   left: 25%;
-  width: 60px; height: 60px;
+  width: 60px;
+  height: 60px;
   animation-duration: 15s;
 }
 .bg-circles span:nth-child(2) {
   left: 10%;
-  width: 100px; height: 100px;
+  width: 100px;
+  height: 100px;
   animation-duration: 20s;
 }
 .bg-circles span:nth-child(3) {
   left: 70%;
-  width: 80px; height: 80px;
+  width: 80px;
+  height: 80px;
   animation-duration: 18s;
 }
 .bg-circles span:nth-child(4) {
   left: 50%;
-  width: 120px; height: 120px;
+  width: 120px;
+  height: 120px;
   animation-duration: 25s;
 }
 @keyframes move {
-  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(-800px) rotate(360deg); opacity: 0; }
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-800px) rotate(360deg);
+    opacity: 0;
+  }
 }
 /* Main content */
 .container {
@@ -204,7 +219,7 @@ h1 {
   font-size: 3rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #D4AF37, #FFFFFF, #D4AF37);
+  background: linear-gradient(90deg, #d4af37, #ffffff, #d4af37);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: glow 3s ease-in-out infinite alternate;
@@ -213,7 +228,7 @@ h1 {
 }
 p {
   font-size: 1.2rem;
-  color: #D4AF37;
+  color: #d4af37;
   margin-top: 5px;
   opacity: 0.85;
   animation: fadeIn 3s ease-in-out;
@@ -231,15 +246,30 @@ p {
   }
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
 }
 @keyframes glow {
-  from { text-shadow: 0 0 10px rgba(212,175,55,0.7); }
-  to { text-shadow: 0 0 25px rgba(255,255,255,0.9); }
+  from {
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+  }
+  to {
+    text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+  }
 }
 </style>

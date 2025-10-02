@@ -143,8 +143,6 @@ watch(() => filtersStore,
       </div>
     </div>
 
-    <!-- {{  console.log(CoursesFilter , "response.data")  }} -->
-    {{ console.log(CoursesFilter, "CourseFilter") }}
     <div v-if="selectedToggle === 'one'">
       <CourseAllCourseOne :HomeSections="CoursesFilter" />
     </div>
