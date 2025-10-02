@@ -1,5 +1,5 @@
 .card-container {
-  background-color: #F6F6F6;
+  background-color: #f6f6f6;
   margin-top: 20px;
   padding: 20px;
   display: flex;
@@ -14,7 +14,6 @@
     gap: 25px;
     @media (max-width: 768px) {
       gap: 0;
-
     }
     // justify-content: space-between;
     // gap: 20px;
@@ -33,7 +32,6 @@
         left: 50%;
         top: 100%;
         transform: translate(-50%, -50%);
-
       }
 
       .card-text-subject-title {
@@ -52,19 +50,16 @@
     }
 
     .card-text-description {
-
       text-align: right;
       margin-top: 15px;
       padding: 0 10px;
-      color: #6F777B;
+      color: #6f777b;
       font-weight: 500;
       // width: 600px;
       margin-left: auto;
       font-size: 18px;
       line-height: 150%;
       // max-width: 600px;
-
-
     }
 
     hr {
@@ -85,7 +80,7 @@
       padding: 0 10px;
       font-weight: 800;
 
-      @media(max-width: 768px) {
+      @media (max-width: 768px) {
         flex-direction: column;
         align-items: flex-end;
       }
@@ -99,7 +94,6 @@
           }
         }
       }
-
 
       .card-profile {
         display: flex;
@@ -120,17 +114,17 @@
         display: flex;
         justify-content: flex-start;
         // min-width: 130px;
-        @media(max-width: 768px) {
+        @media (max-width: 768px) {
           justify-content: flex-end;
-
-
         }
-
-
         span {
-          font-size: 26px;
           font-weight: 500;
-
+          &.currency {
+            font-size: 20px;
+          }
+          &.price {
+            font-size: 20px;
+          }
           @media (max-width: 1000px) {
             font-size: 20px;
           }
@@ -152,13 +146,9 @@
         }
       }
     }
-
-
   }
 
-
   .card-video {
-
     overflow: hidden;
     width: 35%;
     border-radius: 20px;
@@ -169,5 +159,4 @@
       // margin-right: auto;
     }
   }
-
 }

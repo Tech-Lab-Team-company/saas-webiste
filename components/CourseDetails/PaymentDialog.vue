@@ -1,112 +1,229 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import Dialog from 'primevue/dialog';
+import Dialog from "primevue/dialog";
 import AddMedia from "../helper/AddMedia.vue";
+
 import MediaInterfaceParams from "~/features/CoursesFilter/Core/Params/media_interface_params";
 import CoursesPaymentParams from "~/features/CoursePayment/Core/Params/courses_payment_params";
 import CoursesPaymentController from "~/features/CoursePayment/presentation/controllers/courses_payment_controller";
+import { PaymentTypes } from "./Enum/payment_types_enum";
+import OnlinePaymentController from "~/features/OnlinePayment/presentation/controllers/online_payment_controller";
+import OnlinePaymentParams from "~/features/OnlinePayment/Core/Params/online_payment_params";
+import { getWebDomain } from "~/constant/webDomain";
+import Loder from "../Loader/Loder.vue";
 
+// 🔹 Props
+const props = defineProps<{ status: number }>();
 
+// 🔹 State
 const visible = ref(false);
-const title = ref('');
-const subtitle = ref('');
-const descriptoin = ref('');
-const router = useRouter()
-const props = defineProps(['status'])
-const status = ref(props.status)
-const Image = ref<File | null>(null)
-const PhoneNumber = ref<string>()
-const PaymentMethod = ref<number>()
+const status = ref(props.status);
+const paymentMethod = ref();
+const phoneNumber = ref<string>();
+const receiptFile = ref<File | null>(null);
+const selectedPaymentRequiresExtraInfo = ref<boolean>(false);
 
+// 🔹 Stores
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
+const settingStore = useSettingStore();
+const paymentStore = usePaymentStore();
+
+// 🔹 Watchers
+watch(
+  () => props.status,
+  (newValue) => (status.value = newValue)
+);
+
+watch(
+  () => paymentMethod.value,
+  (newValue) => {
+    const method = paymentStore.Payment?.find((item) => item.id === newValue);
+    selectedPaymentRequiresExtraInfo.value = method?.type === 1;
+  }
+);
+
+// 🔹 Methods
 const updateFiles = async (files: File[]) => {
-  Image.value = files[0];
+  receiptFile.value = files[0];
 };
 
-const AddPayment = async () => {
-  const coursePaymentParams = new CoursesPaymentParams({
+const addPayment = async () => {
+  const params = new CoursesPaymentParams({
     CourseId: Number(router.currentRoute.value.params.id),
-    PaymentMethod: PaymentMethod.value,
-    Account: PhoneNumber.value,
-    Receipt: Image.value
+    PaymentMethod: paymentMethod.value.id,
+    Account: phoneNumber.value,
+    Receipt: receiptFile.value,
   });
-  const coursesPaymentController = CoursesPaymentController.getInstance();
-  const state = await coursesPaymentController.CoursesPayment(coursePaymentParams);
+
+  const controller = CoursesPaymentController.getInstance();
+  const state = await controller.CoursesPayment(params);
+
   if (state.value.message) {
     status.value = 1;
   }
+
   visible.value = false;
-}
+};
 
-
-const userStore = useUserStore()
-watch(
-  () => props.status,
-  (newValue) => {
-    status.value = newValue;
-  })
-
-const UserSetting = useSettingStore();
-const PaymentStore = usePaymentStore();
-const SelectedPaymentMethod = ref();
-
-const ChooseMethod = (method: Number) => {
-  const SelectedMethod = PaymentStore.Payment?.filter((item) => {
-    return item.id == method
-  })
-
-  if (SelectedMethod[0]?.type == 1) {
-    SelectedPaymentMethod.value = true
+const Loader = ref(false);
+const OnlinePayment = async () => {
+  visible.value = false;
+  Loader.value = true;
+  const onlinePaymentParams = new OnlinePaymentParams(
+    String(route.params.id),
+    paymentMethod.value.id,
+    null,
+    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
+    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
+    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
+    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
+    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`
+  );
+  const onlinePaymentController = OnlinePaymentController.getInstance();
+  const state = await onlinePaymentController.CreateOnlinePayment(
+    onlinePaymentParams,
+    router
+  );
+  if (state.value.data) {
+    Loader.value = false;
+    // "_self"
+    window.open(state.value.data.url, "_blank");
+    window.localStorage.setItem("onlinePaymentId", String(state.value.data.id));
   }
-  else {
-    SelectedPaymentMethod.value = false
-
-  }
-  // console.log(SelectedPaymentMethod.value)
-}
-
-watch(() => PaymentMethod.value,
-  (Newvalue) => {
-    ChooseMethod(Number(Newvalue))
-  }
-)
-
+};
+onMounted(() => {
+  console.log(settingStore?.setting, "setting");
+});
 </script>
 
 <template>
   <div class="edit-dialog-container">
+    <!-- Action Buttons -->
     <div class="btns">
-      <button @click="visible = true" v-if="status == 0 && userStore.user">شراء الكورس</button>
-      <button @click="visible = false" v-if="status == 1 && userStore.user" disabled class="btn-disabled">فى انتظار قبول
-        الطلب</button>
-      <button @click="visible = false" v-if="status == 4 && userStore.user" disabled class="btn-disabled">تم رفض
-        الطلب</button>
-      <button @click="visible = false" v-if="!userStore.user" disabled class="btn-disabled">يجب تسجيل الدخول</button>
-      <!-- <button @click="visible = false" v-if="UserSetting.setting?.join_option_status == 1"  >الانضمام الى الكروس</button> -->
+      <!-- <button v-if="settingStore?.setting?.join_option_status == 1">
+        طلب الانضمام
+      </button> -->
+
+      <button v-if="status === 0 && userStore.user" @click="visible = true">
+        شراء الكورس
+      </button>
+
+      <button
+        v-else-if="status === 1 && userStore.user"
+        disabled
+        class="btn-disabled"
+      >
+        فى انتظار قبول الطلب
+      </button>
+
+      <button
+        v-else-if="status === 4 && userStore.user"
+        disabled
+        class="btn-disabled"
+      >
+        تم رفض الطلب
+      </button>
+
+      <button v-else-if="!userStore.user" disabled class="btn-disabled">
+        يجب تسجيل الدخول
+      </button>
     </div>
-    <Dialog v-model:visible="visible" class="dialog" modal :style="{ width: '50rem' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
 
+    <!-- Payment Dialog -->
+    <Dialog
+      v-model:visible="visible"
+      :dismissable-mask="true"
+      class="dialog"
+      modal
+      :style="{ width: '50rem' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+    >
       <div class="payment-method-container">
-
-        <div class="payment-method" v-for="(method, index) in PaymentStore.Payment" :key="index">
-          <img @click="PaymentMethod = method.id" :src="method.image" alt="payment" class="payment-img">
-          <label class="payment-title" :for="`${method?.id}`">{{ method.title }}</label>
-          <input :id="`${method?.id}`" type="radio" v-model="PaymentMethod" :value="method.id" name="payment"
-          >
-          <!-- @change="ChooseMethod(Number(method.id))" -->
+        <div
+          v-for="method in paymentStore.Payment"
+          :key="method.id"
+          class="payment-method"
+        >
+          <label class="payment-title" :for="`${method.id}`">
+            {{ method.title }}
+          </label>
+          <input
+            :id="`${method.id}`"
+            type="radio"
+            v-model="paymentMethod"
+            :value="method"
+            name="payment"
+          />
         </div>
       </div>
 
-      <input v-if="SelectedPaymentMethod" type="tel" placeholder="ادخل رقم الهاتف" class="input-data"
-        v-model="PhoneNumber">
-      <AddMedia v-if="SelectedPaymentMethod" class="add-media" :index="0" @update:images="updateFiles" />
-      <button v-if="SelectedPaymentMethod" @click="AddPayment" class=" btn-buy">شراء</button>
-      <button v-else class=" btn-buy">شراء</button>
+      <!-- Extra inputs if method requires info -->
+      <input
+        v-if="
+          selectedPaymentRequiresExtraInfo &&
+          paymentMethod?.type == PaymentTypes.OFFLINE
+        "
+        type="tel"
+        placeholder="ادخل رقم الهاتف"
+        class="input-data"
+        v-model="phoneNumber"
+      />
+
+      <AddMedia
+        v-if="
+          selectedPaymentRequiresExtraInfo &&
+          paymentMethod?.type == PaymentTypes.OFFLINE
+        "
+        class="add-media"
+        :index="0"
+        @update:images="updateFiles"
+      />
+
+      <button
+        v-if="
+          selectedPaymentRequiresExtraInfo &&
+          paymentMethod?.type == PaymentTypes.OFFLINE
+        "
+        @click="addPayment"
+        class="btn-buy"
+      >
+        شراء
+      </button>
+
+      <button
+        class="btn-buy"
+        v-if="paymentMethod?.type == PaymentTypes.ONLINE"
+        @click="OnlinePayment"
+      >
+        شراء
+      </button>
+
+      <button
+        class="btn-buy"
+        v-if="paymentMethod?.type == PaymentTypes.OFFLINE"
+      >
+        شراء
+      </button>
     </Dialog>
+
+    <div class="page-loader" v-if="Loader">
+      <Loder />
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+.page-loader {
+  height: 100vh;
+  width: 100%;
+  position: fixed;
+  background-color: #000000c9;
+  top: 0;
+  left: 0;
+  z-index: 99;
+}
 .payment-method-container {
   display: flex;
   justify-content: flex-end;
@@ -117,13 +234,8 @@ watch(() => PaymentMethod.value,
     flex-direction: column;
     gap: 5px;
 
-    .payment-img {
-      cursor: pointer;
-    }
-
     .payment-title {
       cursor: pointer;
-
     }
   }
 }
@@ -137,26 +249,21 @@ watch(() => PaymentMethod.value,
 
   &:focus {
     outline: none;
-
   }
 }
 
 .dialog {
-
   .add-media {
     display: flex;
     flex-direction: column;
     align-self: center;
     width: 100%;
     height: 100%;
-
   }
 
   .btn-buy {
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 10px;
+    margin: 10px auto 0;
     border-radius: 10px;
     padding: 12px;
     font-size: 20px;
@@ -164,7 +271,6 @@ watch(() => PaymentMethod.value,
     color: white;
     background-color: var(--secondary-color);
   }
-
 }
 
 .edit-dialog-container {

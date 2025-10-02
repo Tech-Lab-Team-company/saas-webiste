@@ -1,0 +1,256 @@
+:root {
+  /*<editor-fold desc="colors">*/
+  --primary-color: #1d4ed8;
+  --secondary-color: #ebf0ff;
+  --white-color: #fff;
+  --opacity-third-color: #fff3ec;
+  --opacity-second-color: #ebffe8;
+  --nav-bg: #12121275;
+  --black-color: #121212;
+  --bg-navbar: rgba(255, 255, 255, 0.25);
+  --white-color-opacity: rgba(255, 255, 255, 0.6);
+  --text-color-white: #eef0f2;
+  --fourth-color: #edf6e9;
+  --sky-color: #e7f9f7;
+  --fifth-color: #0fc5ad;
+  --opacity-orange-color: #fef2eb;
+  --second-gray-color: #ebebeb;
+  --orange-color: #f38035;
+  --third-color: #3aa6eb;
+  --gray-color: #666666;
+  --opcacity-gray-color: #adadad;
+  --opacity-light-gray: rgba(224, 224, 224, 0.2);
+  --opacity-dark-gray: rgba(255, 255, 255, 0.1);
+  --fourth-gray: #b8b9b9;
+  --opacity-gold-color: #d2b24d59;
+  --footer-color: #333;
+  --danger-color: rgba(226, 53, 53, 1);
+  --gray-text: #6b7280;
+  /*</editor-fold>*/
+
+  /*<editor-fold desc="sizes">*/
+  --base-width: 1440;
+  --base-height: 1024;
+  /*</editor-fold>*/
+
+  /*<editor-fold desc="radius">*/
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3.5rem;
+  --radius-circle: 50%;
+  /*</editor-fold>*/
+
+  /*<editor-fold desc="padding">*/
+  --padding-sm: clamp(10px, calc(7 * 100vw / var(--base-width)), 20px);
+  --padding-md: clamp(15px, calc(14 * 100vw / var(--base-width)), 40px);
+  --padding-lg: clamp(20px, calc(28 * 100vw / var(--base-width)), 60px);
+  --padding-xl: clamp(100px, calc(50 * 60vw / var(--base-width)), 70px);
+  /*</editor-fold>*/
+
+  /*<editor-fold desc="space">*/
+  --space-sm: clamp(10px, calc(7 * 100vw / var(--base-width)), 20px);
+  --space-md: clamp(15px, calc(14 * 100vw / var(--base-width)), 40px);
+  --space-lg: clamp(20px, calc(28 * 100vw / var(--base-width)), 60px);
+  --section-space: clamp(90px, calc(65 * 100vh / var(--base-height)), 100px);
+  --line-height: 1.4;
+  --line-height-md: 1.8;
+  --line-height-lg: 2;
+  /*</editor-fold>*/
+
+  /*<editor-fold desc="fontsize">*/
+  --fontsize-xs: clamp(14px, calc(12 * 100vw / var(--base-width)), 14px);
+  --fontsize-sm: clamp(18px, calc(23 * 100vw / var(--base-width)), 19px);
+  --fontsize-md: clamp(20px, calc(26 * 100vw / var(--base-width)), 24px);
+  --fontsize-lg: clamp(30px, calc(40 * 100vw / var(--base-width)), 45px);
+  --fontsize-xl: clamp(35px, calc(73 * 100vw / var(--base-width)), 83px);
+  /*</editor-fold>*/
+
+  /*<editor-fold desc="gap">*/
+  --gap-sm: clamp(6px, calc(7 * 100vw / var(--base-width)), 20px);
+  --gap-md: clamp(12px, calc(14 * 100vw / var(--base-width)), 40px);
+  --gap-lg: clamp(20px, calc(28 * 100vw / var(--base-width)), 60px);
+  /*</editor-fold>*/
+
+  --xl-size-3: clamp(
+    calc(50 * 0.8px),
+    calc(50 * 100vw / var(--base-width)),
+    calc(50 * 1.2px)
+  );
+  --xl-size-2: clamp(
+    calc(30 * 0.8px),
+    calc(30 * 100vw / var(--base-width)),
+    calc(30 * 1.2px)
+  );
+  --xl-size-1: clamp(
+    calc(24 * 0.8px),
+    calc(24 * 100vw / var(--base-width)),
+    calc(24 * 1.2px)
+  );
+  --xl-size-base: clamp(
+    calc(20 * 0.8px),
+    calc(20 * 100vw / var(--base-width)),
+    calc(20 * 1.2px)
+  );
+  --md-size: clamp(
+    calc(16 * 0.8px),
+    calc(16 * 100vw / var(--base-width)),
+    calc(16 * 1.2px)
+  );
+  --md-size-2: clamp(
+    calc(18 * 0.8px),
+    calc(18 * 100vw / var(--base-width)),
+    calc(18 * 1.2px)
+  );
+
+  --sm-size: clamp(
+    calc(14 * 0.8px),
+    calc(14 * 100vw / var(--base-width)),
+    calc(14 * 1.2px)
+  );
+  --xs-size: clamp(
+    calc(12 * 0.8px),
+    calc(12 * 100vw / var(--base-width)),
+    calc(12 * 1.2px)
+  );
+  --xs-size-2: clamp(
+    calc(10 * 0.8px),
+    calc(10 * 100vw / var(--base-width)),
+    calc(10 * 1.2px)
+  );
+  --xs-size-3: clamp(
+    calc(8 * 0.8px),
+    calc(8 * 100vw / var(--base-width)),
+    calc(8 * 1.2px)
+  );
+  --xs-size-4: clamp(
+    calc(6 * 0.8px),
+    calc(6 * 100vw / var(--base-width)),
+    calc(6 * 1.2px)
+  );
+  --section-padding: clamp(
+    calc(120 * 0.8px),
+    calc(120 * 100vw / var(--base-width)),
+    calc(120 * 1.2px)
+  );
+}
+
+// Colors
+$primary-color: #1d4ed8;
+$primary-color-opacity-5: rgba(29, 78, 216, 0.05);
+$secondary-color: #d2b24d;
+$white-color: #fff;
+$opacity-third-color: #fff3ec;
+$opacity-second-color: #ebffe8;
+$nav-bg: #12121275;
+$black-color: #000;
+$bg-navbar: rgba(255, 255, 255, 0.25);
+$white-color-opacity: rgba(255, 255, 255, 0.6);
+$text-color-white: #eef0f2;
+$fourth-color: #edf6e9;
+$sky-color: #e7f9f7;
+$fifth-color: #0fc5ad;
+$opacity-orange-color: #fef2eb;
+$second-gray-color: #ebebeb;
+$orange-color: #f38035;
+$third-color: #3aa6eb;
+$gray-color: #666666;
+$opcacity-gray-color: #adadad;
+$opacity-light-gray: rgba(224, 224, 224, 0.2);
+$opacity-dark-gray: rgba(255, 255, 255, 0.1);
+$fourth-gray: #b8b9b9;
+$opacity-gold-color: #d2b24d59;
+$footer-color: #333;
+$green-color: rgba(80, 200, 120, 0.4);
+$bg-auth: rgba(16, 15, 12, 1);
+$bg-auth-input: #1d242d;
+$placeholder-color: rgba(204, 204, 204, 1);
+$danger-color: rgba(226, 53, 53, 1);
+$gray-text: #6b7280;
+$btn-color: #1d4ed8;
+// Sizes
+$base-width: 1440;
+$base-height: 1024;
+
+// Radius
+$radius-sm: 0.5rem;
+$radius-md: 1rem;
+$radius-lg: 2rem;
+$radius-xl: 3.5rem;
+$radius-circle: 50%;
+
+// Padding
+$padding-sm: clamp(10px, calc(7 * 100vw / #{$base-width}), 20px);
+$padding-md: clamp(15px, calc(14 * 100vw / #{$base-width}), 40px);
+$padding-lg: clamp(20px, calc(28 * 100vw / #{$base-width}), 60px);
+$padding-xl: clamp(100px, calc(50 * 60vw / #{$base-width}), 70px);
+
+// Space
+$space-sm: clamp(10px, calc(7 * 100vw / #{$base-width}), 20px);
+$space-md: clamp(15px, calc(14 * 100vw / #{$base-width}), 40px);
+$space-lg: clamp(20px, calc(28 * 100vw / #{$base-width}), 60px);
+$section-space: clamp(90px, calc(65 * 100vh / #{$base-height}), 100px);
+$line-height: 1.4;
+$line-height-md: 1.8;
+$line-height-lg: 2;
+
+// Font sizes
+$fontsize-xs: clamp(10px, calc(12 * 100vw / #{$base-width}), 14px);
+$fontsize-sm: clamp(18px, calc(23 * 100vw / #{$base-width}), 19px);
+$fontsize-md: clamp(20px, calc(26 * 100vw / #{$base-width}), 24px);
+$fontsize-lg: clamp(30px, calc(40 * 100vw / #{$base-width}), 45px);
+$fontsize-xl: clamp(35px, calc(73 * 100vw / #{$base-width}), 83px);
+
+// Gaps
+$gap-sm: clamp(6px, calc(7 * 100vw / #{$base-width}), 20px);
+$gap-md: clamp(12px, calc(14 * 100vw / #{$base-width}), 40px);
+$gap-lg: clamp(20px, calc(28 * 100vw / #{$base-width}), 60px);
+
+/*<editor-fold desc="sizes">*/
+$XsSize: var(--xs-size); // 12px
+$XsSize2: var(--xs-size-2); // 10px
+$XsSize3: var(--xs-size-3); // 8px
+$XsSize4: var(--xs-size-4); // 6px
+$SmSize: var(--sm-size); // 14px
+$MdSize: var(--md-size); // 16px
+$MdSize2: var(--md-size-2); // 18px
+$XlSize: var(--xl-size-base); // 20px
+$XlSize2: var(--xl-size-1); // 24px
+$XlSize3: var(--xl-size-2); // 30px
+$XlSize4: var(--xl-size-3); // 50px
+$SectionPadding: var(--section-padding);
+/*</editor-fold>*/
+
+/*<editor-fold desc="font">*/
+$BaseFontWeight: 400;
+$BaseFontMediumWeight: 500;
+$BaseFontSemiBoldWeight: 600;
+$BaseFontWeightBold: 700;
+$BaseLineHeight: 1.5;
+$BaseLetterSpacing: 0.02em;
+/*</editor-fold>*/
+
+/*<editor-fold desc="border">*/
+$BorderRadiusLg: 16px;
+$BorderRadiusMd: 12px;
+$BorderRadiusSm: 8px;
+$BorderRadiusXs: 4px;
+$BaseBorderWidth: 1px;
+$BorderWidth2: 2px;
+$BorderWidth3: 3px;
+$BorderWidth4: 4px;
+
+/*</editor-fold>*/
+
+/*<editor-fold desc="shadow">*/
+$Shadow1: 0px 4px 8px rgba(0, 0, 0, 0.1);
+$Shadow2: 0px 8px 16px rgba(0, 0, 0, 0.1);
+$Shadow3: 0px 12px 24px rgba(0, 0, 0, 0.1);
+$Shadow4: 0px 16px 32px rgba(0, 0, 0, 0.1);
+/*</editor-fold>*/
+
+/*<editor-fold desc="transition">*/
+$Transition: all 0.4s ease-in-out;
+$TransitionFast: all 0.2s ease-in-out;
+$TransitionSlow: all 0.7s ease-in-out;
+/*</editor-fold>*/
