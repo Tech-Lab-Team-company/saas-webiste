@@ -39,5 +39,7 @@ export default interface WebStatus {
     country_code_required:boolean;
     teachers_slider:boolean;
     general_subjects_slider:boolean;
+    have_desktop:boolean;
+    desktop_app:string;
 }
 
