@@ -131,10 +131,9 @@ const setting = computed(() => settingStore.setting);
           v-if="settingStore.setting?.have_desktop"
           class="desktop-link"
         >
-        <DesktopIcon class="desktop-icon" />
-        <p>Desktop</p>
+          <DesktopIcon class="desktop-icon" />
+          <p>Desktop</p>
         </a>
-
       </div>
       <div class="social-media-icons">
         <NuxtLink :to="setting?.twitter">
@@ -159,18 +158,18 @@ const setting = computed(() => settingStore.setting);
 </template>
 
 <style scoped lang="scss">
-.desktop-link{
+.desktop-link {
   display: flex;
   justify-content: space-between;
-  align-items:center ;
+  align-items: center;
   gap: 5px;
   background-color: rgba(0, 0, 0, 0.925);
   border-radius: 5px;
   color: white;
   padding-inline: 20px;
 }
-.desktop-icon{
-  width:  60px;
+.desktop-icon {
+  width: 60px;
   height: 30px;
 }
 .footer-container {
