@@ -7,11 +7,12 @@ const router = useRouter()
 const email = ref<string>("");
 const password = ref<string>("");
 
+
 const loginController = LoginController.getInstance();
 
 const login = async () => {
   await loginController.login(
-      new LoginParams(email.value, password.value), router
+    new LoginParams(email.value, password.value), router
   );
 };
 
@@ -19,48 +20,26 @@ const login = async () => {
 </script>
 
 <template>
-  <form @keydown.enter="login"   @submit.prevent="login" class="login-form">
+  
+  <form @keydown.enter="login" @submit.prevent="login" class="login-form">
     <NuxtLink to="/" class="back-link">
-      <svg
-        width="9"
-        height="16"
-        viewBox="0 0 9 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M7.75 14.75L1 8L7.75 1.25"
-          stroke="#313131"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
+      <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.75 14.75L1 8L7.75 1.25" stroke="#313131" stroke-width="1.5" stroke-linecap="round"
+          stroke-linejoin="round" />
       </svg>
-      <span>{{ $t("back_to_home") }}</span></NuxtLink
-    >
+      <span>{{ $t("back_to_home") }}</span>
+    </NuxtLink>
     <h1 class="main-title">
-      {{ $t("welcome_in") }} <span class="rakwa"></span> 
+      {{ $t("welcome_in") }} <span class="rakwa"></span>
     </h1>
     <p class="mb-4">{{ $t("Login_to_access_your_account") }}</p>
     <div class="input-wrapper">
       <label class="input-label" for="email">{{ $t('Email') }}</label>
-      <input
-        class="input"
-        type="email"
-        id="email"
-        v-model="email"
-        placeholder="Enter your email"
-      />
+      <input class="input" type="email" id="email" v-model="email" placeholder="Enter your email" />
     </div>
     <div class="input-wrapper">
       <label class="input-label" for="password">{{ $t('Password') }}</label>
-      <input
-        class="input"
-        type="password"
-        id="password"
-        v-model="password"
-        placeholder="Enter your password"
-      />
+      <input class="input" type="password" id="password" v-model="password" placeholder="Enter your password" />
     </div>
     <div class="flex justify-between items-center mb-8">
       <div class="check-box">
@@ -69,8 +48,7 @@ const login = async () => {
           {{ $t("remember_me") }}
         </label>
       </div>
-      <NuxtLink to="/auth/forget-password" class="forget-password-link"
-        >{{ $t("forget_password") }}
+      <NuxtLink to="/auth/forget-password" class="forget-password-link">{{ $t("forget_password") }}
       </NuxtLink>
     </div>
     <div class="login-button-wrapper mb-6">
