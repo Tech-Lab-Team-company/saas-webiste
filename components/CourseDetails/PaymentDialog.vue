@@ -96,6 +96,12 @@ const OnlinePayment = async () => {
 onMounted(() => {
   console.log(settingStore?.setting, "setting");
 });
+const toast = useToast();
+
+const FireToast = () => {
+  console.log("ASdasd");
+  toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+}
 </script>
 
 <template>
@@ -110,100 +116,55 @@ onMounted(() => {
         شراء الكورس
       </button>
 
-      <button
-        v-else-if="status === 1 && userStore.user"
-        disabled
-        class="btn-disabled"
-      >
+      <button v-else-if="status === 1 && userStore.user" disabled class="btn-disabled">
         فى انتظار قبول الطلب
       </button>
 
-      <button
-        v-else-if="status === 4 && userStore.user"
-        disabled
-        class="btn-disabled"
-      >
+      <button v-else-if="status === 4 && userStore.user" disabled class="btn-disabled">
         تم رفض الطلب
       </button>
 
-      <button v-else-if="!userStore.user" disabled class="btn-disabled">
-        يجب تسجيل الدخول
+      <!-- disabled here -->
+      <button v-else-if="!userStore.user"  class="btn-disabled" @click="FireToast">
+        شراء
       </button>
     </div>
 
     <!-- Payment Dialog -->
-    <Dialog
-      v-model:visible="visible"
-      :dismissable-mask="true"
-      class="dialog"
-      modal
-      :style="{ width: '50rem' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    >
+    <Dialog v-model:visible="visible" :dismissable-mask="true" class="dialog" modal :style="{ width: '50rem' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
       <div class="payment-method-container">
-        <div
-          v-for="method in paymentStore.Payment"
-          :key="method.id"
-          class="payment-method"
-        >
+        <div v-for="method in paymentStore.Payment" :key="method.id" class="payment-method">
           <label class="payment-title" :for="`${method.id}`">
             {{ method.title }}
           </label>
-          <input
-            :id="`${method.id}`"
-            type="radio"
-            v-model="paymentMethod"
-            :value="method"
-            name="payment"
-          />
+          <input :id="`${method.id}`" type="radio" v-model="paymentMethod" :value="method" name="payment" />
         </div>
       </div>
 
       <!-- Extra inputs if method requires info -->
-      <input
-        v-if="
-          selectedPaymentRequiresExtraInfo &&
-          paymentMethod?.type == PaymentTypes.OFFLINE
-        "
-        type="tel"
-        placeholder="ادخل رقم الهاتف"
-        class="input-data"
-        v-model="phoneNumber"
-      />
+      <input v-if="
+        selectedPaymentRequiresExtraInfo &&
+        paymentMethod?.type == PaymentTypes.OFFLINE
+      " type="tel" placeholder="ادخل رقم الهاتف" class="input-data" v-model="phoneNumber" />
 
-      <AddMedia
-        v-if="
-          selectedPaymentRequiresExtraInfo &&
-          paymentMethod?.type == PaymentTypes.OFFLINE
-        "
-        class="add-media"
-        :index="0"
-        @update:images="updateFiles"
-      />
+      <AddMedia v-if="
+        selectedPaymentRequiresExtraInfo &&
+        paymentMethod?.type == PaymentTypes.OFFLINE
+      " class="add-media" :index="0" @update:images="updateFiles" />
 
-      <button
-        v-if="
-          selectedPaymentRequiresExtraInfo &&
-          paymentMethod?.type == PaymentTypes.OFFLINE
-        "
-        @click="addPayment"
-        class="btn-buy"
-      >
+      <button v-if="
+        selectedPaymentRequiresExtraInfo &&
+        paymentMethod?.type == PaymentTypes.OFFLINE
+      " @click="addPayment" class="btn-buy">
         شراء
       </button>
 
-      <button
-        class="btn-buy"
-        v-if="paymentMethod?.type == PaymentTypes.ONLINE"
-        @click="OnlinePayment"
-      >
+      <button class="btn-buy" v-if="paymentMethod?.type == PaymentTypes.ONLINE" @click="OnlinePayment">
         شراء
       </button>
 
-      <button
-        class="btn-buy"
-        v-if="paymentMethod?.type == PaymentTypes.OFFLINE"
-      >
+      <button class="btn-buy" v-if="paymentMethod?.type == PaymentTypes.OFFLINE">
         شراء
       </button>
     </Dialog>
@@ -224,6 +185,7 @@ onMounted(() => {
   left: 0;
   z-index: 99;
 }
+
 .payment-method-container {
   display: flex;
   justify-content: flex-end;

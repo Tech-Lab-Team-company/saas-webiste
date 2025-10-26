@@ -1,16 +1,16 @@
 export function getWebDomain(): string {
-    const url = window.location.href
-    try {
-        const hostname = new URL(url).hostname;
-        if (hostname === 'localhost' || hostname === 'website.saas.techlabeg.com') return 'garhy-academy.com';
-        // const parts = hostname.split('.');
-        // return parts.slice(-2).join('.');
-        return hostname;
-    } catch {
-        return 'garhy-academy.com';
-    }
+  const url = window.location.href;
+  try {
+    const hostname = new URL(url).hostname;
+    if (hostname === "localhost" || hostname === "website.saas.techlabeg.com")
+      return "mr-mohamedkarawya.com";
+    // const parts = hostname.split('.');
+    // return parts.slice(-2).join('.');
+    return hostname;
+  } catch {
+    return "mr-mohamedkarawya.com";
+  }
 }
-
 
 // kodrat.success.sa
 // hrarabians.org
@@ -20,3 +20,4 @@ export function getWebDomain(): string {
 // mrbackend.eduhubco.com
 // https://mr-eslamsalama.com/
 // garhy-academy.com
+// mr-mohamedkarawya.com
