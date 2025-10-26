@@ -70,8 +70,8 @@ watch(() => props.video, (newVal) => {
       @click="VideoBlurScreen = !VideoBlurScreen" @vmPlay="VideoBlurScreen = false" @vmPause="VideoBlurScreen = true"
       :paused="VideoBlurScreen">
       <div @click="VideoBlurScreen = false" v-if="VideoBlurScreen" class="overlay">
-        <img :src="settingStore.setting?.image?.img" class="logo-image" alt="">
-        <!-- <IconsPlay class="play-icon" @click="VideoBlurScreen = false" /> -->
+        <!-- <img :src="settingStore.setting?.image?.img" class="logo-image" alt=""> -->
+        <IconsPause  class="logo-image" @click="VideoBlurScreen = false" />
         <!-- <i class="pi pi-play "></i> -->
       </div>
 

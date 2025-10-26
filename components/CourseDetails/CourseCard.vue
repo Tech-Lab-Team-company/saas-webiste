@@ -86,12 +86,9 @@ const userStore = useUserStore();
       </div>
       <hr />
       <div class="card-text-footer">
-        <p
-          class="salary"
-          v-if="CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed"
-        >
-          <span class="currency">{{ CardDetails?.currency }}</span
-          ><span class="price">{{ CardDetails?.CoursePrice }} </span>
+        <p class="salary" v-if="CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed">
+          <span class="currency">{{ CardDetails?.currency }}</span><span class="price">{{ CardDetails?.CoursePrice }}
+          </span>
         </p>
         <p class="salary" v-else-if="CardDetails?.is_subscribed">
           {{ $t("buying_course_done") }}
@@ -117,58 +114,40 @@ const userStore = useUserStore();
         </div>
         <div class="card-profile">
           <p>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</p>
-          <img
-            :src="
-              CardDetails?.Teacher?.image?.img ||
-              userSetting.setting?.image?.img
-            "
-          />
+          <img :src="CardDetails?.Teacher?.image?.img ||
+            userSetting.setting?.image?.img
+            " />
         </div>
       </div>
 
       <div class="btns btns-container">
         <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
-        <PaymentDialog
-          :status="Status"
-          class="payment-dialog"
-          v-if="CardDetails?.CoursePrice != 0 && PaymentStore?.Payment"
-        />
+        <PaymentDialog :status="Status" class="payment-dialog"
+          v-if="CardDetails?.CoursePrice != 0 && PaymentStore?.Payment" />
 
         <!-- {{ console.log(userSetting.setting , "userSetting") }} -->
-        <button
-          class="payment-btn"
-          
-          @click="JoinCourse"
-          v-if="
-            Status != 1 &&
-            CardDetails?.CoursePrice != 0 &&
-            !CardDetails?.is_subscribed &&
-            userSetting.setting?.join_option_status == 1
-          "
-        >
+        <button class="payment-btn" @click="JoinCourse" v-if="
+          Status != 1 &&
+          CardDetails?.CoursePrice != 0 &&
+          !CardDetails?.is_subscribed &&
+          userSetting.setting?.join_option_status == 1
+        ">
           طلب الانضمام
         </button>
 
-        <button
-          v-if="
-            Status == 1 &&
-            userStore.user &&
-            !CardDetails?.is_subscribed &&
-            CardDetails?.is_paid &&
-            userSetting?.setting?.join_option_status == 1
-          "
-          disabled
-          class="btn-disabled"
-        >
+        <button v-if="
+          Status == 1 &&
+          userStore.user &&
+          !CardDetails?.is_subscribed &&
+          CardDetails?.is_paid &&
+          userSetting?.setting?.join_option_status == 1
+        " disabled class="btn-disabled">
           فى انتظار قبول الطلب
         </button>
       </div>
     </div>
     <div class="card-video">
-      <img
-        :src="CardDetails?.Image?.img || userSetting.setting?.image?.img"
-        :alt="CardDetails?.Image?.image"
-      />
+      <img :src="CardDetails?.Image?.img || userSetting.setting?.image?.img" :alt="CardDetails?.Image?.image" />
     </div>
   </div>
 </template>
@@ -176,6 +155,7 @@ const userStore = useUserStore();
 <style scoped lang="scss">
 .card-text-footer {
   gap: 50px;
+
   @media (max-width: 768px) {
     gap: 10px;
   }
@@ -199,6 +179,7 @@ const userStore = useUserStore();
     display: flex;
     flex-direction: row-reverse;
     gap: 6px;
+
     @media (max-width: 768px) {
       width: 110px;
     }
@@ -210,6 +191,8 @@ const userStore = useUserStore();
   justify-content: center;
   align-items: center;
   gap: 10px;
+  width: 100%;
+
 
   .payment-dialog {
     width: 100%;

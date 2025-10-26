@@ -50,7 +50,7 @@ const droplist = ref(false);
     </div>
 
     <nav class="header-container">
-
+      
       <div class="buttons" v-if="!userStore.user">
         <NuxtLink to="/Auth/register">
           <button class="btn btn-primary btn-create">انشاء حساب</button>
@@ -117,7 +117,7 @@ const droplist = ref(false);
     color: white;
   }
   @media (max-width:768px) {
-      display: none !important;
+      // display: none !important;
   }
 }
 

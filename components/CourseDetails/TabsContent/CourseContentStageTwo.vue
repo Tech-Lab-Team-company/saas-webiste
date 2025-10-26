@@ -82,7 +82,7 @@ const isdisabled = ref(false)
 
 const selectedSessionIndex = ref<number | null>(null);
 
-function handleSessionClick(index: number, link: string, title: string, text: string, show: boolean) {
+function handleSessionClick(index: number, link: string, title: string, text: string, show: boolean, sessionPaid: boolean) {
   if (!userStore.user) {
     toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
     // return;
@@ -94,12 +94,21 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       }
     }
     else if (show === true) {
-      if (!props.isSubscribed && props.isPaied) {
+      if (!sessionPaid && !props.isSubscribed) {
+        isdisabled.value = false
+        selectedSessionIndex.value = index;
+        sendactivetab(0, link, title, text);
+        visible.value = false;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      else if (!props.isSubscribed && props.isPaied) {
         isdisabled.value = true
+
         toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب شراء الكورس اولا ', life: 3000 });
         // console.log("non")
       }
-      else if (props.isSubscribed && props.isPaied) {
+      else if ((props.isSubscribed && props.isPaied)) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
         sendactivetab(0, link, title, text);
@@ -130,16 +139,15 @@ const GotoExam = (examId: number, StartTime: string, EndTime: string, CourseId: 
     router.push(`/course/${CourseId}/timer?id=${examId}&time=${StartTime}`)
   }
 }
-const handelExam = (isFinished:boolean)=>{
-  if( (isFinished || !userStore?.user 
-      || (props.isPaied == true && props?.isSubscribed == false))){
-
+const handelExam = (isFinished: boolean) => {
+  if ((isFinished || !userStore?.user
+    || (props.isPaied == true && props?.isSubscribed == false))) {
     toast.add({ severity: 'info', summary: 'تنبيه', detail: ' يجب شراء الكورس اولا ', life: 3000 })
-    return ;
-  }else{
+    return;
+  } else {
 
   }
- 
+
 }
 </script>
 
@@ -152,12 +160,12 @@ const handelExam = (isFinished:boolean)=>{
       <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
         <div class="course-body-details" :key="thirdindex"
           :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
-          @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video)">
+          @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video, session?.is_paid)">
 
           <component :is="getIconByType(session?.type)" />
           <div class="session-name session-name2">
             <LockIcon v-if="!session?.web_show_video" />
-            <p>{{ session?.title }} </p>
+            <p>{{ session?.title }} <span v-if="!session?.is_paid && !props.isSubscribed">مجانى</span></p>
             <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
           </div>
 
@@ -165,10 +173,9 @@ const handelExam = (isFinished:boolean)=>{
         <div class="course-body-details course-exam" v-if="session?.exam"
           @click="GotoExam(session?.exam?.id, session?.exam?.start_time, session?.exam?.end_time, CourseId, session?.exam?.is_finished)">
           <div class="session-name" :class="{
-            'disabled': session?.exam?.is_finished || !userStore?.user 
+            'disabled': session?.exam?.is_finished || !userStore?.user
               || (isPaied == true && isSubscribed == false)
-          }" 
-          @click="handelExam(session?.exam?.is_finished)">
+          }" @click="handelExam(session?.exam?.is_finished)">
 
             <p>{{ session?.exam?.title }} (امتحان) </p>
             <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
@@ -207,12 +214,13 @@ const handelExam = (isFinished:boolean)=>{
 
 
 <style scoped lang="scss">
-.session-name2{
+.session-name2 {
   display: flex;
   align-items: center;
   justify-content: flex-start !important;
   gap: 10px !important;
 }
+
 .empty-content {
   margin-left: auto;
   margin-right: auto;
