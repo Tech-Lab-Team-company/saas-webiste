@@ -3,6 +3,7 @@
 import {useUserStore} from "~/stores/user";
 import Youtube from "~/components/CourseDetails/Youtube.vue";
 import AudioPlayer from "./TabsContent/AudioPlayer.vue";
+import NormalVedio from "./NormalVedio.vue";
 
 const props = defineProps({
   CourseVideoLink: {
@@ -19,6 +20,7 @@ const CourseVideoLink = ref(props.CourseVideoLink);
 
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
+  if (link.endsWith('mp4')) return 'video';
   if (link.includes('youtube') || link.includes('youtu.be')) return 'youtube';
   if (link.endsWith('.mp3')) return 'audio';
   if (link.endsWith('.pdf')) return 'pdf';
@@ -60,6 +62,7 @@ function openFullscreen() {
 
   <div class="course-video-container">
     <Youtube :video="embedVideoLink" v-if="fileType === 'youtube'" />
+    <NormalVedio :video="embedVideoLink" v-if="fileType === 'video'" />
 
     <div class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
       <iframe

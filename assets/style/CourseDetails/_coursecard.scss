@@ -6,7 +6,7 @@
   // justify-content: space-between;
   align-items: center;
   gap: 10px;
-
+  
   .card-text {
     display: flex;
     flex-direction: column;
@@ -133,6 +133,7 @@
           font-weight: 500;
           &.currency {
             font-size: 20px;
+            text-align: right;
           }
           &.price {
             font-size: 20px;
