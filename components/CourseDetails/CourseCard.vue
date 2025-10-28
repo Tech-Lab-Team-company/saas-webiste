@@ -210,7 +210,6 @@ const userStore = useUserStore();
 .salary {
   display: flex;
   gap: 4px;
-
   align-items: center;
 }
 
