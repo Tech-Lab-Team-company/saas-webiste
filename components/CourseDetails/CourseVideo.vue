@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {useUserStore} from "~/stores/user";
+import { useUserStore } from "~/stores/user";
 import Youtube from "~/components/CourseDetails/Youtube.vue";
 import AudioPlayer from "./TabsContent/AudioPlayer.vue";
 import NormalVedio from "./NormalVedio.vue";
@@ -63,48 +63,31 @@ function openFullscreen() {
   <div class="course-video-container">
     <Youtube :video="embedVideoLink" v-if="fileType === 'youtube'" />
     <NormalVedio :video="embedVideoLink" v-if="fileType === 'video'" />
-
     <div class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
-      <iframe
-          ref="pdfIframe"
-          width="100%"
-          height="600"
-          :src="embedVideoLink"
-          frameborder="0"
-          allowfullscreen
-      ></iframe>
+      <iframe ref="pdfIframe" width="100%" height="600" :src="embedVideoLink" frameborder="0" allowfullscreen></iframe>
       <div class="flex justify-end">
         <button class="btn-primary" @click="openFullscreen">
           تكبير الشاشة
         </button>
       </div>
     </div>
-
-
     <!--<audio
         v-else-if="fileType === 'audio'"
         controls
         :src="CourseVideoLink?.videoLink"
         style="width: 100%;"
     ></audio> -->
-     <AudioPlayer v-else-if="fileType === 'audio'" :src="CourseVideoLink?.videoLink" />
-
-
-
+    <AudioPlayer v-else-if="fileType === 'audio'" :src="CourseVideoLink?.videoLink" />
     <div v-else>
       <p>Unsupported file type</p>
     </div>
   </div>
   <div class="course-video-text">
     <p class="course-video-text-title">شرح {{ CourseVideoLink?.title }}</p>
-    <hr/>
+    <hr />
     <p class="course-video-text-description">{{ CourseVideoLink?.description }}</p>
   </div>
 
 </template>
 
-<style scoped>
-
-</style>
-
-
+<style scoped></style>
