@@ -68,7 +68,6 @@ const JoinCourse = async () => {
     emit("Changestatus");
   }
 };
-const PaymentStore = usePaymentStore();
 
 const userStore = useUserStore();
 </script>
@@ -123,7 +122,7 @@ const userStore = useUserStore();
       <div class="btns btns-container">
         <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
         <PaymentDialog :status="Status" class="payment-dialog"
-          v-if="CardDetails?.CoursePrice != 0 && PaymentStore?.Payment" />
+          v-if="CardDetails?.CoursePrice" />
 
         <!-- {{ console.log(userSetting.setting , "userSetting") }} -->
         <button class="payment-btn" @click="JoinCourse" v-if="
