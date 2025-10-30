@@ -14,6 +14,7 @@ import Loder from "../Loader/Loder.vue";
 
 // 🔹 Props
 const props = defineProps<{ status: number }>();
+const PaymentStore = usePaymentStore();
 
 // 🔹 State
 const visible = ref(false);
@@ -101,10 +102,12 @@ const toast = useToast();
 const FireToast = () => {
   console.log("ASdasd");
   toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
+  router.push("/login");
 }
 </script>
 
 <template>
+
   <div class="edit-dialog-container">
     <!-- Action Buttons -->
     <div class="btns">
@@ -112,7 +115,7 @@ const FireToast = () => {
         طلب الانضمام
       </button> -->
 
-      <button v-if="status === 0 && userStore.user" @click="visible = true">
+      <button v-if="status === 0 && userStore.user && PaymentStore?.Payment " @click="visible = true">
         شراء الكورس
       </button>
 
@@ -125,8 +128,8 @@ const FireToast = () => {
       </button>
 
       <!-- disabled here -->
-      <button v-else-if="!userStore.user"  class="btn-disabled" @click="FireToast">
-        شراء
+      <button v-else-if="!userStore.user" class="btn-disabled" @click="FireToast">
+        شراء الكورس
       </button>
     </div>
 
