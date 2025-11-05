@@ -12,6 +12,7 @@
     flex-direction: column;
     width: 65%;
     gap: 25px;
+    height: 100%;
     @media (max-width: 768px) {
       gap: 0;
       width: 100%;
@@ -97,11 +98,12 @@
       }
 
       .card-profile {
-        // display: flex;
-        // align-items: center;
+        display: flex;
+        align-items: center;
         // justify-content: flex-end;
         gap: 10px;
         width: 100%;
+
         max-width: 120px;
         @media (max-width: 400px) {
           max-width: 100%;

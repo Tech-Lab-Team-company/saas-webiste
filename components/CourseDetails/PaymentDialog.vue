@@ -115,7 +115,7 @@ const FireToast = () => {
         طلب الانضمام
       </button> -->
 
-      <button v-if="status === 0 && userStore.user && PaymentStore?.Payment " @click="visible = true">
+      <button v-if="status === 0 && userStore.user && PaymentStore?.Payment" @click="visible = true">
         شراء الكورس
       </button>
 
