@@ -32,7 +32,7 @@ const {
   // console.log("WebStatus:", getWebDomain());
 
   const DefaultPrimaryColor = "#061147";
-  const DefaultSecondColor = "var(--secondary-color)";
+  const DefaultSecondColor = "#000";
 
   const PrimaryColor = response?.data?.primary_color || DefaultPrimaryColor;
   const SecondColor = response?.data?.secondary_color || DefaultSecondColor;
