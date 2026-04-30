@@ -1,24 +1,21 @@
 import type TitleModel from "~/base/core/Models/title_model";
 import type QuestionsModel from "./questions_model";
 
-
 export default class ExamDetailsModel {
   public id: number;
   public title: string; // Use 'string' instead of 'String'
-  public startTime: string; 
-  public endTime: string; 
-  public date: string; 
-  public examMark: number; 
-  public isFinished: boolean; 
-  public mark: number; 
-  public subject: TitleModel; 
-  public questions: QuestionsModel[]; 
-  public examType: number; 
-  public allow_shuffle: number; 
-  public duration: number; 
-
-
-
+  public startTime: string;
+  public endTime: string;
+  public date: string;
+  public examMark: number;
+  public isFinished: boolean;
+  public mark: number;
+  public subject: TitleModel;
+  public questions: QuestionsModel[];
+  public examType: number;
+  public allow_shuffle: number;
+  public duration: number;
+  public number_of_questions: number;
 
   constructor(
     id: number,
@@ -34,8 +31,7 @@ export default class ExamDetailsModel {
     examType: number,
     allow_shuffle: number,
     duration: number,
-
-
+    number_of_questions: number,
   ) {
     this.id = id;
     this.title = title;
@@ -49,11 +45,9 @@ export default class ExamDetailsModel {
     this.questions = questions;
     this.examType = examType;
     this.allow_shuffle = allow_shuffle;
-    this.duration= duration;
-
- 
+    this.duration = duration;
+    this.number_of_questions = number_of_questions;
   }
-
 
   static fromMap(map: { [key: string]: any }): ExamDetailsModel {
     return new ExamDetailsModel(
@@ -70,7 +64,7 @@ export default class ExamDetailsModel {
       map["exam_type"],
       map["allow_shuffle"],
       map["duration"],
+      map["number_of_questions"],
     );
   }
 }
-

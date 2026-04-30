@@ -1,18 +1,21 @@
 <script setup lang="ts">
 // import Downarrow from '~/public/icons/downarrow.vue';
-import blacknotes from '~/public/icons/blacknotes.vue';
-import clockicon from '~/public/icons/clockicon.vue';
-import calendaricon from '~/public/icons/calendaricon.vue';
+import blacknotes from "~/public/icons/blacknotes.vue";
+import clockicon from "~/public/icons/clockicon.vue";
+import calendaricon from "~/public/icons/calendaricon.vue";
+import NumberOfQuestionIcon from "~/public/icons/NumberOfQuestionIcon.vue";
 // import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
-import type ExamsModel from '~/features/FetchCourseDetails/Data/models/exam_model';
+import type ExamsModel from "~/features/FetchCourseDetails/Data/models/exam_model";
+import Tooltip from 'primevue/tooltip';
 
-const route = useRoute()
-const course_id = ref<string>(<string>route.params.id)
+
+const route = useRoute();
+const course_id = ref<string>(<string>route.params.id);
 
 const props = defineProps({
   CourseData: {
     type: Object as () => ExamsModel | null,
-    default: null
+    default: null,
   },
   CourseStatus: {
     type: Number,
@@ -27,52 +30,105 @@ const props = defineProps({
 
 const CardDetails = ref(props.CourseData);
 
-watch(() => props.CourseData, (newValue) => {
-  CardDetails.value = newValue;
-}, { immediate: true });
+watch(
+  () => props.CourseData,
+  (newValue) => {
+    CardDetails.value = newValue;
+  },
+  { immediate: true },
+);
 
 const router = useRouter();
 // console.log(router.currentRoute.value.params.id)
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 
 const isDisabled = computed(() => {
-  return !userStore.user || (props.isPaid && !(props.isSubscribed));
+  return !userStore.user || (props.isPaid && !props.isSubscribed);
 });
 const { locale } = useI18n();
 const currentTime = new Date();
-
-
-
 </script>
 
 <template>
-
-  <div class="course-exam-container" v-for="(exam, index) in CardDetails" :key="index">
-
-    <NuxtLink v-if="!(exam?.is_finished)"
-      :to="isDisabled || exam?.is_finished ? null : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`"
-      @click.prevent="(isDisabled || exam?.is_finished) && $event.preventDefault()">
+  <div
+    class="course-exam-container"
+    v-for="(exam, index) in CardDetails"
+    :key="index"
+  >
+    <NuxtLink
+      v-if="!exam?.is_finished"
+      :to="
+        isDisabled || exam?.is_finished
+          ? null
+          : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`
+      "
+      @click.prevent="
+        (isDisabled || exam?.is_finished) && $event.preventDefault()
+      "
+    >
       <div class="btns">
-        <button v-if="(new Date(exam.end_time).getTime() - currentTime.getTime()) < 0" disabled class="disabled">
-          {{ $t('انتهى الوقت') }}
+        <button
+          v-if="new Date(exam.end_time).getTime() - currentTime.getTime() < 0"
+          disabled
+          class="disabled"
+        >
+          {{ $t("انتهى الوقت") }}
         </button>
 
-        <button v-else :disabled="isDisabled" :class="[
-          props.isPaid && !props.isSubscribed ? 'disabled' : '',
-          userStore.user ? '' : 'disabled',
-        ]">
-          {{ $t('ابدأ الامتحان') }}
+        <button
+          v-else
+          :disabled="isDisabled"
+          :class="[
+            props.isPaid && !props.isSubscribed ? 'disabled' : '',
+            userStore.user ? '' : 'disabled',
+          ]"
+        >
+          {{
+            exam.mark > 0 && !exam?.is_finished
+              ? $t("complate_exam")
+              : $t("ابدأ الامتحان")
+          }}
         </button>
+        <span class="degree" v-if="exam.mark > 0 && !exam?.is_finished">
+          {{
+            exam.mark > 0 && !exam?.is_finished
+              ? `${exam.mark} / ${exam.exam_mark} `
+              : ""
+          }}
+        </span>
       </div>
     </NuxtLink>
-    <div v-else-if="exam?.is_finished" class="exam-rate">
-      <p class="rating" v-if="exam.degree_type == 2" :class="exam.mark < 6 ? 'failed' : ''"> {{ exam.mark }} / {{
-        exam.exam_mark }}</p>
-      <p class="rating" v-if="exam.degree_type == 1" :class="(exam.mark / exam.exam_mark) * 100 < 50 ? 'failed' : ''"> {{
-        ((exam.mark / exam.exam_mark) * 100).toFixed(2) }} %</p>
-    </div>
+    <div
+      v-else-if="exam?.is_finished"
+      class="exam-rate"
+      v-tooltip.top="{
+        value: `<div style='line-height:1.8'>
+          <div>✅ ${$t('correct_answers')}: ${exam.correct_answers_count ?? 0}</div>
+          <div>❌ ${$t('wrong_answers')}: ${exam.wrong_answers_count ?? 0}</div>
+          <div>⬜ ${$t('unanswered_questions')}: ${exam.unanswered_questions_count ?? 0}</div>
+        </div>`,
+        escape: false
+      }"
+      style="cursor: pointer"
+    >
 
+
+      <p
+        class="rating"
+        v-if="exam.degree_type == 2"
+        :class="exam.mark < 6 ? 'failed' : ''"
+      >
+        {{ exam.mark }} / {{ exam.exam_mark }}
+      </p>
+      <p
+        class="rating"
+        v-if="exam.degree_type == 1"
+        :class="(exam.mark / exam.exam_mark) * 100 < 50 ? 'failed' : ''"
+      >
+        {{ ((exam.mark / exam.exam_mark) * 100).toFixed(2) }} %
+      </p>
+    </div>
 
     <div class="course-exam-content">
       <div class="exam-title">
@@ -83,18 +139,21 @@ const currentTime = new Date();
 
       <div class="exam-date-container">
         <div class="exam-title exam-date">
-          <p>{{ exam.date }} </p>
-          <calendaricon class="exam-icon" />
+          <!-- <NumberOfQuestionIcon class="icon" /> -->
+          <p>{{ exam.number_of_questions }} :</p>
+          <span>{{ $t("number_of_questions") }}</span>
         </div>
         <div class="exam-title exam-date">
-          <p>{{ String(exam.start_time).slice(11, 20) }} </p>
+          <p>{{ exam.date }}</p>
+          <calendaricon class="exam-icon" />
+        </div>
+
+        <div class="exam-title exam-date">
+          <p>{{ String(exam.start_time).slice(11, 20) }}</p>
           <clockicon class="exam-icon" />
         </div>
       </div>
-
     </div>
-
-
   </div>
 </template>
 
@@ -103,4 +162,16 @@ const currentTime = new Date();
   opacity: 0.8;
   cursor: not-allowed;
 }
+.degree {
+  border: 1px solid black;
+  padding-inline: 10px;
+  border-radius: 10px;
+  margin-left: 10px;
+}
+/* .icon {
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+} */
 </style>

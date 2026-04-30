@@ -55,5 +55,10 @@
   "start_now": "ابدأ الآن",
   "all_courses": "جميع الكورسات",
   "basic_education": "التعليم الأساسي",
-  "university_education": "التعليم الجامعي"
+  "university_education": "التعليم الجامعي",
+  "number_of_questions": "عدد الاسئلة",
+  "complate_exam": "اكمل الامتحان",
+  "correct_answers": "الإجابات الصحيحة",
+  "wrong_answers": "الإجابات الخاطئة",
+  "unanswered_questions": "الأسئلة غير المجابة"
 }

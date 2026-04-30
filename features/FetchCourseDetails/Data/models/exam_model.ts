@@ -2,7 +2,6 @@ import ReplayModel from "~/features/MakeCommentFeature/Data/models/replay_model"
 import type SessionsModel from "./sessions_model";
 import type TitleModel from "~/base/core/Models/title_model";
 
-
 export default class ExamsModel {
   public id: number;
   public title: string;
@@ -14,10 +13,10 @@ export default class ExamsModel {
   public Mark: number;
   public Subject: TitleModel[];
   public degree_type: number;
-
-
-
-
+  public number_of_questions: number;
+  public correct_answers_count: number;
+  public wrong_answers_count: number;
+  public unanswered_questions_count: number;
 
   constructor(
     id: number,
@@ -30,8 +29,10 @@ export default class ExamsModel {
     Mark: number,
     Subject: TitleModel[],
     degree_type: number,
-
-
+    number_of_questions: number,
+    correct_answers_count: number,
+    wrong_answers_count: number,
+    unanswered_questions_count: number,
   ) {
     this.id = id;
     this.title = title;
@@ -43,9 +44,11 @@ export default class ExamsModel {
     this.Mark = Mark;
     this.Subject = Subject;
     this.degree_type = degree_type;
- 
+    this.number_of_questions = number_of_questions;
+    this.correct_answers_count = correct_answers_count;
+    this.wrong_answers_count = wrong_answers_count;
+    this.unanswered_questions_count = unanswered_questions_count;
   }
-
 
   static fromMap(map: { [key: string]: any }): ExamsModel {
     return new ExamsModel(
@@ -59,11 +62,13 @@ export default class ExamsModel {
       map["mark"],
       map["subject"],
       map["degree_type"],
-
+      map["number_of_questions"],
+      map["correct_answers_count"] ?? 0,
+      map["wrong_answers_count"] ?? 0,
+      map["unanswered_questions_count"] ?? 0,
     );
   }
 }
-
 
 // "id": 225,
 // "title": "",
@@ -77,10 +82,3 @@ export default class ExamsModel {
 //     "id": 2873,
 //     "title": "رياضة 1"
 // }
-            
-             
-                 
-        
-
-                      
-                

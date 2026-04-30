@@ -2,13 +2,13 @@ export function getWebDomain(): string {
   const url = window.location.href;
   try {
     const hostname = new URL(url).hostname;
-    if (hostname === "localhost" || hostname === "website.saas.techlabeg.com")
-      return "physics-beyts.azcourses.org";
+    if (hostname === "localhost" || hostname === "mr-eslamsalama.com")
+      return "mr-eslamsalama.com";
     // const parts = hostname.split('.');
     // return parts.slice(-2).join('.');
     return hostname;
   } catch {
-    return "physics-beyts.azcourses.org";
+    return "mr-eslamsalama.com";
   }
 }
 
@@ -22,4 +22,3 @@ export function getWebDomain(): string {
 // garhy-academy.com
 // mr-mohamedkarawya.com
 // physics-beyts.azcourses.org
-

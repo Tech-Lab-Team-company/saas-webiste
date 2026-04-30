@@ -5,5 +5,10 @@
   "loginToContinue": "Login to continue",
   "username": "Username",
   "password": "Password",
-  "email": "Email"
+  "email": "Email",
+  "number_of_questions":"Number Of Questions",
+  "complate_exam":"Complate Exam",
+  "correct_answers": "Correct Answers",
+  "wrong_answers": "Wrong Answers",
+  "unanswered_questions": "Unanswered Questions"
 }
