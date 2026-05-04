@@ -90,7 +90,7 @@ const userStore = useUserStore();
           </span>
         </p>
         <p class="salary" v-else-if="CardDetails?.is_subscribed">
-          {{ $t("buying_course_done") }}
+          {{ $t("buying_course_done" ) }}
         </p>
 
         <p class="salary" v-else>{{ $t("free") }}</p>

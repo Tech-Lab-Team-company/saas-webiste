@@ -175,6 +175,8 @@ const selectAnswer = (answerId: number) => {
   SelectedAnswer.value[QuestionIndex.value] = `${answerId}`;
   selected.value[QuestionIndex.value] = answerId;
 };
+
+
 </script>
 
 <template>
@@ -287,7 +289,10 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Next Button (No Submit - for shuffle/edit exams) -->
       <button
-        v-if="canNavigateBack && QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1"
+        v-if="
+          canNavigateBack &&
+          QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
+        "
         @click="IncreaseIndex"
       >
         <LeftArrowIcon />
@@ -296,7 +301,10 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Submit Answer Button (Manual submit - for shuffle/edit exams) -->
       <button
-        v-if="canNavigateBack && QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1"
+        v-if="
+          canNavigateBack &&
+          QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
+        "
         @click="SubmitAndIncrease"
         class="btn-submit"
       >
@@ -305,7 +313,10 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Next Button (With Submit - for standard exams) -->
       <button
-        v-if="!canNavigateBack && QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1"
+        v-if="
+          !canNavigateBack &&
+          QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
+        "
         :class="!canNavigateBack ? 'w-full' : ''"
         @click="SubmitAndIncrease"
       >
@@ -316,10 +327,14 @@ const selectAnswer = (answerId: number) => {
       <!-- Final Submit Button (For all exam types at the end) -->
       <button
         v-if="QuestionIndex === (questionDetails?.questions?.length ?? 0) - 1"
-        :class="!canNavigateBack || QuestionDetails?.questions?.length < 2 ? 'w-50' : ''"
+        :class="
+          !canNavigateBack || QuestionDetails?.questions?.length < 2
+            ? 'w-50'
+            : ''
+        "
         @click="EndExam"
       >
-        {{ $t("ارسال الاجابات وانهي") }}
+        {{ $t("ارسال الاجابة و انهاء الامتحان") }}
       </button>
     </div>
   </div>
