@@ -1,11 +1,13 @@
 import { VoteReviewsApiService } from "~/features/VoteReviewFeature/Data/api_services/vote_review_api_service";
-import RepoInterface, { ResponseType } from "~/base/Domain/Repositories/repo_interface";
+import RepoInterface, {
+  ResponseType,
+} from "~/base/Domain/Repositories/repo_interface";
 import type ServicesInterface from "~/base/Data/ApiService/api_service_interface";
-import {  QuestionsAnswreApiService } from "../../Data/api_services/submit_question_answer_api_services";
+import { QuestionsAnswreApiService } from "../../Data/api_services/submit_question_answer_api_services";
 // import UserModel from "../../Data/models/education_stages_model";
-import QuestionAnswerModel from "../../Data/models/submit_question_answer_model";
+import QuestionsModel from "../../Data/models/questions_model";
 
-class QuestionAnswerRepo extends RepoInterface<QuestionAnswerModel> {
+class QuestionAnswerRepo extends RepoInterface<QuestionsModel> {
   private static instance: QuestionAnswerRepo;
   // eslint-disable-next-line ~typescript-eslint/no-empty-function
   private constructor() {
@@ -18,13 +20,12 @@ class QuestionAnswerRepo extends RepoInterface<QuestionAnswerModel> {
     return this.instance;
   }
 
-    override get responseType(): ResponseType {
-      return ResponseType.withoutData
-    }
+  // override get responseType(): ResponseType {
+  //   return ResponseType.withoutData
+  // }
 
-
-  onParse(data: any): QuestionAnswerModel {
-    return  QuestionAnswerModel.fromMap(data);
+  onParse(data: any): QuestionsModel {
+    return QuestionsModel.fromMap(data);
   }
 
   get serviceInstance(): ServicesInterface {
