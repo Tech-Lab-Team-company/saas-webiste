@@ -60,7 +60,16 @@ const sendData = async (status: string) => {
 };
 
 const IncreaseIndex = () => {
-  sendData("");
+  if (
+    QuestionIndex.value <
+    (questionDetails.value?.questions?.length ?? 0) - 1
+  ) {
+    QuestionIndex.value++;
+    SendEmit();
+  }
+};
+
+const SubmitAndIncrease = async () => {
   if (selected.value[QuestionIndex.value] == undefined) {
     toast.add({
       severity: "info",
@@ -70,14 +79,17 @@ const IncreaseIndex = () => {
     });
 
     return;
-  } else if (
+  }
+
+  await sendData("");
+
+  if (
     QuestionIndex.value <
     (questionDetails.value?.questions?.length ?? 0) - 1
   ) {
     QuestionIndex.value++;
+    SendEmit();
   }
-
-  SendEmit();
 };
 
 const EndExam = () => {
@@ -155,8 +167,7 @@ const canEdit = computed(
 );
 
 const canSelectAnswer = computed(
-  () =>
-    canEdit.value || selected.value[QuestionIndex.value] === undefined,
+  () => canEdit.value || selected.value[QuestionIndex.value] === undefined,
 );
 
 const selectAnswer = (answerId: number) => {
@@ -203,7 +214,9 @@ const selectAnswer = (answerId: number) => {
                   ? `selected-img`
                   : ``
               "
-              :style="!canSelectAnswer ? 'cursor: not-allowed; opacity: 0.7;' : ''"
+              :style="
+                !canSelectAnswer ? 'cursor: not-allowed; opacity: 0.7;' : ''
+              "
             />
 
             <label
@@ -262,56 +275,51 @@ const selectAnswer = (answerId: number) => {
       </div>
     </form>
 
-    <div
-      class="next-btn"
-      v-if="
-        QuestionIndex == 0 &&
-        QuestionIndex != questionDetails?.questions.length - 1
-      "
-    >
-      <button @click="IncreaseIndex">{{ $t("التالي") }}</button>
-    </div>
-
-    <div
-      class="btns"
-      v-if="
-        QuestionIndex > 0 &&
-        QuestionIndex < questionDetails?.questions.length - 1
-      "
-    >
-    <button
-    :class="!canNavigateBack ? `w-50` : ``"
-    @click="IncreaseIndex"
-    >
-    <LeftArrowIcon />
-    {{ $t("التالي") }}
-</button>
-<button v-if="canNavigateBack" @click="DeacreseIndes">
-    {{ $t("السابق") }}
-    <RightArrowIcon />
-</button>
-    </div>
-    <div
-      class="next-btn finish-btn"
-      v-if="QuestionIndex == questionDetails?.questions.length - 1"
-    >
+    <div class="btns">
+      <!-- Previous Button (Only for shuffle/edit exams) -->
       <button
-        v-if="canNavigateBack && QuestionDetails?.questions.length > 1"
-        class="back-btn"
+        v-if="canNavigateBack && QuestionIndex > 0"
         @click="DeacreseIndes"
       >
-        <LeftArrowIcon />
+        <RightArrowIcon />
         {{ $t("السابق") }}
       </button>
+
+      <!-- Next Button (No Submit - for shuffle/edit exams) -->
       <button
-        :class="
-          !canNavigateBack || QuestionDetails?.questions.length < 2
-            ? `w-full`
-            : ``
-        "
+        v-if="canNavigateBack && QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1"
+        @click="IncreaseIndex"
+      >
+        <LeftArrowIcon />
+        {{ $t("التالي") }}
+      </button>
+
+      <!-- Submit Answer Button (Manual submit - for shuffle/edit exams) -->
+      <button
+        v-if="canNavigateBack && QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1"
+        @click="SubmitAndIncrease"
+        class="btn-submit"
+      >
+        {{ $t("ارسال الاجابة") }}
+      </button>
+
+      <!-- Next Button (With Submit - for standard exams) -->
+      <button
+        v-if="!canNavigateBack && QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1"
+        :class="!canNavigateBack ? 'w-full' : ''"
+        @click="SubmitAndIncrease"
+      >
+        <LeftArrowIcon />
+        {{ $t("التالي") }}
+      </button>
+
+      <!-- Final Submit Button (For all exam types at the end) -->
+      <button
+        v-if="QuestionIndex === (questionDetails?.questions?.length ?? 0) - 1"
+        :class="!canNavigateBack || QuestionDetails?.questions?.length < 2 ? 'w-50' : ''"
         @click="EndExam"
       >
-        {{ $t("إنهاء الامتحان ") }}
+        {{ $t("ارسال الاجابات وانهي") }}
       </button>
     </div>
   </div>
@@ -391,6 +399,35 @@ const selectAnswer = (answerId: number) => {
       .answer {
         width: 100%;
       }
+    }
+  }
+}
+
+.btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+
+  button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    &.btn-submit {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
     }
   }
 }
