@@ -5,8 +5,10 @@ import type ExamDetailsModel from "~/features/FetchExams/Data/models/exam_detail
 import QuestionAnswerController from "~/features/SubmitQuestionAnswer/presentation/controllers/submit_question_answer_controller";
 import QuestionAnswerParams from "~/features/SubmitQuestionAnswer/Core/Params/submit_question_answer_params";
 import { ExamShuffleStatus } from "../CourseDetails/Enum/Exam_status_enum";
+import type QuestionsModel from "~/features/FetchExams/Data/models/questions_model";
 
 const SelectedAnswer = ref<string[]>([]);
+const CorrectAnswers = ref<(boolean | null)[]>([]);
 const QuestionIndex = ref(0);
 const Answer = ref();
 
@@ -42,6 +44,17 @@ const selected = ref<(number | undefined)[]>([]);
 const router = useRouter();
 const toast = useToast();
 
+const checkIsCorrectAnswer = (answerId: number, question: QuestionsModel) => {
+  // const question = [...questionDetails.value?.questions[QuestionIndex.value]];
+
+  // console.log(question, "question");
+  console.log(answerId, "id");
+  console.log(question, "question");
+
+  return question?.answers?.find((answer) => answer.id === answerId)
+    ?.correct;
+};
+
 const sendData = async (status: string) => {
   // console.log(selected.value[QuestionIndex.value])
   const questionAnswerParams = new QuestionAnswerParams(
@@ -56,6 +69,9 @@ const sendData = async (status: string) => {
       questionAnswerParams || null,
       status || " ",
     );
+    const isCorrect = checkIsCorrectAnswer(questionAnswerParams.AnswerId, state.value.data);
+    CorrectAnswers.value[QuestionIndex.value] = isCorrect;
+    // console.log("checkIsCorrectAnswer", isCorrect);
   }
 };
 
@@ -174,9 +190,9 @@ const selectAnswer = (answerId: number) => {
   if (!canSelectAnswer.value) return;
   SelectedAnswer.value[QuestionIndex.value] = `${answerId}`;
   selected.value[QuestionIndex.value] = answerId;
+  // Clear correctness state if user changes answer
+  CorrectAnswers.value[QuestionIndex.value] = null;
 };
-
-
 </script>
 
 <template>
@@ -211,11 +227,17 @@ const selectAnswer = (answerId: number) => {
               height="150"
               :for="`answer-${answer.id}`"
               @click="selectAnswer(answer.id)"
-              :class="
+              :class="[
                 SelectedAnswer[QuestionIndex] == `${answer.id}`
                   ? `selected-img`
-                  : ``
-              "
+                  : ``,
+                CorrectAnswers[QuestionIndex] !== null &&
+                SelectedAnswer[QuestionIndex] == `${answer.id}`
+                  ? CorrectAnswers[QuestionIndex]
+                    ? 'success-img'
+                    : 'danger-img'
+                  : '',
+              ]"
               :style="
                 !canSelectAnswer ? 'cursor: not-allowed; opacity: 0.7;' : ''
               "
@@ -224,11 +246,17 @@ const selectAnswer = (answerId: number) => {
             <label
               :for="`answer-${answer.id}`"
               @click.prevent="selectAnswer(answer.id)"
-              :class="
+              :class="[
                 SelectedAnswer[QuestionIndex] == `${answer.id}`
                   ? `selected`
-                  : ``
-              "
+                  : ``,
+                CorrectAnswers[QuestionIndex] !== null &&
+                SelectedAnswer[QuestionIndex] == `${answer.id}`
+                  ? CorrectAnswers[QuestionIndex]
+                    ? 'success'
+                    : 'danger'
+                  : '',
+              ]"
               v-html="answer?.answer"
             ></label>
 
@@ -256,11 +284,17 @@ const selectAnswer = (answerId: number) => {
             <label
               :for="`answer-${answer.id}`"
               @click.prevent="selectAnswer(answer.id)"
-              :class="
+              :class="[
                 SelectedAnswer[QuestionIndex] == `${answer.id}`
                   ? `selected`
-                  : ``
-              "
+                  : ``,
+                CorrectAnswers[QuestionIndex] !== null &&
+                SelectedAnswer[QuestionIndex] == `${answer.id}`
+                  ? CorrectAnswers[QuestionIndex]
+                    ? 'success'
+                    : 'danger'
+                  : '',
+              ]"
               v-html="answer?.answer"
             ></label>
             <input
@@ -444,6 +478,26 @@ const selectAnswer = (answerId: number) => {
       color: white;
       border: none;
     }
+  }
+}
+
+label {
+  &.success {
+    border: 2px solid #28a745 !important;
+    background-color: #d4edda;
+  }
+  &.danger {
+    border: 2px solid #dc3545 !important;
+    background-color: #f8d7da;
+  }
+}
+
+img {
+  &.success-img {
+    border: 5px solid #28a745 !important;
+  }
+  &.danger-img {
+    border: 5px solid #dc3545 !important;
   }
 }
 
