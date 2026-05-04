@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 
-import ExamDetailsParams from '~/features/FetchExams/Core/Params/exam_details_params';
-import { QuestionTypeEnum } from '~/features/FetchExams/Core/questoin_type_enum';
-import type ExamDetailsModel from '~/features/FetchExams/Data/models/exam_details_model';
-import ExamDetailsController from '~/features/FetchExams/presentation/controllers/exam_details_controller';
-import QuestionAnswerParams from '~/features/SubmitQuestionAnswer/Core/Params/submit_question_answer_params';
-import QuestionAnswerController from '~/features/SubmitQuestionAnswer/presentation/controllers/submit_question_answer_controller';
-
-import clockicon from '~/public/icons/clockicon.vue';
-import progressIcon from '~/public/icons/progressIcon.vue';
+import ExamDetailsParams from "~/features/FetchExams/Core/Params/exam_details_params";
+import { QuestionTypeEnum } from "~/features/FetchExams/Core/questoin_type_enum";
+import type ExamDetailsModel from "~/features/FetchExams/Data/models/exam_details_model";
+import ExamDetailsController from "~/features/FetchExams/presentation/controllers/exam_details_controller";
+import QuestionAnswerParams from "~/features/SubmitQuestionAnswer/Core/Params/submit_question_answer_params";
+import QuestionAnswerController from "~/features/SubmitQuestionAnswer/presentation/controllers/submit_question_answer_controller";
+import clockicon from "~/public/icons/clockicon.vue";
+import progressIcon from "~/public/icons/progressIcon.vue";
 
 const router = useRouter();
 
@@ -27,7 +26,9 @@ const examId = Number(router.currentRoute.value.params.exam);
 const startTimeKey = `exam-start-${examId}`;
 
 const FetchExamQuestions = async () => {
-  const ExamParams = new ExamDetailsParams(Number(router.currentRoute.value.params.exam));
+  const ExamParams = new ExamDetailsParams(
+    Number(router.currentRoute.value.params.exam),
+  );
   const examDetailsController = ExamDetailsController.getInstance();
   const state = await examDetailsController.FetchExamDetails(ExamParams);
 
@@ -52,9 +53,7 @@ const FetchExamQuestions = async () => {
 
   const endTime = startTime + state.value.data.duration * 60 * 1000;
   startTimer(endTime);
-
 };
-
 
 const startTimer = (endTime: number) => {
   // console.log(endTime, "endtime");
@@ -90,30 +89,45 @@ onUnmounted(() => {
   <div class="exam-time-container">
     <div class="exam-totla-time">
       <clockicon />
-      <p>{{ `${ExamDetails?.duration} min` }}</p>
+      <p>{{ `${ExamDetails?.duration} دقيقة` }}</p>
     </div>
 
     <div class="exam-time">
       <p>علي نهايه الامتحان</p>
-      <span>{{ RemainingTimeMinutes }} : {{ RemainingTimeSeconds.toString().padStart(2, '0') }} دقيقة</span>
+      <span
+        >{{ RemainingTimeMinutes }}:{{
+          RemainingTimeSeconds.toString().padStart(2, "0")
+        }}
+        <span>دقيقة</span></span
+      >
     </div>
   </div>
 
   <div class="progress-bar">
-    <div class="active-bar"
-      :style="`width:${(questionIndex + 1) * (100 / Number(ExamDetails?.questions.length || 1))}%`"></div>
+    <div
+      class="active-bar"
+      :style="`width:${
+        (questionIndex + 1) * (100 / Number(ExamDetails?.questions.length || 1))
+      }%`"
+    ></div>
     <div class="dots">
-      <div v-for="(dot, index) in ExamDetails?.questions.length" :key="index" class="dot"
-        :class="questionIndex === index ? 'white' : ''"></div>
+      <div
+        v-for="(dot, index) in ExamDetails?.questions.length"
+        :key="index"
+        class="dot"
+        :class="questionIndex === index ? 'white' : ''"
+      ></div>
     </div>
   </div>
 
   <div>
-    <ExamQuestionsText :remainingTimeMinutes="RemainingTimeMinutes" :QuestionDetails="ExamDetails"
-      @SendAnswerIndex="questionIndex = $event" />
+    <ExamQuestionsText
+      :remainingTimeMinutes="RemainingTimeMinutes"
+      :QuestionDetails="ExamDetails"
+      @SendAnswerIndex="questionIndex = $event"
+    />
   </div>
 </template>
-
 
 <style scoped lang="scss">
 .exam-time-container {
@@ -128,13 +142,16 @@ onUnmounted(() => {
     gap: 6px;
 
     p {
-      color: #D38911;
+      color: #d38911;
       font-size: 18px;
     }
 
     span {
       font-size: 18px;
       font-weight: 500;
+      display: flex;
+      flex-direction: row-reverse;
+      gap: 6px;
     }
   }
 
@@ -145,10 +162,12 @@ onUnmounted(() => {
     gap: 6px;
 
     p {
-      color: #6F777B;
+      color: #6f777b;
+      display: flex;
+      flex-direction: row-reverse;
+      gap: 6px;
     }
   }
-
 }
 
 .progress-bar {
@@ -156,7 +175,7 @@ onUnmounted(() => {
   height: 10px;
   margin: 0 20px;
   border-radius: 10px;
-  background: #E0E0E0;
+  background: #e0e0e0;
   margin-top: 2px;
   margin-bottom: 10px;
   position: relative;
@@ -173,8 +192,6 @@ onUnmounted(() => {
     padding: 0 5px;
     justify-content: space-between;
 
-
-
     .dot {
       width: 5px;
       height: 5px;
@@ -183,16 +200,12 @@ onUnmounted(() => {
       z-index: 10;
 
       &:last-child {
-
         background-color: white !important;
       }
-
 
       //     &.white{
       //     background-color: white !important;
       //  }
-
-
 
       &:last-child {
         // background-color: white;
@@ -202,16 +215,13 @@ onUnmounted(() => {
 
   .active-bar {
     position: absolute;
-    background-image: linear-gradient(to left, #D38911, var(--secondary-color));
+    background-image: linear-gradient(to left, #d38911, var(--secondary-color));
     right: 0;
     width: 10.5%;
     height: 100%;
     border-radius: 10px;
     z-index: 0;
-
   }
-
-
 }
 </style>
 <!-- <div class="active-bar" :style="`width:${questionIndex * 5.2}%`"></div> -->
