@@ -16,6 +16,7 @@ export default class ExamDetailsModel {
   public allow_shuffle: number;
   public duration: number;
   public number_of_questions: number;
+  public edit_answer: number;
 
   constructor(
     id: number,
@@ -32,6 +33,7 @@ export default class ExamDetailsModel {
     allow_shuffle: number,
     duration: number,
     number_of_questions: number,
+    edit_answer: number,
   ) {
     this.id = id;
     this.title = title;
@@ -47,6 +49,7 @@ export default class ExamDetailsModel {
     this.allow_shuffle = allow_shuffle;
     this.duration = duration;
     this.number_of_questions = number_of_questions;
+    this.edit_answer = edit_answer;
   }
 
   static fromMap(map: { [key: string]: any }): ExamDetailsModel {
@@ -65,6 +68,7 @@ export default class ExamDetailsModel {
       map["allow_shuffle"],
       map["duration"],
       map["number_of_questions"],
+      map["edit_answer"],
     );
   }
 }

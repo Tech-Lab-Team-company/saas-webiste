@@ -4,6 +4,7 @@ import LeftArrowIcon from "~/public/icons/LeftArrowIcon.vue";
 import type ExamDetailsModel from "~/features/FetchExams/Data/models/exam_details_model";
 import QuestionAnswerController from "~/features/SubmitQuestionAnswer/presentation/controllers/submit_question_answer_controller";
 import QuestionAnswerParams from "~/features/SubmitQuestionAnswer/Core/Params/submit_question_answer_params";
+import { ExamShuffleStatus } from "../CourseDetails/Enum/Exam_status_enum";
 
 const SelectedAnswer = ref<string[]>([]);
 const QuestionIndex = ref(0);
@@ -26,6 +27,7 @@ watch(
   () => props.QuestionDetails,
   (newValue) => {
     questionDetails.value = newValue;
+    // GetExamShuffleStatus();
   },
   { immediate: true },
 );
@@ -35,7 +37,7 @@ const SendEmit = () => {
   emit("SendAnswerIndex", QuestionIndex.value);
 };
 
-const selected = ref([]);
+const selected = ref<(number | undefined)[]>([]);
 
 const router = useRouter();
 const toast = useToast();
@@ -45,7 +47,7 @@ const sendData = async (status: string) => {
   const questionAnswerParams = new QuestionAnswerParams(
     Number(router.currentRoute.value.params.exam),
     Number(questionDetails?.value?.questions[QuestionIndex.value]?.id),
-    selected.value[QuestionIndex.value],
+    selected.value[QuestionIndex.value] ?? 0,
   );
   const questionAnswerController = QuestionAnswerController.getInstance();
   if (selected.value[QuestionIndex.value] !== undefined) {
@@ -123,6 +125,45 @@ watch(
     RemainingTimeMinutes.value = NewValue ?? 0;
   },
 );
+
+const GetExamShuffleStatus = () => {
+  if (
+    questionDetails.value?.allow_shuffle == 1 &&
+    questionDetails.value?.edit_answer == 1
+  ) {
+    return ExamShuffleStatus.shuffleAndEdit;
+  } else if (
+    questionDetails.value?.allow_shuffle == 1 &&
+    questionDetails.value?.edit_answer == 0
+  ) {
+    return ExamShuffleStatus.ShuffleOnly;
+  } else {
+    return ExamShuffleStatus.NoShuffleNoEdit;
+  }
+};
+
+const examStatus = computed(() => GetExamShuffleStatus());
+
+const canNavigateBack = computed(
+  () =>
+    examStatus.value === ExamShuffleStatus.shuffleAndEdit ||
+    examStatus.value === ExamShuffleStatus.ShuffleOnly,
+);
+
+const canEdit = computed(
+  () => examStatus.value === ExamShuffleStatus.shuffleAndEdit,
+);
+
+const canSelectAnswer = computed(
+  () =>
+    canEdit.value || selected.value[QuestionIndex.value] === undefined,
+);
+
+const selectAnswer = (answerId: number) => {
+  if (!canSelectAnswer.value) return;
+  SelectedAnswer.value[QuestionIndex.value] = `${answerId}`;
+  selected.value[QuestionIndex.value] = answerId;
+};
 </script>
 
 <template>
@@ -156,20 +197,18 @@ watch(
               width="150"
               height="150"
               :for="`answer-${answer.id}`"
-              @click="
-                SelectedAnswer[QuestionIndex] = `${answer.id}`;
-                selected[QuestionIndex] = answer.id;
-              "
+              @click="selectAnswer(answer.id)"
               :class="
                 SelectedAnswer[QuestionIndex] == `${answer.id}`
                   ? `selected-img`
                   : ``
               "
+              :style="!canSelectAnswer ? 'cursor: not-allowed; opacity: 0.7;' : ''"
             />
 
             <label
               :for="`answer-${answer.id}`"
-              @click="SelectedAnswer[QuestionIndex] = `${answer.id}`"
+              @click.prevent="selectAnswer(answer.id)"
               :class="
                 SelectedAnswer[QuestionIndex] == `${answer.id}`
                   ? `selected`
@@ -180,11 +219,12 @@ watch(
 
             <input
               class="answer"
-              v-model="selected[QuestionIndex]"
+              :checked="selected[QuestionIndex] === answer.id"
               type="radio"
               :value="answer.id"
               name="answer"
               :id="`answer-${answer.id}`"
+              :disabled="!canSelectAnswer"
             />
           </div>
         </div>
@@ -200,7 +240,7 @@ watch(
           <div class="answer-text" v-if="!answer.image">
             <label
               :for="`answer-${answer.id}`"
-              @click="SelectedAnswer[QuestionIndex] = `${answer.id}`"
+              @click.prevent="selectAnswer(answer.id)"
               :class="
                 SelectedAnswer[QuestionIndex] == `${answer.id}`
                   ? `selected`
@@ -210,11 +250,12 @@ watch(
             ></label>
             <input
               class="answer"
-              v-model="selected[QuestionIndex]"
+              :checked="selected[QuestionIndex] === answer.id"
               type="radio"
               :value="answer.id"
               name="answer"
               :id="`answer-${answer.id}`"
+              :disabled="!canSelectAnswer"
             />
           </div>
         </div>
@@ -238,27 +279,24 @@ watch(
         QuestionIndex < questionDetails?.questions.length - 1
       "
     >
-      <button v-if="QuestionDetails?.allow_shuffle == 1" @click="DeacreseIndes">
-        <LeftArrowIcon />
-        {{ $t("السابق") }}
-      </button>
-      <button
-        :class="QuestionDetails?.allow_shuffle == 0 ? `w-50` : ``"
-        @click="IncreaseIndex"
-      >
-        {{ $t("التالي") }}
-        <RightArrowIcon />
-      </button>
+    <button
+    :class="!canNavigateBack ? `w-50` : ``"
+    @click="IncreaseIndex"
+    >
+    <LeftArrowIcon />
+    {{ $t("التالي") }}
+</button>
+<button v-if="canNavigateBack" @click="DeacreseIndes">
+    {{ $t("السابق") }}
+    <RightArrowIcon />
+</button>
     </div>
     <div
       class="next-btn finish-btn"
       v-if="QuestionIndex == questionDetails?.questions.length - 1"
     >
       <button
-        v-if="
-          QuestionDetails?.allow_shuffle &&
-          QuestionDetails?.questions.length > 1
-        "
+        v-if="canNavigateBack && QuestionDetails?.questions.length > 1"
         class="back-btn"
         @click="DeacreseIndes"
       >
@@ -267,8 +305,7 @@ watch(
       </button>
       <button
         :class="
-          QuestionDetails?.allow_shuffle == 0 ||
-          QuestionDetails?.questions.length < 2
+          !canNavigateBack || QuestionDetails?.questions.length < 2
             ? `w-full`
             : ``
         "
