@@ -51,8 +51,7 @@ const checkIsCorrectAnswer = (answerId: number, question: QuestionsModel) => {
   console.log(answerId, "id");
   console.log(question, "question");
 
-  return question?.answers?.find((answer) => answer.id === answerId)
-    ?.correct;
+  return question?.answers?.find((answer) => answer.id === answerId)?.correct;
 };
 
 const sendData = async (status: string) => {
@@ -69,7 +68,10 @@ const sendData = async (status: string) => {
       questionAnswerParams || null,
       status || " ",
     );
-    const isCorrect = checkIsCorrectAnswer(questionAnswerParams.AnswerId, state.value.data);
+    const isCorrect = checkIsCorrectAnswer(
+      questionAnswerParams.AnswerId,
+      state.value.data,
+    );
     CorrectAnswers.value[QuestionIndex.value] = isCorrect;
     // console.log("checkIsCorrectAnswer", isCorrect);
   }
@@ -339,7 +341,7 @@ const selectAnswer = (answerId: number) => {
           canNavigateBack &&
           QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
         "
-        @click="SubmitAndIncrease"
+        @click="sendData"
         class="btn-submit"
       >
         {{ $t("ارسال الاجابة") }}
@@ -545,5 +547,14 @@ img {
   button {
     width: 50%;
   }
+}
+
+.success {
+  background-color: #28a74677 !important;
+  border: 2px solid #28a745 !important;
+}
+.danger {
+  background-color: #dc354588 !important;
+  border: 2px solid #dc3545 !important;
 }
 </style>
