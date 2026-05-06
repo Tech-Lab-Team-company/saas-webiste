@@ -35,14 +35,18 @@ import EducationBasicSubjectsParams from "~/features/FetchBasicSubjects/Core/Par
 import UpdateProfileParams from "~/features/UpdateProfileFeature/Core/Params/update_profile_params";
 import UpdateProfileController from "~/features/UpdateProfileFeature/presentation/controllers/update_profile_controller";
 
-const studentCategory = ref(0);
+// const studentCategory = ref(0); // Removed redundant ref
 
 const Eductaion_Type = ref<TitleModel[]>([]);
 const EducationCategory = ref<number>();
 const University = ref<TitleModel[]>([]);
+const selectedUniversity = ref<number>();
 const Colleges = ref<TitleModel[]>([]);
+const selectedCollege = ref<number>();
 const CollegeDeprtment = ref<TitleModel[]>([]);
+const selectedDepartment = ref<number>();
 const CollegeDeprtmentDivision = ref<TitleModel[]>([]);
+const selectedDivision = ref<number>();
 
 const userStore = useUserStore();
 
@@ -56,49 +60,97 @@ const FetchEducationStages = async () => {
   );
 
   if (state.value.data) {
-    Eductaion_Type.value.push(...state.value.data);
+    Eductaion_Type.value = state.value.data;
+    if (userStore.user?.category_id == 2) {
+      EducationCategory.value = Number(
+        userStore.user?.userInfo?.university_education_type_id,
+      );
+      if (EducationCategory.value) {
+        FetchUniversityEducationLevel();
+      }
+    } else if (userStore.user?.category_id == 1) {
+      BasicEducationCategory.value = Number(
+        userStore.user?.userInfo?.basic_education_type_id,
+      );
+      if (BasicEducationCategory.value) {
+        FetchEduciationLevels();
+      }
+    }
   }
 };
 
-watch(
-  () => studentCategory.value,
-  (NewValue) => {
-    studentCategory.value = NewValue;
-    FetchEducationStages();
-  },
-);
+// watch(
+//   () => studentCategory.value,
+//   (NewValue) => {
+//     studentCategory.value = NewValue;
+//     FetchEducationStages();
+//   },
+// );
 
-const FetchUniversityEducationLevel = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value));
+const FetchUniversityEducationLevel = async () => {
+  if (!EducationCategory.value) return;
+
+  // Reset dependents
+  University.value = [];
+  selectedUniversity.value = undefined;
+  Colleges.value = [];
+  selectedCollege.value = undefined;
+  CollegeDeprtment.value = [];
+  selectedDepartment.value = undefined;
+  CollegeDeprtmentDivision.value = [];
+  selectedDivision.value = undefined;
+
   const universityParams = new UniversityParams(
-    Number((data.target as HTMLSelectElement).value),
+    Number(EducationCategory.value),
     1,
   );
   const universityController = UniversityController.getInstance();
   const state = await universityController.FetchUniversity(universityParams);
 
   if (state.value.data) {
-    University.value.push(...state.value.data);
+    University.value = state.value.data;
+    if (userStore.user?.userInfo?.university_id && !selectedUniversity.value) {
+      selectedUniversity.value = Number(userStore.user.userInfo.university_id);
+      FetchColleges();
+    }
   }
 };
 
-const FetchColleges = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value));
-  const collegesParams = new CollegesParams(
-    Number((data.target as HTMLSelectElement).value),
-  );
+const FetchColleges = async () => {
+  if (!selectedUniversity.value) return;
+
+  // Reset dependents
+  Colleges.value = [];
+  selectedCollege.value = undefined;
+  CollegeDeprtment.value = [];
+  selectedDepartment.value = undefined;
+  CollegeDeprtmentDivision.value = [];
+  selectedDivision.value = undefined;
+
+  const collegesParams = new CollegesParams(Number(selectedUniversity.value));
   const collegesController = CollegesController.getInstance();
   const state = await collegesController.FetchColleges(collegesParams);
 
   if (state.value.data) {
-    Colleges.value.push(...state.value.data);
+    Colleges.value = state.value.data;
+    if (userStore.user?.userInfo?.college_id && !selectedCollege.value) {
+      selectedCollege.value = Number(userStore.user.userInfo.college_id);
+      FetchCollegesDeprtment();
+    }
   }
-  console.log(Colleges.value);
 };
-const FetchCollegesDeprtment = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value));
+
+const FetchCollegesDeprtment = async () => {
+  if (!selectedCollege.value) return;
+
+  // Reset dependents
+  CollegeDeprtment.value = [];
+  selectedDepartment.value = undefined;
+  CollegeDeprtmentDivision.value = [];
+  selectedDivision.value = undefined;
+
   const collegeDetpartmentParams = new CollegeDetpartmentParams(
-    Number((data.target as HTMLSelectElement).value),
+    Number(selectedCollege.value),
   );
   const collegeDepartmentController = CollegeDepartmentController.getInstance();
   const state = await collegeDepartmentController.FetchCollegeDepartment(
@@ -106,16 +158,23 @@ const FetchCollegesDeprtment = async (data: Event) => {
   );
 
   if (state.value.data) {
-    CollegeDeprtment.value.push(...state.value.data);
+    CollegeDeprtment.value = state.value.data;
+    if (userStore.user?.userInfo?.department_id && !selectedDepartment.value) {
+      selectedDepartment.value = Number(userStore.user.userInfo.department_id);
+      FetchCollegesDeprtmentDivisions();
+    }
   }
-  console.log(Colleges.value);
 };
-const FetchCollegesDeprtmentDivisions = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value));
+
+const FetchCollegesDeprtmentDivisions = async () => {
+  if (!selectedDepartment.value) return;
+
+  // Reset dependents
+  CollegeDeprtmentDivision.value = [];
+  selectedDivision.value = undefined;
+
   const collegeDetpartmentDivisionsParams =
-    new CollegeDetpartmentDivisionsParams(
-      Number((data.target as HTMLSelectElement).value),
-    );
+    new CollegeDetpartmentDivisionsParams(Number(selectedDepartment.value));
   const collegeDepartmentDivisionsController =
     CollegeDepartmentDivisionsController.getInstance();
   const state =
@@ -124,7 +183,10 @@ const FetchCollegesDeprtmentDivisions = async (data: Event) => {
     );
 
   if (state.value.data) {
-    CollegeDeprtmentDivision.value.push(...state.value.data);
+    CollegeDeprtmentDivision.value = state.value.data;
+    if (userStore.user?.userInfo?.division_id && !selectedDivision.value) {
+      selectedDivision.value = Number(userStore.user.userInfo.division_id);
+    }
   }
 };
 
@@ -134,12 +196,12 @@ onMounted(() => {
 
 const SendUniversityData = async () => {
   const EducationDataParams = new SubmitEducationDataParams(
-    Eductaion_Type?.value?.[0]?.id,
-    CollegeDeprtmentDivision.value?.[0]?.id,
-    studentCategory?.value,
-    University.value?.[0]?.id,
-    Colleges.value?.[0]?.id,
-    CollegeDeprtment.value?.[0]?.id,
+    EducationCategory.value,
+    selectedDivision.value,
+    userStore?.user?.category_id,
+    selectedUniversity.value,
+    selectedCollege.value,
+    selectedDepartment.value,
     null,
     null,
     null,
@@ -175,6 +237,16 @@ const Subjects = ref();
 
 const BasicEducationCategory = ref<number | null>(null);
 const FetchEduciationLevels = async () => {
+  if (!BasicEducationCategory.value) return;
+
+  // Reset dependents
+  Levels.value = [];
+  selectedLevel.value = null;
+  Stages.value = [];
+  selectedStage.value = null;
+  BasicSubjects.value = [];
+  selectedBasicSubject.value = null;
+
   const educationBasicLevelsParams = new EducationBasicLevelsParams(
     BasicEducationCategory.value,
   );
@@ -184,13 +256,25 @@ const FetchEduciationLevels = async () => {
     educationBasicLevelsParams,
   );
   if (state.value.data) {
-    Levels.value.push(...state.value.data);
+    Levels.value = state.value.data;
+    if (userStore.user?.userInfo?.stage_id && !selectedLevel.value) {
+      selectedLevel.value = Number(userStore.user.userInfo.stage_id);
+      FetchStage();
+    }
   }
 };
 
 const selectedLevel = ref<number | null>(null);
 const Levels = ref<TitleModel[]>([]);
 const FetchStage = async () => {
+  if (!selectedLevel.value) return;
+
+  // Reset dependents
+  Stages.value = [];
+  selectedStage.value = null;
+  BasicSubjects.value = [];
+  selectedBasicSubject.value = null;
+
   const educationBasicStagesYearParams = new EducationBasicStagesYearParams(
     selectedLevel.value,
   );
@@ -201,13 +285,23 @@ const FetchStage = async () => {
       educationBasicStagesYearParams,
     );
   if (state.value.data) {
-    Stages.value.push(...state.value.data);
+    Stages.value = state.value.data;
+    if (userStore.user?.userInfo?.year_id && !selectedStage.value) {
+      selectedStage.value = Number(userStore.user.userInfo.year_id);
+      FetchSubjects();
+    }
   }
 };
 
 const selectedStage = ref<number | null>(null);
 const Stages = ref<TitleModel[]>([]);
 const FetchSubjects = async () => {
+  if (!selectedStage.value) return;
+
+  // Reset dependents
+  BasicSubjects.value = [];
+  selectedBasicSubject.value = null;
+
   const educationBasicSubjectsParams = new EducationBasicSubjectsParams(
     userStore.user?.category_id,
     selectedStage.value,
@@ -220,7 +314,7 @@ const FetchSubjects = async () => {
       educationBasicSubjectsParams,
     );
   if (state.value.data) {
-    BasicSubjects.value.push(...state.value.data);
+    BasicSubjects.value = state.value.data;
   }
 };
 
@@ -230,7 +324,6 @@ const selectedBasicSubject = ref<number | null>(null);
 const updateProfileController = UpdateProfileController.getInstance();
 
 const SendBasicData = async () => {
-  console.log("sssssss");
   const EducationDataParams = new UpdateProfileParams(
     null,
     null,
@@ -297,6 +390,8 @@ const SendBasicData = async () => {
         </div>
       </div>
 
+      <!-- <pre>{{ userStore.user?.userInfo }}</pre> -->
+      <!-- {{ EducationCategory }} -->
       <div class="inputs" v-if="userStore.user?.category_id == 2">
         <div class="login-input">
           <select
@@ -346,7 +441,11 @@ const SendBasicData = async () => {
 
       <div class="inputs" v-if="userStore.user?.category_id == 2">
         <div class="login-input">
-          <select class="student-select" @change="FetchColleges">
+          <select
+            class="student-select"
+            v-model="selectedUniversity"
+            @change="FetchColleges"
+          >
             <option value="" disabled selected>جامعة</option>
             <option
               v-for="(item, index) in University"
@@ -361,7 +460,11 @@ const SendBasicData = async () => {
       </div>
       <div class="inputs" v-if="userStore.user?.category_id == 2">
         <div class="login-input">
-          <select class="student-select" @change="FetchCollegesDeprtment">
+          <select
+            class="student-select"
+            v-model="selectedCollege"
+            @change="FetchCollegesDeprtment"
+          >
             <option value="" disabled selected>الكلية</option>
             <option
               v-for="(item, index) in Colleges"
@@ -378,6 +481,7 @@ const SendBasicData = async () => {
         <div class="login-input">
           <select
             class="student-select"
+            v-model="selectedDepartment"
             @change="FetchCollegesDeprtmentDivisions"
           >
             <option value="" disabled selected>القسم</option>
@@ -394,7 +498,7 @@ const SendBasicData = async () => {
       </div>
       <div class="inputs" v-if="userStore.user?.category_id == 2">
         <div class="login-input">
-          <select class="student-select">
+          <select class="student-select" v-model="selectedDivision">
             <option value="" disabled selected>المستوى</option>
             <option
               v-for="(item, index) in CollegeDeprtmentDivision"
@@ -517,7 +621,7 @@ const SendBasicData = async () => {
       v-if="userStore.user?.category_id == 1"
     >
       <button class="login-btn">
-        تأكيدsss
+        تأكيد
         <LeftArrowIcon class="left-icon" />
       </button>
     </div>
@@ -530,6 +634,7 @@ const SendBasicData = async () => {
   background-color: #f6f6f6;
   padding: 20px;
   box-sizing: border-box;
+  direction: rtl;
 }
 
 /* ================= TEXT ================= */
@@ -568,6 +673,7 @@ const SendBasicData = async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  // text-align: left !important;
   padding: 30px 0;
 }
 
@@ -589,9 +695,9 @@ const SendBasicData = async () => {
     cursor: pointer;
 
     /* custom arrow */
-    background-image: url("data:image/svg+xml,%3Csvg fill='%236b7280' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.25 7.5l4.5 4.5 4.5-4.5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
+    padding-inline-start: 14px;
+    padding-inline-end: 40px;
+    background-position: left 12px center; /* RTL */
 
     &:hover {
       background-color: #f3f4f6;
