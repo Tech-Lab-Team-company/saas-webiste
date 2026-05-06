@@ -13,7 +13,7 @@ const errorMessage = ref<string | null>(null);
 const profileimage = ref<ProfileImage | null>(null);
 const userStore = useUserStore();
 const isLoggedIn = ref(false);
-const {locale} = useI18n();
+const { locale } = useI18n();
 
 const router = useRouter();
 
@@ -73,7 +73,7 @@ const uploadImage = async () => {
   const paramsImg = new UpdateProfileImageParams(selectedImage.value);
   try {
     await UpdateProfileImageController.getInstance().updateProfileImage(
-      paramsImg
+      paramsImg,
     );
   } catch (error) {
     console.error("خطأ في رفع الصورة:", error);
@@ -90,8 +90,13 @@ const uploadImage = async () => {
         <label for="profile-image-input">
           <EditImageIcon class="edit-icon" />
         </label>
-        <input id="profile-image-input" type="file" accept="image/*" @change="handleImageChange"
-          style="display: none" />
+        <input
+          id="profile-image-input"
+          type="file"
+          accept="image/*"
+          @change="handleImageChange"
+          style="display: none"
+        />
       </div>
       <p class="person-name">{{ userStore.user.name }}</p>
       <p class="person-stage">طالب ثانوي</p>
@@ -99,23 +104,46 @@ const uploadImage = async () => {
     </div>
 
     <ul class="profile-options">
-
-      <NuxtLink to="/profile" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('profile')"
-        :class="{ active: SelectedOption === 'profile' }">
+      <NuxtLink
+        to="/profile"
+        exactActiveClass="active"
+        class="profile-option"
+        @click="UpdateSidebar('profile')"
+        :class="{ active: SelectedOption === 'profile' }"
+      >
         <p>الملف الشخصي</p>
         <SettingsIcon class="profile-icon" />
       </NuxtLink>
 
-
-      <NuxtLink to="/passwordupdate" exactActiveClass="active" class="profile-option" @click="UpdateSidebar('security')"
-        :class="{ active: SelectedOption === 'security' }">
+      <NuxtLink
+        to="/passwordupdate"
+        exactActiveClass="active"
+        class="profile-option"
+        @click="UpdateSidebar('security')"
+        :class="{ active: SelectedOption === 'security' }"
+      >
         <p>تغير كلمة المرور</p>
         <KeyIcon class="profile-icon" />
       </NuxtLink>
 
-      <NuxtLink exactActiveClass="active" to="/profilecourse" class="profile-option"
-        @NuxtLinkck="UpdateSidebar('courses')" :class="{ active: SelectedOption === 'courses' }">
+      <NuxtLink
+        exactActiveClass="active"
+        to="/profilecourse"
+        class="profile-option"
+        @NuxtLinkck="UpdateSidebar('courses')"
+        :class="{ active: SelectedOption === 'courses' }"
+      >
         <p>كورساتي</p>
+        <CoursesNote class="profile-icon" />
+      </NuxtLink>
+      <NuxtLink
+        exactActiveClass="active"
+        to="/profilesubjectinfo"
+        class="profile-option"
+        @NuxtLinkck="UpdateSidebar('academicinfo')"
+        :class="{ active: SelectedOption === 'academicinfo' }"
+      >
+        <p>المعلومات الدراسيه</p>
         <CoursesNote class="profile-icon" />
       </NuxtLink>
       <!-- <li class="profile-option" @click="UpdateSidebar('questionsbank')" exactActiveClass="active"
@@ -123,8 +151,12 @@ const uploadImage = async () => {
         <p>بنك اسئلتي</p>
         <QuestionBank class="profile-icon" />
       </li> -->
-      <li class="profile-option" @click="handleLogout" exactActiveClass="active"
-        :class="{ active: SelectedOption === 'logout' }">
+      <li
+        class="profile-option"
+        @click="handleLogout"
+        exactActiveClass="active"
+        :class="{ active: SelectedOption === 'logout' }"
+      >
         <p>تسجيل الخروج</p>
         <Logout class="profile-icon" />
       </li>
@@ -144,7 +176,6 @@ const uploadImage = async () => {
     width: 95%;
     margin-left: auto;
     margin-right: auto;
-    
   }
 
   .person-data {

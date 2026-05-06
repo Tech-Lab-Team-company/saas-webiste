@@ -20,28 +20,25 @@ const searchListing = async () => {
   }
 };
 
-const props =defineProps<{
-  header: Header
-}>()
-
+const props = defineProps<{
+  header: Header;
+}>();
 
 // console.log(props.header)
 
 const cities = ref<CityModel[]>([]);
-const city  = ref<CityModel>();
+const city = ref<CityModel>();
 const fetchCitiesController = FetchCitiesController.getInstance();
 
 const fetchCities = async () => {
   cities.value = (
-    await fetchCitiesController.fetchCities(
-      new FetchCitiesParams(1, 1, 10),
-    )
+    await fetchCitiesController.fetchCities(new FetchCitiesParams(1, 1, 10))
   ).value.data!;
 };
 
 onMounted(async () => {
   await fetchCities();
-})
+});
 
 useHead({
   link: [
@@ -49,9 +46,9 @@ useHead({
       rel: "preload",
       as: "image",
       href: "/public/hero-background.png",
-    }
-  ]
-})
+    },
+  ],
+});
 </script>
 
 <template>
@@ -78,18 +75,15 @@ useHead({
           <div class="overlay"></div>
         </div>
       </SwiperSlide>
-
     </Swiper>
     <div class="container info-container mx-auto px-8">
       <div class="info">
         <h1 class="website-main-title">
           {{ header.title }}
         </h1>
-        <p class="website-sub-title" v-html="header.description">
-
-        </p>
-<!--        <div class="search-bar"></div>-->
-        <form @submit.prevent="searchListing" class="form-search-home" >
+        <p class="website-sub-title" v-html="header.description"></p>
+        <!--        <div class="search-bar"></div>-->
+        <form @submit.prevent="searchListing" class="form-search-home">
           <div class="input-wrapper">
             <!-- <label class="input-label" for="time_zone">
               {{ $t("countries") }}
@@ -100,10 +94,10 @@ useHead({
               optionLabel="title"
               :placeholder="$t('Select_a_region')"
             >
-            <template #dropdownicon>
-              <IconsLocationPin />
-            </template>
-          </Select>
+              <template #dropdownicon>
+                <IconsLocationPin />
+              </template>
+            </Select>
           </div>
           <div class="website-input-search">
             <IconsAddress />
@@ -113,11 +107,11 @@ useHead({
               class="search-input"
               aria-label="search"
               name="search"
-            v-model="search"
-          />
-          <button class="primary-button" aria-label="search">
-            {{ $t("search") }}
-          </button>
+              v-model="search"
+            />
+            <button class="primary-button" aria-label="search">
+              {{ $t("search") }}
+            </button>
           </div>
         </form>
       </div>
