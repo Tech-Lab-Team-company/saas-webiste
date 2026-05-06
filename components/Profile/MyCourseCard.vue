@@ -91,85 +91,89 @@ import CoursesController from "~/features/FetchCourses/presentation/controllers/
 //   },
 // ];
 
-
-
 const courseParams = new CoursesParams("2");
 const coursesController = CoursesController.getInstance();
 const state = await coursesController.FetchCourses(courseParams);
-
 
 watch(
   () => coursesController.state.value,
   (newValue) => {
     state.value = newValue;
   },
-  { deep: true },)
-
+  { deep: true },
+);
 </script>
 
 <template>
   <GlobalDataStatues :status="state">
-  <template #initial>
-    loader
-  </template>
-  <template #loader>
-    loader
-  </template>
-  <template #empty>
-    لا يوجد كورسات 
-  </template>
-  <template #success>
-    <div class="profile-home">
-    <div class="slider-wrapper">
+    <template #initial> loader </template>
+    <template #loader> loader </template>
+    <template #empty> لا يوجد كورسات </template>
+    <template #success>
+      <div class="profile-home">
+        <div class="slider-wrapper">
+          <div class="cards-container">
+            <NuxtLink
+              class="card"
+              v-for="(course, index) in state.data"
+              :key="index"
+              :to="`/course/${course.id}`"
+            >
+              <div>
+                <div class="image-container">
+                  <img
+                    :src="course?.image?.img"
+                    alt="Card image"
+                    class="course-image"
+                  />
 
-      <div class="cards-container">
-        <NuxtLink class="card" v-for="(course, index) in state.data" :key="index" :to="`/course/${course.id}`">
-        <div >
-          <div class="image-container">
-            <img :src="course?.image?.img" alt="Card image" class="course-image" />
-            
-            <p class="overlay-text">{{ course?.subject?.title }}</p>
-          </div>
-          <div class="card-body" dir="rtl">
-            <h5 class="card-title">{{ course?.title }}</h5>
-            <div class="card-content">
-              <p class="card-text">{{ course?.subtitle }}</p>
-            </div>
-            <div class="card-one_footer">
-              <div class="card-text1">
-                <p class="card-text1"><note_one />{{ course?.videos_number }} فيديو</p>
-                <p class="card-text1"><note_two />{{ course?.docs_number }} ملف ورقي</p>
-              </div>
-              <div class="progress-container">
-                <div class="progress-bar">
-                  <div
-                    class="progress"
-                    :style="{ width: course?.progress + '%' }"
-                  ></div>
+                  <p class="overlay-text">{{ course?.subject?.title }}</p>
                 </div>
-                <span class="progress-percentage">{{ course?.progress }}%</span>
+                <div class="card-body" dir="rtl">
+                  <h5 class="card-title">{{ course?.title }}</h5>
+                  <div class="card-content">
+                    <p class="card-text">{{ course?.subtitle }}</p>
+                  </div>
+                  <div class="card-one_footer">
+                    <div class="card-text1">
+                      <p class="card-text1">
+                        <note_one />{{ course?.videos_number }} فيديو
+                      </p>
+                      <p class="card-text1">
+                        <note_two />{{ course?.docs_number }} ملف ورقي
+                      </p>
+                    </div>
+                    <div class="progress-container">
+                      <div class="progress-bar">
+                        <div
+                          class="progress"
+                          :style="{ width: course?.progress + '%' }"
+                        ></div>
+                      </div>
+                      <span class="progress-percentage"
+                        >{{ course?.progress }}%</span
+                      >
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <span class="card-icon flex">
+                      <!-- <component :is="card.icon" /> -->
+                      <img
+                        :src="course?.teacher?.image?.image"
+                        :alt="course?.teacher?.image?.alt"
+                      />
+                    </span>
+                    <span class="card-name">{{ course?.teacher?.name }}</span>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="card-footer">
-              <span class="card-icon flex">
-                <!-- <component :is="card.icon" /> -->
-                 <img :src="course?.teacher?.image?.image" :alt="course?.teacher?.image?.alt">
-              </span>
-              <span class="card-name">{{course?.teacher?.name }}</span>
-            </div>
+            </NuxtLink>
           </div>
         </div>
-        </NuxtLink>
       </div>
-    </div>
-  </div>
-  </template>
-
-</GlobalDataStatues>
-
- 
+    </template>
+  </GlobalDataStatues>
 </template>
-
 
 <style scoped>
 .slider-wrapper {
@@ -383,10 +387,3 @@ watch(
 @import "swiper/css";
 @import "swiper/css/navigation";
 </style>
-
-
-
-
-
-
-

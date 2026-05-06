@@ -38,7 +38,16 @@ const updateProfile = async () => {
           instagram.value,
           youtube.value,
           linkedin.value,
-          whatsapp.value
+          whatsapp.value,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
       )
   );
 }
