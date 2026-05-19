@@ -42,9 +42,13 @@ const {
   return response.data;
 });
 
-const isEduhubDomain = computed(
-  () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhubco.com"
-);
+const isEduhubDomain = getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhubco.com";
+
+if (isEduhubDomain) {
+  if (import.meta.client) {
+    window.location.replace("/eduhub/index.html");
+  }
+}
 
 const SettingStore = useSettingStore();
 const changeFavicon = (iconPath) => {
@@ -79,27 +83,16 @@ UserSettingStore.setSetting(webStatus.value!);
 </script>
 
 <template>
-  <div class="eduhub-wrapper" v-if="isEduhubDomain">
-    <iframe
-      src="/eduhub/index.html"
-      class="eduhub-iframe"
-      frameborder="0"
-      allowfullscreen
-    ></iframe>
-  </div>
-
-  <div v-else>
-    <NuxtLayout>
-      <MobileNav />
-      <ChatBotButton class="chat-bot-button" />
-      <SpeedDialToast class="social-icons" />
-      <Toast />
-      <NuxtPage v-if="!error" />
-      <Error v-if="error" />
-      <MainDialog v-if="!pending" />
-      <!-- <LoaderDialog v-if="!pending" /> -->
-    </NuxtLayout>
-  </div>
+  <NuxtLayout>
+    <MobileNav />
+    <ChatBotButton class="chat-bot-button" />
+    <SpeedDialToast class="social-icons" />
+    <Toast />
+    <NuxtPage v-if="!error" />
+    <Error v-if="error" />
+    <MainDialog v-if="!pending" />
+    <!-- <LoaderDialog v-if="!pending" /> -->
+  </NuxtLayout>
 </template>
 
 <style scoped lang="scss">
@@ -119,17 +112,5 @@ UserSettingStore.setSetting(webStatus.value!);
   cursor: pointer;
 }
 
-.eduhub-wrapper {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
 
-.eduhub-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
 </style>
