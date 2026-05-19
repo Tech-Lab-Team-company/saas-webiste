@@ -43,7 +43,7 @@ const {
 });
 
 const isEduhubDomain = computed(
-  () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhub.com"
+  () => getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhubco.com"
 );
 
 const SettingStore = useSettingStore();
