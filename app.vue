@@ -42,13 +42,6 @@ const {
   return response.data;
 });
 
-const isEduhubDomain = getWebDomain() === "eduhubco.com" || getWebDomain() === "www.eduhubco.com";
-
-if (isEduhubDomain) {
-  if (import.meta.client) {
-    window.location.replace("/eduhub/index.html");
-  }
-}
 
 const SettingStore = useSettingStore();
 const changeFavicon = (iconPath) => {
