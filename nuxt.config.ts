@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
+import { resolve } from 'node:path';
 export default defineNuxtConfig({
   // app:{
   //   head:{
@@ -62,7 +63,19 @@ export default defineNuxtConfig({
     domain: 'https://your-subdomain.twic.pics',
     anticipation: 0.5,
     step: 100,
-  }
+  },
+  nitro: {
+    publicAssets: [
+      {
+        dir: resolve(__dirname, 'public/eduhub'),
+        baseURL: '/eduhub',
+        maxAge: 60 * 60 * 24 * 7,
+      },
+    ],
+    routeRules: {
+      '/eduhub/**': { headers: { 'x-static': 'true' } },
+    },
+  },
 
 })
 
