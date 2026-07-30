@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
+import { resolve } from 'node:path';
 export default defineNuxtConfig({
   // app:{
   //   head:{
