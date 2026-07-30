@@ -11,6 +11,8 @@ import Error from "./error.vue";
 import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 
 const router = useRouter();
+const route = useRoute();
+const isHomeV2 = computed(() => route.path === "/home-v2");
 const UserStore = useUserStore();
 const {
   data: webStatus,
@@ -107,13 +109,13 @@ UserSettingStore.setSetting(webStatus.value!);
 
   <div v-else>
     <NuxtLayout>
-      <MobileNav />
-      <ChatBotButton class="chat-bot-button" />
-      <SpeedDialToast class="social-icons" />
+      <MobileNav v-if="!isHomeV2" />
+      <ChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
+      <SpeedDialToast v-if="!isHomeV2" class="social-icons" />
       <Toast />
       <NuxtPage v-if="!error" />
       <Error v-if="error" />
-      <MainDialog v-if="!pending" />
+      <MainDialog v-if="!pending && !isHomeV2" />
       <!-- <LoaderDialog v-if="!pending" /> -->
     </NuxtLayout>
   </div>
