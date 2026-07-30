@@ -11,6 +11,8 @@ import Error from "./error.vue";
 import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 
 const router = useRouter();
+const route = useRoute();
+const isHomeV2 = computed(() => route.path === "/home-v2");
 const UserStore = useUserStore();
 const {
   data: webStatus,
@@ -76,16 +78,44 @@ UserSettingStore.setSetting(webStatus.value!);
 </script>
 
 <template>
-  <NuxtLayout>
-    <MobileNav />
-    <ChatBotButton class="chat-bot-button" />
-    <SpeedDialToast class="social-icons" />
-    <Toast />
-    <NuxtPage v-if="!error" />
-    <Error v-if="error" />
-    <MainDialog v-if="!pending" />
-    <!-- <LoaderDialog v-if="!pending" /> -->
-  </NuxtLayout>
+  <div class="coming-soon" v-if="isEduhubDomain">
+    <!-- Animated background -->
+    <div class="bg-circles">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <!-- Main content -->
+    <div class="container">
+      <img
+        src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/logo.png"
+        alt="EduHUB Logo"
+        class="logo"
+      />
+      <h1>Coming Soon</h1>
+      <p>The Future of E-Learning is Here</p>
+    </div>
+    <a href="tel:+201119342223" class="whatsapp">
+      <img
+        src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/whatsapp.png"
+        alt="whatsapp"
+      />
+    </a>
+  </div>
+
+  <div v-else>
+    <NuxtLayout>
+      <MobileNav v-if="!isHomeV2" />
+      <ChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
+      <SpeedDialToast v-if="!isHomeV2" class="social-icons" />
+      <Toast />
+      <NuxtPage v-if="!error" />
+      <Error v-if="error" />
+      <MainDialog v-if="!pending && !isHomeV2" />
+      <!-- <LoaderDialog v-if="!pending" /> -->
+    </NuxtLayout>
+  </div>
 </template>
 
 <style scoped lang="scss">

@@ -128,6 +128,11 @@ class ApiNames {
   // blogs card
   public fetch_blogs = "fetch_blogs";
 
+  // Home V2
+  public fetch_home_sliders = "fetch_sliders";
+  public fetch_home_website_section = "fetch_home_website_section";
+  public filter_courses = "filter_courses";
+
   public show_blog = "show_blog";
 
   public CoursesFilter = this.baseUrl + "filter_courses";
