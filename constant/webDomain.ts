@@ -2,13 +2,13 @@ export function getWebDomain(): string {
   const url = window.location.href;
   try {
     const hostname = new URL(url).hostname;
-    if (hostname === "localhost" || hostname === "mr-eslamsalama.com")
-      return "mr-eslamsalama.com";
+    if (hostname === "localhost" || hostname === "kodrat.success.sa")
+      return "kodrat.success.sa";
     // const parts = hostname.split('.');
     // return parts.slice(-2).join('.');
     return hostname;
   } catch {
-    return "mr-eslamsalama.com";
+    return "kodrat.success.sa";
   }
 }
 
