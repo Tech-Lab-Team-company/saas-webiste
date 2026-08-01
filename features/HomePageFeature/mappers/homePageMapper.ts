@@ -18,6 +18,7 @@ import type {
   HomePageViewModel,
   HomeSiteViewModel,
 } from '../models/HomePageViewModel'
+import { homeBlogsMock } from '../mocks/homeBlogs.mock'
 
 const DEFAULT_HOME_ERROR_MESSAGE = 'تعذر تحميل هذا القسم في الوقت الحالي.'
 
@@ -478,16 +479,23 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
 
   const blogs = (() => {
     if (sources.blogs.kind === 'error') {
-      return mapSectionError<HomeBlogViewModel[]>([], sources.blogs.error)
+      return {
+        data: homeBlogsMock,
+        status: 'success' as const,
+      }
     }
 
     const mappedBlogs = toArray(sources.blogs.data)
       .map(mapBlogApiDto)
+      .filter((blog): blog is HomeBlogApiDto => blog !== null)
+      .map(mapBlog)
       .filter((blog): blog is HomeBlogViewModel => blog !== null)
 
+    const visibleBlogs = mappedBlogs.length > 0 ? mappedBlogs : homeBlogsMock
+
     return {
-      data: mappedBlogs,
-      status: mappedBlogs.length > 0 ? ('success' as const) : ('empty' as const),
+      data: visibleBlogs,
+      status: 'success' as const,
     }
   })()
 
