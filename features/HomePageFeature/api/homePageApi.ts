@@ -3,18 +3,6 @@ import { ApiNames } from '~/base/core/networkStructure/apiNames'
 import NetworkService from '~/base/core/networkStructure/networking/network_service'
 import type { HomeApiSourceResult, HomeDataError, HomePageApiSources } from '../types/homePage.types'
 
-const DEFAULT_WEB_DOMAIN = 'mr-eslamsalama.com'
-
-export const resolveHomeWebDomain = (hostname: string): string => {
-  const normalizedHostname = hostname.trim().toLowerCase()
-
-  if (!normalizedHostname || normalizedHostname === 'localhost' || normalizedHostname === DEFAULT_WEB_DOMAIN) {
-    return DEFAULT_WEB_DOMAIN
-  }
-
-  return normalizedHostname
-}
-
 const normalizeHomeDataError = (error: unknown): HomeDataError => {
   if (axios.isAxiosError(error)) {
     const statusCode = error.response?.status
@@ -70,12 +58,14 @@ export class HomePageApi {
   constructor(private readonly webDomain: string) {}
 
   async load(): Promise<HomePageApiSources> {
-    const [heroSections, sliders, courseSections, blogs, learningJourney] = await Promise.allSettled([
+    const [heroSections, sliders, courseSections, blogs, learningJourney, aboutTeacher] = await Promise.allSettled([
       this.fetchHeroSections(),
       this.fetchSliders(),
       this.fetchCourseSections(),
       this.fetchBlogs(),
-      this.fetchLearningJourney(),
+      // this.fetchLearningJourney(), // Temporarily disabled: use the Learning Journey mock.
+      Promise.resolve([]),
+      this.fetchAboutTeacher(),
     ])
 
     return {
@@ -84,6 +74,7 @@ export class HomePageApi {
       courseSections: toSourceResult(courseSections),
       blogs: toSourceResult(blogs),
       learningJourney: toSourceResult(learningJourney),
+      aboutTeacher: toSourceResult(aboutTeacher),
     }
   }
 
@@ -121,6 +112,10 @@ export class HomePageApi {
 
   private async fetchLearningJourney(): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_home_learning_journey, {})
+  }
+
+  private async fetchAboutTeacher(): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_about_teacher, {})
   }
 
   private async post(url: string, data: Record<string, number | null>): Promise<unknown> {

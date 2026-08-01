@@ -1,68 +1,120 @@
 <script setup lang="ts">
-import type { HomeHeroViewModel, HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
-import type { HomeSectionState } from '~/features/HomePageFeature/types/homePage.types'
+import type {
+  HomeHeroViewModel,
+  HomeSiteViewModel,
+} from "~/features/HomePageFeature/models/HomePageViewModel";
+import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
 
 const props = defineProps<{
-  hero: HomeSectionState<HomeHeroViewModel | null>
-  site: HomeSiteViewModel
-}>()
+  hero: HomeSectionState<HomeHeroViewModel | null>;
+  site: HomeSiteViewModel;
+}>();
 
-const heroData = computed(() => props.hero.data)
-const failedImageSources = ref<string[]>([])
+const heroData = computed(() => props.hero.data);
+const failedImageSources = ref<string[]>([]);
 const imageIsAvailable = (src: string | undefined): boolean =>
-  Boolean(src && !failedImageSources.value.includes(src))
+  Boolean(src && !failedImageSources.value.includes(src));
 
 const desktopHeroImage = computed(() =>
   imageIsAvailable(heroData.value?.image?.src) ? heroData.value?.image : null,
-)
+);
 const mobileHeroImage = computed(() =>
-  imageIsAvailable(heroData.value?.mobileImage?.src) ? heroData.value?.mobileImage : null,
-)
+  imageIsAvailable(heroData.value?.mobileImage?.src)
+    ? heroData.value?.mobileImage
+    : null,
+);
 const settingsLogo = computed(() =>
   imageIsAvailable(props.site.logo?.src) ? props.site.logo : null,
-)
-const heroImage = computed(() => desktopHeroImage.value || mobileHeroImage.value || settingsLogo.value)
+);
+const settingsCover = computed(() =>
+  imageIsAvailable(props.site.cover?.src) ? props.site.cover : null,
+);
+const heroImage = computed(
+  () =>
+    desktopHeroImage.value ||
+    mobileHeroImage.value ||
+    settingsCover.value ||
+    settingsLogo.value,
+);
 const heroUsesSettingsLogo = computed(() =>
-  Boolean(heroImage.value?.src && heroImage.value.src === settingsLogo.value?.src),
-)
+  Boolean(
+    heroImage.value?.src && heroImage.value.src === settingsLogo.value?.src,
+  ),
+);
 
 const handleHeroImageError = (event: Event) => {
-  const image = event.currentTarget as HTMLImageElement
-  const failedSource = image.currentSrc || image.src
+  const image = event.currentTarget as HTMLImageElement;
+  const failedSource = image.currentSrc || image.src;
 
   if (failedSource && !failedImageSources.value.includes(failedSource)) {
-    failedImageSources.value = [...failedImageSources.value, failedSource]
+    failedImageSources.value = [...failedImageSources.value, failedSource];
   }
-}
+};
+
+const truncateText = (value: string, limit: number) => {
+  const normalizedValue = value.replace(/\s+/g, " ").trim();
+
+  return normalizedValue.length > limit
+    ? `${normalizedValue.slice(0, limit).trimEnd()}…`
+    : normalizedValue;
+};
+
 const heroContent = computed(() => ({
-  title: heroData.value?.title || 'تعلّم بخطوات مرتبة،',
-  subtitle: heroData.value?.subtitle || 'وكمّل بثقة.',
-  text: heroData.value?.description || 'تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.',
-  link: heroData.value?.link || '#courses',
-}))
+  title: heroData.value?.title || "تعلّم بخطوات مرتبة،",
+  subtitle: heroData.value?.subtitle || "وكمّل بثقة.",
+  text: truncateText(
+    heroData.value?.description ||
+      "تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.",
+    120,
+  ),
+  link: heroData.value?.link || "#courses",
+}));
+
+const heroKicker = computed(() =>
+  truncateText(props.site.brandName || "EduHub", 42),
+);
 </script>
 
 <template>
   <section id="top" class="home-v2-hero" aria-labelledby="home-v2-hero-title">
     <div class="container home-v2-hero__layout">
       <div class="home-v2-hero__copy">
-        <p class="home-v2-hero__kicker">{{ site.brandName || 'EduHub' }} · {{ site.description || 'تجربة تعليمية أوضح' }}</p>
+        <p class="home-v2-hero__kicker" :title="site.brandName || undefined">
+          {{ heroKicker }}
+        </p>
         <h1 id="home-v2-hero-title">
           {{ heroContent.title }}<br />
           <em>{{ heroContent.subtitle }}</em>
         </h1>
         <p>{{ heroContent.text }}</p>
         <div class="home-v2-hero__actions">
-          <a class="button" :href="heroContent.link">استكشف الكورسات <span aria-hidden="true">←</span></a>
-          <NuxtLink class="home-v2-hero__secondary" to="/aboutus">تعرّف على المنصة <span aria-hidden="true">↗</span></NuxtLink>
+          <a class="button" :href="heroContent.link"
+            >استكشف الكورسات <span aria-hidden="true">←</span></a
+          >
+          <NuxtLink class="home-v2-hero__secondary" to="/aboutus"
+            >تعرّف على المنصة <span aria-hidden="true">↗</span></NuxtLink
+          >
         </div>
       </div>
 
-      <figure :class="['home-v2-hero__visual', { 'home-v2-temporary-asset': !heroImage }]" :aria-label="heroImage?.alt || 'صورة المنصة'">
+      <figure
+        :class="[
+          'home-v2-hero__visual',
+          { 'home-v2-temporary-asset': !heroImage },
+        ]"
+        :aria-label="heroImage?.alt || 'صورة المنصة'"
+      >
         <picture v-if="heroImage">
-          <source v-if="mobileHeroImage && !heroUsesSettingsLogo" media="(max-width: 780px)" :srcset="mobileHeroImage.src" />
+          <source
+            v-if="mobileHeroImage && !heroUsesSettingsLogo"
+            media="(max-width: 780px)"
+            :srcset="mobileHeroImage.src"
+          />
           <img
-            :class="['home-v2-hero__image', { 'home-v2-hero__image--logo': heroUsesSettingsLogo }]"
+            :class="[
+              'home-v2-hero__image',
+              { 'home-v2-hero__image--logo': heroUsesSettingsLogo },
+            ]"
             :src="heroImage.src"
             :alt="heroImage.alt"
             @error="handleHeroImageError"
@@ -74,10 +126,14 @@ const heroContent = computed(() => ({
           <small>سيتم استبدالها بالأصل المعتمد</small>
         </div>
         <span
-          v-if="settingsLogo && !heroUsesSettingsLogo"
+          v-if="settingsLogo"
           class="home-v2-hero__brand-logo"
         >
-          <img :src="settingsLogo.src" :alt="settingsLogo.alt || site.brandName || 'شعار المنصة'" @error="handleHeroImageError" />
+          <img
+            :src="settingsLogo.src"
+            :alt="settingsLogo.alt || site.brandName || 'شعار المنصة'"
+            @error="handleHeroImageError"
+          />
         </span>
       </figure>
     </div>
@@ -107,14 +163,20 @@ const heroContent = computed(() => ({
 }
 
 .home-v2-hero__kicker {
+  display: block;
   width: fit-content;
+  max-width: min(100%, 360px);
   margin: 0 0 18px;
+  overflow: hidden;
   padding: 7px 12px;
   border: 1px solid #ffffff5c;
   border-radius: 999px;
   color: #fff;
   font-size: 12px;
   font-weight: 800;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .home-v2-hero h1 {
@@ -129,10 +191,14 @@ const heroContent = computed(() => ({
 }
 
 .home-v2-hero__copy > p:not(.home-v2-hero__kicker) {
+  display: -webkit-box;
   max-width: 620px;
+  overflow: hidden;
   color: #ffffffe0;
   font-size: 17px;
   line-height: 1.95;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .home-v2-hero__actions {
@@ -153,12 +219,17 @@ const heroContent = computed(() => ({
 }
 
 .home-v2-hero__visual {
+  position: relative;
+  isolation: isolate;
   width: min(100%, 440px);
+  aspect-ratio: 1086 / 1448;
+  margin: 0;
   justify-self: center;
   overflow: hidden;
   border-radius: 20px 20px 120px 20px;
   background: #cfe0ff;
-  box-shadow: 24px 28px 0 color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
+  box-shadow: 24px 28px 0
+    color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
 }
 
 .home-v2-hero .button {
@@ -171,19 +242,24 @@ const heroContent = computed(() => ({
 }
 
 .home-v2-hero__image {
+  display: block;
   width: 100%;
-  aspect-ratio: 1086 / 1448;
+  height: 100%;
   object-fit: cover;
+  object-position: center top;
 }
 
 .home-v2-hero__image--logo {
-  padding: clamp(36px, 8vw, 90px);
+  /* padding: clamp(36px, 8vw, 90px); */
+  padding: 8px;
   background: #fff;
-  object-fit: contain;
+  object-fit: fill;
 }
 
 .home-v2-hero__visual picture {
   display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .home-v2-hero__brand-logo {
@@ -211,13 +287,13 @@ const heroContent = computed(() => ({
 
 .home-v2-hero__placeholder {
   display: grid;
-  aspect-ratio: 1086 / 1448;
+  width: 100%;
+  height: 100%;
   place-content: center;
   gap: 8px;
   padding: 32px;
   text-align: center;
-  background:
-    radial-gradient(circle at 50% 30%, #fff 0 12%, transparent 12.5%),
+  background: radial-gradient(circle at 50% 30%, #fff 0 12%, transparent 12.5%),
     linear-gradient(155deg, #ddebff, #7fb6f7);
   color: var(--home-v2-deep);
 }

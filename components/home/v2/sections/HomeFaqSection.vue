@@ -1,8 +1,58 @@
 <script setup lang="ts">
+/* FAQ API temporarily disabled.
+import type Fqs from '~/types/fqs'
+import { baseUrl } from '~/constant/baseUrl'
+
+type FaqResponse = {
+  data: Fqs[]
+}
+
+const hostname = useRequestURL().hostname
+const webDomain = hostname === 'localhost' || hostname === 'mr-eslamsalama.com'
+  ? 'mr-eslamsalama.com'
+  : hostname
+
+const { data: faqs, pending, error } = await useAsyncData('home-v2-faqs', async () => {
+  const response = await $fetch<FaqResponse>(`${baseUrl}/fetch_faqs`, {
+    method: 'GET',
+    headers: {
+      'Accept-Language': 'ar',
+      'web-domain': webDomain,
+    },
+  })
+
+  return response.data ?? []
+}, {
+  default: () => [],
+})
+*/
+
 const faqs = [
-  { question: 'كيف أبدأ؟', answer: 'اختار القسم أو الكورس المناسب من صفحة الكورسات الحالية.' },
-  { question: 'هل أقدر أتابع من الموبايل؟', answer: 'سيتم ربط روابط التطبيق المعتمدة من إعدادات الموقع لاحقًا.' },
-  { question: 'أين المذكرات؟', answer: 'لا توجد حاليًا صفحة مكتبة أو API معتمد لها في التطبيق.' },
+  {
+    id: 1,
+    question: 'كيف أبدأ استخدام المنصة؟',
+    answer: 'أنشئ حسابًا جديدًا، ثم اختر مرحلتك الدراسية لتظهر لك الكورسات والمحتوى المناسب.',
+  },
+  {
+    id: 2,
+    question: 'هل يمكنني مشاهدة الدروس من الهاتف؟',
+    answer: 'نعم، يمكنك استخدام المنصة من الهاتف أو الجهاز اللوحي أو الكمبيوتر بسهولة.',
+  },
+  {
+    id: 3,
+    question: 'كيف أشترك في أحد الكورسات؟',
+    answer: 'افتح صفحة الكورس المطلوب، ثم اختر طريقة الاشتراك المناسبة وأكمل خطوات الدفع.',
+  },
+  {
+    id: 4,
+    question: 'هل أستطيع متابعة تقدمي داخل الكورس؟',
+    answer: 'نعم، تعرض مساحة الطالب الدروس المكتملة وتساعدك على متابعة تقدمك بشكل منظم.',
+  },
+  {
+    id: 5,
+    question: 'ماذا أفعل إذا واجهت مشكلة؟',
+    answer: 'يمكنك التواصل معنا من خلال بيانات الاتصال أو واتساب، وسيساعدك فريق الدعم في أقرب وقت.',
+  },
 ] as const
 </script>
 
@@ -12,10 +62,10 @@ const faqs = [
       <div>
         <span class="section-tag">عندك سؤال؟</span>
         <h2 id="home-v2-faq-title">الإجابة<br /><em>ببساطة.</em></h2>
-        <p>محتوى الأسئلة الحالية مؤقت، وسيُراجع عند اعتماد بيانات V2 النهائية.</p>
+        <p>كل الإجابات على الأسئلة الشائعة في مكان واحد.</p>
       </div>
       <div class="home-v2-faq__list">
-        <details v-for="(faq, index) in faqs" :key="faq.question" :open="index === 0">
+        <details v-for="(faq, index) in faqs" :key="faq.id" :open="index === 0">
           <summary>{{ faq.question }} <span aria-hidden="true">+</span></summary>
           <p>{{ faq.answer }}</p>
         </details>
@@ -85,6 +135,16 @@ const faqs = [
   padding-bottom: 22px;
   color: var(--home-v2-muted);
   line-height: 1.9;
+}
+
+.home-v2-faq__status {
+  margin: 0;
+  padding: 22px 0;
+  color: var(--home-v2-muted);
+}
+
+.home-v2-faq__status--error {
+  color: #b42318;
 }
 
 @media (max-width: 760px) {

@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import type { HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
 
-defineProps<{
+const props = defineProps<{
   site: HomeSiteViewModel
 }>()
+
+const headerDescription = computed(() => {
+  const description = (props.site.description || 'منصة تعليمية منظمة').replace(/\s+/g, ' ').trim()
+  const limit = 64
+
+  return description.length > limit
+    ? `${description.slice(0, limit).trimEnd()}…`
+    : description
+})
 
 const navItems = [
   { label: 'الكورسات', to: '/course' },
@@ -21,7 +30,7 @@ const navItems = [
         </span>
         <span>
           <b>{{ site.brandName || 'EduHub' }}</b>
-          <small>{{ site.description || 'منصة تعليمية منظمة' }}</small>
+          <small :title="site.description || undefined">{{ headerDescription }}</small>
         </span>
       </NuxtLink>
 
@@ -91,6 +100,8 @@ const navItems = [
 
 .home-v2-header__brand > span:last-child {
   display: grid;
+  min-width: 0;
+  max-width: 220px;
   gap: 2px;
 }
 
@@ -99,8 +110,13 @@ const navItems = [
 }
 
 .home-v2-header__brand small {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--home-v2-muted);
   font-size: 11px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .home-v2-header__nav {
