@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import type {
   HomeCourseTabKey,
   HomeCourseViewModel,
@@ -20,6 +21,13 @@ const coursesByTab = ref<
 >({});
 const loadingTabKey = ref<HomeCourseTabKey | null>(null);
 const requestIds = ref<Partial<Record<HomeCourseTabKey, number>>>({});
+const coursesSection = ref<HTMLElement | null>(null);
+const courseResults = ref<HTMLElement | null>(null);
+const sectionHasEntered = ref(false);
+let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
+
+const shouldReduceMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const selectedTab = computed(
   () =>
@@ -37,11 +45,21 @@ const selectedCourses = computed<HomeSectionState<
   return coursesByTab.value[selectedTab.value.key] ?? null;
 });
 
-const selectTab = async (tabKey: HomeCourseTabKey) => {
+const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
 
   if (!tab || loadingTabKey.value === tab.key) {
     return;
+  }
+
+  const selectedButton = event?.currentTarget as HTMLElement | null;
+  if (selectedButton && !shouldReduceMotion()) {
+    const indexBadge = selectedButton.querySelector(".stage-option-index");
+    gsap.fromTo(
+      indexBadge,
+      { scale: 0.72, rotate: -8 },
+      { scale: 1, rotate: 0, duration: 0.55, ease: "back.out(2)" },
+    );
   }
 
   selectedTabKey.value = tab.key;
@@ -61,14 +79,209 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
     loadingTabKey.value = null;
   }
 };
+
+const animateCourseResults = async () => {
+  await nextTick();
+
+  const results = courseResults.value;
+  if (!results || !sectionHasEntered.value || shouldReduceMotion()) return;
+
+  const header = results.querySelector(".home-course-result-head");
+  const cards = Array.from(results.querySelectorAll(".course-card"));
+  const message = results.querySelector(
+    ".home-course-message, .home-course-empty",
+  );
+  const targets = [header, message, ...cards].filter(
+    (target): target is Element => Boolean(target),
+  );
+
+  gsap.killTweensOf(targets);
+  gsap.fromTo(
+    targets,
+    {
+      autoAlpha: 0,
+      y: 42,
+      scale: 0.965,
+      rotationX: 7,
+    },
+    {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      rotationX: 0,
+      duration: 0.72,
+      stagger: 0.09,
+      ease: "power3.out",
+      clearProps: "opacity,visibility,transform",
+    },
+  );
+};
+
+const revealCoursesSection = () => {
+  const section = coursesSection.value;
+  if (!section || sectionHasEntered.value) return;
+
+  sectionHasEntered.value = true;
+  if (shouldReduceMotion()) return;
+
+  coursesAnimationContext = gsap.context(() => {
+    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    timeline
+      .from(".split-heading .section-tag", {
+        autoAlpha: 0,
+        x: 38,
+        duration: 0.55,
+      })
+      .from(
+        ".split-heading h2",
+        { autoAlpha: 0, y: 48, duration: 0.85, ease: "expo.out" },
+        0.12,
+      )
+      .from(
+        ".split-heading > p",
+        { autoAlpha: 0, y: 28, duration: 0.65 },
+        0.28,
+      )
+      .from(
+        ".home-course-picker",
+        {
+          autoAlpha: 0,
+          clipPath: "inset(0 50% 0 50%)",
+          y: 28,
+          duration: 0.9,
+          ease: "expo.inOut",
+        },
+        0.42,
+      )
+      .from(
+        ".home-course-audiences button",
+        {
+          autoAlpha: 0,
+          y: 20,
+          scale: 0.92,
+          duration: 0.48,
+          stagger: 0.08,
+        },
+        0.72,
+      )
+      .from(
+        ".home-course-result > *",
+        { autoAlpha: 0, y: 34, duration: 0.65 },
+        0.93,
+      )
+      .from(
+        ".all-courses",
+        { autoAlpha: 0, y: 18, duration: 0.5 },
+        1.05,
+      );
+
+    gsap.to(".home-course-motion-orb--one", {
+      x: 30,
+      y: -24,
+      duration: 7,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+    gsap.to(".home-course-motion-orb--two", {
+      x: -26,
+      y: 30,
+      duration: 8.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+  }, section);
+};
+
+const tiltCourseCard = (event: PointerEvent) => {
+  if (event.pointerType === "touch" || shouldReduceMotion()) return;
+
+  const card = event.currentTarget as HTMLElement;
+  const bounds = card.getBoundingClientRect();
+  const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+  const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+  gsap.to(card, {
+    rotationY: horizontal * 5,
+    rotationX: vertical * -5,
+    y: -8,
+    duration: 0.45,
+    ease: "power2.out",
+    overwrite: "auto",
+  });
+  const coverVisual = card.querySelector(".course-cover img, .course-mark");
+  if (coverVisual) {
+    gsap.to(coverVisual, {
+      x: horizontal * 9,
+      y: vertical * 7,
+      duration: 0.55,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  }
+};
+
+const resetCourseCard = (event: PointerEvent) => {
+  const card = event.currentTarget as HTMLElement;
+
+  gsap.to(card, {
+    rotationX: 0,
+    rotationY: 0,
+    y: 0,
+    duration: 0.65,
+    ease: "elastic.out(1, 0.55)",
+    overwrite: "auto",
+    onComplete: () => gsap.set(card, { clearProps: "transform" }),
+  });
+  const coverVisual = card.querySelector(".course-cover img, .course-mark");
+  if (coverVisual) {
+    gsap.to(coverVisual, {
+      x: 0,
+      y: 0,
+      duration: 0.55,
+      ease: "power2.out",
+      overwrite: "auto",
+      onComplete: () => gsap.set(coverVisual, { clearProps: "transform" }),
+    });
+  }
+};
+
+watch(
+  () => [
+    selectedTabKey.value,
+    loadingTabKey.value,
+    selectedCourses.value?.status,
+    selectedCourses.value?.data.map((course) => course.id).join(","),
+  ],
+  animateCourseResults,
+  { flush: "post" },
+);
+
+useScrollTriggeredReveal(coursesSection, revealCoursesSection, {
+  threshold: 0.16,
+});
+
+onBeforeUnmount(() => {
+  coursesAnimationContext?.revert();
+  if (coursesSection.value) {
+    gsap.killTweensOf(coursesSection.value.querySelectorAll("*"));
+  }
+});
 </script>
 
 <template>
   <section
     id="courses"
+    ref="coursesSection"
     class="section courses home-course-showcase"
     aria-labelledby="home-v2-courses-title"
   >
+    <div class="home-course-motion" aria-hidden="true">
+      <span class="home-course-motion-orb home-course-motion-orb--one" />
+      <span class="home-course-motion-orb home-course-motion-orb--two" />
+    </div>
     <div class="container">
       <div class="section-heading split-heading">
         <div>
@@ -105,7 +318,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
             :class="{ active: selectedTabKey === tab.key }"
             :aria-pressed="selectedTabKey === tab.key"
             aria-controls="home-v2-course-results"
-            @click="selectTab(tab.key)"
+            @click="selectTab(tab.key, $event)"
           >
             <span class="stage-option-index" aria-hidden="true">
               {{ String(index + 1).padStart(2, "0") }}
@@ -118,6 +331,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
 
       <div
         id="home-v2-course-results"
+        ref="courseResults"
         class="home-course-result"
         :class="{ 'is-empty': !selectedTab }"
         aria-live="polite"
@@ -184,6 +398,8 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
               :to="course.route"
               class="course-card"
               :class="['mint', 'violet', 'sky', 'deep'][index % 4]"
+              @pointermove="tiltCourseCard"
+              @pointerleave="resetCourseCard"
             >
               <div class="course-cover" :class="{ 'has-image': course.image }">
                 <NuxtImg
@@ -246,7 +462,47 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   --coral: var(--home-v2-coral);
   --ink: var(--home-v2-ink);
   --heading: var(--home-v2-heading);
+  position: relative;
+  overflow: hidden;
   background: var(--paper);
+}
+
+.home-course-showcase > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.home-course-motion {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-course-motion-orb {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--teal) 10%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--teal) 6%, transparent),
+    transparent 68%
+  );
+}
+
+.home-course-motion-orb--one {
+  top: 5%;
+  inset-inline-end: -180px;
+  width: 420px;
+  height: 420px;
+}
+
+.home-course-motion-orb--two {
+  bottom: 4%;
+  inset-inline-start: -220px;
+  width: 520px;
+  height: 520px;
 }
 
 .split-heading {
@@ -389,7 +645,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
 }
 
 .home-course-result .course-grid {
-  animation: home-course-swap 0.38s ease both;
+  perspective: 1200px;
 }
 
 .home-course-empty,
@@ -505,6 +761,9 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   background: #fff;
   color: var(--ink);
   box-shadow: 0 10px 28px -30px #12313966;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  will-change: transform;
   transition: border-color 0.25s ease, transform 0.25s ease,
     box-shadow 0.25s ease;
 }
@@ -521,6 +780,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   overflow: hidden;
   padding: 20px;
   background: #d8e9e5;
+  transform: translateZ(1px);
 }
 
 .course-cover::before {
@@ -804,6 +1064,14 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   .course-arrow,
   .home-course-audiences button {
     transition: none;
+  }
+
+  .course-card {
+    will-change: auto;
+  }
+
+  .home-course-motion {
+    display: none;
   }
 }
 </style>

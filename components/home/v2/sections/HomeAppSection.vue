@@ -1,17 +1,99 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
 defineProps<{
   site: HomeSiteViewModel;
 }>();
+
+const appSection = ref<HTMLElement | null>(null);
+let appAnimationContext: ReturnType<typeof gsap.context> | null = null;
+let appHasEntered = false;
+
+const revealAppSection = () => {
+  const section = appSection.value;
+  if (!section || appHasEntered) return;
+
+  appHasEntered = true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  appAnimationContext = gsap.context(() => {
+    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    timeline
+      .from(".home-v2-app .section-tag", {
+        autoAlpha: 0,
+        x: 28,
+        duration: 0.52,
+      })
+      .from(
+        ".home-v2-app h2",
+        { autoAlpha: 0, y: 34, duration: 0.78, ease: "expo.out" },
+        0.12,
+      )
+      .from(
+        ".home-v2-app__grid > div > p",
+        { autoAlpha: 0, y: 20, duration: 0.6 },
+        0.34,
+      )
+      .from(
+        ".home-v2-app__actions > *",
+        { autoAlpha: 0, y: 14, duration: 0.48, stagger: 0.1 },
+        0.48,
+      )
+      .from(
+        ".home-v2-app__phone",
+        {
+          autoAlpha: 0,
+          y: 42,
+          scale: 0.94,
+          rotation: -2.2,
+          duration: 0.95,
+          ease: "power3.out",
+          clearProps: "opacity,visibility,transform",
+        },
+        0.22,
+      );
+
+    gsap.to(".home-v2-app__ambient-glow--one", {
+      x: 24,
+      y: -18,
+      duration: 7,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+    gsap.to(".home-v2-app__ambient-glow--two", {
+      x: -20,
+      y: 24,
+      duration: 8.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+  }, section);
+};
+
+useScrollTriggeredReveal(appSection, revealAppSection, {
+  threshold: 0.18,
+});
+
+onBeforeUnmount(() => {
+  appAnimationContext?.revert();
+});
 </script>
 
 <template>
   <section
     id="app-status"
+    ref="appSection"
     class="section home-v2-app"
     aria-labelledby="home-v2-app-title"
   >
+    <div class="home-v2-app__ambient" aria-hidden="true">
+      <span class="home-v2-app__ambient-glow home-v2-app__ambient-glow--one" />
+      <span class="home-v2-app__ambient-glow home-v2-app__ambient-glow--two" />
+    </div>
     <div class="container home-v2-app__grid">
       <div>
         <span class="section-tag">تطبيق المنصة</span>
@@ -66,12 +148,46 @@ defineProps<{
 
 <style scoped>
 .home-v2-app {
+  position: relative;
+  isolation: isolate;
   overflow: hidden;
   background: var(--home-v2-deep);
   color: #fff;
 }
 
+.home-v2-app__ambient {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-v2-app__ambient-glow {
+  position: absolute;
+  border: 1px solid rgb(255 255 255 / 7%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(143 198 255 / 10%), transparent 68%);
+  filter: blur(1px);
+}
+
+.home-v2-app__ambient-glow--one {
+  top: -180px;
+  inset-inline-start: -140px;
+  width: 430px;
+  height: 430px;
+}
+
+.home-v2-app__ambient-glow--two {
+  right: 34%;
+  bottom: -230px;
+  width: 520px;
+  height: 520px;
+}
+
 .home-v2-app__grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr 380px;
   align-items: center;
@@ -201,6 +317,10 @@ defineProps<{
   .home-v2-app__phone::after,
   .home-v2-app__phone :deep(img) {
     transition: none;
+  }
+
+  .home-v2-app__ambient {
+    display: none;
   }
 }
 </style>

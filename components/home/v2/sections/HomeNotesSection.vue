@@ -1,5 +1,98 @@
+<script setup lang="ts">
+import { gsap } from "gsap";
+
+const notesSection = ref<HTMLElement | null>(null);
+let notesAnimationContext: ReturnType<typeof gsap.context> | null = null;
+let notesHasEntered = false;
+
+const revealNotesSection = () => {
+  const section = notesSection.value;
+  if (!section || notesHasEntered) return;
+
+  notesHasEntered = true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  notesAnimationContext = gsap.context(() => {
+    const timeline = gsap.timeline({
+      defaults: { ease: "power3.out" },
+    });
+
+    timeline
+      .from(".home-v2-notes__heading .section-tag", {
+        autoAlpha: 0,
+        x: 26,
+        duration: 0.55,
+      })
+      .from(
+        ".home-v2-notes__heading h2",
+        { autoAlpha: 0, y: 34, duration: 0.78 },
+        0.12,
+      )
+      .from(
+        ".home-v2-notes__heading > p",
+        { autoAlpha: 0, y: 22, duration: 0.65 },
+        0.27,
+      )
+      .from(
+        ".home-v2-notes__feature",
+        {
+          autoAlpha: 0,
+          y: 38,
+          scale: 0.985,
+          duration: 0.85,
+          clearProps: "opacity,visibility,transform",
+        },
+        0.4,
+      )
+      .from(
+        ".home-v2-notes__cover",
+        {
+          clipPath: "inset(0 100% 0 0)",
+          duration: 0.85,
+          ease: "expo.inOut",
+          clearProps: "clip-path",
+        },
+        0.52,
+      )
+      .from(
+        ".home-v2-notes__cover > *",
+        { autoAlpha: 0, y: 16, duration: 0.48, stagger: 0.08 },
+        0.82,
+      )
+      .from(
+        ".home-v2-notes__copy > *",
+        { autoAlpha: 0, y: 18, duration: 0.52, stagger: 0.075 },
+        0.72,
+      );
+
+    gsap.to(".home-v2-notes__cover > span", {
+      y: -4,
+      opacity: 0.72,
+      duration: 2.8,
+      delay: 1.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+  }, section);
+};
+
+useScrollTriggeredReveal(notesSection, revealNotesSection, {
+  threshold: 0.18,
+});
+
+onBeforeUnmount(() => {
+  notesAnimationContext?.revert();
+});
+</script>
+
 <template>
-  <section id="notes" class="section home-v2-notes" aria-labelledby="home-v2-notes-title">
+  <section
+    id="notes"
+    ref="notesSection"
+    class="section home-v2-notes"
+    aria-labelledby="home-v2-notes-title"
+  >
     <div class="container">
       <div class="home-v2-notes__heading">
         <div>
@@ -67,17 +160,49 @@
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 30px 80px -62px #06114799;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.home-v2-notes__feature:hover {
+  border-color: color-mix(in srgb, var(--home-v2-blue) 24%, var(--home-v2-line));
+  box-shadow: 0 38px 90px -58px #06114780;
+  transform: translateY(-4px);
 }
 
 .home-v2-notes__cover {
+  position: relative;
   display: grid;
   align-content: end;
   gap: 12px;
+  overflow: hidden;
   padding: 34px;
   background:
     linear-gradient(135deg, transparent 49%, #ffffff16 50%),
     var(--home-v2-deep);
   color: #fff;
+}
+
+.home-v2-notes__cover::after {
+  position: absolute;
+  top: -80px;
+  inset-inline-end: -90px;
+  width: 240px;
+  height: 240px;
+  border: 1px solid rgb(255 255 255 / 11%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 8%), transparent 68%);
+  content: "";
+  transition: transform 0.8s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.home-v2-notes__feature:hover .home-v2-notes__cover::after {
+  transform: scale(1.12) translate(-8px, 8px);
+}
+
+.home-v2-notes__cover > * {
+  position: relative;
+  z-index: 1;
 }
 
 .home-v2-notes__cover span {
@@ -129,6 +254,17 @@
 
   .home-v2-notes__cover {
     min-height: 230px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-v2-notes__feature,
+  .home-v2-notes__cover::after {
+    transition: none;
+  }
+
+  .home-v2-notes__feature:hover {
+    transform: none;
   }
 }
 </style>

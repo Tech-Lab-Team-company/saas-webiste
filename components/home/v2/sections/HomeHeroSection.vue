@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useReducedMotion,
+} from "motion-v";
 import type {
   HomeHeroViewModel,
   HomeSiteViewModel,
@@ -73,18 +81,299 @@ const heroContent = computed(() => ({
 const heroKicker = computed(() =>
   truncateText(props.site.brandName || "EduHub", 42),
 );
+
+const heroSection = ref<HTMLElement | null>(null);
+const heroVisual = ref<HTMLElement | null>(null);
+let heroAnimationContext: ReturnType<typeof gsap.context> | null = null;
+let removeHeroPointerEffects: (() => void) | null = null;
+
+const typewriterPhrases = computed(() =>
+  Array.from(
+    new Set(
+      [
+        heroContent.value.subtitle,
+        "افهم أسرع.",
+        "واتقدّم بثقة.",
+      ].filter(Boolean),
+    ),
+  ),
+);
+const prefersReducedMotion = useReducedMotion();
+const typedText = ref(heroContent.value.subtitle);
+const phraseIndex = ref(0);
+const visibleCharacters = useMotionValue(heroContent.value.subtitle.length);
+let typewriterAnimation: ReturnType<typeof animate> | null = null;
+let typewriterTimer: ReturnType<typeof setTimeout> | null = null;
+
+const stopTypewriter = () => {
+  typewriterAnimation?.stop();
+  typewriterAnimation = null;
+
+  if (typewriterTimer) {
+    clearTimeout(typewriterTimer);
+    typewriterTimer = null;
+  }
+};
+
+useMotionValueEvent(visibleCharacters, "change", (latest) => {
+  const phrase = typewriterPhrases.value[phraseIndex.value] || "";
+  typedText.value = phrase.slice(0, Math.round(latest));
+});
+
+const typeCurrentPhrase = () => {
+  stopTypewriter();
+
+  const phrase = typewriterPhrases.value[phraseIndex.value] || "";
+  if (!phrase) return;
+
+  if (prefersReducedMotion.value || typewriterPhrases.value.length === 1) {
+    visibleCharacters.set(phrase.length);
+    typedText.value = phrase;
+    return;
+  }
+
+  typewriterAnimation = animate(visibleCharacters, phrase.length, {
+    duration: Math.max(0.75, phrase.length * 0.075),
+    ease: "linear",
+    onComplete: () => {
+      typewriterTimer = setTimeout(() => {
+        typewriterAnimation = animate(visibleCharacters, 0, {
+          duration: Math.max(0.35, phrase.length * 0.035),
+          ease: "linear",
+          onComplete: () => {
+            phraseIndex.value =
+              (phraseIndex.value + 1) % typewriterPhrases.value.length;
+            typeCurrentPhrase();
+          },
+        });
+      }, 1500);
+    },
+  });
+};
+
+const restartTypewriter = () => {
+  stopTypewriter();
+  phraseIndex.value = 0;
+  visibleCharacters.set(0);
+  typedText.value = "";
+  typeCurrentPhrase();
+};
+
+const setupHeroAnimation = () => {
+  const section = heroSection.value;
+  const visual = heroVisual.value;
+  if (!section || !visual) return;
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  if (reducedMotion) return;
+
+  heroAnimationContext = gsap.context(() => {
+    const intro = gsap.timeline({
+      defaults: { ease: "power3.out" },
+    });
+
+    intro
+      .from(".home-v2-hero__ambient", {
+        autoAlpha: 0,
+        duration: 1.1,
+      })
+      .from(
+        ".home-v2-hero__kicker",
+        { autoAlpha: 0, x: 36, duration: 0.65 },
+        0.12,
+      )
+      .from(
+        ".home-v2-hero__title-line",
+        {
+          autoAlpha: 0,
+          yPercent: 115,
+          rotate: 2,
+          duration: 0.95,
+          stagger: 0.13,
+          ease: "expo.out",
+        },
+        0.24,
+      )
+      .fromTo(
+        ".home-v2-hero__typewriter-underline",
+        { scaleX: 0, autoAlpha: 0 },
+        {
+          scaleX: 1,
+          autoAlpha: 1,
+          duration: 0.85,
+          ease: "expo.out",
+        },
+        0.82,
+      )
+      .from(
+        ".home-v2-hero__copy > p:not(.home-v2-hero__kicker)",
+        { autoAlpha: 0, y: 24, duration: 0.65 },
+        0.67,
+      )
+      .from(
+        ".home-v2-hero__actions > *",
+        { autoAlpha: 0, y: 18, duration: 0.55, stagger: 0.1 },
+        0.78,
+      )
+      .from(
+        visual,
+        {
+          autoAlpha: 0,
+          clipPath: "inset(48% 12% 48% 12% round 80px)",
+          scale: 0.86,
+          rotate: -3,
+          duration: 1.25,
+          ease: "expo.inOut",
+        },
+        0.16,
+      )
+      .from(
+        ".home-v2-hero__brand-logo",
+        { autoAlpha: 0, scale: 0, rotate: -25, duration: 0.7, ease: "back.out(1.8)" },
+        1.05,
+      )
+      .fromTo(
+        ".home-v2-hero__visual-shine",
+        { xPercent: 170, autoAlpha: 0 },
+        {
+          xPercent: -240,
+          autoAlpha: 1,
+          duration: 1.05,
+          ease: "power2.inOut",
+          onComplete: () => {
+            gsap.set(".home-v2-hero__visual-shine", {
+              autoAlpha: 0,
+              display: "none",
+            });
+          },
+        },
+        0.88,
+      );
+
+    gsap.to(".home-v2-hero__ambient-orb--one", {
+      x: 34,
+      y: -26,
+      scale: 1.08,
+      duration: 6.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+    gsap.to(".home-v2-hero__ambient-orb--two", {
+      x: -28,
+      y: 34,
+      scale: 0.92,
+      duration: 8,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+    gsap.to(visual, {
+      y: -9,
+      duration: 3.8,
+      delay: 1.45,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+
+    if (window.matchMedia("(pointer: fine)").matches) {
+      const moveX = gsap.quickTo(visual, "x", {
+        duration: 0.8,
+        ease: "power3.out",
+      });
+      const rotateX = gsap.quickTo(visual, "rotationX", {
+        duration: 0.8,
+        ease: "power3.out",
+      });
+      const rotateY = gsap.quickTo(visual, "rotationY", {
+        duration: 0.8,
+        ease: "power3.out",
+      });
+
+      const handlePointerMove = (event: PointerEvent) => {
+        const bounds = section.getBoundingClientRect();
+        const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+        moveX(horizontal * 18);
+        rotateX(vertical * -3.5);
+        rotateY(horizontal * 4.5);
+      };
+      const resetPointerEffect = () => {
+        moveX(0);
+        rotateX(0);
+        rotateY(0);
+      };
+
+      section.addEventListener("pointermove", handlePointerMove);
+      section.addEventListener("pointerleave", resetPointerEffect);
+      removeHeroPointerEffects = () => {
+        section.removeEventListener("pointermove", handlePointerMove);
+        section.removeEventListener("pointerleave", resetPointerEffect);
+      };
+    }
+  }, section);
+};
+
+onMounted(() => {
+  restartTypewriter();
+  setupHeroAnimation();
+});
+
+watch(
+  () => typewriterPhrases.value.join("\u0000"),
+  () => {
+    if (import.meta.client) restartTypewriter();
+  },
+);
+
+watch(prefersReducedMotion, restartTypewriter);
+onBeforeUnmount(() => {
+  stopTypewriter();
+  removeHeroPointerEffects?.();
+  heroAnimationContext?.revert();
+});
 </script>
 
 <template>
-  <section id="top" class="home-v2-hero" aria-labelledby="home-v2-hero-title">
+  <section
+    id="top"
+    ref="heroSection"
+    class="home-v2-hero"
+    aria-labelledby="home-v2-hero-title"
+  >
+    <div class="home-v2-hero__ambient" aria-hidden="true">
+      <span class="home-v2-hero__ambient-grid" />
+      <span class="home-v2-hero__ambient-orb home-v2-hero__ambient-orb--one" />
+      <span class="home-v2-hero__ambient-orb home-v2-hero__ambient-orb--two" />
+    </div>
     <div class="container home-v2-hero__layout">
       <div class="home-v2-hero__copy">
         <p class="home-v2-hero__kicker" :title="site.brandName || undefined">
           {{ heroKicker }}
         </p>
         <h1 id="home-v2-hero-title">
-          {{ heroContent.title }}<br />
-          <em>{{ heroContent.subtitle }}</em>
+          <span class="home-v2-hero__title-line">{{ heroContent.title }}</span>
+          <em
+            class="home-v2-hero__title-line home-v2-hero__typewriter"
+            :aria-label="heroContent.subtitle"
+          >
+            <span aria-hidden="true">{{ typedText }}</span>
+            <motion.span
+              v-if="!prefersReducedMotion"
+              aria-hidden="true"
+              class="home-v2-hero__typewriter-cursor"
+              :animate="{ opacity: [1, 0, 1] }"
+              :transition="{ duration: 0.85, repeat: Infinity, ease: 'linear' }"
+            />
+            <span
+              class="home-v2-hero__typewriter-underline"
+              aria-hidden="true"
+            />
+          </em>
         </h1>
         <p>{{ heroContent.text }}</p>
         <div class="home-v2-hero__actions">
@@ -98,6 +387,7 @@ const heroKicker = computed(() =>
       </div>
 
       <figure
+        ref="heroVisual"
         :class="[
           'home-v2-hero__visual',
           { 'home-v2-temporary-asset': !heroImage },
@@ -135,6 +425,7 @@ const heroKicker = computed(() =>
             @error="handleHeroImageError"
           />
         </span>
+        <span class="home-v2-hero__visual-shine" aria-hidden="true" />
       </figure>
     </div>
   </section>
@@ -147,11 +438,67 @@ const heroKicker = computed(() =>
   padding-top: 86px;
   background: var(--home-v2-blue);
   color: #fff;
+  perspective: 1200px;
+}
+
+.home-v2-hero__ambient {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-v2-hero__ambient-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: linear-gradient(90deg, transparent, #000 32%, #000 75%, transparent);
+  opacity: 0.55;
+}
+
+.home-v2-hero__ambient-orb {
+  position: absolute;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.home-v2-hero__ambient-orb::after {
+  position: absolute;
+  inset: 12%;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: inherit;
+  content: "";
+}
+
+.home-v2-hero__ambient-orb--one {
+  top: 8%;
+  inset-inline-start: -8%;
+  width: clamp(260px, 34vw, 520px);
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 60% 45%, rgb(255 255 255 / 9%), transparent 67%);
+}
+
+.home-v2-hero__ambient-orb--two {
+  right: 36%;
+  bottom: -42%;
+  width: clamp(320px, 42vw, 650px);
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--home-v2-blue-light) 18%, transparent),
+    transparent 68%
+  );
 }
 
 .home-v2-hero__layout {
+  position: relative;
+  z-index: 1;
   display: grid;
-  min-height: 630px;
+  min-height: max(700px, calc(100svh - 86px));
   grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
   align-items: center;
   gap: clamp(42px, 6vw, 84px);
@@ -185,9 +532,51 @@ const heroKicker = computed(() =>
   letter-spacing: -0.035em;
 }
 
+.home-v2-hero__title-line {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  transform-origin: right center;
+}
+
 .home-v2-hero h1 em {
-  color: color-mix(in srgb, var(--home-v2-blue-light) 80%, white);
+  color: var(--home-v2-coral);
   font-style: normal;
+  text-shadow: 0 8px 28px color-mix(in srgb, var(--home-v2-coral) 22%, transparent);
+}
+
+.home-v2-hero__typewriter {
+  position: relative;
+  display: inline-flex;
+  min-height: 1.18em;
+  align-items: baseline;
+  padding-bottom: 0.11em;
+}
+
+.home-v2-hero__typewriter-underline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 0.055em;
+  min-height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--home-v2-coral) 65%, #ffd45c),
+    var(--home-v2-coral)
+  );
+  box-shadow: 0 0 16px color-mix(in srgb, var(--home-v2-coral) 34%, transparent);
+  transform-origin: right center;
+}
+
+.home-v2-hero__typewriter-cursor {
+  display: inline-block;
+  width: 0.055em;
+  height: 0.82em;
+  margin-inline-start: 0.1em;
+  border-radius: 999px;
+  background: currentcolor;
 }
 
 .home-v2-hero__copy > p:not(.home-v2-hero__kicker) {
@@ -204,18 +593,44 @@ const heroKicker = computed(() =>
 .home-v2-hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 30px;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 34px;
 }
 
 .home-v2-hero__secondary {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 54px;
   align-items: center;
-  gap: 9px;
-  border-bottom: 1px solid #ffffffb3;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 24px;
+  border: 1px solid #ffffff4f;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--home-v2-deep) 34%, transparent);
   color: #fff;
   font-weight: 800;
+  transition: background-color 0.22s ease, border-color 0.22s ease,
+    color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.home-v2-hero__secondary span {
+  color: #ffd45c;
+  font-size: 17px;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.home-v2-hero__secondary:hover {
+  border-color: #fff;
+  background: #fff;
+  color: var(--home-v2-deep);
+  box-shadow: 0 12px 28px rgb(1 9 40 / 22%);
+  transform: translateY(-3px);
+}
+
+.home-v2-hero__secondary:hover span {
+  color: var(--home-v2-coral);
+  transform: translateX(-3px);
 }
 
 .home-v2-hero__visual {
@@ -230,15 +645,36 @@ const heroKicker = computed(() =>
   background: #cfe0ff;
   box-shadow: 24px 28px 0
     color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
+  transform-style: preserve-3d;
+  will-change: transform, clip-path;
 }
 
 .home-v2-hero .button {
-  background: #fff;
-  color: var(--home-v2-blue);
+  min-height: 54px;
+  padding-inline: 24px;
+  border: 1px solid color-mix(in srgb, #1682ff 82%, white);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--home-v2-blue) 28%, #1682ff);
+  box-shadow: 0 12px 30px color-mix(in srgb, #1682ff 25%, transparent);
+  color: #fff;
+  transition: background-color 0.22s ease, border-color 0.22s ease,
+    transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.home-v2-hero .button span {
+  font-size: 17px;
+  transition: transform 0.22s ease;
 }
 
 .home-v2-hero .button:hover {
-  background: var(--home-v2-blue-light);
+  border-color: #fff;
+  background: color-mix(in srgb, var(--home-v2-blue) 18%, #2990ff);
+  box-shadow: 0 16px 34px color-mix(in srgb, #1682ff 34%, transparent);
+  transform: translateY(-3px);
+}
+
+.home-v2-hero .button:hover span {
+  transform: translateX(-3px);
 }
 
 .home-v2-hero__image {
@@ -264,7 +700,7 @@ const heroKicker = computed(() =>
 
 .home-v2-hero__brand-logo {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   top: 18px;
   inset-inline-start: 18px;
   display: grid;
@@ -276,6 +712,24 @@ const heroKicker = computed(() =>
   border-radius: 50%;
   background: #fffffff0;
   box-shadow: 0 10px 28px #06114738;
+}
+
+.home-v2-hero__visual-shine {
+  position: absolute;
+  z-index: 4;
+  top: -20%;
+  bottom: -20%;
+  left: 42%;
+  width: 22%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 42%),
+    transparent
+  );
+  filter: blur(10px);
+  pointer-events: none;
+  transform: skewX(-14deg) translateX(170%);
 }
 
 .home-v2-hero__brand-logo img {
@@ -326,6 +780,25 @@ const heroKicker = computed(() =>
   .home-v2-hero__visual {
     width: min(84%, 350px);
     margin-bottom: 48px;
+  }
+
+  .home-v2-hero__actions > * {
+    min-width: min(100%, 190px);
+  }
+
+  .home-v2-hero__ambient-grid {
+    background-size: 38px 38px;
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-v2-hero__visual {
+    will-change: auto;
+  }
+
+  .home-v2-hero__visual-shine {
+    display: none;
   }
 }
 </style>

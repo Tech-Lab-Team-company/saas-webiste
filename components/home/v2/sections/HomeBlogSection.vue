@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import type { HomeBlogViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
 import type { HomeSectionState } from '~/features/HomePageFeature/types/homePage.types'
 
@@ -7,6 +8,10 @@ const props = defineProps<{
 }>()
 
 const visibleBlogs = computed(() => props.blogs.data.slice(0, 6))
+const blogSection = ref<HTMLElement | null>(null)
+const blogGrid = ref<HTMLElement | null>(null)
+const blogHasEntered = ref(false)
+let blogAnimationContext: ReturnType<typeof gsap.context> | null = null
 const cardVariants = ['navy', 'blue', 'coral'] as const
 const cardMarkers = ['فهم', '05', '7D', 'قوة', 'وقت', 'دقة'] as const
 
@@ -20,10 +25,164 @@ const formatBlogDate = (date: string | null): string => {
     ? date
     : new Intl.DateTimeFormat('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }).format(parsedDate)
 }
+
+const shouldReduceMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+const animateBlogCards = async () => {
+  await nextTick()
+
+  const grid = blogGrid.value
+  if (!grid || !blogHasEntered.value || shouldReduceMotion()) return
+
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>('.home-v2-blog__card'))
+  const markers = cards
+    .map((card) => card.querySelector(':scope > a > strong'))
+    .filter((marker): marker is Element => Boolean(marker))
+
+  gsap.killTweensOf([...cards, ...markers])
+  gsap.fromTo(
+    cards,
+    {
+      autoAlpha: 0,
+      x: (index) => (index % 2 === 0 ? 48 : -48),
+      y: 42,
+      rotationZ: (index) => (index % 2 === 0 ? 1.6 : -1.6),
+      scale: 0.965,
+    },
+    {
+      autoAlpha: 1,
+      x: 0,
+      y: 0,
+      rotationZ: 0,
+      scale: 1,
+      duration: 0.82,
+      stagger: 0.11,
+      ease: 'power3.out',
+      clearProps: 'opacity,visibility,transform',
+    },
+  )
+  gsap.fromTo(
+    markers,
+    { scale: 0.62, rotation: -7, autoAlpha: 0 },
+    {
+      scale: 1,
+      rotation: 0,
+      autoAlpha: 1,
+      duration: 0.7,
+      stagger: 0.1,
+      delay: 0.18,
+      ease: 'back.out(1.7)',
+      clearProps: 'opacity,visibility,transform',
+    },
+  )
+}
+
+const revealBlogSection = () => {
+  const section = blogSection.value
+  if (!section || blogHasEntered.value) return
+
+  blogHasEntered.value = true
+  if (shouldReduceMotion()) return
+
+  blogAnimationContext = gsap.context(() => {
+    const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    timeline
+      .from('.home-v2-blog__heading .section-tag', {
+        autoAlpha: 0,
+        x: 30,
+        duration: 0.55,
+      })
+      .from(
+        '.home-v2-blog__heading h2',
+        { autoAlpha: 0, y: 38, duration: 0.82, ease: 'expo.out' },
+        0.12,
+      )
+      .from(
+        '.home-v2-blog__heading > div:last-child > *',
+        { autoAlpha: 0, y: 22, duration: 0.58, stagger: 0.1 },
+        0.28,
+      )
+
+    const placeholder = section.querySelector('.home-v2-blog__placeholder')
+    if (placeholder) {
+      timeline.from(
+        placeholder,
+        { autoAlpha: 0, y: 32, scale: 0.98, duration: 0.72 },
+        0.48,
+      )
+    }
+
+    void animateBlogCards()
+  }, section)
+}
+
+const trackBlogPointer = (event: PointerEvent) => {
+  if (event.pointerType === 'touch' || shouldReduceMotion()) return
+
+  const card = event.currentTarget as HTMLElement
+  const bounds = card.getBoundingClientRect()
+  card.style.setProperty('--blog-pointer-x', `${event.clientX - bounds.left}px`)
+  card.style.setProperty('--blog-pointer-y', `${event.clientY - bounds.top}px`)
+}
+
+const focusBlogCard = (event: PointerEvent) => {
+  if (event.pointerType === 'touch' || shouldReduceMotion()) return
+
+  const card = event.currentTarget as HTMLElement
+  const marker = card.querySelector(':scope > a > strong')
+  if (!marker) return
+
+  gsap.to(marker, {
+    scale: 1.055,
+    rotation: 1.4,
+    duration: 0.5,
+    ease: 'power3.out',
+    overwrite: 'auto',
+  })
+}
+
+const resetBlogCard = (event: PointerEvent) => {
+  const card = event.currentTarget as HTMLElement
+  const marker = card.querySelector(':scope > a > strong')
+  if (!marker) return
+
+  gsap.to(marker, {
+    scale: 1,
+    rotation: 0,
+    duration: 0.65,
+    ease: 'elastic.out(1, 0.6)',
+    overwrite: 'auto',
+    onComplete: () => gsap.set(marker, { clearProps: 'transform' }),
+  })
+}
+
+watch(
+  () => visibleBlogs.value.map((blog) => blog.id).join(','),
+  animateBlogCards,
+  { flush: 'post' },
+)
+
+useScrollTriggeredReveal(blogSection, revealBlogSection, {
+  threshold: 0.16,
+})
+
+onBeforeUnmount(() => {
+  blogAnimationContext?.revert()
+  if (blogSection.value) {
+    gsap.killTweensOf(blogSection.value.querySelectorAll('*'))
+  }
+})
 </script>
 
 <template>
-  <section id="blog-preview" class="section home-v2-blog" aria-labelledby="home-v2-blog-title">
+  <section
+    id="blog-preview"
+    ref="blogSection"
+    class="section home-v2-blog"
+    aria-labelledby="home-v2-blog-title"
+  >
     <div class="container">
       <div class="home-v2-blog__heading">
         <div>
@@ -36,11 +195,18 @@ const formatBlogDate = (date: string | null): string => {
         </div>
       </div>
 
-      <div v-if="visibleBlogs.length" class="home-v2-blog__grid">
+      <div
+        v-if="visibleBlogs.length"
+        ref="blogGrid"
+        class="home-v2-blog__grid"
+      >
         <article
           v-for="(blog, index) in visibleBlogs"
           :key="blog.id"
           :class="['home-v2-blog__card', `home-v2-blog__card--${cardVariants[index % cardVariants.length]}`]"
+          @pointerenter="focusBlogCard"
+          @pointermove="trackBlogPointer"
+          @pointerleave="resetBlogCard"
         >
           <NuxtLink :to="blog.route" :aria-label="blog.title">
             <header>
@@ -95,17 +261,29 @@ const formatBlogDate = (date: string | null): string => {
 }
 
 .home-v2-blog__heading a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--home-v2-blue);
   font-weight: 800;
+  transition: color 0.22s ease, gap 0.22s ease;
+}
+
+.home-v2-blog__heading a:hover {
+  gap: 15px;
+  color: var(--home-v2-coral);
 }
 
 .home-v2-blog__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
+  perspective: 1200px;
 }
 
 .home-v2-blog__card {
+  --blog-pointer-x: 50%;
+  --blog-pointer-y: 50%;
   position: relative;
   isolation: isolate;
   min-width: 0;
@@ -114,9 +292,32 @@ const formatBlogDate = (date: string | null): string => {
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 10px 30px -28px color-mix(in srgb, var(--home-v2-deep) 45%, transparent);
+  transform-style: preserve-3d;
+  will-change: transform;
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.24s ease,
     box-shadow 0.28s ease;
+}
+
+.home-v2-blog__card::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: radial-gradient(
+    210px circle at var(--blog-pointer-x) var(--blog-pointer-y),
+    rgb(255 255 255 / 48%),
+    transparent 72%
+  );
+  content: '';
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.home-v2-blog__card:hover::after,
+.home-v2-blog__card:focus-within::after {
+  opacity: 0.72;
 }
 
 .home-v2-blog__card:hover,
@@ -127,6 +328,8 @@ const formatBlogDate = (date: string | null): string => {
 }
 
 .home-v2-blog__card > a {
+  position: relative;
+  z-index: 1;
   display: flex;
   min-height: 420px;
   flex-direction: column;
@@ -173,6 +376,8 @@ const formatBlogDate = (date: string | null): string => {
   color: var(--home-v2-blue);
   background: var(--home-v2-blue-light);
   font: 900 62px var(--home-v2-heading);
+  transform-origin: center;
+  will-change: transform;
   transition: filter 0.28s ease, letter-spacing 0.28s ease;
 }
 
@@ -341,6 +546,15 @@ const formatBlogDate = (date: string | null): string => {
   .home-v2-blog__read,
   .home-v2-blog__read i {
     transition: none;
+  }
+
+  .home-v2-blog__card,
+  .home-v2-blog__card > a > strong {
+    will-change: auto;
+  }
+
+  .home-v2-blog__card::after {
+    display: none;
   }
 
   .home-v2-blog__card:hover,

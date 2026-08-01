@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import type { HomeAboutTeacherViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
 
 const props = defineProps<{
   about: HomeSectionState<HomeAboutTeacherViewModel>;
 }>();
+
+const aboutSection = ref<HTMLElement | null>(null);
+const aboutContent = ref<HTMLElement | null>(null);
+const aboutHasEntered = ref(false);
+let aboutAnimationContext: ReturnType<typeof gsap.context> | null = null;
 
 const titleParts = computed(() => {
   const title = props.about.data.title;
@@ -22,11 +28,119 @@ const titleParts = computed(() => {
 });
 
 const experienceYears = computed(() => titleParts.value.value || "20");
+
+const shouldReduceMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const animateHighlights = async (delay = 0) => {
+  await nextTick();
+
+  const content = aboutContent.value;
+  if (!content || !aboutHasEntered.value || shouldReduceMotion()) return;
+
+  const items = Array.from(content.querySelectorAll("li"));
+  gsap.killTweensOf(items);
+  gsap.fromTo(
+    items,
+    { autoAlpha: 0, x: 38, y: 8 },
+    {
+      autoAlpha: 1,
+      x: 0,
+      y: 0,
+      duration: 0.58,
+      delay,
+      stagger: 0.13,
+      ease: "power3.out",
+      clearProps: "opacity,visibility,transform",
+    },
+  );
+};
+
+const revealAboutSection = () => {
+  const section = aboutSection.value;
+  if (!section || aboutHasEntered.value) return;
+
+  aboutHasEntered.value = true;
+  if (shouldReduceMotion()) return;
+
+  aboutAnimationContext = gsap.context(() => {
+    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    timeline
+      .from(".home-v2-about-teacher__quote", {
+        autoAlpha: 0,
+        clipPath: "inset(8% 8% 92% 8% round 16px)",
+        scale: 0.96,
+        duration: 1,
+        ease: "expo.inOut",
+      })
+      .from(
+        ".home-v2-about-teacher__corner",
+        { scale: 0, rotation: -18, duration: 0.65, ease: "back.out(1.8)" },
+        0.48,
+      )
+      .from(
+        ".home-v2-about-teacher__quote-mark",
+        { autoAlpha: 0, y: -20, scale: 0.7, duration: 0.55 },
+        0.55,
+      )
+      .from(
+        ".home-v2-about-teacher__quote > p",
+        { autoAlpha: 0, y: 30, duration: 0.72 },
+        0.62,
+      )
+      .from(
+        ".home-v2-about-teacher__experience",
+        { autoAlpha: 0, y: 22, duration: 0.62 },
+        0.76,
+      )
+      .from(
+        ".home-v2-about-teacher__content .section-tag",
+        { autoAlpha: 0, x: 30, duration: 0.52 },
+        0.28,
+      )
+      .from(
+        ".home-v2-about-teacher__content h2",
+        { autoAlpha: 0, y: 38, duration: 0.78, ease: "expo.out" },
+        0.4,
+      )
+      .from(
+        ".home-v2-about-teacher__content > p",
+        { autoAlpha: 0, y: 22, duration: 0.58 },
+        0.57,
+      )
+      .from(
+        ".home-v2-about-teacher__content > a",
+        { autoAlpha: 0, y: 16, duration: 0.52 },
+        1.08,
+      );
+  }, section);
+
+  void animateHighlights(0.72);
+};
+
+watch(
+  () => props.about.data.highlights.join("\u0000"),
+  () => void animateHighlights(),
+  { flush: "post" },
+);
+
+useScrollTriggeredReveal(aboutSection, revealAboutSection, {
+  threshold: 0.16,
+});
+
+onBeforeUnmount(() => {
+  aboutAnimationContext?.revert();
+  if (aboutSection.value) {
+    gsap.killTweensOf(aboutSection.value.querySelectorAll("*"));
+  }
+});
 </script>
 
 <template>
   <section
     id="about"
+    ref="aboutSection"
     class="section home-v2-about-teacher"
     aria-labelledby="home-v2-about-teacher-title"
   >
@@ -41,7 +155,7 @@ const experienceYears = computed(() => titleParts.value.value || "20");
         <span class="home-v2-about-teacher__corner" aria-hidden="true"></span>
       </div>
 
-      <div class="home-v2-about-teacher__content">
+      <div ref="aboutContent" class="home-v2-about-teacher__content">
         <span class="section-tag">{{ about.data.eyebrow }}</span>
         <h2 id="home-v2-about-teacher-title">
           {{ titleParts.before }}<em v-if="titleParts.value">{{ titleParts.value }}</em>{{ titleParts.after }}
@@ -77,21 +191,32 @@ const experienceYears = computed(() => titleParts.value.value || "20");
 
 .home-v2-about-teacher__quote {
   position: relative;
+  isolation: isolate;
   display: flex;
   min-height: clamp(560px, 62vw, 735px);
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
   padding: clamp(72px, 7vw, 108px) clamp(42px, 5vw, 76px) clamp(70px, 6vw, 94px);
   background: color-mix(in srgb, var(--home-v2-blue-light) 82%, #dceaff);
+  box-shadow: 0 28px 70px -54px color-mix(in srgb, var(--home-v2-deep) 42%, transparent);
+  transition: box-shadow 0.55s ease, transform 0.55s ease;
+}
+
+.home-v2-about-teacher__quote:hover {
+  box-shadow: 0 38px 86px -48px color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
+  transform: translateY(-4px);
 }
 
 .home-v2-about-teacher__quote-mark {
   position: absolute;
+  z-index: 2;
   top: 38px;
   inset-inline-start: 52px;
   color: var(--home-v2-blue);
   opacity: 0.42;
   font: 900 94px/1 Georgia, serif;
+  transition: color 0.55s ease, opacity 0.55s ease;
 }
 
 .home-v2-about-teacher__quote > p {
@@ -101,6 +226,7 @@ const experienceYears = computed(() => titleParts.value.value || "20");
   margin: auto 0;
   color: var(--home-v2-deep);
   font: 900 clamp(32px, 3.35vw, 52px) / 1.48 var(--home-v2-heading);
+  transition: color 0.55s ease;
 }
 
 .home-v2-about-teacher__experience {
@@ -114,22 +240,54 @@ const experienceYears = computed(() => titleParts.value.value || "20");
 .home-v2-about-teacher__experience strong {
   color: var(--home-v2-blue);
   font: 900 clamp(42px, 4vw, 58px) / 0.85 var(--home-v2-heading);
+  transition: color 0.55s ease;
 }
 
 .home-v2-about-teacher__experience small {
   color: var(--home-v2-muted);
   font-size: 12px;
   line-height: 1.45;
+  transition: color 0.55s ease;
 }
 
 .home-v2-about-teacher__corner {
   position: absolute;
+  z-index: 0;
   inset-inline-end: -30px;
   bottom: -30px;
   width: 142px;
   height: 142px;
   border: 14px solid var(--home-v2-blue);
+  background: transparent;
   pointer-events: none;
+  transform-origin: bottom left;
+  transition: width 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.78s cubic-bezier(0.22, 1, 0.36, 1),
+    border-width 0.5s ease, background-color 0.5s ease;
+}
+
+.home-v2-about-teacher__quote:hover .home-v2-about-teacher__corner {
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  border-width: 0;
+  background: var(--home-v2-blue);
+}
+
+.home-v2-about-teacher__quote:hover .home-v2-about-teacher__quote-mark {
+  color: #fff;
+  opacity: 0.34;
+}
+
+.home-v2-about-teacher__quote:hover > p {
+  color: #fff;
+}
+
+.home-v2-about-teacher__quote:hover .home-v2-about-teacher__experience strong {
+  color: #fff;
+}
+
+.home-v2-about-teacher__quote:hover .home-v2-about-teacher__experience small {
+  color: #ffffffc7;
 }
 
 .home-v2-about-teacher__content {
@@ -186,6 +344,12 @@ const experienceYears = computed(() => titleParts.value.value || "20");
   font-size: 16px;
   font-weight: 800;
   line-height: 1.65;
+  transition: color 0.22s ease, padding-inline-start 0.22s ease;
+}
+
+.home-v2-about-teacher li:hover {
+  padding-inline-start: 42px;
+  color: var(--home-v2-blue);
 }
 
 .home-v2-about-teacher li::before {
@@ -233,8 +397,19 @@ const experienceYears = computed(() => titleParts.value.value || "20");
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-v2-about-teacher a {
+  .home-v2-about-teacher a,
+  .home-v2-about-teacher__quote,
+  .home-v2-about-teacher__corner,
+  .home-v2-about-teacher__quote-mark,
+  .home-v2-about-teacher__quote > p,
+  .home-v2-about-teacher__experience strong,
+  .home-v2-about-teacher__experience small,
+  .home-v2-about-teacher li {
     transition: none;
+  }
+
+  .home-v2-about-teacher__quote:hover {
+    transform: none;
   }
 }
 </style>
