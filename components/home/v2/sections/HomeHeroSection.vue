@@ -1,33 +1,37 @@
 <script setup lang="ts">
-import type { HomeHeroViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
+import type { HomeHeroViewModel, HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
 import type { HomeSectionState } from '~/features/HomePageFeature/types/homePage.types'
 
-defineProps<{
+const props = defineProps<{
   hero: HomeSectionState<HomeHeroViewModel | null>
+  site: HomeSiteViewModel
 }>()
+
+const heroData = computed(() => props.hero.data)
+const heroImage = computed(() => heroData.value?.image || props.site.cover || props.site.logo)
 </script>
 
 <template>
   <section id="top" class="home-v2-hero" aria-labelledby="home-v2-hero-title">
     <div class="container home-v2-hero__layout">
       <div class="home-v2-hero__copy">
-        <p class="home-v2-hero__kicker">EduHub · تجربة تعليمية أوضح</p>
+        <p class="home-v2-hero__kicker">{{ site.brandName || 'EduHub' }} · {{ site.description || 'تجربة تعليمية أوضح' }}</p>
         <h1 id="home-v2-hero-title">
-          تعلّم بخطوات مرتبة،<br />
-          <em>وكمّل بثقة.</em>
+          {{ heroData?.title || 'تعلّم بخطوات مرتبة،' }}<br />
+          <em>{{ heroData?.subtitle || 'وكمّل بثقة.' }}</em>
         </h1>
         <p>
-          هذه معاينة معزولة لتصميم الصفحة الرئيسية الجديدة. سيتم ربط النصوص والمحتوى
-          الفعليين ببيانات المنصة في المرحلة التالية.
+          {{ heroData?.description || site.description || 'تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.' }}
         </p>
         <div class="home-v2-hero__actions">
-          <a class="button" href="#courses">استكشف الكورسات <span aria-hidden="true">←</span></a>
+          <a class="button" :href="heroData?.link || '#courses'">استكشف الكورسات <span aria-hidden="true">←</span></a>
           <NuxtLink class="home-v2-hero__secondary" to="/aboutus">تعرّف على المنصة <span aria-hidden="true">↗</span></NuxtLink>
         </div>
       </div>
 
-      <figure class="home-v2-hero__visual home-v2-temporary-asset" aria-label="مساحة مؤقتة لصورة المدرّس">
-        <div class="home-v2-hero__placeholder">
+      <figure :class="['home-v2-hero__visual', { 'home-v2-temporary-asset': !heroImage }]" :aria-label="heroImage?.alt || 'صورة المنصة'">
+        <img v-if="heroImage" class="home-v2-hero__image" :src="heroImage.src" :alt="heroImage.alt" />
+        <div v-else class="home-v2-hero__placeholder">
           <span aria-hidden="true">EDU</span>
           <strong>صورة المدرّس</strong>
           <small>سيتم استبدالها بالأصل المعتمد</small>
@@ -43,7 +47,7 @@ defineProps<{
   overflow: hidden;
   padding-top: 86px;
   background:
-    radial-gradient(circle at 12% 24%, #0867d41f, transparent 33%),
+    radial-gradient(circle at 12% 24%, color-mix(in srgb, var(--home-v2-blue) 12%, transparent), transparent 33%),
     linear-gradient(135deg, #fbfcff, #eef5ff);
 }
 
@@ -64,7 +68,7 @@ defineProps<{
   width: fit-content;
   margin: 0 0 18px;
   padding: 7px 12px;
-  border: 1px solid #0867d438;
+  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 22%, transparent);
   border-radius: 999px;
   color: var(--home-v2-blue);
   font-size: 12px;
@@ -111,7 +115,13 @@ defineProps<{
   overflow: hidden;
   border-radius: 20px 20px 120px 20px;
   background: #cfe0ff;
-  box-shadow: 24px 28px 0 #0867d41a;
+  box-shadow: 24px 28px 0 color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
+}
+
+.home-v2-hero__image {
+  width: 100%;
+  aspect-ratio: 1086 / 1448;
+  object-fit: cover;
 }
 
 .home-v2-hero__placeholder {

@@ -70,7 +70,7 @@ defineProps<{
   align-content: center;
   gap: 10px;
   padding: 34px;
-  border: 1px dashed #0867d466;
+  border: 1px dashed color-mix(in srgb, var(--home-v2-blue) 40%, transparent);
   border-radius: 14px;
   background: linear-gradient(135deg, #eef5ff, #fbfcff);
 }

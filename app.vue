@@ -33,8 +33,8 @@ const {
 
   // console.log("WebStatus:", getWebDomain());
 
-  const DefaultPrimaryColor = "#061147";
-  const DefaultSecondColor = "#000";
+  const DefaultPrimaryColor = "#28366c";
+  const DefaultSecondColor = "#3a3e7e";
 
   const PrimaryColor = response?.data?.primary_color || DefaultPrimaryColor;
   const SecondColor = response?.data?.secondary_color || DefaultSecondColor;
@@ -51,7 +51,16 @@ const changeFavicon = (iconPath) => {
     link: [{ rel: "icon", type: "image/x-icon", href: iconPath }],
   });
 };
-changeFavicon(`${SettingStore?.setting?.image?.img}`);
+changeFavicon(`${webStatus.value?.image?.img || ''}`);
+
+useSeoMeta({
+  title: webStatus.value?.meta_title || webStatus.value?.name,
+  description: webStatus.value?.meta_description || webStatus.value?.description,
+  keywords: webStatus.value?.meta_keywords || undefined,
+  ogTitle: webStatus.value?.meta_title || webStatus.value?.name,
+  ogDescription: webStatus.value?.meta_description || webStatus.value?.description,
+  ogImage: webStatus.value?.cover?.img || webStatus.value?.image?.img,
+});
 
 const PaymentStore = usePaymentStore();
 const FetchPaymentMethod = async () => {

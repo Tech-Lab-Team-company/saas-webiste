@@ -15,13 +15,13 @@ const navItems = [
 <template>
   <header class="home-v2-header">
     <div class="container home-v2-header__content">
-      <NuxtLink to="/" class="home-v2-header__brand" aria-label="العودة إلى الصفحة الرئيسية الحالية">
-        <span class="home-v2-header__logo home-v2-temporary-asset" aria-hidden="true">
-          <NuxtImg src="/images/logo.png" alt="" width="163" height="52" loading="eager" />
+      <NuxtLink to="/" class="home-v2-header__brand" :aria-label="`العودة إلى صفحة ${site.brandName || 'المنصة'}`">
+        <span :class="['home-v2-header__logo', { 'home-v2-temporary-asset': !site.logo }]">
+          <NuxtImg :src="site.logo?.src || '/images/logo.png'" :alt="site.logo?.alt || site.brandName || ''" width="163" height="52" loading="eager" />
         </span>
         <span>
-          <b>EduHub</b>
-          <small>معاينة الصفحة الرئيسية الجديدة</small>
+          <b>{{ site.brandName || 'EduHub' }}</b>
+          <small>{{ site.description || 'منصة تعليمية منظمة' }}</small>
         </span>
       </NuxtLink>
 

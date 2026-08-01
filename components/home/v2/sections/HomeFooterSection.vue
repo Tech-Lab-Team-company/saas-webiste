@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
 
-defineProps<{
+const props = defineProps<{
   site: HomeSiteViewModel
 }>()
+
+const whatsappUrl = computed(() => {
+  const value = props.site.socials.whatsapp
+  if (!value || value.startsWith('http')) return value
+  return `https://wa.me/${value.replace(/\D/g, '').replace(/^0/, '20')}`
+})
 </script>
 
 <template>
@@ -11,12 +17,17 @@ defineProps<{
     <div class="container home-v2-footer__grid">
       <div>
         <NuxtLink to="/" class="home-v2-footer__brand">
-          <span class="home-v2-footer__logo home-v2-temporary-asset" aria-hidden="true">
-            <NuxtImg src="/images/logo.png" alt="" width="163" height="52" loading="lazy" />
+          <span :class="['home-v2-footer__logo', { 'home-v2-temporary-asset': !site.logo }]">
+            <NuxtImg :src="site.logo?.src || '/images/logo.png'" :alt="site.logo?.alt || site.brandName || ''" width="163" height="52" loading="lazy" />
           </span>
-          <span><b>EduHub</b><small>معاينة الصفحة الرئيسية الجديدة</small></span>
+          <span><b>{{ site.brandName || 'EduHub' }}</b><small>{{ site.description || 'منصة تعليمية منظمة' }}</small></span>
         </NuxtLink>
-        <p>واجهة V2 معزولة للتطوير. ستُربط معلومات التواصل والتطبيق والشبكات الاجتماعية بإعدادات الموقع لاحقًا.</p>
+        <p>{{ site.description || 'منصة تعليمية منظمة تساعد الطلاب على التعلّم بخطوات واضحة.' }}</p>
+        <div class="home-v2-footer__contacts">
+          <a v-if="site.phone" :href="`tel:${site.phone}`">{{ site.phone }}</a>
+          <a v-if="site.email" :href="`mailto:${site.email}`">{{ site.email }}</a>
+          <span v-if="site.address">{{ site.address }}</span>
+        </div>
       </div>
 
       <nav aria-label="روابط المنصة">
@@ -31,12 +42,17 @@ defineProps<{
         <b>مساحة الطالب</b>
         <NuxtLink to="/login">تسجيل الدخول</NuxtLink>
         <NuxtLink to="/Auth/register">إنشاء حساب</NuxtLink>
-        <span class="home-v2-nav-disabled" aria-disabled="true">روابط التطبيق قيد الربط</span>
+        <a v-if="site.app.androidUrl" :href="site.app.androidUrl" target="_blank" rel="noopener">تطبيق Android</a>
+        <a v-if="site.app.iosUrl" :href="site.app.iosUrl" target="_blank" rel="noopener">تطبيق iPhone</a>
+        <a v-if="site.socials.youtube" :href="site.socials.youtube" target="_blank" rel="noopener">YouTube</a>
+        <a v-if="site.socials.facebook" :href="site.socials.facebook" target="_blank" rel="noopener">Facebook</a>
+        <a v-if="site.socials.instagram" :href="site.socials.instagram" target="_blank" rel="noopener">Instagram</a>
+        <a v-if="whatsappUrl" :href="whatsappUrl" target="_blank" rel="noopener">WhatsApp</a>
       </nav>
     </div>
 
     <div class="container home-v2-footer__bottom">
-      <span>© {{ new Date().getFullYear() }} EduHub. جميع الحقوق محفوظة.</span>
+      <span>© {{ new Date().getFullYear() }} {{ site.brandName || 'EduHub' }}. جميع الحقوق محفوظة.</span>
       <nav aria-label="السياسات القانونية">
         <NuxtLink to="/privacy">سياسة الخصوصية</NuxtLink>
         <NuxtLink to="/terms">الشروط والأحكام</NuxtLink>
@@ -48,7 +64,7 @@ defineProps<{
 <style scoped>
 .home-v2-footer {
   padding-top: 68px;
-  background: #102e36;
+  background: var(--home-v2-deep);
   color: #fff;
 }
 
@@ -103,6 +119,14 @@ defineProps<{
   max-width: 490px;
   margin: 20px 0 0;
   line-height: 1.9;
+}
+
+.home-v2-footer__contacts {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+  color: #ffffffbf;
+  font-size: 13px;
 }
 
 .home-v2-footer__grid nav {

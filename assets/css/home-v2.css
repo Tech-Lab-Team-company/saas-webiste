@@ -1,8 +1,8 @@
 .home-v2 {
   --home-v2-ink: #081b3a;
-  --home-v2-deep: #061147;
-  --home-v2-blue: #0867d4;
-  --home-v2-blue-light: #ddebff;
+  --home-v2-deep: var(--secondary-color, #3a3e7e);
+  --home-v2-blue: var(--primary-color, #28366c);
+  --home-v2-blue-light: color-mix(in srgb, var(--primary-color, #28366c) 14%, white);
   --home-v2-paper: #fbfcff;
   --home-v2-cream: #f2f6fc;
   --home-v2-coral: #ef7a63;
@@ -89,7 +89,7 @@
 }
 
 .home-v2 .button:hover {
-  background: #0b5fc2;
+  background: color-mix(in srgb, var(--home-v2-blue) 84%, black);
   transform: translateY(-2px);
 }
 

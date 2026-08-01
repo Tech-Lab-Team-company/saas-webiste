@@ -21,8 +21,9 @@ export default interface WebStatus {
     meta_keywords: string;
     allow_payment_gateway: boolean;
     expire_app: number;
-    img: ImageModel;
+    image: ImageModel;
     cover: ImageModel;
+    address: string;
     primary_color: string;
     secondary_color: string;
     whatsapp_otp_activation:number;
@@ -41,5 +42,8 @@ export default interface WebStatus {
     general_subjects_slider:boolean;
     have_desktop:boolean;
     desktop_app:string;
+    buy_option_status:number;
+    allow_coupon:boolean;
+    allow_complete_data:boolean;
 }
 

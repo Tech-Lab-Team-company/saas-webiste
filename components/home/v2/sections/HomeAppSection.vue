@@ -13,20 +13,21 @@ defineProps<{
         <span class="section-tag">تطبيق المنصة</span>
         <h2 id="home-v2-app-title">تابع من الويب،<br /><em>وكمّل من التطبيق.</em></h2>
         <p>
-          ستستخدم روابط Android وiPhone المعتمدة من إعدادات الموقع عند ربط بيانات V2 في
-          المرحلة التالية.
+          حمّل تطبيق {{ site.brandName || 'المنصة' }} وتابع محتواك من هاتفك في أي وقت.
         </p>
         <div class="home-v2-app__actions">
-          <span class="home-v2-disabled-action" aria-disabled="true">رابط Android قيد الربط</span>
-          <span class="home-v2-disabled-action" aria-disabled="true">رابط iPhone قيد الربط</span>
+          <a v-if="site.app.androidUrl" :href="site.app.androidUrl" target="_blank" rel="noopener">تحميل Android</a>
+          <span v-else class="home-v2-disabled-action" aria-disabled="true">تطبيق Android غير متاح</span>
+          <a v-if="site.app.iosUrl" :href="site.app.iosUrl" target="_blank" rel="noopener">تحميل iPhone</a>
+          <span v-else class="home-v2-disabled-action" aria-disabled="true">تطبيق iPhone غير متاح</span>
         </div>
       </div>
 
       <figure class="home-v2-app__phone home-v2-temporary-asset" aria-label="مساحة مؤقتة للقطّة شاشة التطبيق">
         <div>
           <span aria-hidden="true">APP</span>
-          <strong>لقطة التطبيق</strong>
-          <small>مورد بصري مؤقت</small>
+          <strong>{{ site.brandName || 'تطبيق المنصة' }}</strong>
+          <small>{{ site.description || 'تعلّم من أي مكان' }}</small>
         </div>
       </figure>
     </div>
@@ -72,6 +73,12 @@ defineProps<{
   flex-wrap: wrap;
   gap: 20px;
   margin-top: 24px;
+}
+
+.home-v2-app__actions a {
+  color: #fff;
+  border-bottom: 1px solid #ffffff8c;
+  font-weight: 800;
 }
 
 .home-v2-app .home-v2-disabled-action {

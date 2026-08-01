@@ -364,7 +364,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   align-content: center;
   gap: 8px;
   padding: clamp(26px, 4vw, 42px);
-  border: 1px dashed #0867d466;
+  border: 1px dashed color-mix(in srgb, var(--home-v2-blue) 40%, transparent);
   border-radius: 14px;
   background: linear-gradient(135deg, #eef5ff, #fbfcff);
 }
