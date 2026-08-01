@@ -2,6 +2,7 @@ import type {
   HomeBlogApiDto,
   HomeCourseApiDto,
   HomeImageApiDto,
+  HomeHeroSectionApiDto,
   HomePageApiSources,
   HomeSliderApiDto,
   HomeWebsiteSectionApiDto,
@@ -88,6 +89,58 @@ const mapSliderApiDto = (value: unknown): HomeSliderApiDto | null => {
   }
 }
 
+const mapFlexibleImageApiDto = (value: unknown, fallbackAlt: unknown = null): HomeImageApiDto | null => {
+  if (typeof value === 'string') {
+    return {
+      img: toNullableString(value),
+      alt: toNullableString(fallbackAlt),
+    }
+  }
+
+  return mapImageApiDto(value)
+}
+
+const mapHeroSectionApiDto = (value: unknown): HomeHeroSectionApiDto | null => {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const media = isRecord(value.media) ? value.media : null
+
+  const hero: HomeHeroSectionApiDto = {
+    id: toNullableNumber(value.id),
+    title: toNullableString(value.title),
+    subtitle: toNullableString(value.subtitle ?? value.sub_title),
+    description: toNullableString(value.description ?? value.text),
+    link: toNullableString(value.link ?? value.button_link ?? value.action_url),
+    image: mapFlexibleImageApiDto(
+      value.image ?? value.img ?? media?.image ?? media?.img,
+      value.image_alt ?? value.alt,
+    ),
+    mobileImage: mapFlexibleImageApiDto(
+      value.mobile_image ?? value.mobile_img ?? media?.mobileImage ?? media?.mobile_img,
+      value.mobile_image_alt ?? value.mobile_alt,
+    ),
+  }
+
+  return hero.title || hero.subtitle || hero.description || hero.image || hero.mobileImage
+    ? hero
+    : null
+}
+
+const readHeroSections = (value: unknown): unknown[] => {
+  if (Array.isArray(value)) {
+    return value
+  }
+
+  if (!isRecord(value)) {
+    return []
+  }
+
+  const nestedSections = value.hero_sections ?? value.heroes ?? value.items
+  return Array.isArray(nestedSections) ? nestedSections : [value]
+}
+
 const mapCourseApiDto = (value: unknown): HomeCourseApiDto | null => {
   if (!isRecord(value)) {
     return null
@@ -169,6 +222,15 @@ const mapHero = (slider: HomeSliderApiDto): HomeHeroViewModel => ({
   link: slider.link,
   image: mapImage(slider.media.image),
   mobileImage: mapImage(slider.media.mobileImage),
+})
+
+const mapCustomHero = (hero: HomeHeroSectionApiDto): HomeHeroViewModel => ({
+  title: hero.title,
+  subtitle: hero.subtitle,
+  description: hero.description,
+  link: hero.link,
+  image: mapImage(hero.image),
+  mobileImage: mapImage(hero.mobileImage),
 })
 
 const mapCourse = (course: HomeCourseApiDto): HomeCourseViewModel | null => {
@@ -370,17 +432,32 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
 
 export const mapHomePage = (sources: HomePageApiSources, settings: unknown): HomePageViewModel => {
   const hero = (() => {
-    if (sources.sliders.kind === 'error') {
-      return mapSectionError<HomeHeroViewModel | null>(null, sources.sliders.error)
+    if (sources.heroSections.kind === 'success') {
+      const customHeroes = readHeroSections(sources.heroSections.data)
+        .map(mapHeroSectionApiDto)
+        .filter((item): item is HomeHeroSectionApiDto => item !== null)
+      const customHero = customHeroes[customHeroes.length - 1]
+
+      if (customHero) {
+        return { data: mapCustomHero(customHero), status: 'success' as const }
+      }
     }
 
-    const slider = toArray(sources.sliders.data)
-      .map(mapSliderApiDto)
-      .find((item): item is HomeSliderApiDto => item !== null)
+    if (sources.sliders.kind === 'success') {
+      const slider = toArray(sources.sliders.data)
+        .map(mapSliderApiDto)
+        .find((item): item is HomeSliderApiDto => item !== null)
 
-    return slider
-      ? { data: mapHero(slider), status: 'success' as const }
-      : { data: null, status: 'empty' as const }
+      if (slider) {
+        return { data: mapHero(slider), status: 'success' as const }
+      }
+    }
+
+    if (sources.heroSections.kind === 'error' && sources.sliders.kind === 'error') {
+      return mapSectionError<HomeHeroViewModel | null>(null, sources.heroSections.error)
+    }
+
+    return { data: null, status: 'empty' as const }
   })()
 
   const courses = (() => {

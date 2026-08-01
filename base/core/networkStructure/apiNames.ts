@@ -129,6 +129,8 @@ class ApiNames {
   public fetch_blogs = "fetch_blogs";
 
   // Home V2
+  // This endpoint is available on the development API only.
+  public fetch_hero_sections = "https://dev.saas.techlabeg.com/api/website/fetch_hero_sections";
   public fetch_home_sliders = "fetch_sliders";
   public fetch_home_website_section = "fetch_home_website_section";
   public filter_courses = "filter_courses";

@@ -37,6 +37,16 @@ export interface HomeSliderApiDto {
   }
 }
 
+export interface HomeHeroSectionApiDto {
+  id: number | null
+  title: string | null
+  subtitle: string | null
+  description: string | null
+  link: string | null
+  image: HomeImageApiDto | null
+  mobileImage: HomeImageApiDto | null
+}
+
 export interface HomeCourseApiDto {
   id: number | null
   title: string | null
@@ -83,6 +93,7 @@ export interface HomeBlogApiDto {
 }
 
 export interface HomePageApiSources {
+  heroSections: HomeApiSourceResult<unknown>
   sliders: HomeApiSourceResult<unknown>
   courseSections: HomeApiSourceResult<unknown>
   blogs: HomeApiSourceResult<unknown>

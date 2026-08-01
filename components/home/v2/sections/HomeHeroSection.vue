@@ -8,7 +8,38 @@ const props = defineProps<{
 }>()
 
 const heroData = computed(() => props.hero.data)
-const heroImage = computed(() => heroData.value?.image || props.site.cover || props.site.logo)
+const failedImageSources = ref<string[]>([])
+const imageIsAvailable = (src: string | undefined): boolean =>
+  Boolean(src && !failedImageSources.value.includes(src))
+
+const desktopHeroImage = computed(() =>
+  imageIsAvailable(heroData.value?.image?.src) ? heroData.value?.image : null,
+)
+const mobileHeroImage = computed(() =>
+  imageIsAvailable(heroData.value?.mobileImage?.src) ? heroData.value?.mobileImage : null,
+)
+const settingsLogo = computed(() =>
+  imageIsAvailable(props.site.logo?.src) ? props.site.logo : null,
+)
+const heroImage = computed(() => desktopHeroImage.value || mobileHeroImage.value || settingsLogo.value)
+const heroUsesSettingsLogo = computed(() =>
+  Boolean(heroImage.value?.src && heroImage.value.src === settingsLogo.value?.src),
+)
+
+const handleHeroImageError = (event: Event) => {
+  const image = event.currentTarget as HTMLImageElement
+  const failedSource = image.currentSrc || image.src
+
+  if (failedSource && !failedImageSources.value.includes(failedSource)) {
+    failedImageSources.value = [...failedImageSources.value, failedSource]
+  }
+}
+const heroContent = computed(() => ({
+  title: heroData.value?.title || 'تعلّم بخطوات مرتبة،',
+  subtitle: heroData.value?.subtitle || 'وكمّل بثقة.',
+  text: heroData.value?.description || 'تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.',
+  link: heroData.value?.link || '#courses',
+}))
 </script>
 
 <template>
@@ -17,25 +48,37 @@ const heroImage = computed(() => heroData.value?.image || props.site.cover || pr
       <div class="home-v2-hero__copy">
         <p class="home-v2-hero__kicker">{{ site.brandName || 'EduHub' }} · {{ site.description || 'تجربة تعليمية أوضح' }}</p>
         <h1 id="home-v2-hero-title">
-          {{ heroData?.title || 'تعلّم بخطوات مرتبة،' }}<br />
-          <em>{{ heroData?.subtitle || 'وكمّل بثقة.' }}</em>
+          {{ heroContent.title }}<br />
+          <em>{{ heroContent.subtitle }}</em>
         </h1>
-        <p>
-          {{ heroData?.description || site.description || 'تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.' }}
-        </p>
+        <p>{{ heroContent.text }}</p>
         <div class="home-v2-hero__actions">
-          <a class="button" :href="heroData?.link || '#courses'">استكشف الكورسات <span aria-hidden="true">←</span></a>
+          <a class="button" :href="heroContent.link">استكشف الكورسات <span aria-hidden="true">←</span></a>
           <NuxtLink class="home-v2-hero__secondary" to="/aboutus">تعرّف على المنصة <span aria-hidden="true">↗</span></NuxtLink>
         </div>
       </div>
 
       <figure :class="['home-v2-hero__visual', { 'home-v2-temporary-asset': !heroImage }]" :aria-label="heroImage?.alt || 'صورة المنصة'">
-        <img v-if="heroImage" class="home-v2-hero__image" :src="heroImage.src" :alt="heroImage.alt" />
+        <picture v-if="heroImage">
+          <source v-if="mobileHeroImage && !heroUsesSettingsLogo" media="(max-width: 780px)" :srcset="mobileHeroImage.src" />
+          <img
+            :class="['home-v2-hero__image', { 'home-v2-hero__image--logo': heroUsesSettingsLogo }]"
+            :src="heroImage.src"
+            :alt="heroImage.alt"
+            @error="handleHeroImageError"
+          />
+        </picture>
         <div v-else class="home-v2-hero__placeholder">
           <span aria-hidden="true">EDU</span>
           <strong>صورة المدرّس</strong>
           <small>سيتم استبدالها بالأصل المعتمد</small>
         </div>
+        <span
+          v-if="settingsLogo && !heroUsesSettingsLogo"
+          class="home-v2-hero__brand-logo"
+        >
+          <img :src="settingsLogo.src" :alt="settingsLogo.alt || site.brandName || 'شعار المنصة'" @error="handleHeroImageError" />
+        </span>
       </figure>
     </div>
   </section>
@@ -46,9 +89,8 @@ const heroImage = computed(() => heroData.value?.image || props.site.cover || pr
   position: relative;
   overflow: hidden;
   padding-top: 86px;
-  background:
-    radial-gradient(circle at 12% 24%, color-mix(in srgb, var(--home-v2-blue) 12%, transparent), transparent 33%),
-    linear-gradient(135deg, #fbfcff, #eef5ff);
+  background: var(--home-v2-blue);
+  color: #fff;
 }
 
 .home-v2-hero__layout {
@@ -68,9 +110,9 @@ const heroImage = computed(() => heroData.value?.image || props.site.cover || pr
   width: fit-content;
   margin: 0 0 18px;
   padding: 7px 12px;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 22%, transparent);
+  border: 1px solid #ffffff5c;
   border-radius: 999px;
-  color: var(--home-v2-blue);
+  color: #fff;
   font-size: 12px;
   font-weight: 800;
 }
@@ -82,13 +124,13 @@ const heroImage = computed(() => heroData.value?.image || props.site.cover || pr
 }
 
 .home-v2-hero h1 em {
-  color: var(--home-v2-blue);
+  color: color-mix(in srgb, var(--home-v2-blue-light) 80%, white);
   font-style: normal;
 }
 
 .home-v2-hero__copy > p:not(.home-v2-hero__kicker) {
   max-width: 620px;
-  color: var(--home-v2-muted);
+  color: #ffffffe0;
   font-size: 17px;
   line-height: 1.95;
 }
@@ -105,7 +147,8 @@ const heroImage = computed(() => heroData.value?.image || props.site.cover || pr
   min-height: 48px;
   align-items: center;
   gap: 9px;
-  border-bottom: 1px solid var(--home-v2-ink);
+  border-bottom: 1px solid #ffffffb3;
+  color: #fff;
   font-weight: 800;
 }
 
@@ -118,10 +161,52 @@ const heroImage = computed(() => heroData.value?.image || props.site.cover || pr
   box-shadow: 24px 28px 0 color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
 }
 
+.home-v2-hero .button {
+  background: #fff;
+  color: var(--home-v2-blue);
+}
+
+.home-v2-hero .button:hover {
+  background: var(--home-v2-blue-light);
+}
+
 .home-v2-hero__image {
   width: 100%;
   aspect-ratio: 1086 / 1448;
   object-fit: cover;
+}
+
+.home-v2-hero__image--logo {
+  padding: clamp(36px, 8vw, 90px);
+  background: #fff;
+  object-fit: contain;
+}
+
+.home-v2-hero__visual picture {
+  display: block;
+}
+
+.home-v2-hero__brand-logo {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  inset-inline-start: 18px;
+  display: grid;
+  width: 74px;
+  height: 74px;
+  place-items: center;
+  padding: 7px;
+  border: 1px solid #ffffffa6;
+  border-radius: 50%;
+  background: #fffffff0;
+  box-shadow: 0 10px 28px #06114738;
+}
+
+.home-v2-hero__brand-logo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
 }
 
 .home-v2-hero__placeholder {
