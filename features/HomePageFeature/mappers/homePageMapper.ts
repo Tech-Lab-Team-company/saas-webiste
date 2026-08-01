@@ -15,10 +15,13 @@ import type {
   HomeCoursesViewModel,
   HomeHeroViewModel,
   HomeImageViewModel,
+  HomeLearningJourneyItemViewModel,
+  HomeLearningJourneyViewModel,
   HomePageViewModel,
   HomeSiteViewModel,
 } from '../models/HomePageViewModel'
 import { homeBlogsMock } from '../mocks/homeBlogs.mock'
+import { createHomeLearningJourneyMock } from '../mocks/homeLearningJourney.mock'
 
 const DEFAULT_HOME_ERROR_MESSAGE = 'تعذر تحميل هذا القسم في الوقت الحالي.'
 
@@ -351,6 +354,82 @@ const mapBlog = (blog: HomeBlogApiDto): HomeBlogViewModel | null => {
   }
 }
 
+const mapLearningJourneyItem = (
+  value: unknown,
+  index: number,
+): HomeLearningJourneyItemViewModel | null => {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const title = toNullableString(value.title ?? value.name ?? value.label)
+  const description = toNullableString(
+    value.description ?? value.text ?? value.subtitle ?? value.content,
+  )
+
+  if (!title || !description) {
+    return null
+  }
+
+  return {
+    id: toNullableNumber(value.id) ?? toNullableString(value.id) ?? index + 1,
+    title,
+    description,
+  }
+}
+
+const mapLearningJourney = (
+  value: unknown,
+  site: HomeSiteViewModel,
+): HomeLearningJourneyViewModel => {
+  const fallback = createHomeLearningJourneyMock(site)
+  const rootItems = toArray(value)
+  const lastRootItem = rootItems[rootItems.length - 1]
+  const section = isRecord(lastRootItem)
+    ? lastRootItem
+    : isRecord(value)
+      ? value
+      : null
+
+  if (!section) {
+    return fallback
+  }
+
+  const nestedItems =
+    section.items ??
+    section.steps ??
+    section.benefits ??
+    section.journey_steps ??
+    (Array.isArray(section.content) ? section.content : undefined) ??
+    section.learning_journey
+  const itemsSource = Array.isArray(nestedItems)
+    ? nestedItems
+    : rootItems.length > 1
+      ? rootItems
+      : []
+  const items = itemsSource
+    .map(mapLearningJourneyItem)
+    .filter((item): item is HomeLearningJourneyItemViewModel => item !== null)
+
+  return {
+    eyebrow:
+      toNullableString(section.eyebrow ?? section.subtitle ?? section.label) ??
+      fallback.eyebrow,
+    title: toNullableString(section.title ?? section.name) ?? fallback.title,
+    description:
+      toNullableString(section.description ?? section.text ?? section.content) ??
+      fallback.description,
+    link:
+      toNullableString(section.link ?? section.button_link ?? section.action_url) ??
+      fallback.link,
+    linkLabel:
+      toNullableString(
+        section.link_label ?? section.button_text ?? section.link_text,
+      ) ?? fallback.linkLabel,
+    items: items.length > 0 ? items : fallback.items,
+  }
+}
+
 const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeSectionState<T> => ({
   data,
   status: 'error',
@@ -425,6 +504,10 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
     data: [],
     status: 'empty',
   },
+  learningJourney: {
+    data: createHomeLearningJourneyMock(createEmptySite()),
+    status: 'empty',
+  },
   notes: {
     status: 'unsupported',
     reason: 'لا توجد واجهة بيانات أو مسار معتمد للمذكرات حاليًا.',
@@ -432,6 +515,7 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
 })
 
 export const mapHomePage = (sources: HomePageApiSources, settings: unknown): HomePageViewModel => {
+  const site = mapHomeSite(settings)
   const hero = (() => {
     if (sources.heroSections.kind === 'success') {
       const customHeroes = readHeroSections(sources.heroSections.data)
@@ -499,11 +583,32 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
     }
   })()
 
+  const learningJourney = (() => {
+    if (sources.learningJourney.kind === 'error') {
+      return {
+        data: createHomeLearningJourneyMock(site),
+        status: 'empty' as const,
+      }
+    }
+
+    const hasApiData =
+      (Array.isArray(sources.learningJourney.data) &&
+        sources.learningJourney.data.length > 0) ||
+      (isRecord(sources.learningJourney.data) &&
+        Object.keys(sources.learningJourney.data).length > 0)
+
+    return {
+      data: mapLearningJourney(sources.learningJourney.data, site),
+      status: hasApiData ? ('success' as const) : ('empty' as const),
+    }
+  })()
+
   return {
-    site: mapHomeSite(settings),
+    site,
     hero,
     courses,
     blogs,
+    learningJourney,
     notes: {
       status: 'unsupported',
       reason: 'لا توجد واجهة بيانات أو مسار معتمد للمذكرات حاليًا.',

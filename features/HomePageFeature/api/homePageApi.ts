@@ -70,11 +70,12 @@ export class HomePageApi {
   constructor(private readonly webDomain: string) {}
 
   async load(): Promise<HomePageApiSources> {
-    const [heroSections, sliders, courseSections, blogs] = await Promise.allSettled([
+    const [heroSections, sliders, courseSections, blogs, learningJourney] = await Promise.allSettled([
       this.fetchHeroSections(),
       this.fetchSliders(),
       this.fetchCourseSections(),
       this.fetchBlogs(),
+      this.fetchLearningJourney(),
     ])
 
     return {
@@ -82,6 +83,7 @@ export class HomePageApi {
       sliders: toSourceResult(sliders),
       courseSections: toSourceResult(courseSections),
       blogs: toSourceResult(blogs),
+      learningJourney: toSourceResult(learningJourney),
     }
   }
 
@@ -115,6 +117,10 @@ export class HomePageApi {
 
   private async fetchBlogs(): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_blogs, {})
+  }
+
+  private async fetchLearningJourney(): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_home_learning_journey, {})
   }
 
   private async post(url: string, data: Record<string, number | null>): Promise<unknown> {

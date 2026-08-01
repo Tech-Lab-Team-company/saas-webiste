@@ -3,6 +3,7 @@ import { HomePageApi, normalizeHomeDataError, resolveHomeWebDomain } from '../ap
 import { createEmptyHomePageViewModel, mapHomeCourseList, mapHomePage, mapHomeSite } from '../mappers/homePageMapper'
 import type { HomeCourseViewModel, HomePageViewModel } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
+import { createHomeLearningJourneyMock } from '../mocks/homeLearningJourney.mock'
 
 export const useHomePage = () => {
   const settingsStore = useSettingStore()
@@ -21,10 +22,18 @@ export const useHomePage = () => {
 
   const home = computed<HomePageViewModel>(() => {
     const currentHome = data.value ?? createEmptyHomePageViewModel()
+    const site = mapHomeSite(setting.value)
 
     return {
       ...currentHome,
-      site: mapHomeSite(setting.value),
+      site,
+      learningJourney:
+        currentHome.learningJourney.status === 'empty'
+          ? {
+              data: createHomeLearningJourneyMock(site),
+              status: 'empty',
+            }
+          : currentHome.learningJourney,
     }
   })
 

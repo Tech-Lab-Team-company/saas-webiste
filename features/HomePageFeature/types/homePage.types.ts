@@ -97,4 +97,5 @@ export interface HomePageApiSources {
   sliders: HomeApiSourceResult<unknown>
   courseSections: HomeApiSourceResult<unknown>
   blogs: HomeApiSourceResult<unknown>
+  learningJourney: HomeApiSourceResult<unknown>
 }
