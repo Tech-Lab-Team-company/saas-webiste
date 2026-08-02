@@ -122,11 +122,198 @@ watch(() => props.CourseData, (newValue) => {
 
 
 <style scoped lang="scss">
-.collapse-text{
-    text-decoration: underline;
+.homework-card {
+    width: 100%;
+    margin: 20px 0 0;
+}
+
+.panels {
+    overflow: hidden;
+    margin-bottom: 12px;
+    border: 1px solid #e5e9f0;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.panel-header {
+    min-height: 68px;
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: #172033;
+}
+
+.panel-header-container {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.homework-title,
+.homework-content-title,
+.homework-upload-title {
+    color: #172033;
+    font-weight: 800;
+    text-align: start;
+}
+
+.homework-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px 18px;
+    color: #707a8b;
+    font-size: 12px;
+}
+
+.homework-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.clock-icon { width: 14px; }
+
+.panels :deep(.p-accordioncontent-content) {
+    padding: 18px;
+    border-top: 1px solid #edf0f4;
+}
+
+.collapse-text {
+    color: var(--primary-color, #1d4ed8);
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.homework-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.homework-attachments :deep(img) {
+    width: 150px;
+    height: 105px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.homework-content-container {
+    display: grid;
+    gap: 8px;
+    padding: 16px 0;
+    text-align: start;
+}
+
+.homework-content-subtitle {
+    padding-bottom: 14px;
+    border-bottom: 1px solid #edf0f4;
+    color: #687386;
+    line-height: 1.8;
+}
+
+.homework-hr { display: none; }
+
+.homework-upload {
+    display: grid;
+    gap: 10px;
+    padding: 0;
+}
+
+.add-media { display: flex; flex-direction: column; }
+
+.notes-input {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #dfe4ec;
+    border-radius: 11px;
+    background: #fbfcfe;
+    color: #172033;
+    text-align: start;
+}
+
+.notes-input:focus {
+    border-color: var(--primary-color, #1d4ed8);
+    outline: 3px solid color-mix(in srgb, var(--primary-color, #1d4ed8) 10%, transparent);
+}
+
+.btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.submit-image {
+    min-width: 180px;
+    min-height: 44px;
+    padding: 10px 18px;
+    border-radius: 11px;
+    background: var(--primary-color, #1d4ed8);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .panel-header,
+    .panels :deep(.p-accordioncontent-content) { padding: 13px; }
+    .submit-image { width: 100%; }
+}
+
+.homework-card .panels .panel-header {
+    min-height: 68px;
+    padding: 14px 18px;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: #172033;
+}
+
+.homework-card .panels .panel-header .panel-header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.homework-card .panels .panel-header .panel-header-container .homework-title {
+    color: #172033;
+    font-weight: 800;
+    text-align: start;
+}
+
+.homework-card .panels .panel-header .panel-header-container .homework-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px 18px;
+}
+
+.homework-card .panels .homework-content-container,
+.homework-card .panels .homework-upload {
+    width: 100%;
+    padding: 16px 0;
+    text-align: start;
+}
+
+.homework-card .panels .btn-container .submit-image {
+    min-width: 180px;
+    width: auto;
+    padding: 10px 18px;
+    border-radius: 11px;
+    background: var(--primary-color, #1d4ed8);
+}
+
+@media (max-width: 640px) {
+    .homework-card .panels .panel-header { padding: 13px; }
+    .homework-card .panels .btn-container .submit-image { width: 100%; }
 }
 </style>
 
 
         
-
