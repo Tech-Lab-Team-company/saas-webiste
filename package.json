@@ -27,6 +27,8 @@
     "@vime/core": "^5.4.1",
     "@vime/vue-next": "^5.4.1",
     "axios": "^1.8.4",
+    "gsap": "^3.15.0",
+    "motion-v": "^2.3.0",
     "nuxt": "^3.16.1",
     "nuxt-swiper": "^2.0.0",
     "pinia-plugin-persistedstate": "^4.2.0",

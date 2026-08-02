@@ -64,6 +64,34 @@ export interface HomeBlogViewModel {
   image: HomeImageViewModel | null
 }
 
+export interface HomeLearningJourneyItemViewModel {
+  id: number | string
+  title: string
+  description: string
+}
+
+export interface HomeLearningJourneyViewModel {
+  eyebrow: string
+  title: string
+  description: string
+  icon: HomeImageViewModel | null
+  link: string
+  linkLabel: string
+  items: HomeLearningJourneyItemViewModel[]
+}
+
+export interface HomeAboutTeacherViewModel {
+  eyebrow: string
+  title: string
+  description: string
+  quote: string
+  teacherName: string
+  teacherRole: string
+  highlights: string[]
+  link: string
+  linkLabel: string
+}
+
 export interface HomeSiteViewModel {
   brandName: string | null
   description: string | null
@@ -98,5 +126,7 @@ export interface HomePageViewModel {
   hero: HomeSectionState<HomeHeroViewModel | null>
   courses: HomeSectionState<HomeCoursesViewModel>
   blogs: HomeSectionState<HomeBlogViewModel[]>
+  learningJourney: HomeSectionState<HomeLearningJourneyViewModel>
+  aboutTeacher: HomeSectionState<HomeAboutTeacherViewModel>
   notes: HomeNotesViewModel
 }

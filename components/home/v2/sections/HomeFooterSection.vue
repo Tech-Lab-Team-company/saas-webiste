@@ -10,6 +10,24 @@ const whatsappUrl = computed(() => {
   if (!value || value.startsWith('http')) return value
   return `https://wa.me/${value.replace(/\D/g, '').replace(/^0/, '20')}`
 })
+
+const descriptionIsExpanded = ref(false)
+const descriptionLimit = 180
+const footerDescription = computed(() =>
+  (props.site.description || 'منصة تعليمية منظمة تساعد الطلاب على التعلّم بخطوات واضحة.')
+    .replace(/\s+/g, ' ')
+    .trim(),
+)
+const descriptionCanExpand = computed(() => footerDescription.value.length > descriptionLimit)
+const visibleFooterDescription = computed(() => {
+  if (descriptionIsExpanded.value || !descriptionCanExpand.value) return footerDescription.value
+
+  return `${footerDescription.value.slice(0, descriptionLimit).trimEnd()}…`
+})
+
+watch(footerDescription, () => {
+  descriptionIsExpanded.value = false
+})
 </script>
 
 <template>
@@ -20,9 +38,20 @@ const whatsappUrl = computed(() => {
           <span :class="['home-v2-footer__logo', { 'home-v2-temporary-asset': !site.logo }]">
             <NuxtImg :src="site.logo?.src || '/images/logo.png'" :alt="site.logo?.alt || site.brandName || ''" width="163" height="52" loading="lazy" />
           </span>
-          <span><b>{{ site.brandName || 'EduHub' }}</b><small>{{ site.description || 'منصة تعليمية منظمة' }}</small></span>
+          <span><b>{{ site.brandName || 'EduHub' }}</b><small>منصة تعليمية منظمة</small></span>
         </NuxtLink>
-        <p>{{ site.description || 'منصة تعليمية منظمة تساعد الطلاب على التعلّم بخطوات واضحة.' }}</p>
+        <p class="home-v2-footer__description">
+          <span id="home-v2-footer-description">{{ visibleFooterDescription }}</span>
+          <button
+            v-if="descriptionCanExpand"
+            type="button"
+            :aria-expanded="descriptionIsExpanded"
+            aria-controls="home-v2-footer-description"
+            @click="descriptionIsExpanded = !descriptionIsExpanded"
+          >
+            {{ descriptionIsExpanded ? 'عرض أقل' : 'عرض المزيد' }}
+          </button>
+        </p>
         <div class="home-v2-footer__contacts">
           <a v-if="site.phone" :href="`tel:${site.phone}`">{{ site.phone }}</a>
           <a v-if="site.email" :href="`mailto:${site.email}`">{{ site.email }}</a>
@@ -119,6 +148,23 @@ const whatsappUrl = computed(() => {
   max-width: 490px;
   margin: 20px 0 0;
   line-height: 1.9;
+}
+
+.home-v2-footer__description button {
+  margin-inline-start: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #8fc6ff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-v2-footer__description button:hover {
+  color: #fff;
 }
 
 .home-v2-footer__contacts {

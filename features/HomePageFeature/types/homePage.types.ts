@@ -47,6 +47,24 @@ export interface HomeHeroSectionApiDto {
   mobileImage: HomeImageApiDto | null
 }
 
+export interface HomeSectionResourceChildApiDto {
+  id: number
+  title: string
+  description: string
+  type: number
+  parent_id: number
+}
+
+export interface HomeSectionResourceApiDto {
+  id: number
+  title: string
+  subtitle: string
+  description: string
+  type: number
+  icon: string | null
+  children: HomeSectionResourceChildApiDto[]
+}
+
 export interface HomeCourseApiDto {
   id: number | null
   title: string | null
@@ -97,4 +115,6 @@ export interface HomePageApiSources {
   sliders: HomeApiSourceResult<unknown>
   courseSections: HomeApiSourceResult<unknown>
   blogs: HomeApiSourceResult<unknown>
+  learningJourney: HomeApiSourceResult<unknown>
+  aboutTeacher: HomeApiSourceResult<unknown>
 }

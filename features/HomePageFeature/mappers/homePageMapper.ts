@@ -10,14 +10,21 @@ import type {
 } from '../types/homePage.types'
 import type {
   HomeBlogViewModel,
+  HomeAboutTeacherViewModel,
   HomeCourseTabViewModel,
   HomeCourseViewModel,
   HomeCoursesViewModel,
   HomeHeroViewModel,
   HomeImageViewModel,
+  HomeLearningJourneyItemViewModel,
+  HomeLearningJourneyViewModel,
   HomePageViewModel,
   HomeSiteViewModel,
 } from '../models/HomePageViewModel'
+import { homeBlogsMock } from '../mocks/homeBlogs.mock'
+import { createHomeLearningJourneyMock } from '../mocks/homeLearningJourney.mock'
+import { createHomeAboutTeacherMock } from '../mocks/homeAboutTeacher.mock'
+import { createHomeHeroSectionMock } from '../mocks/homeHeroSection.mock'
 
 const DEFAULT_HOME_ERROR_MESSAGE = 'تعذر تحميل هذا القسم في الوقت الحالي.'
 
@@ -114,7 +121,7 @@ const mapHeroSectionApiDto = (value: unknown): HomeHeroSectionApiDto | null => {
     description: toNullableString(value.description ?? value.text),
     link: toNullableString(value.link ?? value.button_link ?? value.action_url),
     image: mapFlexibleImageApiDto(
-      value.image ?? value.img ?? media?.image ?? media?.img,
+      value.image ?? value.img ?? value.icon ?? media?.image ?? media?.img,
       value.image_alt ?? value.alt,
     ),
     mobileImage: mapFlexibleImageApiDto(
@@ -350,6 +357,114 @@ const mapBlog = (blog: HomeBlogApiDto): HomeBlogViewModel | null => {
   }
 }
 
+const mapLearningJourneyItem = (
+  value: unknown,
+  index: number,
+): HomeLearningJourneyItemViewModel | null => {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const title = toNullableString(value.title ?? value.name ?? value.label)
+  const description = toNullableString(
+    value.description ?? value.text ?? value.subtitle ?? value.content,
+  )
+
+  if (!title || !description) {
+    return null
+  }
+
+  return {
+    id: toNullableNumber(value.id) ?? toNullableString(value.id) ?? index + 1,
+    title,
+    description,
+  }
+}
+
+const mapLearningJourney = (
+  value: unknown,
+  site: HomeSiteViewModel,
+): HomeLearningJourneyViewModel => {
+  const fallbackSection = createHomeLearningJourneyMock(site)[0]
+  const rootItems = toArray(value)
+  const lastRootItem = rootItems[rootItems.length - 1]
+  const section = isRecord(lastRootItem)
+    ? lastRootItem
+    : isRecord(value)
+      ? value
+      : fallbackSection
+
+  const nestedItems = section.children
+  const itemsSource = Array.isArray(nestedItems)
+    ? nestedItems
+    : fallbackSection.children
+  const items = itemsSource
+    .map(mapLearningJourneyItem)
+    .filter((item): item is HomeLearningJourneyItemViewModel => item !== null)
+
+  return {
+    eyebrow: toNullableString(section.subtitle) ?? fallbackSection.subtitle,
+    title: toNullableString(section.title) ?? fallbackSection.title,
+    description: toNullableString(section.description) ?? fallbackSection.description,
+    icon: mapImage(mapFlexibleImageApiDto(section.icon, section.title)),
+    link: '/course',
+    linkLabel: 'شاهد نموذج الطالب',
+    items,
+  }
+}
+
+const mapAboutTeacher = (
+  value: unknown,
+  site: HomeSiteViewModel,
+): HomeAboutTeacherViewModel => {
+  const fallbackSection = createHomeAboutTeacherMock(site)[0]
+  const rootItems = toArray(value)
+  const lastRootItem = rootItems[rootItems.length - 1]
+  const section = isRecord(lastRootItem)
+    ? lastRootItem
+    : isRecord(value)
+      ? value
+      : fallbackSection
+
+  const rawHighlights = Array.isArray(section.children)
+    ? section.children
+    : fallbackSection.children
+  const highlights = toArray(rawHighlights)
+    .map((item) => {
+      if (!isRecord(item)) {
+        return null
+      }
+
+      const title = toNullableString(item.title)
+      const description = toNullableString(item.description)
+      return title && description ? `${title}: ${description}` : title ?? description
+    })
+    .filter((item): item is string => item !== null)
+
+  const teacherName = site.brandName || 'مدرسك'
+  const teacherRole = site.description || 'مدرس متخصص يساعدك تفهم وتطبّق بثقة'
+  const quote = toNullableString(section.description) ?? fallbackSection.description
+  const description = `${teacherName} يقدّم محتوى تعليميًا منظمًا يساعد الطالب على فهم المفاهيم، تطبيقها، ومتابعة تقدمه بثقة.`
+
+  return {
+    eyebrow: toNullableString(section.subtitle) ?? fallbackSection.subtitle,
+    title: toNullableString(section.title) ?? fallbackSection.title,
+    description,
+    quote,
+    teacherName,
+    teacherRole,
+    highlights,
+    link: '/aboutus',
+    linkLabel: `اعرف أكثر عن ${teacherName}`,
+  }
+}
+
+export const mapHomeLearningJourneyMock = (site: HomeSiteViewModel) =>
+  mapLearningJourney(createHomeLearningJourneyMock(site), site)
+
+export const mapHomeAboutTeacherMock = (site: HomeSiteViewModel) =>
+  mapAboutTeacher(createHomeAboutTeacherMock(site), site)
+
 const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeSectionState<T> => ({
   data,
   status: 'error',
@@ -424,6 +539,14 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
     data: [],
     status: 'empty',
   },
+  learningJourney: {
+    data: mapHomeLearningJourneyMock(createEmptySite()),
+    status: 'empty',
+  },
+  aboutTeacher: {
+    data: mapHomeAboutTeacherMock(createEmptySite()),
+    status: 'empty',
+  },
   notes: {
     status: 'unsupported',
     reason: 'لا توجد واجهة بيانات أو مسار معتمد للمذكرات حاليًا.',
@@ -431,6 +554,7 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
 })
 
 export const mapHomePage = (sources: HomePageApiSources, settings: unknown): HomePageViewModel => {
+  const site = mapHomeSite(settings)
   const hero = (() => {
     if (sources.heroSections.kind === 'success') {
       const customHeroes = readHeroSections(sources.heroSections.data)
@@ -453,11 +577,14 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
       }
     }
 
+    const mockHero = mapHeroSectionApiDto(createHomeHeroSectionMock(site)[0])
+    const mockHeroViewModel = mockHero ? mapCustomHero(mockHero) : null
+
     if (sources.heroSections.kind === 'error' && sources.sliders.kind === 'error') {
-      return mapSectionError<HomeHeroViewModel | null>(null, sources.heroSections.error)
+      return mapSectionError<HomeHeroViewModel | null>(mockHeroViewModel, sources.heroSections.error)
     }
 
-    return { data: null, status: 'empty' as const }
+    return { data: mockHeroViewModel, status: 'empty' as const }
   })()
 
   const courses = (() => {
@@ -478,24 +605,73 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
 
   const blogs = (() => {
     if (sources.blogs.kind === 'error') {
-      return mapSectionError<HomeBlogViewModel[]>([], sources.blogs.error)
+      return {
+        data: homeBlogsMock,
+        status: 'success' as const,
+      }
     }
 
     const mappedBlogs = toArray(sources.blogs.data)
       .map(mapBlogApiDto)
+      .filter((blog): blog is HomeBlogApiDto => blog !== null)
+      .map(mapBlog)
       .filter((blog): blog is HomeBlogViewModel => blog !== null)
 
+    const visibleBlogs = mappedBlogs.length > 0 ? mappedBlogs : homeBlogsMock
+
     return {
-      data: mappedBlogs,
-      status: mappedBlogs.length > 0 ? ('success' as const) : ('empty' as const),
+      data: visibleBlogs,
+      status: 'success' as const,
+    }
+  })()
+
+  const learningJourney = (() => {
+    if (sources.learningJourney.kind === 'error') {
+      return {
+        data: mapHomeLearningJourneyMock(site),
+        status: 'empty' as const,
+      }
+    }
+
+    const hasApiData =
+      (Array.isArray(sources.learningJourney.data) &&
+        sources.learningJourney.data.length > 0) ||
+      (isRecord(sources.learningJourney.data) &&
+        Object.keys(sources.learningJourney.data).length > 0)
+
+    return {
+      data: mapLearningJourney(sources.learningJourney.data, site),
+      status: hasApiData ? ('success' as const) : ('empty' as const),
+    }
+  })()
+
+  const aboutTeacher = (() => {
+    if (sources.aboutTeacher.kind === 'error') {
+      return {
+        data: mapHomeAboutTeacherMock(site),
+        status: 'empty' as const,
+      }
+    }
+
+    const hasApiData =
+      (Array.isArray(sources.aboutTeacher.data) &&
+        sources.aboutTeacher.data.length > 0) ||
+      (isRecord(sources.aboutTeacher.data) &&
+        Object.keys(sources.aboutTeacher.data).length > 0)
+
+    return {
+      data: mapAboutTeacher(sources.aboutTeacher.data, site),
+      status: hasApiData ? ('success' as const) : ('empty' as const),
     }
   })()
 
   return {
-    site: mapHomeSite(settings),
+    site,
     hero,
     courses,
     blogs,
+    learningJourney,
+    aboutTeacher,
     notes: {
       status: 'unsupported',
       reason: 'لا توجد واجهة بيانات أو مسار معتمد للمذكرات حاليًا.',

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import type {
   HomeCourseTabKey,
   HomeCourseViewModel,
@@ -20,6 +21,13 @@ const coursesByTab = ref<
 >({});
 const loadingTabKey = ref<HomeCourseTabKey | null>(null);
 const requestIds = ref<Partial<Record<HomeCourseTabKey, number>>>({});
+const coursesSection = ref<HTMLElement | null>(null);
+const courseResults = ref<HTMLElement | null>(null);
+const sectionHasEntered = ref(false);
+let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
+
+const shouldReduceMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const selectedTab = computed(
   () =>
@@ -37,11 +45,21 @@ const selectedCourses = computed<HomeSectionState<
   return coursesByTab.value[selectedTab.value.key] ?? null;
 });
 
-const selectTab = async (tabKey: HomeCourseTabKey) => {
+const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
 
   if (!tab || loadingTabKey.value === tab.key) {
     return;
+  }
+
+  const selectedButton = event?.currentTarget as HTMLElement | null;
+  if (selectedButton && !shouldReduceMotion()) {
+    const indexBadge = selectedButton.querySelector(".stage-option-index");
+    gsap.fromTo(
+      indexBadge,
+      { scale: 0.72, rotate: -8 },
+      { scale: 1, rotate: 0, duration: 0.55, ease: "back.out(2)" },
+    );
   }
 
   selectedTabKey.value = tab.key;
@@ -61,29 +79,224 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
     loadingTabKey.value = null;
   }
 };
+
+const animateCourseResults = async () => {
+  await nextTick();
+
+  const results = courseResults.value;
+  if (!results || !sectionHasEntered.value || shouldReduceMotion()) return;
+
+  const header = results.querySelector(".home-course-result-head");
+  const cards = Array.from(results.querySelectorAll(".course-card"));
+  const message = results.querySelector(
+    ".home-course-message, .home-course-empty",
+  );
+  const targets = [header, message, ...cards].filter(
+    (target): target is Element => Boolean(target),
+  );
+
+  gsap.killTweensOf(targets);
+  gsap.fromTo(
+    targets,
+    {
+      autoAlpha: 0,
+      y: 42,
+      scale: 0.965,
+      rotationX: 7,
+    },
+    {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      rotationX: 0,
+      duration: 0.72,
+      stagger: 0.09,
+      ease: "power3.out",
+      clearProps: "opacity,visibility,transform",
+    },
+  );
+};
+
+const revealCoursesSection = () => {
+  const section = coursesSection.value;
+  if (!section || sectionHasEntered.value) return;
+
+  sectionHasEntered.value = true;
+  if (shouldReduceMotion()) return;
+
+  coursesAnimationContext = gsap.context(() => {
+    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    timeline
+      .from(".split-heading .section-tag", {
+        autoAlpha: 0,
+        x: 38,
+        duration: 0.55,
+      })
+      .from(
+        ".split-heading h2",
+        { autoAlpha: 0, y: 48, duration: 0.85, ease: "expo.out" },
+        0.12,
+      )
+      .from(
+        ".split-heading > p",
+        { autoAlpha: 0, y: 28, duration: 0.65 },
+        0.28,
+      )
+      .from(
+        ".home-course-picker",
+        {
+          autoAlpha: 0,
+          clipPath: "inset(0 50% 0 50%)",
+          y: 28,
+          duration: 0.9,
+          ease: "expo.inOut",
+        },
+        0.42,
+      )
+      .from(
+        ".home-course-audiences button",
+        {
+          autoAlpha: 0,
+          y: 20,
+          scale: 0.92,
+          duration: 0.48,
+          stagger: 0.08,
+        },
+        0.72,
+      )
+      .from(
+        ".home-course-result > *",
+        { autoAlpha: 0, y: 34, duration: 0.65 },
+        0.93,
+      )
+      .from(
+        ".all-courses",
+        { autoAlpha: 0, y: 18, duration: 0.5 },
+        1.05,
+      );
+
+    gsap.to(".home-course-motion-orb--one", {
+      x: 30,
+      y: -24,
+      duration: 7,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+    gsap.to(".home-course-motion-orb--two", {
+      x: -26,
+      y: 30,
+      duration: 8.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+  }, section);
+};
+
+const tiltCourseCard = (event: PointerEvent) => {
+  if (event.pointerType === "touch" || shouldReduceMotion()) return;
+
+  const card = event.currentTarget as HTMLElement;
+  const bounds = card.getBoundingClientRect();
+  const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+  const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+  gsap.to(card, {
+    rotationY: horizontal * 5,
+    rotationX: vertical * -5,
+    y: -8,
+    duration: 0.45,
+    ease: "power2.out",
+    overwrite: "auto",
+  });
+  const coverVisual = card.querySelector(".course-cover img, .course-mark");
+  if (coverVisual) {
+    gsap.to(coverVisual, {
+      x: horizontal * 9,
+      y: vertical * 7,
+      duration: 0.55,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  }
+};
+
+const resetCourseCard = (event: PointerEvent) => {
+  const card = event.currentTarget as HTMLElement;
+
+  gsap.to(card, {
+    rotationX: 0,
+    rotationY: 0,
+    y: 0,
+    duration: 0.65,
+    ease: "elastic.out(1, 0.55)",
+    overwrite: "auto",
+    onComplete: () => gsap.set(card, { clearProps: "transform" }),
+  });
+  const coverVisual = card.querySelector(".course-cover img, .course-mark");
+  if (coverVisual) {
+    gsap.to(coverVisual, {
+      x: 0,
+      y: 0,
+      duration: 0.55,
+      ease: "power2.out",
+      overwrite: "auto",
+      onComplete: () => gsap.set(coverVisual, { clearProps: "transform" }),
+    });
+  }
+};
+
+watch(
+  () => [
+    selectedTabKey.value,
+    loadingTabKey.value,
+    selectedCourses.value?.status,
+    selectedCourses.value?.data.map((course) => course.id).join(","),
+  ],
+  animateCourseResults,
+  { flush: "post" },
+);
+
+useScrollTriggeredReveal(coursesSection, revealCoursesSection, {
+  threshold: 0.16,
+});
+
+onBeforeUnmount(() => {
+  coursesAnimationContext?.revert();
+  if (coursesSection.value) {
+    gsap.killTweensOf(coursesSection.value.querySelectorAll("*"));
+  }
+});
 </script>
 
 <template>
   <section
     id="courses"
-    class="section home-v2-courses"
+    ref="coursesSection"
+    class="section courses home-course-showcase"
     aria-labelledby="home-v2-courses-title"
   >
+    <div class="home-course-motion" aria-hidden="true">
+      <span class="home-course-motion-orb home-course-motion-orb--one" />
+      <span class="home-course-motion-orb home-course-motion-orb--two" />
+    </div>
     <div class="container">
-      <div class="home-v2-courses__heading">
+      <div class="section-heading split-heading">
         <div>
           <span class="section-tag">اختار نقطة البداية</span>
           <h2 id="home-v2-courses-title">
-            ابدأ من صفك،<br /><em>وكمل بخطة واضحة.</em>
+            ابدأ من صفك.<br />وكمل <em>بخطة واضحة.</em>
           </h2>
         </div>
         <p>
-          كل صف له منهجه وسرعته. اختار مرحلتك علشان تشوف كورساتها ومراجعاتها
-          فقط.
+          كل صف له منهجه وسرعته. اختار مرحلتك علشان تشوف كورساتها
+          ومراجعاتها فقط.
         </p>
       </div>
 
-      <div class="home-v2-courses__panel">
+      <div class="home-course-picker">
         <div>
           <span>خطوتك الأولى</span>
           <h3 id="home-v2-stage-title">أنت في أنهي صف؟</h3>
@@ -93,7 +306,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
         </div>
 
         <div
-          class="home-v2-courses__stages"
+          class="home-course-audiences"
           role="group"
           aria-labelledby="home-v2-stage-title"
           aria-describedby="home-v2-stage-help"
@@ -102,48 +315,52 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
             v-for="(tab, index) in courses.data.tabs"
             :key="tab.key"
             type="button"
-            :class="{ 'is-active': selectedTabKey === tab.key }"
+            :class="{ active: selectedTabKey === tab.key }"
             :aria-pressed="selectedTabKey === tab.key"
             aria-controls="home-v2-course-results"
-            @click="selectTab(tab.key)"
+            @click="selectTab(tab.key, $event)"
           >
-            <b aria-hidden="true">0{{ index + 1 }}</b>
-            <span>{{ tab.label }}</span>
-            <small v-if="loadingTabKey === tab.key">جاري التحميل</small>
+            <span class="stage-option-index" aria-hidden="true">
+              {{ String(index + 1).padStart(2, "0") }}
+            </span>
+            <span class="stage-option-label">{{ tab.label }}</span>
+            <small>{{ loadingTabKey === tab.key ? "جاري التحميل" : "اختار" }}</small>
           </button>
         </div>
       </div>
 
       <div
         id="home-v2-course-results"
-        class="home-v2-courses__results"
+        ref="courseResults"
+        class="home-course-result"
+        :class="{ 'is-empty': !selectedTab }"
         aria-live="polite"
       >
-        <div v-if="!selectedTab" class="home-v2-courses__empty">
-          <span aria-hidden="true">01</span>
+        <div v-if="!selectedTab" class="home-course-empty">
+          <span class="home-course-empty-step" aria-hidden="true">01</span>
           <div>
-            <b>البداية من هنا</b>
+            <span>البداية من هنا</span>
             <h3>اختار صفك من فوق</h3>
             <p>
-              هنظهر لك الكورسات المناسبة من غير ما نخلط لك مناهج باقي الصفوف.
+              هنظهر لك الكورسات المناسبة من غير ما نخلط لك مناهج باقي
+              الصفوف.
             </p>
           </div>
+          <span class="home-course-empty-arrow" aria-hidden="true">↑</span>
         </div>
 
         <template v-else>
-          <div class="home-v2-courses__result-head">
+          <div class="home-course-result-head">
             <div>
               <span>المسار المختار</span>
               <h3>كورسات {{ selectedTab.label }}</h3>
             </div>
-            <b v-if="selectedCourses"
-              >{{ selectedCourses.data.length }} كورسات</b
-            >
+            <b v-if="selectedCourses">{{ selectedCourses.data.length }} كورس</b>
           </div>
 
           <div
             v-if="loadingTabKey === selectedTab.key"
-            class="home-v2-courses__message"
+            class="home-course-message"
             role="status"
           >
             <span>جاري التحميل</span>
@@ -153,7 +370,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
 
           <div
             v-else-if="selectedCourses?.status === 'error'"
-            class="home-v2-courses__message"
+            class="home-course-message"
             role="alert"
           >
             <span>تعذر التحميل</span>
@@ -166,7 +383,7 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
 
           <div
             v-else-if="selectedCourses?.status === 'empty'"
-            class="home-v2-courses__message"
+            class="home-course-message"
             role="status"
           >
             <span>لا توجد كورسات</span>
@@ -174,37 +391,50 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
             <p>ستظهر الكورسات والمراجعات هنا فور إتاحتها.</p>
           </div>
 
-          <div v-else-if="selectedCourses" class="home-v2-courses__grid">
+          <div v-else-if="selectedCourses" class="course-grid">
             <NuxtLink
-              v-for="course in selectedCourses.data"
+              v-for="(course, index) in selectedCourses.data"
               :key="course.id"
               :to="course.route"
-              class="home-v2-courses__card"
+              class="course-card"
+              :class="['mint', 'violet', 'sky', 'deep'][index % 4]"
+              @pointermove="tiltCourseCard"
+              @pointerleave="resetCourseCard"
             >
-              <div class="home-v2-courses__image">
+              <div class="course-cover" :class="{ 'has-image': course.image }">
                 <NuxtImg
                   v-if="course.image"
                   :src="course.image.src"
                   :alt="course.image.alt || course.title"
                   width="680"
-                  height="360"
+                  height="452"
                   loading="lazy"
                 />
-                <span v-else aria-hidden="true">📚</span>
+                <template v-else>
+                  <span class="course-code">PHYSICS COURSE</span>
+                  <span class="course-index">{{ String(index + 1).padStart(2, "0") }}</span>
+                  <span class="course-mark" aria-hidden="true">ف</span>
+                  <span class="level-pill">{{ selectedTab.label }}</span>
+                </template>
               </div>
-              <div class="home-v2-courses__card-content">
-                <span>{{
-                  course.sourceSubject?.title || selectedTab.label
-                }}</span>
+
+              <div class="course-content">
+                <span class="teacher">
+                  {{ course.sourceSubject?.title || selectedTab.label }}
+                </span>
                 <h3>{{ course.title }}</h3>
                 <p v-if="course.description">{{ course.description }}</p>
-                <div>
-                  <small>{{ course.videosCount ?? 0 }} درس</small>
-                  <b>{{
-                    course.price !== null && course.price > 0
-                      ? `${course.price} ${course.currency ?? ""}`
-                      : "مجاني"
-                  }}</b>
+                <p v-else>شرح منظم ومراجعة مركزة تساعدك تفهم وتطبق بثقة.</p>
+                <div class="course-footer">
+                  <span>{{ course.videosCount ?? 0 }} درس</span>
+                  <b>
+                    {{
+                      course.price !== null && course.price > 0
+                        ? `${course.price} ${course.currency ?? ""}`
+                        : "مجاني"
+                    }}
+                  </b>
+                  <span class="course-arrow" aria-hidden="true">←</span>
                 </div>
               </div>
             </NuxtLink>
@@ -214,13 +444,9 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
 
       <NuxtLink
         :to="selectedTab ? `/course?year_id=${selectedTab.yearId}` : '/course'"
-        class="home-v2-courses__link"
+        class="all-courses"
       >
-        {{
-          selectedTab
-            ? `شاهد كل كورسات ${selectedTab.label}`
-            : "عرض الكورسات الحالية"
-        }}
+        {{ selectedTab ? `كل كورسات ${selectedTab.label}` : "صفحة كل الكورسات" }}
         <span aria-hidden="true">←</span>
       </NuxtLink>
     </div>
@@ -228,11 +454,58 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
 </template>
 
 <style scoped>
-.home-v2-courses {
-  background: var(--home-v2-paper);
+.home-course-showcase {
+  --line: var(--home-v2-line);
+  --paper: var(--home-v2-paper);
+  --deep: var(--home-v2-deep);
+  --teal: var(--home-v2-blue);
+  --coral: var(--home-v2-coral);
+  --ink: var(--home-v2-ink);
+  --heading: var(--home-v2-heading);
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
 }
 
-.home-v2-courses__heading {
+.home-course-showcase > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.home-course-motion {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-course-motion-orb {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--teal) 10%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--teal) 6%, transparent),
+    transparent 68%
+  );
+}
+
+.home-course-motion-orb--one {
+  top: 5%;
+  inset-inline-end: -180px;
+  width: 420px;
+  height: 420px;
+}
+
+.home-course-motion-orb--two {
+  bottom: 4%;
+  inset-inline-start: -220px;
+  width: 520px;
+  height: 520px;
+}
+
+.split-heading {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   align-items: end;
@@ -240,58 +513,63 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   margin-bottom: 38px;
 }
 
-.home-v2-courses h2 {
-  margin: 13px 0 0;
-  font: 900 clamp(37px, 4.1vw, 58px) / 1.18 var(--home-v2-heading);
+.home-course-showcase h2 {
+  margin: 14px 0 0;
+  font: 900 clamp(38px, 4.1vw, 58px) / 1.18 var(--heading);
 }
 
-.home-v2-courses h2 em {
-  color: var(--home-v2-blue);
+.home-course-showcase h2 em {
+  color: var(--teal);
   font-style: normal;
 }
 
-.home-v2-courses__heading > p,
-.home-v2-courses__panel p,
-.home-v2-courses__message p,
-.home-v2-courses__empty p {
+.split-heading > p,
+.home-course-picker p,
+.home-course-empty p,
+.home-course-message p {
   margin: 0;
   color: var(--home-v2-muted);
   line-height: 1.9;
 }
 
-.home-v2-courses__panel {
-  display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
-  gap: 36px;
-  padding: clamp(24px, 4vw, 46px);
-  border: 1px solid var(--home-v2-line);
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 25px 65px -56px #06114799;
+.home-course-picker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 32px;
+  padding: 24px 28px;
+  border: 1px solid var(--line);
+  background: #edf4f1;
 }
 
-.home-v2-courses__panel > div:first-child > span,
-.home-v2-courses__result-head span,
-.home-v2-courses__message > span,
-.home-v2-courses__empty b,
-.home-v2-courses__card-content > span {
-  color: var(--home-v2-blue);
-  font-size: 12px;
+.home-course-picker > div:first-child {
+  min-width: 270px;
+}
+
+.home-course-picker > div:first-child > span,
+.home-course-result-head span,
+.home-course-message > span,
+.home-course-empty > div > span,
+.teacher {
+  color: var(--coral);
+  font-size: 11px;
   font-weight: 900;
 }
 
-.home-v2-courses h3 {
-  margin: 8px 0;
-  font: 900 clamp(25px, 3vw, 37px) / 1.3 var(--home-v2-heading);
+.home-course-picker h3 {
+  margin: 5px 0 3px;
+  font: 900 20px/1.4 var(--heading);
 }
 
-.home-v2-courses__stages {
+.home-course-audiences {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  width: min(100%, 590px);
+  grid-template-columns: repeat(3, minmax(132px, 1fr));
+  gap: 8px;
 }
 
-.home-v2-courses__stages button {
+.home-course-audiences button {
   display: grid;
   min-height: 74px;
   grid-template-columns: 48px minmax(0, 1fr);
@@ -299,266 +577,501 @@ const selectTab = async (tabKey: HomeCourseTabKey) => {
   align-items: center;
   gap: 2px 12px;
   padding: 7px;
-  border: 1px solid var(--home-v2-line);
-  border-radius: 8px;
-  background: var(--home-v2-cream);
-  color: var(--home-v2-ink);
+  border: 1px solid #12313929;
+  background: #fff;
+  color: #61777c;
   cursor: pointer;
   text-align: right;
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease, transform 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease,
+    background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.home-v2-courses__stages button:hover {
-  border-color: var(--home-v2-blue);
-  transform: translateY(-3px);
+.home-course-audiences button:hover {
+  border-color: var(--teal);
+  color: var(--ink);
+  box-shadow: 0 12px 24px -20px #12313999;
+  transform: translateY(-2px);
 }
 
-.home-v2-courses__stages button.is-active {
-  border-color: var(--home-v2-deep);
-  background: var(--home-v2-deep);
+.home-course-audiences button:focus-visible,
+.course-card:focus-visible,
+.all-courses:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--coral) 65%, transparent);
+  outline-offset: 4px;
+}
+
+.home-course-audiences button.active {
+  border-color: var(--deep);
+  background: var(--deep);
   color: #fff;
-  box-shadow: inset 0 -3px var(--home-v2-coral);
+  box-shadow: inset 0 -3px var(--coral), 0 14px 26px -22px var(--deep);
 }
 
-.home-v2-courses__stages b {
+.stage-option-index {
   display: grid;
   width: 48px;
   height: 48px;
   grid-row: 1 / 3;
   place-items: center;
-  border: 1px solid var(--home-v2-line);
-  background: var(--home-v2-paper);
-  color: var(--home-v2-blue);
-  font: 900 13px var(--home-v2-heading);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--teal);
+  font: 900 13px var(--heading);
+  transition: inherit;
 }
 
-.home-v2-courses__stages button.is-active b {
+.home-course-audiences button.active .stage-option-index {
   border-color: #ffffff47;
   background: #ffffff24;
   color: #fff;
 }
 
-.home-v2-courses__stages span {
-  font: 800 18px/1.45 var(--home-v2-heading);
+.stage-option-label {
+  font: 800 16px/1.4 var(--heading);
 }
 
-.home-v2-courses__stages small {
+.home-course-audiences small {
   color: var(--home-v2-muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
 }
 
-.home-v2-courses__stages button.is-active small {
+.home-course-audiences button.active small {
   color: #ffffffb8;
 }
 
-.home-v2-courses__results {
-  margin-top: 24px;
+.home-course-result {
+  min-height: 180px;
 }
 
-.home-v2-courses__empty,
-.home-v2-courses__message {
+.home-course-result .course-grid {
+  perspective: 1200px;
+}
+
+.home-course-empty,
+.home-course-message {
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  border: 1px dashed color-mix(in srgb, var(--teal) 38%, transparent);
+  background: linear-gradient(135deg, #e8f2ef, #f8fbfa);
+}
+
+.home-course-empty {
   display: grid;
-  min-height: 190px;
-  align-content: center;
-  gap: 8px;
-  padding: clamp(26px, 4vw, 42px);
-  border: 1px dashed color-mix(in srgb, var(--home-v2-blue) 40%, transparent);
-  border-radius: 14px;
-  background: linear-gradient(135deg, #eef5ff, #fbfcff);
-}
-
-.home-v2-courses__empty {
-  grid-template-columns: auto minmax(0, 620px);
+  grid-template-columns: auto minmax(0, 560px) auto;
+  place-content: center;
   align-items: center;
-  gap: 22px;
+  gap: 28px;
+  padding: 34px;
 }
 
-.home-v2-courses__empty > span {
+.home-course-empty::before,
+.home-course-message::before {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 6px;
+  background: var(--coral);
+  content: "";
+}
+
+.home-course-empty-step {
   display: grid;
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   place-items: center;
-  border: 1px solid var(--home-v2-line);
+  border: 1px solid var(--line);
   background: #fff;
-  color: var(--home-v2-deep);
-  font: 900 14px var(--home-v2-heading);
+  color: var(--deep);
+  box-shadow: 0 18px 34px -28px #12313999;
+  font: 900 14px var(--heading);
 }
 
-.home-v2-courses__empty h3,
-.home-v2-courses__message h3 {
-  margin: 2px 0;
-  font-size: clamp(22px, 3vw, 31px);
+.home-course-empty h3,
+.home-course-message h3 {
+  margin: 4px 0;
+  font: 900 clamp(22px, 3vw, 31px) / 1.3 var(--heading);
 }
 
-.home-v2-courses__result-head {
+.home-course-empty-arrow {
+  color: var(--coral);
+  font-size: 34px;
+  font-weight: 900;
+  animation: home-course-nudge 1.7s ease-in-out infinite;
+}
+
+.home-course-result-head {
   display: flex;
   align-items: end;
   justify-content: space-between;
   gap: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.home-v2-courses__result-head h3 {
+.home-course-result-head h3 {
   margin: 3px 0 0;
+  font: 900 clamp(24px, 3vw, 34px) / 1.3 var(--heading);
 }
 
-.home-v2-courses__result-head > b {
-  flex: 0 0 auto;
-  padding: 5px 10px;
-  border: 1px solid var(--home-v2-line);
-  border-radius: 999px;
-  color: var(--home-v2-blue);
+.home-course-result-head > b {
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  color: var(--teal);
   font-size: 12px;
 }
 
-.home-v2-courses__message {
-  position: relative;
-  overflow: hidden;
+.home-course-message {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  padding: clamp(28px, 4vw, 42px);
 }
 
-.home-v2-courses__message button {
+.home-course-message button {
   width: max-content;
   min-height: 42px;
   margin-top: 8px;
-  padding: 0 16px;
+  padding: 0 17px;
   border: 0;
-  border-radius: 5px;
-  background: var(--home-v2-blue);
+  background: var(--deep);
   color: #fff;
   cursor: pointer;
   font-weight: 800;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.home-v2-courses__grid {
+.home-course-message button:hover {
+  background: var(--teal);
+  transform: translateY(-2px);
+}
+
+.course-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 22px;
 }
 
-.home-v2-courses__card {
+.course-card {
   display: flex;
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--home-v2-line);
-  border-radius: 12px;
+  border: 1px solid var(--line);
   background: #fff;
-  color: var(--home-v2-ink);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  color: var(--ink);
+  box-shadow: 0 10px 28px -30px #12313966;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  will-change: transform;
+  transition: border-color 0.25s ease, transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.home-v2-courses__card:hover {
-  border-color: var(--home-v2-blue);
-  box-shadow: 0 18px 32px -26px #06114773;
-  transform: translateY(-4px);
+.course-card:hover {
+  border-color: color-mix(in srgb, var(--teal) 55%, var(--line));
+  box-shadow: 0 24px 54px -34px #12313980;
+  transform: translateY(-8px);
 }
 
-.home-v2-courses__image {
-  display: grid;
-  aspect-ratio: 1.85;
-  place-items: center;
+.course-cover {
+  position: relative;
+  height: 226px;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--home-v2-blue-light), #f4f8ff);
-  color: var(--home-v2-blue);
-  font-size: 34px;
+  padding: 20px;
+  background: #d8e9e5;
+  transform: translateZ(1px);
 }
 
-.home-v2-courses__image :deep(img) {
+.course-cover::before {
+  position: absolute;
+  bottom: -90px;
+  left: -50px;
+  width: 230px;
+  height: 230px;
+  border: 1px solid #1231392b;
+  border-radius: 50%;
+  content: "";
+  transition: transform 0.45s ease;
+}
+
+.course-card:hover .course-cover::before {
+  transform: scale(1.08) translate(5px, -4px);
+}
+
+.course-card.violet .course-cover {
+  background: #dcd8ed;
+}
+
+.course-card.sky .course-cover {
+  background: #bcdadc;
+}
+
+.course-card.deep .course-cover {
+  background: var(--deep);
+  color: #fff;
+}
+
+.course-cover.has-image {
+  padding: 0;
+  background: #d8e9e5;
+}
+
+.course-cover.has-image::before {
+  z-index: 1;
+  border-color: #ffffff52;
+}
+
+.course-cover :deep(img) {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
-.home-v2-courses__card-content {
-  display: flex;
-  min-height: 176px;
-  flex-direction: column;
-  padding: 18px;
+.course-card:hover .course-cover :deep(img) {
+  transform: scale(1.045);
 }
 
-.home-v2-courses__card-content h3 {
-  display: -webkit-box;
-  margin: 8px 0 7px;
-  overflow: hidden;
-  font-size: 18px;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+.course-code {
+  font: 800 10px var(--heading);
+  letter-spacing: 0.15em;
 }
 
-.home-v2-courses__card-content p {
-  display: -webkit-box;
-  margin: 0;
-  overflow: hidden;
-  color: var(--home-v2-muted);
-  font-size: 13px;
-  line-height: 1.75;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+.course-index {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  font: 700 11px var(--heading);
 }
 
-.home-v2-courses__card-content > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--home-v2-line);
-  color: var(--home-v2-muted);
+.course-mark {
+  position: absolute;
+  right: 26px;
+  bottom: -25px;
+  opacity: 0.16;
+  font: 900 152px/1 var(--heading);
+  transition: opacity 0.25s ease, transform 0.35s ease;
 }
 
-.home-v2-courses__card-content small {
-  font-size: 12px;
+.course-card:hover .course-mark {
+  opacity: 0.22;
+  transform: translateY(-4px);
 }
 
-.home-v2-courses__card-content > div b {
-  color: var(--home-v2-deep);
-  font: 900 13px var(--home-v2-heading);
-}
-
-.home-v2-courses__link {
-  display: inline-flex;
-  gap: 9px;
-  margin-top: 25px;
-  color: var(--home-v2-blue);
+.level-pill {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  padding: 7px 11px;
+  background: #ffffffe0;
+  color: var(--ink);
+  font-size: 10px;
   font-weight: 800;
 }
 
-@media (max-width: 820px) {
-  .home-v2-courses__heading,
-  .home-v2-courses__panel {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
+.course-content {
+  display: flex;
+  min-height: 225px;
+  flex: 1;
+  flex-direction: column;
+  padding: 25px;
+}
 
-  .home-v2-courses__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.course-content h3 {
+  display: -webkit-box;
+  margin: 7px 0 10px;
+  overflow: hidden;
+  font: 800 21px/1.35 var(--heading);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.course-content p {
+  display: -webkit-box;
+  min-height: 68px;
+  margin: 0;
+  overflow: hidden;
+  color: #6b7e82;
+  font-size: 13px;
+  line-height: 1.75;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.course-footer {
+  display: grid;
+  grid-template-columns: 1fr auto 38px;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.course-footer > b {
+  color: var(--deep);
+  font: 900 13px var(--heading);
+}
+
+.course-arrow {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  background: var(--ink);
+  color: #fff;
+  font-size: 18px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.course-card:hover .course-arrow {
+  background: var(--coral);
+  transform: translateX(-2px);
+}
+
+.all-courses {
+  display: flex;
+  width: max-content;
+  gap: 18px;
+  margin: 36px auto 0;
+  padding-bottom: 7px;
+  border-bottom: 1px solid;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+
+.all-courses:hover {
+  gap: 23px;
+  color: var(--coral);
+}
+
+@keyframes home-course-swap {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (max-width: 570px) {
-  .home-v2-courses__stages,
-  .home-v2-courses__grid {
+@keyframes home-course-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@media (max-width: 820px) {
+  .split-heading {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
 
-  .home-v2-courses__stages button {
-    min-height: 92px;
+  .home-course-picker {
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .home-v2-courses__empty {
-    grid-template-columns: 1fr;
+  .home-course-picker > div:first-child,
+  .home-course-audiences {
+    width: 100%;
+    min-width: 0;
   }
 
-  .home-v2-courses__empty > span {
+  .course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-course-empty {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .home-course-empty-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .home-course-picker {
+    padding: 20px;
+  }
+
+  .home-course-audiences {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-course-audiences button {
+    display: flex;
+    min-height: 58px;
+    justify-content: center;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .stage-option-index,
+  .home-course-audiences small {
     display: none;
   }
 
-  .home-v2-courses__result-head {
+  .stage-option-label {
+    font-size: 13px;
+  }
+
+  .course-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-course-result-head {
     align-items: start;
     flex-direction: column;
+  }
+
+  .home-course-empty {
+    grid-template-columns: 1fr;
+    padding: 26px;
+  }
+
+  .home-course-empty-step {
+    display: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .home-course-audiences {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-course-result .course-grid,
+  .home-course-empty-arrow {
+    animation: none;
+  }
+
+  .course-card,
+  .course-cover :deep(img),
+  .course-mark,
+  .course-arrow,
+  .home-course-audiences button {
+    transition: none;
+  }
+
+  .course-card {
+    will-change: auto;
+  }
+
+  .home-course-motion {
+    display: none;
   }
 }
 </style>

@@ -1,17 +1,25 @@
 import { storeToRefs } from 'pinia'
-import { HomePageApi, normalizeHomeDataError, resolveHomeWebDomain } from '../api/homePageApi'
-import { createEmptyHomePageViewModel, mapHomeCourseList, mapHomePage, mapHomeSite } from '../mappers/homePageMapper'
+import { getWebDomain } from '~/constant/webDomain'
+import { HomePageApi, normalizeHomeDataError } from '../api/homePageApi'
+import {
+  createEmptyHomePageViewModel,
+  mapHomeAboutTeacherMock,
+  mapHomeCourseList,
+  mapHomeLearningJourneyMock,
+  mapHomePage,
+  mapHomeSite,
+} from '../mappers/homePageMapper'
 import type { HomeCourseViewModel, HomePageViewModel } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
 
 export const useHomePage = () => {
   const settingsStore = useSettingStore()
   const { setting } = storeToRefs(settingsStore)
-  const requestUrl = useRequestURL()
-  const api = new HomePageApi(resolveHomeWebDomain(requestUrl.hostname))
+  const webDomain = getWebDomain()
+  const api = new HomePageApi(webDomain)
 
   const { data, pending, error, refresh } = useAsyncData<HomePageViewModel>(
-    'home-v2-data',
+    `home-v2-data:learning-mock-v1:${webDomain}`,
     async () => mapHomePage(await api.load(), setting.value),
     {
       default: createEmptyHomePageViewModel,
@@ -21,10 +29,23 @@ export const useHomePage = () => {
 
   const home = computed<HomePageViewModel>(() => {
     const currentHome = data.value ?? createEmptyHomePageViewModel()
+    const site = mapHomeSite(setting.value)
 
     return {
       ...currentHome,
-      site: mapHomeSite(setting.value),
+      site,
+      // Temporarily force the backend-shaped mock until the API resource is ready.
+      learningJourney: {
+        data: mapHomeLearningJourneyMock(site),
+        status: 'empty',
+      },
+      aboutTeacher:
+        currentHome.aboutTeacher.status === 'empty'
+          ? {
+              data: mapHomeAboutTeacherMock(site),
+              status: 'empty',
+            }
+          : currentHome.aboutTeacher,
     }
   })
 

@@ -1,0 +1,58 @@
+import type { HomeBlogViewModel } from '../models/HomePageViewModel'
+
+export const homeBlogsMock: HomeBlogViewModel[] = [
+  {
+    id: 9001,
+    title: 'إزاي تذاكر الفيزياء بذكاء؟',
+    subtitle: 'خطة عملية للمذاكرة بدون تضييع وقت',
+    description: 'خطوات بسيطة تساعدك تفهم الدرس، ترتب قوانينك، وتراجع بطريقة تثبّت المعلومة.',
+    date: '2026-07-28',
+    route: '/blog-v2/study-physics-smart',
+    image: { src: '/images/handwritting.png', alt: 'طالب يكتب ملاحظات الفيزياء' },
+  },
+  {
+    id: 9002,
+    title: 'الفهم ولا الحفظ في الفيزياء؟',
+    subtitle: 'اعرف إمتى تستخدم كل طريقة',
+    description: 'ليه فهم الفكرة هو البداية، وإزاي تحفظ القوانين بعد ما تعرف معناها واستخدامها.',
+    date: '2026-07-24',
+    route: '/blog-v2/understanding-vs-memorizing',
+    image: { src: '/images/vides.png', alt: 'شرح تعليمي منظم' },
+  },
+  {
+    id: 9003,
+    title: 'خمس خطوات لحل أي مسألة',
+    subtitle: 'من قراءة السؤال لحد مراجعة الإجابة',
+    description: 'طريقة ثابتة تحوّل المسألة الكبيرة إلى أجزاء صغيرة وتقلل أخطاء الحل والحسابات.',
+    date: '2026-07-20',
+    route: '/blog-v2/solve-problem-five-steps',
+    image: { src: '/images/person1.png', alt: 'طالبة تراجع خطوات الحل' },
+  },
+  {
+    id: 9004,
+    title: 'كيف تتعامل مع قوانين الفيزياء؟',
+    subtitle: 'رتّب القوانين واربطها ببعض',
+    description: 'تعرف على أفضل طريقة لكتابة القوانين، فهم الوحدات، واختيار القانون المناسب للسؤال.',
+    date: '2026-07-16',
+    route: '/blog-v2/organize-physics-laws',
+    image: { src: '/images/person2.png', alt: 'طالب يتعلم قوانين الفيزياء' },
+  },
+  {
+    id: 9005,
+    title: 'المراجعة قبل الامتحان',
+    subtitle: 'خطة هادئة لأفضل استغلال للوقت',
+    description: 'قسّم وقتك بين القوانين والأفكار والأسئلة، وادخل الامتحان بخطة واضحة وثقة أكبر.',
+    date: '2026-07-12',
+    route: '/blog-v2/revision-before-exam',
+    image: { src: '/images/person3.jpg', alt: 'مراجعة الفيزياء قبل الامتحان' },
+  },
+  {
+    id: 9006,
+    title: 'أخطاء شائعة في حل المسائل',
+    subtitle: 'لاحظها وتجنبها من أول تدريب',
+    description: 'إشارات الوحدات والتحويل والتعويض من أكثر أسباب الخطأ؛ إليك طريقة عملية لمراجعتها.',
+    date: '2026-07-08',
+    route: '/blog-v2/common-problem-mistakes',
+    image: { src: '/images/person4.jpg', alt: 'طالب يراجع أخطاء حل المسائل' },
+  },
+]

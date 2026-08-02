@@ -10,13 +10,13 @@ import HomeAppSection from "./sections/HomeAppSection.vue";
 import HomeBlogSection from "./sections/HomeBlogSection.vue";
 import HomeCoursesSection from "./sections/HomeCoursesSection.vue";
 import HomeCtaSection from "./sections/HomeCtaSection.vue";
-import HomeExperienceSection from "./sections/HomeExperienceSection.vue";
+import HomeLearningJourneySection from "./sections/HomeLearningJourneySection.vue";
 import HomeFaqSection from "./sections/HomeFaqSection.vue";
 import HomeFooterSection from "./sections/HomeFooterSection.vue";
 import HomeHeaderSection from "./sections/HomeHeaderSection.vue";
 import HomeHeroSection from "./sections/HomeHeroSection.vue";
 import HomeNotesSection from "./sections/HomeNotesSection.vue";
-import HomeStorySection from "./sections/HomeStorySection.vue";
+import HomeAboutTeacherSection from "./sections/HomeAboutTeacherSection.vue";
 
 const props = defineProps<{
   home: HomePageViewModel;
@@ -48,8 +48,8 @@ const props = defineProps<{
       />
       <HomeNotesSection />
       <HomeBlogSection :blogs="props.home.blogs" />
-      <HomeExperienceSection />
-      <HomeStorySection />
+      <HomeLearningJourneySection :journey="props.home.learningJourney" />
+      <HomeAboutTeacherSection :about="props.home.aboutTeacher" />
       <HomeAppSection :site="props.home.site" />
       <HomeFaqSection />
       <HomeCtaSection />
