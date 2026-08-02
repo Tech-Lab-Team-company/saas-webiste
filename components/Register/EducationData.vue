@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-import student from "../../public/icons/student.vue";
-import RegisterBook from "../../public/icons/RegisterBook.vue";
-import RegisterBookOne from "../../public/icons/RegisterBookOne.vue";
-import Award from "../../public/icons/Award.vue";
 import LeftArrowIcon from "~/public/icons/LeftArrowIcon.vue";
 import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 import EducationStagesController from "~/features/FetchEducationStages/presentation/controllers/education_stages_controller";
@@ -205,8 +201,9 @@ const SendBasicData = async()=>{
       </p>
 
       <div class="inputs">
+        <label class="auth-field-label" for="education-account-type">نوع الدراسة</label>
         <div class="login-input">
-           <select class="student-select" 
+           <select id="education-account-type" class="student-select"
            disabled
           :value="userStore.user?.category_id == 1 ? StudentCategoryEnum.base : userStore.user?.category_id == 2 ? StudentCategoryEnum.university : StudentCategoryEnum.general"
           >
@@ -214,32 +211,30 @@ const SendBasicData = async()=>{
             <option :value="StudentCategoryEnum.university">جامعى</option>
             <option :value="StudentCategoryEnum.general">عام</option>
           </select>
-          <Award class="login-call-icon" />
         </div>
       </div>
 
 
       <div class="inputs" v-if="userStore.user?.category_id == 2">
+        <label class="auth-field-label" for="education-category">نوع التعليم</label>
         <div class="login-input">
-          <select class="student-select" v-model="EducationCategory" @change="FetchUniversityEducationLevel">
+          <select id="education-category" class="student-select" v-model="EducationCategory" @change="FetchUniversityEducationLevel">
             <option value="" disabled selected>نوع التعليم</option>
             <option v-for="(item, index) in Eductaion_Type" :key="index" :value="item.id">{{ item.title }}</option>
 
           </select>
-          <Award class="login-call-icon" />
         </div>
       </div>
 
 
       <div class="inputs" v-if="userStore.user?.category_id == 1">
+        <label class="auth-field-label" for="basic-education-category">نوع التعليم</label>
         <div class="login-input">
-          <label :class="{'select-placeholder': !BasicEducationCategory , 'hidden':BasicEducationCategory}">نوع التعليم</label>
-          <select class="student-select" v-model="BasicEducationCategory" @change="FetchEduciationLevels">
+          <select id="basic-education-category" class="student-select" v-model="BasicEducationCategory" @change="FetchEduciationLevels">
             <!-- <option value="" disabled selected>نوع التعليم</option> -->
             <option v-for="(item, index) in Eductaion_Type" :key="index" :value="item.id">{{ item.title }}</option>
 
           </select>
-          <Award class="login-call-icon" />
         </div>
       </div>
 
@@ -247,77 +242,74 @@ const SendBasicData = async()=>{
 
 
       <div class="inputs" v-if=" userStore.user?.category_id == 2">
+        <label class="auth-field-label" for="education-university">الجامعة</label>
         <div class="login-input">
-          <select class="student-select" @change="FetchColleges">
+          <select id="education-university" class="student-select" @change="FetchColleges">
             <option value="" disabled selected>جامعة</option>
             <option v-for="(item, index) in University" :key="index" :value="item.id">{{ item.title }}</option>
 
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
       <div class="inputs" v-if=" userStore.user?.category_id == 2">
+        <label class="auth-field-label" for="education-college">الكلية</label>
         <div class="login-input">
-          <select class="student-select" @change="FetchCollegesDeprtment">
+          <select id="education-college" class="student-select" @change="FetchCollegesDeprtment">
             <option value="" disabled selected>الكلية</option>
             <option v-for="(item, index) in Colleges" :key="index" :value="item.id">{{ item.title }}</option>
 
 
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
       <div class="inputs" v-if=" userStore.user?.category_id == 2">
+        <label class="auth-field-label" for="education-department">القسم</label>
         <div class="login-input">
-          <select class="student-select" @change="FetchCollegesDeprtmentDivisions">
+          <select id="education-department" class="student-select" @change="FetchCollegesDeprtmentDivisions">
             <option value="" disabled selected>القسم</option>
             <option v-for="(item, index) in CollegeDeprtment" :key="index" :value="item.id">{{ item.title }}</option>
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
       <div class="inputs" v-if=" userStore.user?.category_id == 2">
+        <label class="auth-field-label" for="education-level">المستوى</label>
         <div class="login-input">
-          <select class="student-select">
+          <select id="education-level" class="student-select">
             <option value="" disabled selected>المستوى</option>
             <option v-for="(item, index) in CollegeDeprtmentDivision" :key="index" :value="item.id">{{ item.title }}
             </option>
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
 
 
 
       <div class="inputs" v-if=" userStore.user?.category_id == 1 && BasicEducationCategory">
+        <label class="auth-field-label" for="basic-education-level">المرحلة</label>
         <div class="login-input">
-          <label :class="{'select-placeholder': !selectedLevel , 'hidden':selectedLevel}">المرحلة</label>
-          <select class="student-select" v-model="selectedLevel" @change="FetchStage">
+          <select id="basic-education-level" class="student-select" v-model="selectedLevel" @change="FetchStage">
             <option v-for="(item, index) in Levels" :key="index" :value="item.id">{{ item.title }}
             </option>
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
 
       <div class="inputs" v-if=" userStore.user?.category_id == 1 && selectedLevel">
+        <label class="auth-field-label" for="basic-education-stage">الصف</label>
         <div class="login-input">
-          <label :class="{'select-placeholder': !selectedStage , 'hidden':selectedStage}">الصف</label>
-          <select class="student-select" v-model="selectedStage" @change="FetchSubjects">
+          <select id="basic-education-stage" class="student-select" v-model="selectedStage" @change="FetchSubjects">
             <option v-for="(item, index) in Stages" :key="index" :value="item.id">{{ item.title }}
             </option>
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
       <div class="inputs" v-if=" userStore.user?.category_id == 1 && selectedStage">
+        <label class="auth-field-label" for="basic-education-subject">المادة</label>
         <div class="login-input">
-          <label :class="{'select-placeholder': !selectedBasicSubject , 'hidden':selectedBasicSubject}">المادة</label>
-          <select class="student-select" v-model="selectedBasicSubject" >
+          <select id="basic-education-subject" class="student-select" v-model="selectedBasicSubject" >
             <option v-for="(item, index) in BasicSubjects" :key="index" :value="item.id">{{ item.title }}
             </option>
           </select>
-          <RegisterBook class="login-call-icon" />
         </div>
       </div>
 

@@ -1,8 +1,5 @@
     
 <script lang="ts" setup>
-import callIcon from '../../public/icons/callIcon.vue';
-
-
 import SentCodeController from '~/features/ResetPasswordFeature/presentation/controllers/sent_code_controller';
 import SentCodeParams from '~/features/ResetPasswordFeature/Core/Params/sent_code_params';
 import countries from "~/data/countries.json";
@@ -46,23 +43,20 @@ const sendotp =()=>{
         <p>{{ $t('ادخل البريد الالكترونى الذى سوف نرسل اليك كود استرجاع كلمه المرور عليه') }}</p>
 
         <div class="inputs inputs-pass forgit-pass">
+            <label class="auth-field-label" for="reset-phone">{{ $t('رقم الهاتف') }}</label>
             <div class="phone">
                 <div class="login-input">
-                    <input type="text" placeholder="رقم الهاتف" v-model="phoneNumber">
-                    <callIcon class="login-call-icon"/>
+                    <input id="reset-phone" type="text" v-model="phoneNumber">
                 </div>
                 <div class="phone-code" v-if="UserSettingStore?.setting?.country_code_required">
 
                     <Select :defaultValue="{ dial_code: `${UserSettingStore?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
-                    placeholder="Select a Country" class="w-full md:w-56">
+                    class="w-full md:w-56">
 
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex items-center">
                         <div>{{ slotProps.value.dial_code }} {{ slotProps.value.flag }}</div>
                         </div>
-                        <span v-else>
-                        {{ slotProps.placeholder }}
-                        </span>
                     </template>
 
                     <template #option="slotProps">

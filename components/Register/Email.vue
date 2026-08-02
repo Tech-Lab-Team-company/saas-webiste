@@ -1,13 +1,4 @@
 <script lang="ts" setup>
-import callIcon from "../../public/icons/callIcon.vue";
-import MapIcon from "../../public/icons/map.vue";
-import city from "../../public/icons/city.vue";
-import national from "../../public/icons/national.vue";
-import student from "../../public/icons/student.vue";
-import LockIcon from "../../public/icons/LockIcon.vue";
-import sms from "../../public/icons/sms.vue";
-import eyeone from "../../public/icons/eyeone.vue";
-import userEdit from "../../public/icons/userEdit.vue";
 import { ref } from "vue";
 
 const showPassword = ref(false);
@@ -35,21 +26,19 @@ const validatePassword = () => {
       <h3>هذا البريد مسجل من قبل</h3>
       <p>ادخل كلمه المرور الخاصه بك لاستكمال عمليه تسجيل الدخول</p>
 
-      <div class="login-input password-container">
-        <LockIcon class="login-call-icon lock-icon" />
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          placeholder="كلمه المرور"
-          v-model="password"
-          @input="validatePassword"
-        />
-        <eyeone
-          class="login-call-aicon eye-icon"
-          @click="showPassword = !showPassword"
-        />
-      </div>
-      <div class="error-message" v-if="passwordError">
-        {{ passwordError }}
+      <div class="auth-field-group">
+        <label class="auth-field-label" for="existing-email-password">كلمة المرور</label>
+        <div class="login-input password-container">
+          <input
+            id="existing-email-password"
+            :type="showPassword ? 'text' : 'password'"
+            v-model="password"
+            @input="validatePassword"
+          />
+        </div>
+        <div class="error-message" v-if="passwordError">
+          {{ passwordError }}
+        </div>
       </div>
 
       <div class="btns btns-home">

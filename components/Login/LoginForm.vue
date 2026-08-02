@@ -35,11 +35,11 @@ const login = async () => {
     <p class="mb-4">{{ $t("Login_to_access_your_account") }}</p>
     <div class="input-wrapper">
       <label class="input-label" for="email">{{ $t('Email') }}</label>
-      <input class="input" type="email" id="email" v-model="email" placeholder="Enter your email" />
+      <input class="input" type="email" id="email" v-model="email" />
     </div>
     <div class="input-wrapper">
       <label class="input-label" for="password">{{ $t('Password') }}</label>
-      <input class="input" type="password" id="password" v-model="password" placeholder="Enter your password" />
+      <input class="input" type="password" id="password" v-model="password" />
     </div>
     <div class="flex justify-between items-center mb-8">
       <div class="check-box">

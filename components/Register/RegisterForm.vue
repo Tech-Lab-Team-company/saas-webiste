@@ -1,13 +1,7 @@
 <script lang="ts" setup>
-import callIcon from "../../public/icons/callIcon.vue";
 // import MapIcon from "../../public/icons/map.vue";
 // import city from "../../public/icons/city.vue";
 // import national from "../../public/icons/national.vue";
-import student from "../../public/icons/student.vue";
-import LockIcon from "../../public/icons/LockIcon.vue";
-import sms from "../../public/icons/sms.vue";
-import eyeone from "../../public/icons/eyeone.vue";
-import userEdit from "../../public/icons/userEdit.vue";
 import { ref } from "vue";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import RegisterController from "~/features/RegisterFeature/presentation/controllers/register_controller";
@@ -148,99 +142,111 @@ const settingStore = useSettingStore();
       </p>
 
       <div class="inputs">
-        <div class="login-input">
-          <input type="text" placeholder="الاسم الاول * " v-model="FirstName" />
-          <userEdit class="login-call-icon" />
-        </div>
-        <div class="login-input" v-if="settingStore?.setting?.allow_parent_name">
-          <input type="text" placeholder="اسم ولي الامر * " v-model="SecondName" />
-          <userEdit class="login-call-icon" />
-        </div>
-        <div class="login-input" v-if="settingStore?.setting?.address_required">
-          <input type="text" placeholder="العنوان * " v-model="StudentAddress" />
-          <sms class="login-call-icon" />
-        </div>
-        <div class="login-input" v-if="settingStore?.setting?.email_required">
-          <input type="email" placeholder="البريد الالكترونى * " v-model="Email" />
-          <sms class="login-call-icon" />
-        </div>
-
-
-        <div class="login-input login-input-phone-code">
-          <div class="phone-number">
-            <input type="tel" placeholder="رقم الهاتف" v-model="FirstphoneNumber" />
-            <callIcon class="login-call-icon" />
-          </div>
-          <div class="phone-code" v-if="settingStore?.setting?.country_code_required">
-
-            <Select :defaultValue="{ dial_code: `${UserSetting?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
-              placeholder="Select a Country" class="w-full md:w-56">
-
-              <template #value="slotProps">
-                <div v-if="slotProps.value" class="flex items-center">
-                  <div>{{ slotProps.value.dial_code }} {{ slotProps.value.flag }}</div>
-                </div>
-                <span v-else>
-                  {{ slotProps.placeholder }}
-                </span>
-              </template>
-
-              <template #option="slotProps">
-                <div class="flex items-center "  >
-                  <span>{{ slotProps.option.flag }}</span>
-                  <span>{{ slotProps.option.name }}</span>
-                  <div>({{ slotProps.option.dial_code }})</div>
-                </div>
-              </template>
-
-            </Select>
+        <div class="auth-field-group">
+          <label class="auth-field-label" for="register-first-name">الاسم الأول *</label>
+          <div class="login-input">
+            <input id="register-first-name" type="text" v-model="FirstName" />
           </div>
         </div>
 
-
-        <div class="login-input" v-if="settingStore?.setting?.allow_parent_phone">
-          <input type="tel" placeholder=" رقم هاتف ولي الامر" v-model="SecondphoneNumber" />
-          <callIcon class="login-call-icon" />
+        <div class="auth-field-group" v-if="settingStore?.setting?.allow_parent_name">
+          <label class="auth-field-label" for="register-parent-name">اسم ولي الأمر *</label>
+          <div class="login-input">
+            <input id="register-parent-name" type="text" v-model="SecondName" />
+          </div>
         </div>
 
-        <div class="login-input">
-          <label :class="{ 'select-placeholder': !studentType, 'hidden': studentType }">نوع الطالب</label>
-          <select class="student-select" v-model="studentType" required>
-            <option :value="GenderEnum?.male">ذكر</option>
-            <option :value="GenderEnum?.female">انثى</option>
-          </select>
-          <student class="login-call-icon" />
-        </div>
-        <div class="login-input">
-          <label :class="{ 'select-placeholder': !Education_Type, 'hidden': Education_Type }">نوع التعليم</label>
-          <select class="student-select" v-model="Education_Type" required>
-            <option v-if="settingStore?.setting?.categories.includes(1)" :value="StudentCategoryEnum.base">اساسى
-            </option>
-            <option v-if="settingStore?.setting?.categories.includes(2)" :value="StudentCategoryEnum.university">جامعى
-            </option>
-            <option v-if="settingStore?.setting?.has_general" :value="StudentCategoryEnum.general">عام</option>
-          </select>
-          <student class="login-call-icon" />
+        <div class="auth-field-group" v-if="settingStore?.setting?.address_required">
+          <label class="auth-field-label" for="register-address">العنوان *</label>
+          <div class="login-input">
+            <input id="register-address" type="text" v-model="StudentAddress" />
+          </div>
         </div>
 
-        <div class="login-input password-container">
-          <LockIcon class="login-call-icon lock-icon" />
-          <input :type="showPassword ? 'text' : 'password'" placeholder="كلمه المرور" v-model="password"
-            @input="validatePassword" />
-          <eyeone class="login-call-aicon eye-icon" @click="showPassword = !showPassword" />
-        </div>
-        <div class="error-message" v-if="passwordError">
-          {{ passwordError }}
+        <div class="auth-field-group" v-if="settingStore?.setting?.email_required">
+          <label class="auth-field-label" for="register-email">البريد الإلكتروني *</label>
+          <div class="login-input">
+            <input id="register-email" type="email" v-model="Email" />
+          </div>
         </div>
 
-        <div class="login-input password-container">
-          <LockIcon class="login-call-icon lock-icon" />
-          <input :type="showConfirmPassword ? 'text' : 'password'" placeholder="تأكيد كلمه المرور * "
-            v-model="confirmPassword" @input="validatePassword" />
-          <eyeone class="login-call-aicon eye-icon" @click="showConfirmPassword = !showConfirmPassword" />
+        <div class="auth-field-group">
+          <label class="auth-field-label" for="register-phone">رقم الهاتف</label>
+          <div class="login-input login-input-phone-code">
+            <div class="phone-number">
+              <input id="register-phone" type="tel" v-model="FirstphoneNumber" />
+            </div>
+            <div class="phone-code" v-if="settingStore?.setting?.country_code_required">
+              <Select :defaultValue="{ dial_code: `${UserSetting?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
+                class="w-full md:w-56">
+                <template #value="slotProps">
+                  <div v-if="slotProps.value" class="flex items-center">
+                    <div>{{ slotProps.value.dial_code }} {{ slotProps.value.flag }}</div>
+                  </div>
+                </template>
+
+                <template #option="slotProps">
+                  <div class="flex items-center ">
+                    <span>{{ slotProps.option.flag }}</span>
+                    <span>{{ slotProps.option.name }}</span>
+                    <div>({{ slotProps.option.dial_code }})</div>
+                  </div>
+                </template>
+              </Select>
+            </div>
+          </div>
         </div>
-        <div class="error-message" v-if="confirmPasswordError">
-          {{ confirmPasswordError }}
+
+        <div class="auth-field-group" v-if="settingStore?.setting?.allow_parent_phone">
+          <label class="auth-field-label" for="register-parent-phone">رقم هاتف ولي الأمر</label>
+          <div class="login-input">
+            <input id="register-parent-phone" type="tel" v-model="SecondphoneNumber" />
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label class="auth-field-label" for="register-student-type">نوع الطالب</label>
+          <div class="login-input">
+            <select id="register-student-type" class="student-select" v-model="studentType" required>
+              <option :value="GenderEnum?.male">ذكر</option>
+              <option :value="GenderEnum?.female">انثى</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label class="auth-field-label" for="register-education-type">نوع التعليم</label>
+          <div class="login-input">
+            <select id="register-education-type" class="student-select" v-model="Education_Type" required>
+              <option v-if="settingStore?.setting?.categories.includes(1)" :value="StudentCategoryEnum.base">اساسى
+              </option>
+              <option v-if="settingStore?.setting?.categories.includes(2)" :value="StudentCategoryEnum.university">جامعى
+              </option>
+              <option v-if="settingStore?.setting?.has_general" :value="StudentCategoryEnum.general">عام</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label class="auth-field-label" for="register-password">كلمة المرور</label>
+          <div class="login-input password-container">
+            <input id="register-password" :type="showPassword ? 'text' : 'password'" v-model="password"
+              @input="validatePassword" />
+          </div>
+          <div class="error-message" v-if="passwordError">
+            {{ passwordError }}
+          </div>
+        </div>
+
+        <div class="auth-field-group">
+          <label class="auth-field-label" for="register-confirm-password">تأكيد كلمة المرور *</label>
+          <div class="login-input password-container">
+            <input id="register-confirm-password" :type="showConfirmPassword ? 'text' : 'password'"
+              v-model="confirmPassword" @input="validatePassword" />
+          </div>
+          <div class="error-message" v-if="confirmPasswordError">
+            {{ confirmPasswordError }}
+          </div>
         </div>
 
         <!-- <div class="login-input">
