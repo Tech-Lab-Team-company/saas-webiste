@@ -84,9 +84,18 @@ const uploadImage = async () => {
 
 <template>
   <div class="profile-sidebar-container">
+    <div class="profile-sidebar-brand">
+      <span class="profile-brand-mark">ES</span>
+      <div>
+        <strong>مساحة الطالب</strong>
+        <small>منصتك التعليمية</small>
+      </div>
+    </div>
+
     <div class="person-data">
       <div class="profile-image-container">
-        <img :src="imagePreview || ''" class="course-image" />
+        <img v-if="imagePreview" :src="imagePreview" class="course-image" alt="الصورة الشخصية" />
+        <img v-else src="/images/user.png" class="course-image" alt="الصورة الشخصية" />
         <label for="profile-image-input">
           <EditImageIcon class="edit-icon" />
         </label>
@@ -100,6 +109,7 @@ const uploadImage = async () => {
       </div>
       <p class="person-name">{{ userStore.user.name }}</p>
       <p class="person-stage">طالب ثانوي</p>
+      <span class="person-account-state">الحساب نشط</span>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
 
@@ -161,6 +171,13 @@ const uploadImage = async () => {
         <Logout class="profile-icon" />
       </li>
     </ul>
+
+    <div class="profile-sidebar-help">
+      <span>?</span>
+      <strong>محتاج مساعدة؟</strong>
+      <p>راجع الأسئلة الشائعة أو تواصل معنا.</p>
+      <NuxtLink to="/fqs">الأسئلة الشائعة</NuxtLink>
+    </div>
   </div>
 </template>
 

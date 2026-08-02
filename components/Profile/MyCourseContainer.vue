@@ -4,9 +4,30 @@
 </script>
 
 <template>
-    <div class="prfile-home">
-        <ProfileMyCourseCard class="courses-container aa" />
-        <ProfileSidebar />
+    <div class="prfile-home profile-dashboard">
+        <ProfileSidebar class="profile-dashboard-sidebar" />
+
+        <div class="profile-dashboard-workspace">
+            <header class="profile-dashboard-topbar">
+                <div class="profile-topbar-copy">
+                    <strong>مساحة الطالب</strong>
+                    <span>إدارة بيانات حسابك ومعلوماتك الدراسية</span>
+                </div>
+                <div class="profile-topbar-status"><span></span>كورساتي</div>
+            </header>
+
+            <main class="profile-dashboard-main">
+                <header class="profile-page-heading">
+                    <span>المحتوى التعليمي</span>
+                    <h1>كورساتي</h1>
+                    <p>تابع كورساتك ومحتواك الدراسي من مكان واحد.</p>
+                </header>
+
+                <section class="courses-container aa profile-section-card profile-courses-card">
+                    <ProfileMyCourseCard />
+                </section>
+            </main>
+        </div>
     </div>
 
 </template>

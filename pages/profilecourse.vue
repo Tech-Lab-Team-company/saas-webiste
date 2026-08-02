@@ -4,8 +4,9 @@ import ProfileSidebar from "~/components/Profile/ProfileSidebar.vue";
 </script>
 
 <template>
-  <div class="profile-page">
+  <div class="profile-page profile-redesign-page" dir="rtl">
     <ProfileMyCourseContainer />
   </div>
 </template>
-<style></style>
+
+<style lang="scss" src="~/assets/style/profile-redesign/profile.scss"></style>
