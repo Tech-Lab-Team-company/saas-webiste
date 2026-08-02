@@ -7,7 +7,10 @@ const props = defineProps<{
   blogs: HomeSectionState<HomeBlogViewModel[]>
 }>()
 
-const visibleBlogs = computed(() => props.blogs.data.slice(0, 6))
+const MAX_VISIBLE_BLOGS = 6
+const visibleBlogs = computed(() =>
+  props.blogs.data.slice(0, MAX_VISIBLE_BLOGS),
+)
 const blogSection = ref<HTMLElement | null>(null)
 const blogGrid = ref<HTMLElement | null>(null)
 const blogHasEntered = ref(false)

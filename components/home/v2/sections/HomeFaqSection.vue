@@ -66,7 +66,12 @@ const faqs = [
         <span class="home-v2-faq__intro-mark" aria-hidden="true">FAQ</span>
       </div>
       <div class="home-v2-faq__list">
-        <details v-for="(faq, index) in faqs" :key="faq.id" :open="index === 0">
+        <details
+          v-for="(faq, index) in faqs"
+          :key="faq.id"
+          name="home-v2-faq"
+          :open="index === 0"
+        >
           <summary>
             <span class="home-v2-faq__number" aria-hidden="true">
               {{ String(index + 1).padStart(2, "0") }}

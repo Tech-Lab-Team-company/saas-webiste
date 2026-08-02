@@ -59,21 +59,56 @@ const handleHeroImageError = (event: Event) => {
   }
 };
 
-const truncateText = (value: string, limit: number) => {
-  const normalizedValue = value.replace(/\s+/g, " ").trim();
+const HERO_TITLE_LIMIT = 100;
+const TYPEWRITER_PHRASE_LIMIT = 80;
 
-  return normalizedValue.length > limit
-    ? `${normalizedValue.slice(0, limit).trimEnd()}…`
-    : normalizedValue;
+const HERO_DESCRIPTION_LIMIT = 120;
+
+const normalizeText = (value: string) => value.replace(/\s+/g, " ").trim();
+
+const splitGraphemes = (value: string): string[] => {
+  if (typeof Intl !== "undefined" && "Segmenter" in Intl) {
+    const segmenter = new Intl.Segmenter("ar", { granularity: "grapheme" });
+    return Array.from(segmenter.segment(value), ({ segment }) => segment);
+  }
+
+  return Array.from(value);
 };
 
+const truncateText = (value: string, limit: number) => {
+  const normalizedValue = normalizeText(value);
+  const graphemes = splitGraphemes(normalizedValue);
+
+  if (graphemes.length <= limit) return normalizedValue;
+
+  const limitedValue = graphemes.slice(0, limit).join("").trimEnd();
+  const lastSpaceIndex = limitedValue.lastIndexOf(" ");
+  const wordBoundary = Math.floor(limitedValue.length * 0.65);
+  const safeValue =
+    lastSpaceIndex >= wordBoundary
+      ? limitedValue.slice(0, lastSpaceIndex).trimEnd()
+      : limitedValue;
+
+  return `${safeValue}…`;
+};
+
+const rawHeroSubtitle = computed(() =>
+  normalizeText(heroData.value?.subtitle || "وكمّل بثقة."),
+);
+const hasOversizedSubtitle = computed(
+  () => splitGraphemes(rawHeroSubtitle.value).length > TYPEWRITER_PHRASE_LIMIT,
+);
+
 const heroContent = computed(() => ({
-  title: heroData.value?.title || "تعلّم بخطوات مرتبة،",
-  subtitle: heroData.value?.subtitle || "وكمّل بثقة.",
+  title: truncateText(
+    heroData.value?.title || "تعلّم بخطوات مرتبة،",
+    HERO_TITLE_LIMIT,
+  ),
+  subtitle: truncateText(rawHeroSubtitle.value, TYPEWRITER_PHRASE_LIMIT),
   text: truncateText(
     heroData.value?.description ||
       "تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.",
-    120,
+    HERO_DESCRIPTION_LIMIT,
   ),
   link: heroData.value?.link || "#courses",
 }));
@@ -90,18 +125,22 @@ let removeHeroPointerEffects: (() => void) | null = null;
 const typewriterPhrases = computed(() =>
   Array.from(
     new Set(
-      [
-        heroContent.value.subtitle,
-        "افهم أسرع.",
-        "واتقدّم بثقة.",
-      ].filter(Boolean),
+      (hasOversizedSubtitle.value
+        ? [heroContent.value.subtitle]
+        : [heroContent.value.subtitle, "افهم أسرع.", "واتقدّم بثقة."]
+      ).filter(Boolean),
     ),
   ),
+);
+const typewriterPhraseGraphemes = computed(() =>
+  typewriterPhrases.value.map(splitGraphemes),
 );
 const prefersReducedMotion = useReducedMotion();
 const typedText = ref(heroContent.value.subtitle);
 const phraseIndex = ref(0);
-const visibleCharacters = useMotionValue(heroContent.value.subtitle.length);
+const visibleCharacters = useMotionValue(
+  splitGraphemes(heroContent.value.subtitle).length,
+);
 let typewriterAnimation: ReturnType<typeof animate> | null = null;
 let typewriterTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -116,29 +155,31 @@ const stopTypewriter = () => {
 };
 
 useMotionValueEvent(visibleCharacters, "change", (latest) => {
-  const phrase = typewriterPhrases.value[phraseIndex.value] || "";
-  typedText.value = phrase.slice(0, Math.round(latest));
+  const graphemes = typewriterPhraseGraphemes.value[phraseIndex.value] || [];
+  typedText.value = graphemes.slice(0, Math.round(latest)).join("");
 });
 
 const typeCurrentPhrase = () => {
   stopTypewriter();
 
   const phrase = typewriterPhrases.value[phraseIndex.value] || "";
+  const phraseLength =
+    typewriterPhraseGraphemes.value[phraseIndex.value]?.length || 0;
   if (!phrase) return;
 
   if (prefersReducedMotion.value || typewriterPhrases.value.length === 1) {
-    visibleCharacters.set(phrase.length);
+    visibleCharacters.set(phraseLength);
     typedText.value = phrase;
     return;
   }
 
-  typewriterAnimation = animate(visibleCharacters, phrase.length, {
-    duration: Math.max(0.75, phrase.length * 0.075),
+  typewriterAnimation = animate(visibleCharacters, phraseLength, {
+    duration: Math.min(3.2, Math.max(0.75, phraseLength * 0.075)),
     ease: "linear",
     onComplete: () => {
       typewriterTimer = setTimeout(() => {
         typewriterAnimation = animate(visibleCharacters, 0, {
-          duration: Math.max(0.35, phrase.length * 0.035),
+          duration: Math.min(1.4, Math.max(0.35, phraseLength * 0.035)),
           ease: "linear",
           onComplete: () => {
             phraseIndex.value =
@@ -358,12 +399,18 @@ onBeforeUnmount(() => {
         <h1 id="home-v2-hero-title">
           <span class="home-v2-hero__title-line">{{ heroContent.title }}</span>
           <em
-            class="home-v2-hero__title-line home-v2-hero__typewriter"
+            :class="[
+              'home-v2-hero__title-line home-v2-hero__typewriter',
+              {
+                'home-v2-hero__typewriter--static':
+                  hasOversizedSubtitle || prefersReducedMotion,
+              },
+            ]"
             :aria-label="heroContent.subtitle"
           >
             <span aria-hidden="true">{{ typedText }}</span>
             <motion.span
-              v-if="!prefersReducedMotion"
+              v-if="!prefersReducedMotion && !hasOversizedSubtitle"
               aria-hidden="true"
               class="home-v2-hero__typewriter-cursor"
               :animate="{ opacity: [1, 0, 1] }"
@@ -498,14 +545,15 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   display: grid;
+  width: min(1280px, calc(100% - 48px));
   min-height: max(700px, calc(100svh - 86px));
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   align-items: center;
-  gap: clamp(42px, 6vw, 84px);
+  gap: clamp(36px, 4vw, 64px);
 }
 
 .home-v2-hero__copy {
-  max-width: 680px;
+  max-width: 780px;
   padding-block: 78px;
 }
 
@@ -548,9 +596,15 @@ onBeforeUnmount(() => {
 .home-v2-hero__typewriter {
   position: relative;
   display: inline-flex;
+  max-width: 100%;
   min-height: 1.18em;
   align-items: baseline;
   padding-bottom: 0.11em;
+}
+
+.home-v2-hero__typewriter--static > span:first-child {
+  display: block;
+  overflow-wrap: anywhere;
 }
 
 .home-v2-hero__typewriter-underline {
@@ -767,7 +821,18 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 780px) {
+  .home-v2-hero h1 {
+    font-size: clamp(34px, 10.5vw, 46px);
+    line-height: 1.25;
+  }
+
+  .home-v2-hero__typewriter {
+    font-size: 0.86em;
+    line-height: 1.3;
+  }
+
   .home-v2-hero__layout {
+    width: calc(100% - 24px);
     min-height: 0;
     grid-template-columns: 1fr;
     padding-top: 25px;

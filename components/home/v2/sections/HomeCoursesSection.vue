@@ -25,6 +25,7 @@ const coursesSection = ref<HTMLElement | null>(null);
 const courseResults = ref<HTMLElement | null>(null);
 const sectionHasEntered = ref(false);
 let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
+const MAX_VISIBLE_COURSES = 6;
 
 const shouldReduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -44,6 +45,10 @@ const selectedCourses = computed<HomeSectionState<
 
   return coursesByTab.value[selectedTab.value.key] ?? null;
 });
+
+const visibleCourses = computed(() =>
+  selectedCourses.value?.data.slice(0, MAX_VISIBLE_COURSES) ?? [],
+);
 
 const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
@@ -253,7 +258,7 @@ watch(
     selectedTabKey.value,
     loadingTabKey.value,
     selectedCourses.value?.status,
-    selectedCourses.value?.data.map((course) => course.id).join(","),
+    visibleCourses.value.map((course) => course.id).join(","),
   ],
   animateCourseResults,
   { flush: "post" },
@@ -355,7 +360,7 @@ onBeforeUnmount(() => {
               <span>المسار المختار</span>
               <h3>كورسات {{ selectedTab.label }}</h3>
             </div>
-            <b v-if="selectedCourses">{{ selectedCourses.data.length }} كورس</b>
+            <b v-if="selectedCourses">{{ visibleCourses.length }} كورس</b>
           </div>
 
           <div
@@ -393,7 +398,7 @@ onBeforeUnmount(() => {
 
           <div v-else-if="selectedCourses" class="course-grid">
             <NuxtLink
-              v-for="(course, index) in selectedCourses.data"
+              v-for="(course, index) in visibleCourses"
               :key="course.id"
               :to="course.route"
               class="course-card"
