@@ -8,115 +8,178 @@ const props = defineProps<{
 const whatsappUrl = computed(() => {
   const value = props.site.socials.whatsapp
   if (!value || value.startsWith('http')) return value
+
   return `https://wa.me/${value.replace(/\D/g, '').replace(/^0/, '20')}`
 })
 
-const descriptionIsExpanded = ref(false)
-const descriptionLimit = 180
 const footerDescription = computed(() =>
-  (props.site.description || 'منصة تعليمية منظمة تساعد الطلاب على التعلّم بخطوات واضحة.')
+  (props.site.description || 'شرح منظم يساعد الطلاب على الفهم والتطبيق بخطوات واضحة.')
     .replace(/\s+/g, ' ')
     .trim(),
 )
-const descriptionCanExpand = computed(() => footerDescription.value.length > descriptionLimit)
-const visibleFooterDescription = computed(() => {
-  if (descriptionIsExpanded.value || !descriptionCanExpand.value) return footerDescription.value
 
-  return `${footerDescription.value.slice(0, descriptionLimit).trimEnd()}…`
+const brandSubtitle = computed(() => {
+  if (props.site.brandName?.toLowerCase().includes('gamma')) {
+    return 'إسلام سلامة · مدرس الفيزياء للمرحلة الثانوية'
+  }
+
+  return 'منصة تعليمية منظمة للمرحلة الثانوية'
 })
 
-watch(footerDescription, () => {
-  descriptionIsExpanded.value = false
-})
+const followLabel = computed(() =>
+  props.site.brandName?.toLowerCase().includes('gamma') ? 'تابع مستر إسلام' : 'تابع المنصة',
+)
 </script>
 
 <template>
   <footer class="home-v2-footer">
     <div class="container home-v2-footer__grid">
-      <div>
-        <NuxtLink to="/" class="home-v2-footer__brand">
+      <div class="home-v2-footer__brand-column">
+        <NuxtLink to="/" class="home-v2-footer__brand" :aria-label="`${site.brandName || 'EduHub'} — الرئيسية`">
           <span :class="['home-v2-footer__logo', { 'home-v2-temporary-asset': !site.logo }]">
-            <NuxtImg :src="site.logo?.src || '/images/logo.png'" :alt="site.logo?.alt || site.brandName || ''" width="163" height="52" loading="lazy" />
+            <NuxtImg
+              :src="site.logo?.src || '/images/logo.png'"
+              :alt="site.logo?.alt || site.brandName || ''"
+              width="46"
+              height="46"
+              loading="lazy"
+            />
           </span>
-          <span><b>{{ site.brandName || 'EduHub' }}</b><small>منصة تعليمية منظمة</small></span>
+          <span class="home-v2-footer__brand-copy">
+            <b lang="en">{{ site.brandName || 'EduHub' }}</b>
+            <small>{{ brandSubtitle }}</small>
+          </span>
         </NuxtLink>
-        <p class="home-v2-footer__description">
-          <span id="home-v2-footer-description">{{ visibleFooterDescription }}</span>
-          <button
-            v-if="descriptionCanExpand"
-            type="button"
-            :aria-expanded="descriptionIsExpanded"
-            aria-controls="home-v2-footer-description"
-            @click="descriptionIsExpanded = !descriptionIsExpanded"
-          >
-            {{ descriptionIsExpanded ? 'عرض أقل' : 'عرض المزيد' }}
-          </button>
-        </p>
-        <div class="home-v2-footer__contacts">
-          <a v-if="site.phone" :href="`tel:${site.phone}`">{{ site.phone }}</a>
-          <a v-if="site.email" :href="`mailto:${site.email}`">{{ site.email }}</a>
+
+        <p class="home-v2-footer__description">{{ footerDescription }}</p>
+
+        <address class="home-v2-footer__contacts" aria-label="بيانات التواصل">
+          <a v-if="site.phone" :href="`tel:${site.phone}`" dir="ltr">{{ site.phone }}</a>
+          <a v-if="site.email" :href="`mailto:${site.email}`" dir="ltr">{{ site.email }}</a>
           <span v-if="site.address">{{ site.address }}</span>
+        </address>
+
+        <div
+          v-if="site.socials.facebook || site.socials.instagram || whatsappUrl"
+          class="home-v2-footer__social-block"
+          aria-label="حسابات المنصة على وسائل التواصل الاجتماعي"
+        >
+          <b>{{ followLabel }}</b>
+          <div class="home-v2-footer__socials" role="list">
+            <a
+              v-if="site.socials.facebook"
+              :href="site.socials.facebook"
+              target="_blank"
+              rel="noreferrer"
+              role="listitem"
+              aria-label="فيسبوك — يفتح في نافذة جديدة"
+            >
+              <span class="home-v2-footer__social-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M14 8h3V4.2c-.5-.1-2.2-.2-4-.2-3.9 0-6.5 2.4-6.5 6.7V14H3v4h3.5v6h4.3v-6h3.6l.6-4h-4.2v-2.9C10.8 10 11.1 8 14 8Z" />
+                </svg>
+              </span>
+              <span>فيسبوك</span>
+            </a>
+
+            <a
+              v-if="site.socials.instagram"
+              :href="site.socials.instagram"
+              target="_blank"
+              rel="noreferrer"
+              role="listitem"
+              aria-label="إنستجرام — يفتح في نافذة جديدة"
+            >
+              <span class="home-v2-footer__social-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    fill-rule="evenodd"
+                    d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6ZM18.3 6.7a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </span>
+              <span>إنستجرام</span>
+            </a>
+
+            <a
+              v-if="whatsappUrl"
+              :href="whatsappUrl"
+              target="_blank"
+              rel="noreferrer"
+              role="listitem"
+              aria-label="واتساب — يفتح في نافذة جديدة"
+            >
+              <span class="home-v2-footer__social-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M20.5 3.5A11.7 11.7 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.6 4.1 1.6 5.9L.2 24l6.4-1.7c1.7.9 3.6 1.4 5.5 1.4 6.5 0 11.8-5.3 11.8-11.8 0-3.1-1.2-6-3.4-8.4Zm-8.4 18.2c-1.7 0-3.4-.5-4.9-1.3l-.4-.2-3.8 1 1-3.7-.2-.4a9.7 9.7 0 1 1 8.3 4.6Zm5.3-7.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.8-.9-3-1.6-4.2-3.6-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.6L9 7.2c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.4 1.4 3.6c.2.2 2.5 3.8 6 5.3 2.2 1 3 .9 4.1.8.7-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.2-.3-.3-.6-.4Z" />
+                </svg>
+              </span>
+              <span>واتساب</span>
+            </a>
+          </div>
         </div>
       </div>
 
-      <nav aria-label="روابط المنصة">
+      <nav class="home-v2-footer__links" aria-label="روابط المنصة">
         <b>استكشف</b>
         <NuxtLink to="/course">الكورسات</NuxtLink>
+        <NuxtLink to="/#notes">المذكرات</NuxtLink>
         <NuxtLink to="/blogs">المدونة</NuxtLink>
-        <NuxtLink to="/aboutus">عن المنصة</NuxtLink>
-        <span class="home-v2-nav-disabled" aria-disabled="true">المذكرات غير متاحة حاليًا</span>
+        <NuxtLink to="/aboutus">عن مستر إسلام</NuxtLink>
+        <NuxtLink to="/#app-status">التطبيق</NuxtLink>
       </nav>
 
-      <nav aria-label="روابط الطالب">
+      <nav class="home-v2-footer__links" aria-label="روابط الطالب">
         <b>مساحة الطالب</b>
+        <NuxtLink to="/profile">مساحة الطالب</NuxtLink>
         <NuxtLink to="/login">تسجيل الدخول</NuxtLink>
         <NuxtLink to="/Auth/register">إنشاء حساب</NuxtLink>
-        <a v-if="site.app.androidUrl" :href="site.app.androidUrl" target="_blank" rel="noopener">تطبيق Android</a>
-        <a v-if="site.app.iosUrl" :href="site.app.iosUrl" target="_blank" rel="noopener">تطبيق iPhone</a>
-        <a v-if="site.socials.youtube" :href="site.socials.youtube" target="_blank" rel="noopener">YouTube</a>
-        <a v-if="site.socials.facebook" :href="site.socials.facebook" target="_blank" rel="noopener">Facebook</a>
-        <a v-if="site.socials.instagram" :href="site.socials.instagram" target="_blank" rel="noopener">Instagram</a>
-        <a v-if="whatsappUrl" :href="whatsappUrl" target="_blank" rel="noopener">WhatsApp</a>
       </nav>
     </div>
 
     <div class="container home-v2-footer__bottom">
       <span>© {{ new Date().getFullYear() }} {{ site.brandName || 'EduHub' }}. جميع الحقوق محفوظة.</span>
-      <nav aria-label="السياسات القانونية">
+      <nav class="home-v2-footer__legal" aria-label="السياسات القانونية">
         <NuxtLink to="/privacy">سياسة الخصوصية</NuxtLink>
         <NuxtLink to="/terms">الشروط والأحكام</NuxtLink>
       </nav>
+      <span dir="ltr">Powered by EduHub</span>
     </div>
   </footer>
 </template>
 
 <style scoped>
 .home-v2-footer {
-  padding-top: 68px;
-  background: var(--home-v2-deep);
+  padding-top: 70px;
+  background: #061147;
   color: #fff;
 }
 
 .home-v2-footer__grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: clamp(36px, 8vw, 100px);
-  padding-bottom: 52px;
+  gap: clamp(52px, 6vw, 100px);
+  padding-bottom: 55px;
 }
 
 .home-v2-footer__brand {
   display: flex;
+  width: max-content;
+  max-width: 100%;
   align-items: center;
   gap: 11px;
 }
 
 .home-v2-footer__logo {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
   place-items: center;
   overflow: hidden;
-  border-radius: 50%;
+  border: 2px solid #ffffffb3;
+  border-radius: 10px;
   background: #fff;
 }
 
@@ -124,91 +187,207 @@ watch(footerDescription, () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 7px;
 }
 
-.home-v2-footer__brand > span:last-child {
-  display: grid;
-  gap: 2px;
+.home-v2-footer__brand-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
 }
 
-.home-v2-footer__brand b,
-.home-v2-footer__grid nav > b {
-  font: 900 17px var(--home-v2-heading);
+.home-v2-footer__brand b {
+  font: 900 17px/1 var(--home-v2-heading);
+  letter-spacing: 0.04em;
 }
 
-.home-v2-footer__brand small,
-.home-v2-footer p,
-.home-v2-footer__grid nav a,
-.home-v2-footer__grid nav span {
-  color: #ffffffbf;
+.home-v2-footer__brand small {
+  margin-top: 6px;
+  color: #ffffffb8;
+  font-size: 12px;
 }
 
-.home-v2-footer p {
-  max-width: 490px;
-  margin: 20px 0 0;
-  line-height: 1.9;
-}
-
-.home-v2-footer__description button {
-  margin-inline-start: 6px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #8fc6ff;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 800;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.home-v2-footer__description button:hover {
-  color: #fff;
+.home-v2-footer__description {
+  max-width: 350px;
+  margin: 22px 0 0;
+  color: #ef7a63;
+  font-size: 15px;
+  line-height: 1.8;
 }
 
 .home-v2-footer__contacts {
-  display: grid;
-  gap: 5px;
-  margin-top: 12px;
-  color: #ffffffbf;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  margin-top: 18px;
+  color: #ffffffb8;
+  font-style: normal;
+}
+
+.home-v2-footer__contacts a,
+.home-v2-footer__contacts span {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  color: #ffffffb8;
   font-size: 13px;
 }
 
-.home-v2-footer__grid nav {
-  display: grid;
-  align-content: start;
-  gap: 12px;
+.home-v2-footer__contacts a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
-.home-v2-footer__grid nav > b {
-  margin-bottom: 7px;
+.home-v2-footer__social-block {
+  margin-top: 22px;
+}
+
+.home-v2-footer__social-block > b {
+  display: block;
+  color: #f0cb81;
+  font: 800 12px var(--home-v2-heading);
+}
+
+.home-v2-footer__socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.home-v2-footer__socials > a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid #ffffff29;
+  color: #ffffffc7;
+  font-size: 11px;
+  font-weight: 800;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.home-v2-footer__socials > a:hover {
+  transform: translateY(-2px);
+  border-color: #f0cb81;
   color: #fff;
 }
 
-.home-v2-footer__grid nav a:hover {
-  color: #8fc6ff;
+.home-v2-footer__social-icon {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff1a;
+  color: #f2ca7c;
+}
+
+.home-v2-footer__social-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.home-v2-footer__links {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.home-v2-footer__links > b {
+  margin-bottom: 8px;
+  color: #f0cb81;
+  font: 800 14px var(--home-v2-heading);
+}
+
+.home-v2-footer__links > a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: #ffffff9e;
+  font-size: 14px;
+}
+
+.home-v2-footer__links > a:hover {
+  color: #fff;
 }
 
 .home-v2-footer__bottom {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 20px 0;
-  border-top: 1px solid #ffffff24;
-  color: #ffffffa8;
-  font-size: 13px;
+  gap: 24px;
+  padding: 22px 0;
+  border-top: 1px solid #ffffff1a;
+  color: #ffffffb3;
+  font-size: 12px;
 }
 
-.home-v2-footer__bottom nav {
+.home-v2-footer__legal {
   display: flex;
-  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
-@media (max-width: 760px) {
+.home-v2-footer__legal a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: #ffffffc7;
+  font-size: 12px;
+  font-weight: 800;
+  transition: color 0.18s;
+}
+
+.home-v2-footer__legal a:hover {
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .home-v2-footer__grid {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 680px) {
+  .home-v2-footer {
+    padding-top: 54px;
+  }
+
+  .home-v2-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 38px 24px;
+  }
+
+  .home-v2-footer__brand-column {
+    grid-column: 1 / -1;
+  }
+
+  .home-v2-footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-v2-footer__legal {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 430px) {
   .home-v2-footer__grid {
     grid-template-columns: 1fr;
+  }
+
+  .home-v2-footer__brand-column {
+    grid-column: auto;
+  }
+
+  .home-v2-footer__brand small {
+    display: none;
   }
 }
 </style>

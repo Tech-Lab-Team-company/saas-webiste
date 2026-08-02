@@ -9512,6 +9512,7 @@ html[data-theme="dark"] .home-course-showcase .course-card.deep .course-cover {
 
 .stage-option-label {
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .home-course-audiences button small {

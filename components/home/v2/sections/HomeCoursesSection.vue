@@ -569,8 +569,8 @@ onBeforeUnmount(() => {
 
 .home-course-audiences {
   display: grid;
-  width: min(100%, 590px);
-  grid-template-columns: repeat(3, minmax(132px, 1fr));
+  width: min(100%, 600px);
+  grid-template-columns: repeat(3, minmax(142px, 1fr));
   gap: 8px;
 }
 
@@ -632,7 +632,8 @@ onBeforeUnmount(() => {
 }
 
 .stage-option-label {
-  font: 800 16px/1.4 var(--heading);
+  font: 800 15px/1.4 var(--heading);
+  white-space: nowrap;
 }
 
 .home-course-audiences small {
@@ -781,7 +782,8 @@ onBeforeUnmount(() => {
 
 .course-cover {
   position: relative;
-  height: 226px;
+  /* height: 226px; */
+  height: 300px;
   overflow: hidden;
   padding: 20px;
   background: #d8e9e5;

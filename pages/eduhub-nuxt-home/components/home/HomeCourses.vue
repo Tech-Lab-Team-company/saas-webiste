@@ -351,6 +351,7 @@ const selectStage = (stage: Stage) => {
 
 .stage-option-label {
   font: inherit;
+  white-space: nowrap;
 }
 
 .home-course-empty {
