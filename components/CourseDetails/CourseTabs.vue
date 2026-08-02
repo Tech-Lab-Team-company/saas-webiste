@@ -97,421 +97,214 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="course-details-page" dir="auto">
+  <div
+    class="course-details-page"
+    :class="{ 'is-viewing-course-content': activetab == 0 }"
+    dir="auto"
+  >
     <div class="page-loader" v-if="!CardData">
       <Loder />
     </div>
-    <div class="course-viewer" v-if="activetab == 0">
-      <CourseDetailsCourseVideo
-        :CourseData="CardData"
-        :CourseVideoLink="videoLink"
-      />
-    </div>
 
-    <div v-if="activetab != 0">
-      <CourseDetailsCourseCard
-        :CourseData="CardData"
-        :status="CardData?.allow_status"
-        :isSubscribed="CardData?.is_subscribed"
-        :isPaied="CardData?.is_paid"
-        @Changestatus="FetchCourseDetails"
-      />
-    </div>
+    <CourseDetailsCourseCard
+      :CourseData="CardData"
+      :status="CardData?.allow_status"
+      :isSubscribed="CardData?.is_subscribed"
+      :isPaied="CardData?.is_paid"
+      @Changestatus="FetchCourseDetails"
+    >
+      <template #main="{ platformTeacher }">
+        <div class="course-viewer" v-if="activetab == 0">
+          <CourseDetailsCourseVideo
+            :CourseData="CardData"
+            :CourseVideoLink="videoLink"
+          />
+        </div>
 
-    <section class="course-tabs">
-      <div class="tabs-container">
-        <nav class="tabs-header" :aria-label="$t('course_sections')">
-          <button
-          type="button"
-          class="tab-title"
-          v-if="CardData?.homeworks?.length"
-          @click="tab_value = 'homework'"
-          :class="tab_value === 'homework' ? 'active-tab' : ''"
-          :aria-current="tab_value === 'homework' ? 'page' : undefined"
-        >
-          <homeworkicon />
-          <p>{{ $t("homework") }}</p>
-        </button>
-        <button
-          type="button"
-          class="tab-title"
-          v-if="CardData?.lives?.length"
-          @click="tab_value = 'live'"
-          :class="tab_value === 'live' ? 'active-tab' : ''"
-          :aria-current="tab_value === 'live' ? 'page' : undefined"
-        >
-          <wifiIcon />
-          <p>{{ $t("live_sessions") }}</p>
-        </button>
-        <button
-          type="button"
-          class="tab-title"
-          v-if="CardData?.externalLinks?.length"
-          @click="tab_value = 'urls'"
-          :class="tab_value === 'urls' ? 'active-tab' : ''"
-          :aria-current="tab_value === 'urls' ? 'page' : undefined"
-        >
-          <exterinalurls />
-          <p>{{ $t("external_links") }}</p>
-        </button>
-        <button
-          type="button"
-          class="tab-title"
-          v-if="CardData?.exams?.length"
-          @click="tab_value = 'exams'"
-          :class="tab_value === 'exams' ? 'active-tab' : ''"
-          :aria-current="tab_value === 'exams' ? 'page' : undefined"
-        >
-          <examsicon />
-          <p>{{ $t("exams") }}</p>
-        </button>
-        <button
-          type="button"
-          class="tab-title"
-          v-if="CardData?.units"
-          @click="tab_value = 'content'"
-          :class="tab_value === 'content' ? 'active-tab' : ''"
-          :aria-current="tab_value === 'content' ? 'page' : undefined"
-        >
-          <ContentIcon />
-          <p>{{ $t("content") }}</p>
-        </button>
-        </nav>
+        <section class="course-tabs">
+          <div class="tabs-container">
+            <nav class="section-navigation detail-tabs" :aria-label="$t('course_sections')">
+              <a class="nav-overview" href="#course-overview">{{ $t("about_course") }}</a>
+              <a
+                class="nav-curriculum"
+                href="#course-curriculum"
+                @click="tab_value = 'content'"
+              >
+                {{ $t("course_curriculum") }}
+              </a>
+              <a
+                href="#course-curriculum"
+                v-if="CardData?.homeworks?.length"
+                @click="tab_value = 'homework'"
+                :class="{ 'active-tab': tab_value === 'homework' }"
+              >
+                {{ $t("homework") }}
+              </a>
+              <a
+                href="#course-curriculum"
+                v-if="CardData?.lives?.length"
+                @click="tab_value = 'live'"
+                :class="{ 'active-tab': tab_value === 'live' }"
+              >
+                {{ $t("live_sessions") }}
+              </a>
+              <a
+                href="#course-curriculum"
+                v-if="CardData?.externalLinks?.length"
+                @click="tab_value = 'urls'"
+                :class="{ 'active-tab': tab_value === 'urls' }"
+              >
+                {{ $t("external_links") }}
+              </a>
+              <a
+                href="#course-curriculum"
+                v-if="CardData?.exams?.length"
+                @click="tab_value = 'exams'"
+                :class="{ 'active-tab': tab_value === 'exams' }"
+              >
+                {{ $t("exams") }}
+              </a>
+              <a class="nav-teacher" href="#course-teacher" v-if="CardData?.Teacher || platformTeacher">
+                {{ $t("course_teacher") }}
+              </a>
+            </nav>
 
-        <div class="tabs-content">
-          <header class="content-heading">
-            <span class="content-heading-icon">
-              <i
-                :class="tab_value === 'content' ? 'pi pi-list-check' : 'pi pi-folder-open'"
-                aria-hidden="true"
-              ></i>
-            </span>
-            <div>
-              <p>{{ $t("course_sections") }}</p>
-              <h2 v-if="tab_value === 'content'">{{ $t("course_curriculum") }}</h2>
-              <h2 v-else-if="tab_value === 'homework'">{{ $t("homework") }}</h2>
-              <h2 v-else-if="tab_value === 'live'">{{ $t("live_sessions") }}</h2>
-              <h2 v-else-if="tab_value === 'urls'">{{ $t("external_links") }}</h2>
-              <h2 v-else-if="tab_value === 'exams'">{{ $t("exams") }}</h2>
-            </div>
-          </header>
+            <article class="course-overview" id="course-overview">
+              <header class="section-heading-block">
+                <span class="detail-section-tag">نظرة عامة</span>
+                <h2>كل ما يتضمنه <em>الكورس.</em></h2>
+              </header>
 
-          <div v-if="tab_value === 'homework'">
-          <CourseDetailsTabsContentCourseHomework
-            :CourseData="CardData?.homeworks"
-            :CourseStatus="CardData?.allow_status"
-          />
-        </div>
-        <div v-if="tab_value === 'content' && CardData?.StageType == 3">
-          <CourseDetailsTabsContentCourseContent
-            @coursechanged="Data"
-            :CourseData="CardData?.units"
-            :CourseStatus="CardData?.allow_status"
-            :isSubscribed="CardData?.is_subscribed"
-            :isPaied="CardData?.is_paid"
-            :courseId="CardData?.id"
-          />
-        </div>
-        <div v-if="tab_value === 'content' && CardData?.StageType == 2">
-          <CourseDetailsTabsContentCourseContentStageTwo
-            @coursechanged="Data"
-            :CourseData="CardData?.lessons"
-            :CourseStatus="CardData?.allow_status"
-            :isSubscribed="CardData?.is_subscribed"
-            :isPaied="CardData?.is_paid"
-            :courseId="CardData?.id"
-          />
-        </div>
-        <div v-if="tab_value === 'content' && CardData?.StageType == 1">
-          <CourseDetailsTabsContentCourseContentStageOne
-            @coursechanged="Data"
-            :CourseData="CardData?.sessions"
-            :CourseStatus="CardData?.allow_status"
-            :isSubscribed="CardData?.is_subscribed"
-            :isPaied="CardData?.is_paid"
-            :courseId="CardData?.id"
-          />
-        </div>
-        <div v-if="tab_value === 'urls'">
-          <CourseDetailsTabsContentCourseUrls
-            :CourseData="CardData?.externalLinks"
-            :CourseStatus="CardData?.allow_status"
-          />
-        </div>
-        <div v-if="tab_value === 'live'">
-          <CourseDetailsTabsContentCourseLive
-            :CourseData="CardData?.lives"
-            :CourseStatus="CardData?.allow_status"
-          />
-        </div>
-          <div class="course-exams" v-if="tab_value === 'exams'">
-            <CourseDetailsTabsContentCourseExam
-              :CourseData="CardData?.exams"
-              :CourseStatus="CardData?.allow_status"
-              :isPaid="CardData?.is_paid"
-              :isSubscribed="CardData?.is_subscribed"
-            />
+              <div
+                class="overview-description"
+                v-if="CardData?.description"
+                v-html="CardData?.description"
+              ></div>
+
+              <div class="course-statistics detail-numbers">
+                <div class="statistic-item">
+                  <strong>{{ CardData?.course_videos || 0 }}</strong>
+                  <small>{{ $t("video") }}</small>
+                </div>
+                <div class="statistic-item">
+                  <strong>{{ CardData?.course_docs || 0 }}</strong>
+                  <small>{{ $t("paper_file") }}</small>
+                </div>
+                <div class="statistic-item statistic-price">
+                  <strong v-if="CardData?.CoursePrice != 0">
+                    {{ CardData?.CoursePrice }} {{ CardData?.currency }}
+                  </strong>
+                  <strong v-else>{{ $t("free") }}</strong>
+                  <small>{{ $t("course_access") }}</small>
+                </div>
+                <div class="statistic-item" v-if="CardData?.Subject?.title">
+                  <strong>{{ CardData?.Subject?.title }}</strong>
+                  <small>{{ $t("content") }}</small>
+                </div>
+              </div>
+            </article>
+
+            <article class="curriculum-section" id="course-curriculum">
+              <header class="section-heading-block curriculum-heading">
+                <span class="detail-section-tag">{{ $t("course_curriculum") }}</span>
+                <h2 v-if="tab_value === 'content'">ملخص المحتوى المتاح داخل الكورس</h2>
+                <h2 v-else-if="tab_value === 'homework'">{{ $t("homework") }}</h2>
+                <h2 v-else-if="tab_value === 'live'">{{ $t("live_sessions") }}</h2>
+                <h2 v-else-if="tab_value === 'urls'">{{ $t("external_links") }}</h2>
+                <h2 v-else-if="tab_value === 'exams'">{{ $t("exams") }}</h2>
+              </header>
+
+              <div class="platform-key" v-if="tab_value === 'content'">
+                <span><i></i>ضمن محتوى الكورس</span>
+              </div>
+
+              <div class="tabs-content">
+                <div v-if="tab_value === 'homework'">
+                  <CourseDetailsTabsContentCourseHomework
+                    :CourseData="CardData?.homeworks"
+                    :CourseStatus="CardData?.allow_status"
+                  />
+                </div>
+                <div v-if="tab_value === 'content' && CardData?.StageType == 3">
+                  <CourseDetailsTabsContentCourseContent
+                    @coursechanged="Data"
+                    :CourseData="CardData?.units"
+                    :CourseStatus="CardData?.allow_status"
+                    :isSubscribed="CardData?.is_subscribed"
+                    :isPaied="CardData?.is_paid"
+                    :courseId="CardData?.id"
+                  />
+                </div>
+                <div v-if="tab_value === 'content' && CardData?.StageType == 2">
+                  <CourseDetailsTabsContentCourseContentStageTwo
+                    @coursechanged="Data"
+                    :CourseData="CardData?.lessons"
+                    :CourseStatus="CardData?.allow_status"
+                    :isSubscribed="CardData?.is_subscribed"
+                    :isPaied="CardData?.is_paid"
+                    :courseId="CardData?.id"
+                  />
+                </div>
+                <div v-if="tab_value === 'content' && CardData?.StageType == 1">
+                  <CourseDetailsTabsContentCourseContentStageOne
+                    @coursechanged="Data"
+                    :CourseData="CardData?.sessions"
+                    :CourseStatus="CardData?.allow_status"
+                    :isSubscribed="CardData?.is_subscribed"
+                    :isPaied="CardData?.is_paid"
+                    :courseId="CardData?.id"
+                  />
+                </div>
+                <div v-if="tab_value === 'urls'">
+                  <CourseDetailsTabsContentCourseUrls
+                    :CourseData="CardData?.externalLinks"
+                    :CourseStatus="CardData?.allow_status"
+                  />
+                </div>
+                <div v-if="tab_value === 'live'">
+                  <CourseDetailsTabsContentCourseLive
+                    :CourseData="CardData?.lives"
+                    :CourseStatus="CardData?.allow_status"
+                  />
+                </div>
+                <div class="course-exams" v-if="tab_value === 'exams'">
+                  <CourseDetailsTabsContentCourseExam
+                    :CourseData="CardData?.exams"
+                    :CourseStatus="CardData?.allow_status"
+                    :isPaid="CardData?.is_paid"
+                    :isSubscribed="CardData?.is_subscribed"
+                  />
+                </div>
+              </div>
+            </article>
+
+            <article class="teacher-section public-teacher" id="course-teacher" v-if="CardData?.Teacher || platformTeacher">
+              <div class="teacher-profile">
+                <span class="teacher-avatar" aria-hidden="true">
+                  {{ (CardData?.Teacher?.name || platformTeacher?.name || "").charAt(0) }}
+                </span>
+                <div>
+                  <span class="teacher-role">
+                    {{ $t("course_teacher") }}
+                    <template v-if="CardData?.Subject?.title"> · {{ CardData?.Subject?.title }}</template>
+                  </span>
+                  <h2>{{ CardData?.Teacher?.name || platformTeacher?.name }}</h2>
+                  <div
+                    class="teacher-description"
+                    v-if="!CardData?.Teacher && platformTeacher?.description"
+                    v-html="platformTeacher?.description"
+                  ></div>
+                  <p v-else-if="CardData?.Subject?.title">{{ CardData?.Subject?.title }}</p>
+                </div>
+              </div>
+            </article>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      </template>
+    </CourseDetailsCourseCard>
   </div>
 </template>
 
-<style scoped lang="scss">
-.course-details-page {
-  --course-accent: var(--primary-color, #1d4ed8);
-  --course-accent-soft: color-mix(in srgb, var(--course-accent) 8%, white);
-  --course-ink: #172033;
-  --course-muted: #6b7485;
-  --course-border: #e5e9f0;
-  min-height: 70vh;
-  background: #f7f8fb;
-}
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-tabs.scss">
 
-.page-loader {
-  height: 100vh;
-  width: 100%;
-  position: fixed;
-  background-color: #000000c9;
-  top: 0;
-  left: 0;
-  z-index: 99;
-}
-
-.course-viewer {
-  width: min(1180px, calc(100% - 32px));
-  margin: 28px auto 0;
-  overflow: hidden;
-  border: 1px solid var(--course-border);
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 14px 36px rgba(24, 39, 75, 0.08);
-}
-
-.course-tabs {
-  position: relative;
-  width: 100%;
-  margin: 0;
-  padding: 0 clamp(14px, 4vw, 54px) clamp(40px, 6vw, 72px);
-  overflow: visible;
-  background: #f7f8fb;
-}
-
-.tabs-container {
-  width: min(1180px, 100%);
-  margin: 0 auto;
-  padding-top: clamp(26px, 4vw, 48px);
-}
-
-.tabs-header {
-  position: sticky;
-  z-index: 30;
-  top: 10px;
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px;
-  overflow-x: auto;
-  border: 1px solid var(--course-border);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 8px 24px rgba(24, 39, 75, 0.07);
-  scrollbar-width: none;
-}
-
-.tabs-header::-webkit-scrollbar {
-  display: none;
-}
-
-.tab-title {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 112px;
-  min-height: 46px;
-  padding: 9px 15px;
-  border: 0;
-  border-radius: 11px;
-  background: transparent;
-  color: var(--course-muted);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.tab-title:hover {
-  background: var(--course-accent-soft);
-  color: var(--course-accent);
-}
-
-.tab-title.active-tab {
-  border: 0;
-  background: var(--course-accent);
-  color: #fff;
-  box-shadow: 0 7px 16px color-mix(in srgb, var(--course-accent) 22%, transparent);
-}
-
-.tab-title :deep(svg) {
-  width: 19px;
-  height: 19px;
-}
-
-.tab-title :deep(svg path) {
-  stroke: currentColor;
-}
-
-.tab-title p {
-  margin: 0;
-}
-
-.tabs-content {
-  width: 100%;
-  margin: 20px auto 0;
-  padding: clamp(18px, 3vw, 32px);
-  position: relative;
-  z-index: 20;
-  border: 1px solid var(--course-border);
-  border-radius: 20px;
-  background: #fff;
-  text-align: start;
-  box-shadow: 0 10px 30px rgba(24, 39, 75, 0.05);
-}
-
-.content-heading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--course-border);
-}
-
-.content-heading-icon {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
-  background: var(--course-accent-soft);
-  color: var(--course-accent);
-  font-size: 19px;
-}
-
-.content-heading p {
-  color: var(--course-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.content-heading h2 {
-  margin-top: 2px;
-  color: var(--course-ink);
-  font-size: clamp(19px, 2.5vw, 25px);
-  font-weight: 800;
-}
-
-.course-exams {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-@media (max-width: 700px) {
-  .course-tabs {
-    padding-inline: 12px;
-  }
-
-  .tabs-container {
-    padding-top: 22px;
-  }
-
-  .tabs-header {
-    top: 6px;
-    justify-content: flex-start;
-    border-radius: 14px;
-  }
-
-  .tab-title {
-    min-width: auto;
-    min-height: 42px;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  .tabs-content {
-    margin-top: 14px;
-    padding: 16px 12px 22px;
-    border-radius: 16px;
-  }
-
-  .content-heading {
-    padding-inline: 4px;
-    padding-bottom: 15px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tab-title {
-    transition: none;
-  }
-}
-
-/* Override the older global tab bundle only inside this page. */
-.course-details-page .course-tabs .tabs-container .tabs-header {
-  flex-wrap: nowrap;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px;
-}
-
-.course-details-page .course-tabs .tabs-container .tabs-header .tab-title {
-  flex-direction: row;
-  gap: 8px;
-  min-width: 112px;
-  padding: 9px 15px;
-  border: 0;
-  font-family: inherit;
-  font-size: 14px;
-}
-
-.course-details-page .course-tabs .tabs-container .tabs-header .tab-title.active-tab {
-  border: 0;
-  background: var(--course-accent);
-  color: #fff;
-}
-
-.course-details-page .course-tabs .tabs-container .tabs-header .tab-title :deep(svg path) {
-  stroke: currentColor;
-}
-
-.course-details-page .course-tabs .tabs-container .tabs-content {
-  width: 100%;
-  margin: 20px auto 0;
-  padding: clamp(18px, 3vw, 32px);
-  text-align: start;
-}
-
-@media (max-width: 700px) {
-  .course-details-page .course-tabs .tabs-container .tabs-header {
-    justify-content: flex-start;
-  }
-
-  .course-details-page .course-tabs .tabs-container .tabs-header .tab-title {
-    min-width: auto;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  .course-details-page .course-tabs .tabs-container .tabs-content {
-    margin-top: 14px;
-    padding: 16px 12px 22px;
-  }
-}
 </style>

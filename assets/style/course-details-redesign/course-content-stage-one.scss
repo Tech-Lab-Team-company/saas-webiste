@@ -1,0 +1,106 @@
+.empty-content {
+  width: min(340px, 80%);
+  margin: 24px auto;
+}
+
+.stores-logos-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stores-logos-link {
+  width: 50%;
+}
+
+.stores-logos-apple {
+  width: 88%;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.session-name {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  text-align: start;
+}
+
+.session-name p {
+  margin: 0;
+  color: #59675f;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.session-name p:first-child:not(:last-of-type) {
+  color: #8a958f;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.course-body-details {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 11px;
+  margin: 0;
+  padding: 11px 13px;
+  border: 1px solid #dfe6e1;
+  border-bottom: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  color: #59675f;
+  cursor: pointer;
+}
+
+div:first-of-type > .course-body-details {
+  border-radius: 7px 7px 0 0;
+}
+
+div:last-of-type > .course-body-details {
+  border-bottom: 1px solid #dfe6e1;
+  border-radius: 0 0 7px 7px;
+}
+
+.course-body-details:hover,
+.course-body-details.active {
+  background: color-mix(in srgb, var(--primary-color, #237a57) 4%, white);
+  color: var(--primary-color, #237a57);
+}
+
+.course-body-details > :deep(svg) {
+  flex: 0 0 auto;
+  width: 19px;
+  height: 19px;
+}
+
+.course-body-details :deep(svg path) {
+  stroke: currentColor;
+}
+
+@media (max-width: 576px) {
+  .course-body-details {
+    align-items: flex-start;
+    padding: 11px 10px;
+  }
+
+  .session-name {
+    flex-wrap: wrap;
+  }
+
+  .session-name p:first-child:not(:last-of-type) {
+    width: 100%;
+  }
+}
