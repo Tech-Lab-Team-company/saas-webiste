@@ -5,7 +5,6 @@ import {
   createEmptyHomePageViewModel,
   mapHomeAboutTeacherMock,
   mapHomeCourseList,
-  mapHomeLearningJourneyMock,
   mapHomePage,
   mapHomeSite,
 } from '../mappers/homePageMapper'
@@ -19,7 +18,7 @@ export const useHomePage = () => {
   const api = new HomePageApi(webDomain)
 
   const { data, pending, error, refresh } = useAsyncData<HomePageViewModel>(
-    `home-v2-data:learning-mock-v1:${webDomain}`,
+    `home-v2-data:dynamic-v2:${webDomain}`,
     async () => mapHomePage(await api.load(), setting.value),
     {
       default: createEmptyHomePageViewModel,
@@ -34,11 +33,6 @@ export const useHomePage = () => {
     return {
       ...currentHome,
       site,
-      // Temporarily force the backend-shaped mock until the API resource is ready.
-      learningJourney: {
-        data: mapHomeLearningJourneyMock(site),
-        status: 'empty',
-      },
       aboutTeacher:
         currentHome.aboutTeacher.status === 'empty'
           ? {

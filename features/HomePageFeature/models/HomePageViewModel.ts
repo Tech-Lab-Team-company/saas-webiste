@@ -64,6 +64,55 @@ export interface HomeBlogViewModel {
   image: HomeImageViewModel | null
 }
 
+export interface HomeBookViewModel {
+  id: number
+  bookId: number
+  image: string | null
+  numberOfPages: number | null
+  title: string
+  subtitle: string | null
+  description: string | null
+  isFree: boolean
+  price: string
+  currency: string
+  bookType: number | null
+  invoiceLink: string | null
+}
+
+export interface HomeBooksViewModel {
+  items: HomeBookViewModel[]
+  pagination: {
+    currentPage: number
+    lastPage: number
+    perPage: number
+    total: number
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+  }
+}
+
+export interface HomeBookDetailsViewModel extends HomeBookViewModel {
+  images: string[]
+  certificatesCount: number
+  videoLinks: string[]
+  externalVideoLinks: string[]
+  ratesCount: number
+  videoLinksCount: number
+  offlineVideoLinksCount: number
+  multimediaCount: number
+  fees: number
+  vat: number
+  totalAfterDiscount: number
+  isFavorite: boolean
+  allowStatus: number
+  orderStatus: number
+  bookUrl: string | null
+  isFlipbook: boolean
+  hasFreePreview: boolean
+  isFreeFlipbook: boolean
+  freeBookUrl: string | null
+}
+
 export interface HomeLearningJourneyItemViewModel {
   id: number | string
   title: string
@@ -80,16 +129,31 @@ export interface HomeLearningJourneyViewModel {
   items: HomeLearningJourneyItemViewModel[]
 }
 
+export interface HomeAboutTeacherBenefitViewModel {
+  id: number
+  title: string
+  description: string
+}
+
 export interface HomeAboutTeacherViewModel {
+  id: number
+  title: string
+  subTitle: string
+  description: string
+  icon: HomeImageViewModel | null
+  experience: {
+    value: string
+    prefix: string
+  }
+  benefits: HomeAboutTeacherBenefitViewModel[]
+  link: string
+  linkLabel: string
+}
+
+export interface HomeCtaViewModel {
   eyebrow: string
   title: string
   description: string
-  quote: string
-  teacherName: string
-  teacherRole: string
-  highlights: string[]
-  link: string
-  linkLabel: string
 }
 
 export interface HomeSiteViewModel {
@@ -116,17 +180,13 @@ export interface HomeSiteViewModel {
   }
 }
 
-export interface HomeNotesViewModel {
-  status: 'unsupported'
-  reason: string
-}
-
 export interface HomePageViewModel {
   site: HomeSiteViewModel
   hero: HomeSectionState<HomeHeroViewModel | null>
   courses: HomeSectionState<HomeCoursesViewModel>
   blogs: HomeSectionState<HomeBlogViewModel[]>
+  books: HomeSectionState<HomeBooksViewModel>
   learningJourney: HomeSectionState<HomeLearningJourneyViewModel>
   aboutTeacher: HomeSectionState<HomeAboutTeacherViewModel>
-  notes: HomeNotesViewModel
+  cta: HomeSectionState<HomeCtaViewModel>
 }

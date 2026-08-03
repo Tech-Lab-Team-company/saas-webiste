@@ -65,6 +65,27 @@ export interface HomeSectionResourceApiDto {
   children: HomeSectionResourceChildApiDto[]
 }
 
+export interface HomeAboutTeacherExperienceApiDto {
+  value: string
+  prefix: string
+}
+
+export interface HomeAboutTeacherBenefitApiDto {
+  id: number
+  title: string
+  description: string
+}
+
+export interface HomeAboutTeacherApiDto {
+  id: number
+  title: string
+  sub_title: string
+  description: string
+  icon: string | null
+  experience: HomeAboutTeacherExperienceApiDto
+  benefits: HomeAboutTeacherBenefitApiDto[]
+}
+
 export interface HomeCourseApiDto {
   id: number | null
   title: string | null
@@ -110,11 +131,73 @@ export interface HomeBlogApiDto {
   attachments: HomeImageApiDto[]
 }
 
+export interface HomeBookApiDto {
+  id: number
+  book_id: number
+  image: string
+  number_of_pages: number
+  title: string
+  subtitle: string
+  attachments: unknown[]
+  description: string
+  isFree: boolean
+  start_date: string
+  end_date: string
+  price: string
+  currency: string
+  book_types: unknown[]
+  book_type: number
+  invoice_link: string
+}
+
+export interface HomeBookDetailsApiDto extends HomeBookApiDto {
+  images: string[]
+  certificates: unknown[]
+  video_link: string[]
+  video_external_link: string[]
+  rates: unknown[]
+  number_of_video_link: number
+  number_of_offline_video_link: number
+  multiMedia: number
+  fees: number
+  vat: number
+  total_after_discount: number
+  bookStatus: unknown | null
+  is_favorite: boolean
+  allow_status: number
+  order_status: number
+  book_url: string
+  is_flipbook: number
+  has_free: number
+  is_free_flipbook: number
+  free_book_url: string
+}
+
+export interface HomeBooksApiDto {
+  data: HomeBookApiDto[]
+  links: {
+    first: string | null
+    last: string | null
+    prev: string | null
+    next: string | null
+  }
+  meta: {
+    current_page: number
+    from: number | null
+    last_page: number
+    per_page: number
+    to: number | null
+    total: number
+  }
+}
+
 export interface HomePageApiSources {
   heroSections: HomeApiSourceResult<unknown>
   sliders: HomeApiSourceResult<unknown>
   courseSections: HomeApiSourceResult<unknown>
   blogs: HomeApiSourceResult<unknown>
+  books: HomeApiSourceResult<unknown>
   learningJourney: HomeApiSourceResult<unknown>
   aboutTeacher: HomeApiSourceResult<unknown>
+  readySection: HomeApiSourceResult<unknown>
 }

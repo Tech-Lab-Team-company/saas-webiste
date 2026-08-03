@@ -10,7 +10,11 @@ import type {
 } from '../types/homePage.types'
 import type {
   HomeBlogViewModel,
+  HomeBookDetailsViewModel,
+  HomeBookViewModel,
+  HomeBooksViewModel,
   HomeAboutTeacherViewModel,
+  HomeCtaViewModel,
   HomeCourseTabViewModel,
   HomeCourseViewModel,
   HomeCoursesViewModel,
@@ -38,6 +42,11 @@ const toNullableString = (value: unknown): string | null => {
 
   const normalizedValue = value.trim()
   return normalizedValue.length > 0 ? normalizedValue : null
+}
+
+const toSafeUrl = (value: unknown): string | null => {
+  const url = toNullableString(value)
+  return url && /^(https?:\/\/|\/)/i.test(url) ? url : null
 }
 
 const toNullableNumber = (value: unknown): number | null =>
@@ -357,6 +366,108 @@ const mapBlog = (blog: HomeBlogApiDto): HomeBlogViewModel | null => {
   }
 }
 
+const createEmptyBooksPagination = (): HomeBooksViewModel['pagination'] => ({
+  currentPage: 1,
+  lastPage: 1,
+  perPage: 10,
+  total: 0,
+  hasPreviousPage: false,
+  hasNextPage: false,
+})
+
+export const createEmptyBooks = (): HomeBooksViewModel => ({
+  items: [],
+  pagination: createEmptyBooksPagination(),
+})
+
+const mapBook = (value: unknown): HomeBookViewModel | null => {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const id = toNullableNumber(value.id)
+  const title = toNullableString(value.title)
+
+  if (id === null || !title) {
+    return null
+  }
+
+  return {
+    id,
+    bookId: toNullableNumber(value.book_id) ?? id,
+    image: toNullableString(value.image),
+    numberOfPages: toNullableNumber(value.number_of_pages),
+    title,
+    subtitle: toNullableString(value.subtitle),
+    description: toNullableString(value.description),
+    isFree: toNullableBoolean(value.isFree ?? value.is_free) ?? false,
+    price: toNullableString(value.price) ?? '0',
+    currency: toNullableString(value.currency) ?? '',
+    bookType: toNullableNumber(value.book_type),
+    invoiceLink: toSafeUrl(value.invoice_link),
+  }
+}
+
+export const mapBookDetails = (value: unknown): HomeBookDetailsViewModel | null => {
+  const book = mapBook(value)
+  if (!book || !isRecord(value)) {
+    return null
+  }
+
+  const mapUrlList = (source: unknown): string[] =>
+    toArray(source)
+      .map(toSafeUrl)
+      .filter((url): url is string => url !== null)
+
+  return {
+    ...book,
+    images: mapUrlList(value.images),
+    certificatesCount: toArray(value.certificates).length,
+    videoLinks: mapUrlList(value.video_link),
+    externalVideoLinks: mapUrlList(value.video_external_link),
+    ratesCount: toArray(value.rates).length,
+    videoLinksCount: toNullableNumber(value.number_of_video_link) ?? 0,
+    offlineVideoLinksCount: toNullableNumber(value.number_of_offline_video_link) ?? 0,
+    multimediaCount: toNullableNumber(value.multiMedia ?? value.multimedia) ?? 0,
+    fees: toNullableNumber(value.fees) ?? 0,
+    vat: toNullableNumber(value.vat) ?? 0,
+    totalAfterDiscount: toNullableNumber(value.total_after_discount) ?? 0,
+    isFavorite: toNullableBoolean(value.is_favorite) ?? false,
+    allowStatus: toNullableNumber(value.allow_status) ?? 0,
+    orderStatus: toNullableNumber(value.order_status) ?? 0,
+    bookUrl: toSafeUrl(value.book_url),
+    isFlipbook: toNullableNumber(value.is_flipbook) === 1,
+    hasFreePreview: toNullableNumber(value.has_free) === 1,
+    isFreeFlipbook: toNullableNumber(value.is_free_flipbook) === 1,
+    freeBookUrl: toSafeUrl(value.free_book_url),
+  }
+}
+
+export const mapBooksPage = (value: unknown): HomeBooksViewModel => {
+  if (!isRecord(value)) {
+    return createEmptyBooks()
+  }
+
+  const meta = isRecord(value.meta) ? value.meta : {}
+  const links = isRecord(value.links) ? value.links : {}
+  const currentPage = toNullableNumber(meta.current_page) ?? 1
+  const lastPage = toNullableNumber(meta.last_page) ?? 1
+
+  return {
+    items: toArray(value.data)
+      .map(mapBook)
+      .filter((book): book is HomeBookViewModel => book !== null),
+    pagination: {
+      currentPage,
+      lastPage,
+      perPage: toNullableNumber(meta.per_page) ?? 10,
+      total: toNullableNumber(meta.total) ?? 0,
+      hasPreviousPage: Boolean(toNullableString(links.prev)) || currentPage > 1,
+      hasNextPage: Boolean(toNullableString(links.next)) || currentPage < lastPage,
+    },
+  }
+}
+
 const mapLearningJourneyItem = (
   value: unknown,
   index: number,
@@ -417,7 +528,7 @@ const mapAboutTeacher = (
   value: unknown,
   site: HomeSiteViewModel,
 ): HomeAboutTeacherViewModel => {
-  const fallbackSection = createHomeAboutTeacherMock(site)[0]
+  const fallbackSection = createHomeAboutTeacherMock()
   const rootItems = toArray(value)
   const lastRootItem = rootItems[rootItems.length - 1]
   const section = isRecord(lastRootItem)
@@ -426,36 +537,69 @@ const mapAboutTeacher = (
       ? value
       : fallbackSection
 
-  const rawHighlights = Array.isArray(section.children)
-    ? section.children
-    : fallbackSection.children
-  const highlights = toArray(rawHighlights)
-    .map((item) => {
-      if (!isRecord(item)) {
-        return null
-      }
+  const fallbackExperience = fallbackSection.experience
+  const experience = isRecord(section.experience) ? section.experience : fallbackExperience
+  const rawBenefits = Array.isArray(section.benefits) && section.benefits.length > 0
+    ? section.benefits
+    : fallbackSection.benefits
+  const benefits = rawBenefits.flatMap((item, index) => {
+    if (!isRecord(item)) {
+      return []
+    }
 
-      const title = toNullableString(item.title)
-      const description = toNullableString(item.description)
-      return title && description ? `${title}: ${description}` : title ?? description
-    })
-    .filter((item): item is string => item !== null)
+    const fallbackBenefit = fallbackSection.benefits[index]
+    const title = toNullableString(item.title) ?? fallbackBenefit?.title
+    const description = toNullableString(item.description) ?? fallbackBenefit?.description
+
+    if (!title || !description) {
+      return []
+    }
+
+    return [{
+      id: toNullableNumber(item.id) ?? fallbackBenefit?.id ?? index + 1,
+      title,
+      description,
+    }]
+  })
 
   const teacherName = site.brandName || 'مدرسك'
-  const teacherRole = site.description || 'مدرس متخصص يساعدك تفهم وتطبّق بثقة'
-  const quote = toNullableString(section.description) ?? fallbackSection.description
-  const description = `${teacherName} يقدّم محتوى تعليميًا منظمًا يساعد الطالب على فهم المفاهيم، تطبيقها، ومتابعة تقدمه بثقة.`
 
   return {
-    eyebrow: toNullableString(section.subtitle) ?? fallbackSection.subtitle,
+    id: toNullableNumber(section.id) ?? fallbackSection.id,
     title: toNullableString(section.title) ?? fallbackSection.title,
-    description,
-    quote,
-    teacherName,
-    teacherRole,
-    highlights,
-    link: '/aboutus',
+    subTitle: toNullableString(section.sub_title ?? section.subtitle) ?? fallbackSection.sub_title,
+    description: toNullableString(section.description) ?? fallbackSection.description,
+    icon: mapImage(mapFlexibleImageApiDto(section.icon, section.title)),
+    experience: {
+      value: toNullableString(experience.value) ?? fallbackExperience.value,
+      prefix: toNullableString(experience.prefix) ?? fallbackExperience.prefix,
+    },
+    benefits,
+    link: '/about-teacher',
     linkLabel: `اعرف أكثر عن ${teacherName}`,
+  }
+}
+
+const createHomeCtaFallback = (): HomeCtaViewModel => ({
+  eyebrow: 'جاهز تبدأ؟',
+  title: 'اختار مسارك، وابدأ بخطوة واضحة.',
+  description: 'الصفحة الجديدة ما زالت في وضع المعاينة، بينما يظل مسار التسجيل والكورسات الحالي متاحًا.',
+})
+
+const mapReadySection = (value: unknown): HomeCtaViewModel => {
+  const fallback = createHomeCtaFallback()
+  const rootItems = toArray(value)
+  const lastRootItem = rootItems[rootItems.length - 1]
+  const section: Record<string, unknown> = isRecord(lastRootItem)
+    ? lastRootItem
+    : isRecord(value)
+      ? value
+      : {}
+
+  return {
+    eyebrow: toNullableString(section.subtitle) ?? fallback.eyebrow,
+    title: toNullableString(section.title) ?? fallback.title,
+    description: toNullableString(section.description) ?? fallback.description,
   }
 }
 
@@ -463,7 +607,7 @@ export const mapHomeLearningJourneyMock = (site: HomeSiteViewModel) =>
   mapLearningJourney(createHomeLearningJourneyMock(site), site)
 
 export const mapHomeAboutTeacherMock = (site: HomeSiteViewModel) =>
-  mapAboutTeacher(createHomeAboutTeacherMock(site), site)
+  mapAboutTeacher(createHomeAboutTeacherMock(), site)
 
 const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeSectionState<T> => ({
   data,
@@ -539,6 +683,10 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
     data: [],
     status: 'empty',
   },
+  books: {
+    data: createEmptyBooks(),
+    status: 'empty',
+  },
   learningJourney: {
     data: mapHomeLearningJourneyMock(createEmptySite()),
     status: 'empty',
@@ -547,9 +695,9 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
     data: mapHomeAboutTeacherMock(createEmptySite()),
     status: 'empty',
   },
-  notes: {
-    status: 'unsupported',
-    reason: 'لا توجد واجهة بيانات أو مسار معتمد للمذكرات حاليًا.',
+  cta: {
+    data: createHomeCtaFallback(),
+    status: 'empty',
   },
 })
 
@@ -625,6 +773,19 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
     }
   })()
 
+  const books = (() => {
+    if (sources.books.kind === 'error') {
+      return mapSectionError<HomeBooksViewModel>(createEmptyBooks(), sources.books.error)
+    }
+
+    const mappedBooks = mapBooksPage(sources.books.data)
+
+    return {
+      data: mappedBooks,
+      status: mappedBooks.items.length > 0 ? ('success' as const) : ('empty' as const),
+    }
+  })()
+
   const learningJourney = (() => {
     if (sources.learningJourney.kind === 'error') {
       return {
@@ -665,16 +826,28 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
     }
   })()
 
+  const cta = (() => {
+    const hasApiData =
+      sources.readySection.kind === 'success' &&
+      ((Array.isArray(sources.readySection.data) && sources.readySection.data.length > 0) ||
+        (isRecord(sources.readySection.data) && Object.keys(sources.readySection.data).length > 0))
+
+    return {
+      data: mapReadySection(
+        sources.readySection.kind === 'success' ? sources.readySection.data : null,
+      ),
+      status: hasApiData ? ('success' as const) : ('empty' as const),
+    }
+  })()
+
   return {
     site,
     hero,
     courses,
     blogs,
+    books,
     learningJourney,
     aboutTeacher,
-    notes: {
-      status: 'unsupported',
-      reason: 'لا توجد واجهة بيانات أو مسار معتمد للمذكرات حاليًا.',
-    },
+    cta,
   }
 }

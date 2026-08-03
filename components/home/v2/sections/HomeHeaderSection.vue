@@ -5,6 +5,8 @@ const props = defineProps<{
   site: HomeSiteViewModel
 }>()
 
+const route = useRoute()
+
 const headerDescription = computed(() => {
   const description = (props.site.description || 'منصة تعليمية منظمة').replace(/\s+/g, ' ').trim()
   const limit = 64
@@ -14,11 +16,15 @@ const headerDescription = computed(() => {
     : description
 })
 
-const navItems = [
+const navItems = computed(() => [
+  ...(route.path === '/home-v2'
+    ? []
+    : [{ label: 'الرئيسية', to: '/home-v2' }]),
   { label: 'الكورسات', to: '/course' },
+  { label: 'الكتب', to: '/books' },
   { label: 'المدونة', to: '/blogs' },
-  { label: 'عن المنصة', to: '/aboutus' },
-] as const
+  { label: 'عن المنصة', to: '/about-teacher' },
+])
 
 const scrollProgress = ref(0)
 const isScrolled = ref(false)
@@ -79,9 +85,6 @@ onBeforeUnmount(() => {
 
       <nav class="home-v2-header__nav" aria-label="التنقل الرئيسي">
         <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to">{{ item.label }}</NuxtLink>
-        <span class="home-v2-nav-disabled" aria-disabled="true" title="لا توجد صفحة مكتبة في التطبيق حاليًا">
-          المذكرات
-        </span>
         <a href="#app-status">التطبيق</a>
       </nav>
 

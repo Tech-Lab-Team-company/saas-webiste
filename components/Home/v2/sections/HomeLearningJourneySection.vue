@@ -110,7 +110,7 @@ const revealJourneySection = () => {
     const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     timeline
-      .from(".home-v2-learning-journey .section-tag", {
+      .from(".home-v2-learning-journey__eyebrow", {
         autoAlpha: 0,
         x: 34,
         duration: 0.58,
@@ -167,7 +167,17 @@ onBeforeUnmount(() => {
   >
     <div class="container home-v2-learning-journey__grid">
       <div class="home-v2-learning-journey__intro">
-        <span class="section-tag">{{ journey.data.eyebrow }}</span>
+        <div class="home-v2-learning-journey__eyebrow">
+          <img
+            v-if="journey.data.icon"
+            class="home-v2-learning-journey__icon"
+            :src="journey.data.icon.src"
+            :alt="journey.data.icon.alt"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="section-tag">{{ journey.data.eyebrow }}</span>
+        </div>
         <h2 id="home-v2-learning-journey-title">
           <span class="home-v2-learning-journey__title-line">
             {{ titleParts.main }}
@@ -241,6 +251,21 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   color: var(--journey-gold);
+}
+
+.home-v2-learning-journey__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-v2-learning-journey__icon {
+  width: 52px;
+  height: 52px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
 }
 
 .home-v2-learning-journey .section-tag::after {

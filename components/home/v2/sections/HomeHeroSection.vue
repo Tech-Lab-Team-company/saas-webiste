@@ -272,7 +272,13 @@ const setupHeroAnimation = () => {
       )
       .from(
         ".home-v2-hero__brand-logo",
-        { autoAlpha: 0, scale: 0, rotate: -25, duration: 0.7, ease: "back.out(1.8)" },
+        {
+          autoAlpha: 0,
+          scale: 0,
+          rotate: -25,
+          duration: 0.7,
+          ease: "back.out(1.8)",
+        },
         1.05,
       )
       .fromTo(
@@ -462,10 +468,7 @@ onBeforeUnmount(() => {
           <strong>صورة المدرّس</strong>
           <small>سيتم استبدالها بالأصل المعتمد</small>
         </div>
-        <span
-          v-if="settingsLogo"
-          class="home-v2-hero__brand-logo"
-        >
+        <span v-if="settingsLogo" class="home-v2-hero__brand-logo">
           <img
             :src="settingsLogo.src"
             :alt="settingsLogo.alt || site.brandName || 'شعار المنصة'"
@@ -496,15 +499,21 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.home-v2-hero__ambient-grid {
+/* .home-v2-hero__ambient-grid {
   position: absolute;
   inset: 0;
   background-image: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px),
     linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px);
   background-size: 54px 54px;
-  mask-image: linear-gradient(90deg, transparent, #000 32%, #000 75%, transparent);
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 32%,
+    #000 75%,
+    transparent
+  );
   opacity: 0.55;
-}
+} */
 
 .home-v2-hero__ambient-orb {
   position: absolute;
@@ -526,7 +535,11 @@ onBeforeUnmount(() => {
   inset-inline-start: -8%;
   width: clamp(260px, 34vw, 520px);
   aspect-ratio: 1;
-  background: radial-gradient(circle at 60% 45%, rgb(255 255 255 / 9%), transparent 67%);
+  background: radial-gradient(
+    circle at 60% 45%,
+    rgb(255 255 255 / 9%),
+    transparent 67%
+  );
 }
 
 .home-v2-hero__ambient-orb--two {
@@ -590,7 +603,8 @@ onBeforeUnmount(() => {
 .home-v2-hero h1 em {
   color: var(--home-v2-coral);
   font-style: normal;
-  text-shadow: 0 8px 28px color-mix(in srgb, var(--home-v2-coral) 22%, transparent);
+  text-shadow: 0 8px 28px
+    color-mix(in srgb, var(--home-v2-coral) 10%, transparent);
 }
 
 .home-v2-hero__typewriter {
@@ -640,6 +654,7 @@ onBeforeUnmount(() => {
   color: #ffffffe0;
   font-size: 17px;
   line-height: 1.95;
+  margin-top: 36px;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -647,7 +662,7 @@ onBeforeUnmount(() => {
 .home-v2-hero__actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: start;
   gap: 14px;
   margin-top: 34px;
 }

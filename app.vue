@@ -12,7 +12,10 @@ import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.v
 
 const router = useRouter();
 const route = useRoute();
-const isHomeV2 = computed(() => route.path === "/home-v2");
+const isHomeV2 = computed(() =>
+  ["/home-v2", "/aboutus", "/about-teacher", "/books"].includes(route.path) ||
+  route.path.startsWith("/books/"),
+);
 const UserStore = useUserStore();
 const {
   data: webStatus,

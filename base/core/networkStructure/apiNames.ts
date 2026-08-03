@@ -133,6 +133,10 @@ class ApiNames {
   public fetch_hero_sections = "https://dev.saas.techlabeg.com/api/website/fetch_hero_sections";
   public fetch_home_learning_journey = "https://dev.saas.techlabeg.com/api/website/fetch_home_learning_journey";
   public fetch_about_teacher = "https://dev.saas.techlabeg.com/api/website/fetch_about_teacher";
+  public fetch_study_process = "https://dev.saas.techlabeg.com/api/website/fetch_study_process";
+  public fetch_ready_section = "https://dev.saas.techlabeg.com/api/website/fetch_ready_section";
+  public fetch_books = "https://dev.saas.techlabeg.com/api/website/fetch_Books";
+  public fetch_book_details = "https://dev.saas.techlabeg.com/api/website/fetch_Book_Details";
   public fetch_home_sliders = "fetch_sliders";
   public fetch_home_website_section = "fetch_home_website_section";
   public filter_courses = "filter_courses";

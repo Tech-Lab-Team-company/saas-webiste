@@ -1,81 +1,108 @@
-import axios from 'axios'
-import { ApiNames } from '~/base/core/networkStructure/apiNames'
-import NetworkService from '~/base/core/networkStructure/networking/network_service'
-import type { HomeApiSourceResult, HomeDataError, HomePageApiSources } from '../types/homePage.types'
+import axios from "axios";
+import { ApiNames } from "~/base/core/networkStructure/apiNames";
+import NetworkService from "~/base/core/networkStructure/networking/network_service";
+import type {
+  HomeApiSourceResult,
+  HomeDataError,
+  HomePageApiSources,
+} from "../types/homePage.types";
 
 const normalizeHomeDataError = (error: unknown): HomeDataError => {
   if (axios.isAxiosError(error)) {
-    const statusCode = error.response?.status
+    const statusCode = error.response?.status;
 
-    if (error.code === 'ECONNABORTED') {
-      return { type: 'timeout', message: 'تعذر تحميل هذا القسم في الوقت الحالي.' }
+    if (error.code === "ECONNABORTED") {
+      return {
+        type: "timeout",
+        message: "تعذر تحميل هذا القسم في الوقت الحالي.",
+      };
     }
 
     if (!error.response) {
-      return { type: 'network', message: 'تعذر الاتصال بالخدمة في الوقت الحالي.' }
+      return {
+        type: "network",
+        message: "تعذر الاتصال بالخدمة في الوقت الحالي.",
+      };
     }
 
     return {
-      type: 'server',
-      message: 'تعذر تحميل هذا القسم في الوقت الحالي.',
-      ...(typeof statusCode === 'number' ? { statusCode } : {}),
-    }
+      type: "server",
+      message: "تعذر تحميل هذا القسم في الوقت الحالي.",
+      ...(typeof statusCode === "number" ? { statusCode } : {}),
+    };
   }
 
   if (error instanceof HomeApiResponseError) {
-    return { type: 'invalid-response', message: 'تعذر تحميل هذا القسم في الوقت الحالي.' }
+    return {
+      type: "invalid-response",
+      message: "تعذر تحميل هذا القسم في الوقت الحالي.",
+    };
   }
 
-  return { type: 'unknown', message: 'تعذر تحميل هذا القسم في الوقت الحالي.' }
-}
+  return { type: "unknown", message: "تعذر تحميل هذا القسم في الوقت الحالي." };
+};
 
 class HomeApiResponseError extends Error {
   constructor() {
-    super('HOME_API_INVALID_RESPONSE')
+    super("HOME_API_INVALID_RESPONSE");
   }
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
+  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const readEnvelopeData = (value: unknown): unknown => {
-  if (!isRecord(value) || !('data' in value)) {
-    throw new HomeApiResponseError()
+  if (!isRecord(value) || !("data" in value)) {
+    throw new HomeApiResponseError();
   }
 
-  return value.data
-}
+  return value.data;
+};
 
-const toSourceResult = (result: PromiseSettledResult<unknown>): HomeApiSourceResult<unknown> => {
-  if (result.status === 'fulfilled') {
-    return { kind: 'success', data: result.value }
+const toSourceResult = (
+  result: PromiseSettledResult<unknown>,
+): HomeApiSourceResult<unknown> => {
+  if (result.status === "fulfilled") {
+    return { kind: "success", data: result.value };
   }
 
-  return { kind: 'error', error: normalizeHomeDataError(result.reason) }
-}
+  return { kind: "error", error: normalizeHomeDataError(result.reason) };
+};
 
 export class HomePageApi {
   constructor(private readonly webDomain: string) {}
 
   async load(): Promise<HomePageApiSources> {
-    const [heroSections, sliders, courseSections, blogs, learningJourney, aboutTeacher] = await Promise.allSettled([
+    const [
+      heroSections,
+      sliders,
+      courseSections,
+      blogs,
+      books,
+      learningJourney,
+      aboutTeacher,
+      readySection,
+    ] = await Promise.allSettled([
       this.fetchHeroSections(),
       this.fetchSliders(),
       this.fetchCourseSections(),
       this.fetchBlogs(),
-      // this.fetchLearningJourney(), // Temporarily disabled: use the Learning Journey mock.
-      Promise.resolve([]),
+      this.fetchBooks(),
+      this.fetchLearningJourney(),
       this.fetchAboutTeacher(),
-    ])
+      this.fetchReadySection(),
+    ]);
 
     return {
       heroSections: toSourceResult(heroSections),
       sliders: toSourceResult(sliders),
       courseSections: toSourceResult(courseSections),
       blogs: toSourceResult(blogs),
+      books: toSourceResult(books),
       learningJourney: toSourceResult(learningJourney),
       aboutTeacher: toSourceResult(aboutTeacher),
-    }
+      readySection: toSourceResult(readySection),
+    };
   }
 
   async fetchCoursesByYear(stageId: number, yearId: number): Promise<unknown> {
@@ -91,48 +118,65 @@ export class HomePageApi {
       department_id: null,
       division_id: null,
       university_subject_id: null,
-    })
+    });
+  }
+
+  async fetchBooks(page = 1): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_books, {}, { page });
+  }
+
+  async fetchBookDetails(bookId: number): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_book_details, { book_id: bookId });
   }
 
   private async fetchHeroSections(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_hero_sections, {})
+    return this.post(ApiNames.Instance.fetch_hero_sections, {});
   }
 
   private async fetchSliders(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_home_sliders, { type: 3 })
+    return this.post(ApiNames.Instance.fetch_home_sliders, { type: 3 });
   }
 
   private async fetchCourseSections(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_home_website_section, { type: 1 })
+    return this.post(ApiNames.Instance.fetch_home_website_section, { type: 1 });
   }
 
   private async fetchBlogs(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_blogs, {})
+    return this.post(ApiNames.Instance.fetch_blogs, {});
   }
 
   private async fetchLearningJourney(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_home_learning_journey, {})
+    return this.post(ApiNames.Instance.fetch_home_learning_journey, {});
   }
 
   private async fetchAboutTeacher(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_about_teacher, {})
+    return this.post(ApiNames.Instance.fetch_about_teacher, {});
   }
 
-  private async post(url: string, data: Record<string, number | null>): Promise<unknown> {
+  private async fetchReadySection(): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_ready_section, {});
+  }
+
+  private async post(
+    url: string,
+    data: Record<string, number | null>,
+    queryParams?: Record<string, number>,
+  ): Promise<unknown> {
     const response = await NetworkService.instance.post({
       url,
       data,
       headers: {
-        Accept: 'application/json',
-        'Accept-Language': 'ar',
-        'Content-Type': 'application/json',
-        'web-domain': this.webDomain,
+        Accept: "application/json",
+        "Accept-Language": "ar",
+        "Content-Type": "application/json",
+        "web-domain": this.webDomain,
       },
+      queryParams,
       isAuth: false,
-    })
+    });
 
-    return readEnvelopeData(response.data)
+    return readEnvelopeData(response.data);
   }
 }
 
-export { normalizeHomeDataError }
+export { normalizeHomeDataError };

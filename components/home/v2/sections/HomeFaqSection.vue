@@ -1,5 +1,4 @@
 <script setup lang="ts">
-/* FAQ API temporarily disabled.
 import type Fqs from '~/types/fqs'
 import { baseUrl } from '~/constant/baseUrl'
 
@@ -12,22 +11,27 @@ const webDomain = hostname === 'localhost' || hostname === 'mr-eslamsalama.com'
   ? 'mr-eslamsalama.com'
   : hostname
 
-const { data: faqs, pending, error } = await useAsyncData('home-v2-faqs', async () => {
-  const response = await $fetch<FaqResponse>(`${baseUrl}/fetch_faqs`, {
-    method: 'GET',
-    headers: {
-      'Accept-Language': 'ar',
-      'web-domain': webDomain,
-    },
-  })
+const { data: faqs, pending, error } = await useAsyncData(
+  `home-v2-faqs:${webDomain}`,
+  async () => {
+    const response = await $fetch<FaqResponse>(`${baseUrl}/fetch_faqs`, {
+      method: 'GET',
+      headers: {
+        'Accept-Language': 'ar',
+        'web-domain': webDomain,
+      },
+    })
 
-  return response.data ?? []
-}, {
-  default: () => [],
-})
-*/
+    return response.data ?? []
+  },
+  {
+    default: () => [],
+    dedupe: 'defer',
+  },
+)
 
-const faqs = [
+/* Static FAQ mock retained for reference.
+const faqMock = [
   {
     id: 1,
     question: 'كيف أبدأ استخدام المنصة؟',
@@ -54,6 +58,7 @@ const faqs = [
     answer: 'يمكنك التواصل معنا من خلال بيانات الاتصال أو واتساب، وسيساعدك فريق الدعم في أقرب وقت.',
   },
 ] as const
+*/
 </script>
 
 <template>
@@ -66,24 +71,33 @@ const faqs = [
         <span class="home-v2-faq__intro-mark" aria-hidden="true">FAQ</span>
       </div>
       <div class="home-v2-faq__list">
-        <details
-          v-for="(faq, index) in faqs"
-          :key="faq.id"
-          name="home-v2-faq"
-          :open="index === 0"
-        >
-          <summary>
-            <span class="home-v2-faq__number" aria-hidden="true">
-              {{ String(index + 1).padStart(2, "0") }}
-            </span>
-            <span class="home-v2-faq__question">{{ faq.question }}</span>
-            <span class="home-v2-faq__toggle" aria-hidden="true">
-              <i />
-              <i />
-            </span>
-          </summary>
-          <p>{{ faq.answer }}</p>
-        </details>
+        <p v-if="pending" class="home-v2-faq__status">جاري تحميل الأسئلة الشائعة...</p>
+        <p v-else-if="error" class="home-v2-faq__status home-v2-faq__status--error">
+          تعذر تحميل الأسئلة الشائعة في الوقت الحالي.
+        </p>
+        <p v-else-if="faqs.length === 0" class="home-v2-faq__status">
+          لا توجد أسئلة شائعة حاليًا.
+        </p>
+        <template v-else>
+          <details
+            v-for="(faq, index) in faqs"
+            :key="faq.id"
+            name="home-v2-faq"
+            :open="index === 0"
+          >
+            <summary>
+              <span class="home-v2-faq__number" aria-hidden="true">
+                {{ String(index + 1).padStart(2, "0") }}
+              </span>
+              <span class="home-v2-faq__question">{{ faq.question }}</span>
+              <span class="home-v2-faq__toggle" aria-hidden="true">
+                <i />
+                <i />
+              </span>
+            </summary>
+            <p>{{ faq.answer }}</p>
+          </details>
+        </template>
       </div>
     </div>
   </section>

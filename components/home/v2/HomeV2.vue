@@ -14,7 +14,7 @@ import HomeFaqSection from "./sections/HomeFaqSection.vue";
 import HomeFooterSection from "./sections/HomeFooterSection.vue";
 import HomeHeaderSection from "./sections/HomeHeaderSection.vue";
 import HomeHeroSection from "./sections/HomeHeroSection.vue";
-import HomeNotesSection from "./sections/HomeNotesSection.vue";
+import HomeBooksSection from "./sections/HomeBooksSection.vue";
 import HomeLearningJourneySection from "~/components/Home/v2/sections/HomeLearningJourneySection.vue";
 import HomeAboutTeacherSection from "~/components/Home/v2/sections/HomeAboutTeacherSection.vue";
 
@@ -36,7 +36,9 @@ const props = defineProps<{
     :style="{
       '--home-v2-blue': props.home.site.colors.primary || '#28366c',
       '--home-v2-deep': props.home.site.colors.secondary || '#3a3e7e',
-      '--home-v2-blue-light': `color-mix(in srgb, ${props.home.site.colors.primary || '#28366c'} 14%, white)`,
+      '--home-v2-blue-light': `color-mix(in srgb, ${
+        props.home.site.colors.primary || '#28366c'
+      } 14%, white)`,
     }"
   >
     <HomeHeaderSection :site="props.home.site" />
@@ -46,13 +48,13 @@ const props = defineProps<{
         :courses="props.home.courses"
         :load-courses-by-year="props.loadCoursesByYear"
       />
-      <HomeNotesSection />
+      <HomeBooksSection :books="props.home.books" />
       <HomeBlogSection :blogs="props.home.blogs" />
       <HomeLearningJourneySection :journey="props.home.learningJourney" />
       <HomeAboutTeacherSection :about="props.home.aboutTeacher" />
       <HomeAppSection :site="props.home.site" />
       <HomeFaqSection />
-      <HomeCtaSection />
+      <HomeCtaSection :cta="props.home.cta" />
     </main>
     <HomeFooterSection :site="props.home.site" />
   </div>

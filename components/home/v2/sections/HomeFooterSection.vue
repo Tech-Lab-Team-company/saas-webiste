@@ -124,9 +124,9 @@ const followLabel = computed(() =>
       <nav class="home-v2-footer__links" aria-label="روابط المنصة">
         <b>استكشف</b>
         <NuxtLink to="/course">الكورسات</NuxtLink>
-        <NuxtLink to="/#notes">المذكرات</NuxtLink>
+        <NuxtLink to="/books">الكتب</NuxtLink>
         <NuxtLink to="/blogs">المدونة</NuxtLink>
-        <NuxtLink to="/aboutus">عن مستر إسلام</NuxtLink>
+        <NuxtLink to="/about-teacher">عن المدرس</NuxtLink>
         <NuxtLink to="/#app-status">التطبيق</NuxtLink>
       </nav>
 
@@ -144,7 +144,15 @@ const followLabel = computed(() =>
         <NuxtLink to="/privacy">سياسة الخصوصية</NuxtLink>
         <NuxtLink to="/terms">الشروط والأحكام</NuxtLink>
       </nav>
-      <span dir="ltr">Powered by EduHub</span>
+      <a
+        class="home-v2-footer__powered-by"
+        href="https://eduhubco.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        dir="ltr"
+      >
+        Powered by EduHub
+      </a>
     </div>
   </footer>
 </template>
@@ -344,6 +352,20 @@ const followLabel = computed(() =>
 
 .home-v2-footer__legal a:hover {
   color: #fff;
+}
+
+.home-v2-footer__powered-by {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: #e6ba62;
+  font-weight: 900;
+  transition: color 0.18s ease;
+}
+
+.home-v2-footer__powered-by:hover,
+.home-v2-footer__powered-by:focus-visible {
+  color: #f4d590;
 }
 
 @media (max-width: 900px) {

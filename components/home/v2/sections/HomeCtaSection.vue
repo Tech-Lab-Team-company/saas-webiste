@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { gsap } from "gsap";
+import type { HomeCtaViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+
+const props = defineProps<{
+  cta: HomeSectionState<HomeCtaViewModel>;
+}>();
 
 const ctaSection = ref<HTMLElement | null>(null);
 let ctaAnimationContext: ReturnType<typeof gsap.context> | null = null;
@@ -79,9 +85,9 @@ onBeforeUnmount(() => {
     <div class="container">
       <div class="home-v2-cta__panel">
         <span class="home-v2-cta__pulse" aria-hidden="true" />
-        <span>جاهز تبدأ؟</span>
-        <h2 id="home-v2-cta-title">اختار مسارك،<br /><em>وابدأ بخطوة واضحة.</em></h2>
-        <p>الصفحة الجديدة ما زالت في وضع المعاينة، بينما يظل مسار التسجيل والكورسات الحالي متاحًا.</p>
+        <span>{{ props.cta.data.eyebrow }}</span>
+        <h2 id="home-v2-cta-title">{{ props.cta.data.title }}</h2>
+        <p>{{ props.cta.data.description }}</p>
         <div class="home-v2-cta__actions">
           <a class="button" href="#courses">استكشف المسارات <span aria-hidden="true">←</span></a>
           <NuxtLink to="/Auth/register">أنشئ حسابك</NuxtLink>
