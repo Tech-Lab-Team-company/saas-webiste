@@ -18,7 +18,6 @@ watch(() => props.CourseData, (newValue) => {
 </script>
 
 <template>
-    {{ console.log(CardDetails , "CardDetails data") }}
     <div class="course-url-container" v-for="(url , index) in CardDetails" :key="index">
 
         <div class="btns" >
@@ -41,4 +40,4 @@ watch(() => props.CourseData, (newValue) => {
 
 </template>
 
-<style scoped></style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-urls.scss"></style>

@@ -1,21 +1,15 @@
-
-
 <template>
-    <div class="login-layout">
-        <slot></slot>
-        <!-- <GlobalMainDialog /> -->
-    </div>
-  </template>
-  
-  <script lang="ts" setup>
+  <slot v-if="isRedesignedLoginHome" />
+  <AuthUnifiedShell v-else>
+    <slot />
+  </AuthUnifiedShell>
+</template>
 
+<script lang="ts" setup>
+import AuthUnifiedShell from "~/components/AuthLayout/AuthUnifiedShell.vue";
 
-
-  </script>
-  
-  <style scoped lang="scss">
-  .login-layout{
-    background-color: #FFFFFF;
-  }
-
-  </style>                
+const route = useRoute();
+const isRedesignedLoginHome = computed(
+  () => route.path.toLowerCase() === "/login/loginhome",
+);
+</script>

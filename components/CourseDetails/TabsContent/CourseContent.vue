@@ -147,13 +147,29 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
     <AccordionPanel :value="index == 0 ? '0' : index" class="course-content-panel" v-for="(unit, index) in CardDetails"
       :key="index" :class="{ 'active': activePanels.includes(index) }">
 
-      <AccordionHeader class="course-content-header ">{{ unit?.title }}</AccordionHeader>
+      <AccordionHeader class="course-content-header ">
+        <span class="chapter-index">{{ String(index + 1).padStart(2, "0") }}</span>
+        <span class="accordion-heading-copy">
+          <span class="accordion-title">{{ unit?.title }}</span>
+          <span class="accordion-count" v-if="unit?.lessons?.length">
+            <i class="pi pi-book" aria-hidden="true"></i>
+            {{ unit?.lessons?.length }} {{ $t("lesson") }}
+          </span>
+        </span>
+      </AccordionHeader>
       <AccordionContent class="course-content-body">
         <Accordion value="0" class="course-class-container" v-model:activeIndex="activeIndices"
           v-for="(lesson, secondindex) in unit?.lessons" :key="secondindex">
           <AccordionPanel :class="{ 'active': SecondactivePanels.includes(secondindex) }" :value="secondindex"
             class="course-class-panel">
-            <AccordionHeader class="course-class-header"> {{ lesson?.title }}</AccordionHeader>
+            <AccordionHeader class="course-class-header">
+              <span class="accordion-heading-copy">
+                <span class="accordion-title">{{ lesson?.title }}</span>
+                <span class="accordion-count" v-if="lesson?.sessions?.length">
+                  {{ lesson?.sessions?.length }} {{ $t("course_items") }}
+                </span>
+              </span>
+            </AccordionHeader>
 
             <hr class="course-class-hr" />
             <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
@@ -219,94 +235,4 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
 </template>
 
 
-<style scoped lang="scss">
-.session-name3{
-  display: flex;
-  align-items: center;
-  justify-content: flex-start !important;
-  gap: 10px !important; 
-}
-.disabled{
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-    .exam-rate{
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3px;
-        .rating{
-            color: #08851B;
-            background-color: #E8FFEF;
-            padding: 4px 20px;
-            border-radius: 20px;
-
-            &.failed{
-                background-color: #FFEBEC;
-                color: #BE2426;
-            }
-        
-        }
-        .details{
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-    }
-.empty-content {
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-
-.stores-logos-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .stores-logos-link {
-    width: 50%;
-
-    .stores-logos-apple {
-      width: 88%;
-    }
-  }
-
-}
-
-.course-body-details {
-  position: relative;
-
- 
-}
-
-.disabled {
-  pointer-events: none;
-  opacity: 0.5;
-  cursor: not-allowed;
-
-}
-
-.session-name {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.course-class-container .course-class-panel .course-class-body .course-body-details {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  box-shadow: 3px 3px 3px 0 #00000038;
-  padding: 0.7rem;
-  border-radius: 10px;
-  width: 100%;
-}
-</style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-content.scss"></style>

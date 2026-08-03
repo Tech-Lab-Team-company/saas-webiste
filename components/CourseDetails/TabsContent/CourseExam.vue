@@ -157,21 +157,4 @@ const currentTime = new Date();
   </div>
 </template>
 
-<style scoped>
-.disabled {
-  opacity: 0.8;
-  cursor: not-allowed;
-}
-.degree {
-  border: 1px solid black;
-  padding-inline: 10px;
-  border-radius: 10px;
-  margin-left: 10px;
-}
-/* .icon {
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-} */
-</style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-exam.scss"></style>

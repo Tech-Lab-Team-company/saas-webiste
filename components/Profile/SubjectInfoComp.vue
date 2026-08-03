@@ -3,9 +3,30 @@ import ProfileSidebar from "./ProfileSidebar.vue";
 import SubjectInfoCard from "./SubjectInfoCard.vue";
 </script>
 <template>
-  <div class="prfile-home">
-    <SubjectInfoCard class="courses-container" />
-    <ProfileSidebar />
+  <div class="prfile-home profile-dashboard">
+    <ProfileSidebar class="profile-dashboard-sidebar" />
+
+    <div class="profile-dashboard-workspace">
+      <header class="profile-dashboard-topbar">
+        <div class="profile-topbar-copy">
+          <strong>مساحة الطالب</strong>
+          <span>إدارة بيانات حسابك ومعلوماتك الدراسية</span>
+        </div>
+        <div class="profile-topbar-status"><span></span>البيانات الدراسية</div>
+      </header>
+
+      <main class="profile-dashboard-main">
+        <header class="profile-page-heading">
+          <span>المعلومات الدراسية</span>
+          <h1>بياناتك التعليمية</h1>
+          <p>راجع بياناتك الدراسية واختر المرحلة والصف المناسبين.</p>
+        </header>
+
+        <section class="courses-container profile-section-card profile-subject-card">
+          <SubjectInfoCard />
+        </section>
+      </main>
+    </div>
   </div>
 </template>
 <style scoped lang="scss">

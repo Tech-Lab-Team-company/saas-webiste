@@ -73,176 +73,197 @@ const userStore = useUserStore();
 </script>
 
 <template>
-  <div class="card-container">
-    <div class="card-text">
-      <div class="card-text-title">
-        <p class="card-text-subject-title">{{ CardDetails?.Subject?.title }}</p>
-        <p class="card-text-main-title">{{ CardDetails?.title }}</p>
-      </div>
+  <div class="course-card-layout" dir="auto">
+    <section class="course-hero-shell public-detail-hero">
+      <div class="course-hero-inner detail-hero-grid">
+        <div class="card-text detail-copy">
+          <div class="detail-breadcrumb" aria-label="مسار الصفحة">
+            <NuxtLink to="/">الرئيسية</NuxtLink>
+            <span>/</span>
+            <NuxtLink to="/course">{{ $t("all_courses") }}</NuxtLink>
+            <span>/</span>
+            <b>{{ CardDetails?.title }}</b>
+          </div>
 
-      <div class="card-text-description">
-        <p v-html="CardDetails?.description"></p>
-      </div>
-      <hr />
-      <div class="card-text-footer">
-        <p class="salary" v-if="CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed">
-          <span class="currency">{{ CardDetails?.currency }}</span><span class="price">{{ CardDetails?.CoursePrice }}
-          </span>
-        </p>
-        <p class="salary" v-else-if="CardDetails?.is_subscribed">
-          {{ $t("buying_course_done" ) }}
-        </p>
+          <div class="course-badges">
+            <span class="course-badge course-badge-access detail-badge">
+              <i
+                :class="CardDetails?.CoursePrice != 0 ? 'pi pi-wallet' : 'pi pi-check-circle'"
+                aria-hidden="true"
+              ></i>
+              <template v-if="CardDetails?.course_videos">
+                {{ CardDetails?.course_videos }} {{ $t("video") }}
+                <span class="course-badge-separator" aria-hidden="true">&middot;</span>
+              </template>
+              {{ CardDetails?.CoursePrice != 0 ? $t("paid_course") : $t("free") }}
+            </span>
+          </div>
 
-        <p class="salary" v-else>{{ $t("free") }}</p>
-        <div class="card-content">
-          <p class="card-text1" v-if="CardDetails?.course_videos">
-            <video1 />
-            {{ CardDetails?.course_videos }}
-            {{ $t("video") }}
-          </p>
-          <p class="card-text1" v-if="CardDetails?.course_docs">
-            <note />
-            {{ CardDetails?.course_docs }}
-            {{ $t("paper_file") }}
-          </p>
-          <p class="card-text1" v-if="CardDetails?.course_records">
-            <microphone />
-            {{ CardDetails?.course_records }}
-            {{ $t("audio_file") }}
-          </p>
+          <div class="card-text-title">
+            <h1 class="card-text-main-title">{{ CardDetails?.title }}</h1>
+            <h2>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</h2>
+          </div>
+
+          <div
+            class="hero-description"
+            v-if="CardDetails?.description"
+            v-html="CardDetails?.description"
+          ></div>
+
+          <div class="hero-course-details detail-teacher">
+            <div class="hero-teacher" v-if="CardDetails?.Teacher || userSetting.setting">
+              <span class="hero-teacher-avatar" aria-hidden="true">
+                {{ (CardDetails?.Teacher?.name || userSetting.setting?.name || CardDetails?.title || "").charAt(0) }}
+              </span>
+              <div>
+                <small>{{ $t("course_teacher") }}</small>
+                <b>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</b>
+              </div>
+            </div>
+
+            <i v-if="(CardDetails?.Teacher || userSetting.setting) && CardDetails?.Subject?.title"></i>
+
+            <div class="hero-subject" v-if="CardDetails?.Subject?.title">
+              <small>{{ $t("subject") }}</small>
+              <b>{{ CardDetails?.Subject?.title }}</b>
+            </div>
+          </div>
         </div>
-        <div class="card-profile">
-          <p>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</p>
-          <img :src="CardDetails?.Teacher?.image?.img ||
-            userSetting.setting?.image?.img
-            " />
+
+        <div class="hero-media detail-art">
+          <img
+            :src="CardDetails?.Image?.img || userSetting.setting?.image?.img"
+            :alt="CardDetails?.title || CardDetails?.Image?.image"
+          />
+          <span>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</span>
+          <small v-if="CardDetails?.Subject?.title">{{ CardDetails?.Subject?.title }}</small>
         </div>
       </div>
+    </section>
 
-      <div class="btns btns-container">
-        <!--  :class="{ 'multi-btn': userSetting.setting?.join_option_status == 1 }" -->
-        <PaymentDialog :status="Status" class="payment-dialog"
-          v-if="CardDetails?.CoursePrice" />
+    <div class="course-body-shell course-detail-main">
+      <div class="course-body-grid detail-layout">
+        <main class="course-main-content detail-content">
+          <slot name="main" :platform-teacher="userSetting.setting"></slot>
+        </main>
 
-        <!-- {{ console.log(userSetting.setting , "userSetting") }} -->
-        <button class="payment-btn" @click="JoinCourse" v-if="
-          Status != 1 &&
-          CardDetails?.CoursePrice != 0 &&
-          !CardDetails?.is_subscribed &&
-          userSetting.setting?.join_option_status == 1
-        ">
-          طلب الانضمام
-        </button>
+        <aside class="course-details-sidebar">
+          <div class="course-details-sidebar__inner">
+            <article class="course-summary-card enroll-card">
+              <div class="summary-media enroll-cover">
+                <img
+                  :src="CardDetails?.Image?.img || userSetting.setting?.image?.img"
+                  :alt="CardDetails?.title || CardDetails?.Image?.image"
+                />
+                <span aria-hidden="true"><i class="pi pi-play-circle"></i></span>
+                <small v-if="CardDetails?.Subject?.title">{{ CardDetails?.Subject?.title }}</small>
+              </div>
 
-        <button v-if="
-          Status == 1 &&
-          userStore.user &&
-          !CardDetails?.is_subscribed &&
-          CardDetails?.is_paid &&
-          userSetting?.setting?.join_option_status == 1
-        " disabled class="btn-disabled">
-          فى انتظار قبول الطلب
-        </button>
+              <div class="summary-content">
+                <div class="enroll-price">
+                  <span class="summary-label">{{ $t("course_access") }}</span>
+                <p class="salary" v-if="CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed">
+                  <span class="price">{{ CardDetails?.CoursePrice }}</span>
+                  <span class="currency">{{ CardDetails?.currency }}</span>
+                </p>
+                <p class="salary salary-status" v-else-if="CardDetails?.is_subscribed">
+                  <i class="pi pi-verified" aria-hidden="true"></i>
+                  {{ $t("buying_course_done" ) }}
+                </p>
+                <p class="salary salary-status" v-else>
+                  <i class="pi pi-gift" aria-hidden="true"></i>
+                  {{ $t("free") }}
+                </p>
+                </div>
+
+                <div class="summary-meta"><ul>
+                  <li>
+                    <span>{{ CardDetails?.course_videos || 0 }} {{ $t("video") }}</span>
+                  </li>
+                  <li>
+                    <span>{{ CardDetails?.course_docs || 0 }} {{ $t("paper_file") }}</span>
+                  </li>
+                  <li v-if="CardDetails?.course_records">
+                    <span>{{ CardDetails?.course_records }} {{ $t("audio_file") }}</span>
+                  </li>
+                  <li v-if="CardDetails?.Subject?.title">
+                    <span>{{ CardDetails?.Subject?.title }}</span>
+                  </li>
+                </ul></div>
+
+                <div class="btns btns-container">
+                  <PaymentDialog
+                    :status="Status"
+                    class="payment-dialog"
+                    v-if="CardDetails?.CoursePrice"
+                  />
+
+                  <button class="payment-btn" @click="JoinCourse" v-if="
+                    Status != 1 &&
+                    CardDetails?.CoursePrice != 0 &&
+                    !CardDetails?.is_subscribed &&
+                    userSetting.setting?.join_option_status == 1
+                  ">
+                    طلب الانضمام
+                  </button>
+
+                  <button v-if="
+                    Status == 1 &&
+                    userStore.user &&
+                    !CardDetails?.is_subscribed &&
+                    CardDetails?.is_paid &&
+                    userSetting?.setting?.join_option_status == 1
+                  " disabled class="btn-disabled">
+                    فى انتظار قبول الطلب
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </aside>
       </div>
     </div>
-    <div class="card-video">
-      <img :src="CardDetails?.Image?.img || userSetting.setting?.image?.img" :alt="CardDetails?.Image?.image" />
-    </div>
+
+    <section
+      class="course-final-cta detail-final"
+      v-if="CardDetails?.CoursePrice != 0 && !CardDetails?.is_subscribed"
+    >
+      <div class="course-final-cta__inner">
+        <div class="final-cta-copy">
+          <span>{{ $t("course_access") }}</span>
+          <h2>جاهز تبدأ <em>{{ CardDetails?.title }}</em>؟</h2>
+          <div v-if="CardDetails?.description" v-html="CardDetails?.description"></div>
+        </div>
+
+        <div class="btns final-cta-actions">
+          <PaymentDialog
+            :status="Status"
+            class="payment-dialog"
+            v-if="CardDetails?.CoursePrice"
+          />
+
+          <button class="payment-btn" @click="JoinCourse" v-if="
+            Status != 1 &&
+            CardDetails?.CoursePrice != 0 &&
+            !CardDetails?.is_subscribed &&
+            userSetting.setting?.join_option_status == 1
+          ">
+            طلب الانضمام
+          </button>
+
+          <button v-if="
+            Status == 1 &&
+            userStore.user &&
+            !CardDetails?.is_subscribed &&
+            CardDetails?.is_paid &&
+            userSetting?.setting?.join_option_status == 1
+          " disabled class="btn-disabled">
+            فى انتظار قبول الطلب
+          </button>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
-<style scoped lang="scss">
-.card-text-footer {
-  gap: 50px;
-
-  @media (max-width: 768px) {
-    gap: 10px;
-  }
-}
-
-.card-content {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
-  width: 50%;
-  margin-left: auto;
-  gap: 50px;
-  flex-wrap: wrap;
-
-  @media (max-width: 1000px) {
-    gap: 5px;
-    justify-content: flex-start;
-  }
-
-  .card-text1 {
-    display: flex;
-    flex-direction: row-reverse;
-    gap: 6px;
-
-    @media (max-width: 768px) {
-      width: 110px;
-    }
-  }
-}
-
-.btns-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-
-
-  .payment-dialog {
-    width: 100%;
-
-    &.multi-btn {
-      width: 50%;
-    }
-  }
-
-  button {
-    width: 50%;
-  }
-}
-
-.salary {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.icon {
-  position: absolute;
-}
-
-.card-container {
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-
-  .card-video {
-    img {
-      height: 100%;
-    }
-
-    @media (max-width: 768px) {
-      width: 100%;
-    }
-  }
-}
-
-.card-text-description {
-  max-height: 500px;
-  height: fit-content;
-  overflow-y: auto;
-}
-
-.btns {
-  button {
-    &.btn-disabled {
-      background-color: gainsboro;
-    }
-  }
-}
-</style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-card.scss"></style>

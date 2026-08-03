@@ -156,7 +156,16 @@ const handelExam = (isFinished: boolean) => {
   <Accordion v-if="CardDetails.length > 0" value="0" class="course-content-container">
     <AccordionPanel :value="index == 0 ? '0' : index" class="course-content-panel"
       v-for="(lesson, index) in CardDetails" :key="index" :class="{ 'active': activePanels.includes(index) }">
-      <AccordionHeader class="course-content-header ">{{ lesson?.title }}</AccordionHeader>
+      <AccordionHeader class="course-content-header ">
+        <span class="chapter-index">{{ String(index + 1).padStart(2, "0") }}</span>
+        <span class="accordion-heading-copy">
+          <span class="accordion-title">{{ lesson?.title }}</span>
+          <span class="accordion-count" v-if="lesson?.sessions?.length">
+            <i class="pi pi-play-circle" aria-hidden="true"></i>
+            {{ lesson?.sessions?.length }} {{ $t("course_items") }}
+          </span>
+        </span>
+      </AccordionHeader>
       <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
         <div class="course-body-details" :key="thirdindex"
           :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
@@ -165,7 +174,7 @@ const handelExam = (isFinished: boolean) => {
           <component :is="getIconByType(session?.type)" />
           <div class="session-name session-name2">
             <LockIcon v-if="!session?.web_show_video" />
-            <p>{{ session?.title }} <span v-if="!session?.is_paid && !props.isSubscribed">مجانى</span></p>
+            <p>{{ session?.title }} <span class="preview-badge" v-if="!session?.is_paid && !props.isSubscribed">مجانى</span></p>
             <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
           </div>
 
@@ -213,89 +222,4 @@ const handelExam = (isFinished: boolean) => {
 </template>
 
 
-<style scoped lang="scss">
-.session-name2 {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start !important;
-  gap: 10px !important;
-}
-
-.empty-content {
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-
-.stores-logos-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .stores-logos-link {
-    width: 50%;
-
-    .stores-logos-apple {
-      width: 88%;
-    }
-  }
-
-}
-
-.course-body-details {
-  position: relative;
-  justify-content: space-between;
-
-  .disabled {
-    pointer-events: none;
-    // opacity: 0.5;
-    cursor: not-allowed;
-
-  }
-
-  @media (max-width:768px) {
-    flex-direction: column;
-  }
-}
-
-
-
-// course-exam
-.session-name {
-  // display: flex;
-  // align-items: center;
-  // gap: 5px;
-  // position: relative;
-  display: flex;
-  justify-content: space-between;
-  gap: 21px;
-  flex-direction: row-reverse;
-  width: 100%;
-
-
-  @media(max-width:768px) {
-    flex-direction: column;
-  }
-}
-
-.course-body-details {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  box-shadow: 3px 3px 3px 0 #00000038;
-  padding: 0.7rem;
-  border-radius: 10px;
-
-
-
-  &:has(.disabled) {
-    cursor: not-allowed !important;
-    // opacity: 0.5 !important;
-    pointer-events: none !important;
-  }
-
-
-}
-</style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-content-stage-two.scss"></style>

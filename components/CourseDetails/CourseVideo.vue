@@ -90,4 +90,4 @@ function openFullscreen() {
 
 </template>
 
-<style scoped></style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-video.scss"></style>

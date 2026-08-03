@@ -1,6 +1,5 @@
     
 <script lang="ts" setup>
-import LockIcon from '~/public/icons/LockIcon.vue';
 import SetNewPasswordParams from "~/features/SetNewPasswordFeature/Core/Params/set_new_password_params";
 import SetNewPasswordController from "~/features/SetNewPasswordFeature/presentation/controllers/set_new_password_controller";
 import ResetPasswordBuilder from "~/features/ResetPasswordFeature/presentation/builders/reset_password_builder";
@@ -66,19 +65,24 @@ const UserSettingStore = useSettingStore();
     <p>{{ $t('ادخل كلمه مرور جديده و احرص على ان تكون تحتوى على اكثر من 8 حروف و علامات قويه مثل # @ &') }}</p>
 
     <div class="inputs inputs-pass">
-  
-        <div class="login-input">
-            <input
-              type="password"
-              placeholder="كلمه المرور الجديده"
-              v-model="Password"
-              @input="validatePassword"
-            />
-            <LockIcon class="login-call-icon"/>
+
+        <div class="auth-field-group">
+            <label class="auth-field-label" for="new-password">{{ $t('كلمة المرور الجديدة') }}</label>
+            <div class="login-input">
+                <input
+                  id="new-password"
+                  type="password"
+                  v-model="Password"
+                  @input="validatePassword"
+                />
+            </div>
         </div>
-        <div class="login-input">
-            <input type="password" placeholder="تأكيد كلمه المرور الجديده" v-model="confirmPassword">
-            <LockIcon class="login-call-icon"/>
+
+        <div class="auth-field-group">
+            <label class="auth-field-label" for="confirm-new-password">{{ $t('تأكيد كلمة المرور الجديدة') }}</label>
+            <div class="login-input">
+                <input id="confirm-new-password" type="password" v-model="confirmPassword">
+            </div>
         </div>
        
     

@@ -80,43 +80,63 @@ const UpdateData = async () => {
 
 <template>
   <div class="profile-home">
-    <div class="profile-home-text">
-      <p>{{ $t('البيانات الشخصيه') }}</p>
-      <p>
-        {{ $t('هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين الآخرين') }}
-      </p>
-    </div>
-    <hr class="profile-text-hr" />
+    <aside class="profile-summary-card">
+      <div class="profile-summary-avatar" aria-hidden="true">
+        {{ name ? name.charAt(0) : 'ط' }}
+      </div>
+      <div class="profile-summary-copy">
+        <span>الملف الشخصي</span>
+        <h2>{{ name || 'طالب' }}</h2>
+        <p>طالب ثانوي</p>
+      </div>
+      <div class="profile-summary-state">
+        <i></i>
+        بيانات الحساب قابلة للتحديث
+      </div>
+    </aside>
 
-    <div class="profile-home-information">
-      <div class="profile-info-container">
-        <label>{{ $t('الاسم بالكامل') }}</label>
-        <div class="profile-input-container">
-          <button>{{ $t('تعديل') }}</button>
-          <input type="text" class="input" placeholder=" " v-model="name" />
-        </div>
+    <section class="profile-data-card">
+      <div class="profile-home-text">
+        <span class="profile-card-tag">البيانات الشخصية</span>
+        <p>{{ $t('البيانات الشخصيه') }}</p>
+        <p>
+          {{ $t('هذه البيانات التي أدخلتها عند التسجيل لا تظهر إلى أي من المستخدمين الآخرين') }}
+        </p>
       </div>
-      <div class="profile-info-container">
-        <label>{{ $t('البريد الالكتروني') }}</label>
-        <div class="profile-input-container">
-          <button>{{ $t('تعديل') }}</button>
-          <input type="text" class="input" placeholder="" v-model="email" />
-        </div>
-      </div>
-      <div class="profile-info-container">
-        <label>{{ $t('رقم الهاتف') }}</label>
-        <div class="profile-input-container">
-          <button>{{ $t('تعديل') }}</button>
-          <input type="text" class="input" placeholder="" v-model="phone" />
-        </div>
-      </div>
-    </div>
 
-    <div class="button" @click="UpdateData">
-      <button class="btn-save-changes">
-        {{ $t('حفظ التغييرات') }}
-      </button>
-    </div>
+      <div class="profile-home-information">
+        <div class="profile-info-container">
+          <label for="profile-full-name">{{ $t('الاسم بالكامل') }}</label>
+          <div class="profile-input-container">
+            <input id="profile-full-name" type="text" class="input" placeholder=" " v-model="name" />
+            <button type="button">{{ $t('تعديل') }}</button>
+          </div>
+        </div>
+        <div class="profile-info-container">
+          <label for="profile-email">{{ $t('البريد الالكتروني') }}</label>
+          <div class="profile-input-container">
+            <input id="profile-email" type="text" class="input" placeholder="" v-model="email" />
+            <button type="button">{{ $t('تعديل') }}</button>
+          </div>
+        </div>
+        <div class="profile-info-container">
+          <label for="profile-phone">{{ $t('رقم الهاتف') }}</label>
+          <div class="profile-input-container">
+            <input id="profile-phone" type="text" class="input" placeholder="" v-model="phone" />
+            <button type="button">{{ $t('تعديل') }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-card-actions">
+        <p>راجع البيانات قبل حفظ التغييرات.</p>
+        <div class="button" @click="UpdateData">
+          <button class="btn-save-changes">
+            {{ $t('حفظ التغييرات') }}
+          </button>
+        </div>
+      </div>
+    </section>
 
     <!-- <div class="hrs">
       <hr class="profile-first-hr" />

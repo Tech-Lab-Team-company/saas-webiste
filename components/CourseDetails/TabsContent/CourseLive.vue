@@ -55,7 +55,6 @@ watch(() => props.CourseData, (newValue) => {
 </script>
 
 <template>
-    {{ console.log(CardDetails , "CardDetails") }}
     <div class="course-live-container" v-for="(live,index) in CardDetails" :key="(index)"
     :class="live.state === 'not live' ? 'not-live' : ''">
 
@@ -100,4 +99,4 @@ watch(() => props.CourseData, (newValue) => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-live.scss"></style>

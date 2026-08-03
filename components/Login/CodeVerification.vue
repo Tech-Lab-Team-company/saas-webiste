@@ -44,12 +44,12 @@ const UserSettingStore = useSettingStore();
 
         <div class="inputs inputs-pass ">
 
-
+            <span id="reset-otp-label" class="auth-field-label">{{ $t('رمز التحقق') }}</span>
             <div class="login-code">
                 <div class="card flex justify-center">
-                    <InputOtp v-model="OtpValue" :length=6 >
+                    <InputOtp v-model="OtpValue" :length=6 aria-labelledby="reset-otp-label">
                         <template #default="{ attrs, events }">
-                            <input type="text" v-bind="attrs" v-on="events" class="code-number-box" placeholder="0" />
+                            <input type="text" v-bind="attrs" v-on="events" class="code-number-box" />
                         </template>
                     </InputOtp>
                 </div>

@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import callIcon from "../../public/icons/callIcon.vue";
-import LockIcon from "../../public/icons/LockIcon.vue";
 import LeftArrowIcon from "~/public/icons/LeftArrowIcon.vue";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import {onMounted, ref} from "vue";
@@ -67,16 +65,16 @@ onMounted(() => {
       <P class="pass-code1"> {{ EmailBuilder.Instance.getEmail() }}</P>
 
       <div class="inputs inputs-pass">
+        <span id="register-otp-label" class="auth-field-label">رمز التحقق</span>
         <div class="login-code">
           <div class="card flex justify-center">
-            <InputOtp v-model="optvalue" :length="6">
+            <InputOtp v-model="optvalue" :length="6" aria-labelledby="register-otp-label">
               <template #default="{ attrs, events }">
                 <input
                   type="text"
                   v-bind="attrs"
                   v-on="events"
                   class="code-number-box"
-                  placeholder="0"
                 />
               </template>
             </InputOtp>

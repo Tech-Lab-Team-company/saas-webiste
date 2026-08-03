@@ -121,12 +121,7 @@ watch(() => props.CourseData, (newValue) => {
         
 
 
-<style scoped lang="scss">
-.collapse-text{
-    text-decoration: underline;
-}
-</style>
+<style scoped lang="scss" src="~/assets/style/course-details-redesign/course-homework.scss"></style>
 
 
         
-
