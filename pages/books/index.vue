@@ -570,7 +570,7 @@ useHead({
   }
 }
 
-/* Library design adapted from the reference page in pages/lorem/lorem.vue. */
+/* Library design adapted from the student dashboard visual language. */
 .books-page__hero {
   padding: 150px 0 78px;
   overflow: hidden;

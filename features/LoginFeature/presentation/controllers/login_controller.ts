@@ -27,34 +27,29 @@ export default class LoginController extends ControllerInterface<UserModel> {
     // useLoaderStore().setLoadingWithDialog();
     try {
       const router = useRouter();
-      const dataState: DataState<UserModel> =
-        await this.LoginUseCase.call(params);
+      const dataState: DataState<UserModel> = await this.LoginUseCase.call(
+        params,
+      );
       this.setState(dataState);
       if (this.isDataSuccess()) {
-        
-          DialogSelector.instance.successDialog.openDialog({
-            dialogName: "dialog",
-            titleContent: "Login Success",
-            imageElement: successImage,
-            messageContent: null,
-          });
-          const userStore = useUserStore();
-          if (this.state.value.data) {
-            
-          
-           await userStore.setUser(this.state.value.data);
-           console.log('login')
-          await router.push("/");
-
-          }
-      
+        DialogSelector.instance.successDialog.openDialog({
+          dialogName: "dialog",
+          titleContent: "Login Success",
+          imageElement: successImage,
+          messageContent: null,
+        });
+        const userStore = useUserStore();
+        if (this.state.value.data) {
+          await userStore.setUser(this.state.value.data);
+          console.log("login");
+          await router.push("/student-dashboard");
+        }
       } else {
-        
         throw new Error(this.state.value.error?.title);
       }
       // useLoaderStore().endLoadingWithDialog();
     } catch (error: any) {
-      console.log('log in error' ,  error)
+      console.log("log in error", error);
       DialogSelector.instance.errorDialog.openDialog({
         dialogName: "dialog",
         titleContent: error,

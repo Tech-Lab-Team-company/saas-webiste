@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import ProfileHome from "~/components/Profile/ProfileHome.vue";
 import ProfileSidebar from "~/components/Profile/ProfileSidebar.vue";
+
+definePageMeta({ middleware: ["verified-student"] });
 </script>
 
 <template>

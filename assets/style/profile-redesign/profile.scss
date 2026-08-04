@@ -506,9 +506,36 @@ body:has(.profile-redesign-page) {
   flex-direction: column;
   margin: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   border-radius: 0;
   background: var(--profile-primary);
   color: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--profile-secondary) 72%, white) transparent;
+  scrollbar-gutter: stable;
+}
+
+.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar {
+  width: 7px;
+}
+
+.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar-track {
+  margin-block: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--profile-primary) 86%, white);
+}
+
+.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar-thumb {
+  min-height: 48px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--profile-secondary) 72%, white);
+  background-clip: padding-box;
+}
+
+.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--profile-secondary) 48%, white);
+  background-clip: padding-box;
 }
 
 .profile-redesign-page .profile-sidebar-brand {
@@ -895,5 +922,219 @@ body:has(.profile-redesign-page) {
 
   .profile-redesign-page .profile-input-container button {
     min-width: 58px;
+  }
+}
+
+/* Shared professional finish and motion for every profile dashboard page. */
+.profile-redesign-page {
+  background:
+    radial-gradient(circle at 8% 4%, color-mix(in srgb, var(--profile-secondary) 8%, transparent), transparent 28%),
+    linear-gradient(145deg, color-mix(in srgb, var(--profile-primary) 2%, #f7f9f9), var(--profile-canvas));
+}
+
+.profile-redesign-page .profile-dashboard-workspace {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container {
+  z-index: 25;
+  box-shadow: -18px 0 50px color-mix(in srgb, var(--profile-primary) 22%, transparent);
+}
+
+.profile-redesign-page .profile-dashboard-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-color: color-mix(in srgb, var(--profile-primary) 10%, white);
+  background: color-mix(in srgb, white 92%, transparent);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--profile-primary) 6%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.profile-redesign-page .profile-topbar-copy strong {
+  letter-spacing: -0.01em;
+}
+
+.profile-redesign-page .profile-topbar-status {
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 50%, transparent);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.profile-redesign-page .profile-topbar-status:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--profile-secondary) 14%, transparent);
+}
+
+.profile-redesign-page .profile-topbar-status > span {
+  animation: profile-status-pulse 2.2s ease-in-out infinite;
+}
+
+.profile-redesign-page .profile-dashboard-main {
+  position: relative;
+}
+
+.profile-redesign-page .profile-page-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.profile-redesign-page .profile-page-heading > span::before {
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--profile-secondary);
+  content: "";
+  transition: width 220ms ease;
+}
+
+.profile-redesign-page .profile-page-heading:hover > span::before {
+  width: 38px;
+}
+
+.profile-redesign-page .profile-page-heading h1 {
+  letter-spacing: -0.025em;
+}
+
+.profile-redesign-page .profile-section-card,
+.profile-redesign-page .profile-summary-card,
+.profile-redesign-page .profile-data-card {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--profile-primary) 12%, white);
+  border-radius: 18px;
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--profile-primary) 7%, transparent);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.profile-redesign-page .profile-section-card:hover,
+.profile-redesign-page .profile-summary-card:hover,
+.profile-redesign-page .profile-data-card:hover {
+  border-color: color-mix(in srgb, var(--profile-secondary) 28%, white);
+  box-shadow: 0 22px 52px color-mix(in srgb, var(--profile-primary) 10%, transparent);
+  transform: translateY(-2px);
+}
+
+.profile-redesign-page .profile-summary-avatar {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--profile-secondary) 18%, transparent);
+  transition: transform 240ms cubic-bezier(.2, .8, .2, 1), box-shadow 240ms ease;
+}
+
+.profile-redesign-page .profile-summary-avatar::after {
+  position: absolute;
+  inset: -45% auto auto -65%;
+  width: 55%;
+  height: 190%;
+  background: linear-gradient(90deg, transparent, #ffffff80, transparent);
+  transform: rotate(20deg);
+  content: "";
+  transition: left 500ms ease;
+}
+
+.profile-redesign-page .profile-summary-card:hover .profile-summary-avatar {
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--profile-secondary) 24%, transparent);
+  transform: translateY(-4px) scale(1.035);
+}
+
+.profile-redesign-page .profile-summary-card:hover .profile-summary-avatar::after {
+  left: 120%;
+}
+
+.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input,
+.profile-redesign-page .profile-password-card .profile-input-container input.input,
+.profile-redesign-page .profile-subject-card .login-input select.student-select {
+  border-radius: 10px;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:hover,
+.profile-redesign-page .profile-password-card .profile-input-container input.input:hover,
+.profile-redesign-page .profile-subject-card .login-input select.student-select:hover {
+  border-color: color-mix(in srgb, var(--profile-secondary) 38%, var(--profile-border));
+  background: #fff;
+}
+
+.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:focus,
+.profile-redesign-page .profile-password-card .profile-input-container input.input:focus,
+.profile-redesign-page .profile-subject-card .login-input select.student-select:focus {
+  transform: translateY(-1px);
+}
+
+.profile-redesign-page .profile-input-container button {
+  border-radius: 10px 0 0 10px;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.profile-redesign-page .profile-input-container button:hover {
+  background: var(--profile-secondary-soft);
+  color: var(--profile-primary);
+}
+
+.profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes,
+.profile-redesign-page .profile-password-card button.primary-button-2,
+.profile-redesign-page .profile-subject-card .btns-home .login-btn {
+  border-radius: 10px;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--profile-primary) 18%, transparent);
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes:hover,
+.profile-redesign-page .profile-password-card button.primary-button-2:hover,
+.profile-redesign-page .profile-subject-card .btns-home .login-btn:hover {
+  border-color: var(--profile-secondary);
+  background: var(--profile-secondary);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--profile-secondary) 24%, transparent);
+  transform: translateY(-2px);
+}
+
+.profile-redesign-page .profile-courses-card .card {
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--profile-primary) 6%, transparent);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.profile-redesign-page .profile-courses-card .card:hover {
+  border-color: color-mix(in srgb, var(--profile-secondary) 30%, white);
+  box-shadow: 0 20px 42px color-mix(in srgb, var(--profile-primary) 12%, transparent);
+  transform: translateY(-5px);
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-option {
+  border-radius: 10px;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-option:hover {
+  transform: translateX(-3px);
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-image-container img.course-image {
+  box-shadow: 0 12px 30px #0000002e;
+  transition: transform 250ms cubic-bezier(.2, .8, .2, 1), box-shadow 250ms ease;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-image-container:hover img.course-image {
+  box-shadow: 0 17px 38px #0000003d;
+  transform: scale(1.045) rotate(-1deg);
+}
+
+@keyframes profile-status-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--profile-secondary) 34%, transparent); }
+  50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-redesign-page *,
+  .profile-redesign-page *::before,
+  .profile-redesign-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

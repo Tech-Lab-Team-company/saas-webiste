@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import ProfileSubjectInfoComp from "~/components/Profile/SubjectInfoComp.vue";
+
+definePageMeta({ middleware: ["verified-student"] });
 </script>
 
 <template>

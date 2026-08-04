@@ -162,7 +162,7 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
   .profile-options {
     .profile-option {
       display: flex;
-      justify-content: end;
+      // justify-content: end;
       gap: 5px;
       align-items: center;
       padding: 20px 10px;

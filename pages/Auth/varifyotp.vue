@@ -3,6 +3,7 @@
     // console.log(route.path);
 
     definePageMeta({
+        name: 'verify-account-otp',
         layout: 'auth' 
     });
   

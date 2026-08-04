@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+definePageMeta({ middleware: ["verified-student"] });
+
 </script>
 
 <template>

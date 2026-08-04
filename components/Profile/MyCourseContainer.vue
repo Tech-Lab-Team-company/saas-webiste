@@ -1,6 +1,10 @@
 
 <script setup lang="ts">
-
+const userStore = useUserStore();
+const yearLabel = computed(() => {
+    const info = userStore.user?.userInfo;
+    return info?.year_title || info?.stage_title || info?.university_title || "مستواك الدراسي";
+});
 </script>
 
 <template>
@@ -18,12 +22,12 @@
 
             <main class="profile-dashboard-main">
                 <header class="profile-page-heading">
-                    <span>المحتوى التعليمي</span>
-                    <h1>كورساتي</h1>
-                    <p>تابع كورساتك ومحتواك الدراسي من مكان واحد.</p>
+                    <span>{{ yearLabel }}</span>
+                    <h1>محتوى {{ yearLabel }}</h1>
+                    <p>الكورسات المتاحة لصفك مع ملخص واضح لعدد الفيديوهات والملفات في كل كورس.</p>
                 </header>
 
-                <section class="courses-container aa profile-section-card profile-courses-card">
+                <section class="courses-container profile-courses-library">
                     <ProfileMyCourseCard />
                 </section>
             </main>
@@ -52,9 +56,10 @@
 
     .courses-container{
         grid-column: span 5;
-        padding: 20px;
-        border-radius: 20px;
-        background-color: #f6f6f6;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
 
         @media (max-width: 768px) {
             width: 100%;

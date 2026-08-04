@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { useUserStore } from "~/stores/user";
@@ -12,38 +12,22 @@ const imagePreview = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
 const profileimage = ref<ProfileImage | null>(null);
 const userStore = useUserStore();
-const isLoggedIn = ref(false);
-const { locale } = useI18n();
-
 const router = useRouter();
 
-onMounted(() => {
-  isLoggedIn.value = localStorage.getItem("auth") === "true";
-
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    userStore.setUser(JSON.parse(storedUser));
-  }
-
-  const savedImage = localStorage.getItem("profileImage");
-  if (savedImage) {
-    userStore.setImage(savedImage);
-  }
+const displayedImage = computed(() =>
+  imagePreview.value || userStore.image || userStore.user?.image || "/images/user.png",
+);
+const educationLabel = computed(() => {
+  const info = userStore.user?.userInfo;
+  return info?.year_title || info?.stage_title || info?.university_title || "طالب";
 });
 
 const handleLogout = () => {
   localStorage.removeItem("auth");
   localStorage.removeItem("user");
   userStore.logout();
-  isLoggedIn.value = false;
-  router.push("/");
+  router.push({ name: "login-loginhome" });
 };
-
-onMounted(() => {
-  if (userStore.image) {
-    imagePreview.value = userStore.image;
-  }
-});
 
 const handleImageChange = async (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -94,8 +78,11 @@ const uploadImage = async () => {
 
     <div class="person-data">
       <div class="profile-image-container">
-        <img v-if="imagePreview" :src="imagePreview" class="course-image" alt="الصورة الشخصية" />
-        <img v-else src="/images/user.png" class="course-image" alt="الصورة الشخصية" />
+        <img
+          :src="displayedImage"
+          class="course-image"
+          alt="الصورة الشخصية"
+        />
         <label for="profile-image-input">
           <EditImageIcon class="edit-icon" />
         </label>
@@ -107,68 +94,73 @@ const uploadImage = async () => {
           style="display: none"
         />
       </div>
-      <p class="person-name">{{ userStore.user.name }}</p>
-      <p class="person-stage">طالب ثانوي</p>
+      <p class="person-name">{{ userStore.user?.name || "الطالب" }}</p>
+      <p class="person-stage">{{ educationLabel }}</p>
       <span class="person-account-state">الحساب نشط</span>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
 
     <ul class="profile-options">
       <NuxtLink
-        to="/profile"
-        exactActiveClass="active"
+        :to="{ name: 'student-dashboard' }"
+        exact-active-class="active"
         class="profile-option"
-        @click="UpdateSidebar('profile')"
-        :class="{ active: SelectedOption === 'profile' }"
       >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-home" />
+        </span>
+        <p>الرئيسية</p>
+      </NuxtLink>
+
+      <NuxtLink
+        :to="{ name: 'profile' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-user" />
+        </span>
         <p>الملف الشخصي</p>
-        <SettingsIcon class="profile-icon" />
       </NuxtLink>
 
       <NuxtLink
-        to="/passwordupdate"
-        exactActiveClass="active"
+        :to="{ name: 'profilecourse' }"
+        exact-active-class="active"
         class="profile-option"
-        @click="UpdateSidebar('security')"
-        :class="{ active: SelectedOption === 'security' }"
       >
-        <p>تغير كلمة المرور</p>
-        <KeyIcon class="profile-icon" />
-      </NuxtLink>
-
-      <NuxtLink
-        exactActiveClass="active"
-        to="/profilecourse"
-        class="profile-option"
-        @NuxtLinkck="UpdateSidebar('courses')"
-        :class="{ active: SelectedOption === 'courses' }"
-      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-book" />
+        </span>
         <p>كورساتي</p>
-        <CoursesNote class="profile-icon" />
       </NuxtLink>
       <NuxtLink
-        exactActiveClass="active"
-        to="/profilesubjectinfo"
+        :to="{ name: 'profilesubjectinfo' }"
+        exact-active-class="active"
         class="profile-option"
-        @NuxtLinkck="UpdateSidebar('academicinfo')"
-        :class="{ active: SelectedOption === 'academicinfo' }"
       >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-graduation-cap" />
+        </span>
         <p>المعلومات الدراسيه</p>
-        <CoursesNote class="profile-icon" />
       </NuxtLink>
-      <!-- <li class="profile-option" @click="UpdateSidebar('questionsbank')" exactActiveClass="active"
-        :class="{ active: SelectedOption === 'questionsbank' }">
-        <p>بنك اسئلتي</p>
-        <QuestionBank class="profile-icon" />
-      </li> -->
+      <NuxtLink
+        :to="{ name: 'passwordupdate' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-lock" />
+        </span>
+        <p>تغيير كلمة المرور</p>
+      </NuxtLink>
       <li
         class="profile-option"
         @click="handleLogout"
-        exactActiveClass="active"
-        :class="{ active: SelectedOption === 'logout' }"
       >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-sign-out" />
+        </span>
         <p>تسجيل الخروج</p>
-        <Logout class="profile-icon" />
       </li>
     </ul>
 
@@ -241,7 +233,7 @@ const uploadImage = async () => {
   .profile-options {
     .profile-option {
       display: flex;
-      justify-content: end;
+      // justify-content: end;
       gap: 5px;
       align-items: center;
       padding: 20px 10px;
@@ -254,6 +246,33 @@ const uploadImage = async () => {
 
       .profile-icon {
         width: 20px;
+      }
+
+      .profile-option-icon {
+        width: 34px !important;
+        height: 34px !important;
+        display: grid;
+        flex: 0 0 34px;
+        place-items: center;
+        border: 1px solid currentColor;
+        border-radius: 9px;
+        background: color-mix(in srgb, currentColor 7%, transparent);
+        opacity: 0.82;
+        transition: background 180ms ease, color 180ms ease, opacity 180ms ease, transform 180ms ease;
+
+        i {
+          font-size: 14px;
+        }
+      }
+
+      &:hover .profile-option-icon,
+      &.active .profile-option-icon,
+      &.router-link-exact-active .profile-option-icon {
+        border-color: var(--profile-secondary, var(--secondary-color));
+        background: var(--profile-secondary, var(--secondary-color));
+        color: #fff;
+        opacity: 1;
+        transform: translateX(-2px);
       }
     }
   }

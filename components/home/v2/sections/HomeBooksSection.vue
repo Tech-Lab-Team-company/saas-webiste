@@ -285,7 +285,7 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   height: 100%;
   object-fit: contain;
   object-position: center bottom;
-  opacity: 0.08;
+  opacity: 0.8;
   filter: saturate(0.82) contrast(1.08);
 }
 

@@ -1,377 +1,339 @@
 <script setup lang="ts">
 import CoursesParams from "~/features/FetchCourses/Core/Params/courses_params";
+import type CoursesModel from "~/features/FetchCourses/Data/models/courses_model";
 import CoursesController from "~/features/FetchCourses/presentation/controllers/courses_controller";
-import HomeCourseCard from "~/components/home/v2/HomeCourseCard.vue";
-import type { HomeCourseViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { useUserStore } from "~/stores/user";
 
-// const cards = [
-//   {
-//     id: 1,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 70,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 2,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 50,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 3,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 90,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 4,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 30,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 5,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 85,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 6,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 60,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 7,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 45,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 8,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 75,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-//   {
-//     id: 9,
-//     title: "كورس مراجعه النحو مادة اللغه العربيه",
-//     img: arabic_three,
-//     text: " انطلق في رحلة ممتعة لتعلّم اللغة العربية، من الأساسيات إلى الاحتراف، من خلال دروس تفاعلية وتمارين شيّقة",
-//     progress: 20,
-//     name: "أحمد حوام",
-//     icon: user,
-//   },
-// ];
-
-const courseParams = new CoursesParams("2");
+const userStore = useUserStore();
+const categoryId = String(userStore.user?.category_id || "2");
 const coursesController = CoursesController.getInstance();
-const state = await coursesController.FetchCourses(courseParams);
+const state = await coursesController.FetchCourses(new CoursesParams(categoryId));
 
-const getCourseImage = (course: any) => {
-  const image = course?.image;
-  const source = typeof image === "string"
-    ? image
-    : image?.img || image?.image || image?.src || image?.url;
+const courses = computed<CoursesModel[]>(() => state.value.data ?? []);
+const educationLabel = computed(() => {
+  const info = userStore.user?.userInfo;
+  return info?.year_title || info?.stage_title || info?.university_title || "المستوى الدراسي";
+});
 
-  return source ? { src: source, alt: image?.alt || course.title || "" } : null;
+const courseStage = (course: CoursesModel) =>
+  educationLabel.value || course.subject?.title || "المستوى الدراسي";
+
+const courseDescription = (course: CoursesModel) =>
+  course.subtitle || `تابع محتوى ${course.title} ودروس الكورس من مكان واحد.`;
+
+const courseMeta = (course: CoursesModel) => {
+  const items = [
+    `${course.videos_number || 0} فيديو`,
+    course.docs_number ? `${course.docs_number} ملف` : null,
+    course.teacher?.name || null,
+  ];
+  return items.filter(Boolean).join(" · ");
 };
 
-const profileCourses = computed(() => (state.value.data ?? []).map((course): HomeCourseViewModel => ({
-  id: course.id,
-  title: course.title,
-  description: course.subtitle || null,
-  intro: null,
-  route: `/course/${course.id}`,
-  image: getCourseImage(course),
-  price: null,
-  currency: null,
-  isPaid: null,
-  isSubscribed: true,
-  teacher: course.teacher ? { id: course.teacher.id ?? null, name: course.teacher.name ?? null, image: null } : null,
-  sourceSubject: course.subject ? { id: course.subject.id ?? null, title: course.subject.title ?? null } : null,
-  videosCount: course.videos_number ?? 0,
-  documentsCount: course.docs_number ?? 0,
-  recordingsCount: null,
-})));
-
-watch(
-  () => coursesController.state.value,
-  (newValue) => {
-    state.value = newValue;
-  },
-  { deep: true },
-);
+const courseRoute = (course: CoursesModel) => ({
+  name: "course-id",
+  params: { id: course.id },
+});
 </script>
 
 <template>
   <GlobalDataStatues :status="state">
-    <template #initial> loader </template>
-    <template #loader> loader </template>
-    <template #empty> لا يوجد كورسات </template>
+    <template #initial>
+      <div class="library-grid library-loading" aria-label="جارٍ تحميل الكورسات">
+        <article v-for="item in 2" :key="item" class="library-course"><span /><div><i /><i /><i /></div></article>
+      </div>
+    </template>
+
+    <template #loader>
+      <div class="library-grid library-loading" aria-label="جارٍ تحميل الكورسات">
+        <article v-for="item in 2" :key="item" class="library-course"><span /><div><i /><i /><i /></div></article>
+      </div>
+    </template>
+
+    <template #empty>
+      <div class="library-empty">
+        <span class="pi pi-book" />
+        <h2>لا توجد كورسات مسجلة</h2>
+        <p>عند الاشتراك في كورس سيظهر هنا ويمكنك متابعة تقدّمك.</p>
+        <NuxtLink :to="{ name: 'course' }">استكشف الكورسات ←</NuxtLink>
+      </div>
+    </template>
+
+    <template #failed>
+      <div class="library-empty library-error">
+        <span class="pi pi-exclamation-circle" />
+        <h2>تعذر تحميل الكورسات</h2>
+        <p>يرجى تحديث الصفحة والمحاولة مرة أخرى.</p>
+      </div>
+    </template>
+
     <template #success>
-      <div class="profile-home">
-        <div class="slider-wrapper">
-          <div class="cards-container profile-course-grid">
-            <HomeCourseCard
-              v-for="(course, index) in profileCourses"
-              :key="course.id"
-              :course="course"
-              :level-label="course.sourceSubject?.title || ''"
-              :index="index"
-              :progress="state.data[index]?.progress ?? 0"
-            />
+      <div class="library-grid">
+        <article
+          v-for="(course, index) in courses"
+          :key="course.id"
+          class="library-course"
+          :style="{ '--order': index }"
+        >
+          <div class="library-cover" :class="`tone-${index % 3}`">
+            <span>{{ course.title?.charAt(0) || "ك" }}</span>
+
+            <div class="cover-caption">
+              <small>{{ courseStage(course) }}</small>
+              <div v-if="Number(course.progress)" class="cover-progress">
+                <i :style="{ width: `${Math.min(100, Number(course.progress) || 0)}%` }" />
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div class="library-body">
+            <span class="course-stage">{{ courseStage(course) }}</span>
+            <h2>{{ course.title }}</h2>
+            <p>{{ courseDescription(course) }}</p>
+
+            <div class="library-footer">
+              <small>{{ courseMeta(course) }}</small>
+              <NuxtLink :to="courseRoute(course)">عرض محتوى الكورس <span>←</span></NuxtLink>
+            </div>
+          </div>
+        </article>
       </div>
     </template>
   </GlobalDataStatues>
 </template>
 
 <style scoped>
-.slider-wrapper {
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.library-course {
+  --order: 0;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 190px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--profile-primary) 12%, white);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  animation: library-course-in 0.58s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: calc(var(--order) * 70ms);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.library-course:hover {
+  border-color: color-mix(in srgb, var(--profile-secondary) 35%, white);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--profile-primary) 8%, transparent);
+  transform: translateY(-3px);
+}
+
+.library-cover {
+  position: relative;
+  display: grid;
+  min-height: 240px;
+  place-items: center;
+  overflow: hidden;
+  color: var(--profile-primary);
+  background: color-mix(in srgb, var(--profile-secondary) 20%, white);
+}
+
+.library-cover.tone-1 {
+  color: var(--profile-primary);
+  background: color-mix(in srgb, var(--profile-primary) 17%, white);
+}
+
+.library-cover.tone-2 {
+  color: var(--profile-primary);
+  background: color-mix(in srgb, var(--profile-secondary) 15%, #f4dfaa);
+}
+
+.library-cover::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 58%, color-mix(in srgb, var(--profile-primary) 12%, transparent));
+  content: "";
+  pointer-events: none;
+}
+
+.library-cover > span {
+  font-size: 142px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: .13;
+  transition: opacity 260ms ease, transform 350ms ease;
+}
+
+.library-course:hover .library-cover > span { opacity: .19; transform: scale(1.06) rotate(-2deg); }
+
+.cover-caption {
+  position: absolute;
+  z-index: 2;
+  right: 15px;
+  bottom: 15px;
+  left: 15px;
+  display: grid;
+  gap: 7px;
+  color: var(--profile-ink);
+}
+
+.cover-caption small {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cover-progress {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--profile-primary) 16%, transparent);
+}
+
+.cover-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--profile-secondary);
+}
+
+.library-body {
   display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.course-stage {
+  align-self: stretch;
+  width: 100%;
+  overflow: hidden;
+  color: var(--profile-secondary);
+  padding: 7px 10px;
+  background: color-mix(in srgb, var(--profile-secondary) 9%, white);
+  font-size: 9px;
+  font-weight: 900;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-body h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 6px 0 8px;
+  color: var(--profile-ink);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.library-body > p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 11px;
+  line-height: 1.8;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.library-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--profile-primary) 9%, white);
+}
+
+.library-footer small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--profile-muted);
+  font-size: 9px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.library-footer a {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  color: var(--profile-secondary);
+  font-size: 10px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.library-footer a span { transition: transform 180ms ease; }
+.library-footer a:hover span { transform: translateX(-3px); }
+
+.library-empty {
+  display: flex;
+  min-height: 300px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.slider-heading {
-  font-size: 35px;
-  color: #222;
+  padding: 30px;
   text-align: center;
-  margin-bottom: 20px;
-  font-weight: 800;
-  line-height: 200%;
-  letter-spacing: 0%;
-  vertical-align: middle;
-  font-family: "bold";
 }
 
-.cards-container {
+.library-empty > span {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 90%;
-  gap: 22px;
-  width: 100%;
-  justify-items: center;
-  align-items: center;
-  direction: rtl;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 16px;
+  color: var(--profile-secondary);
+  background: var(--profile-secondary-soft);
+  font-size: 24px;
 }
 
-.profile-course-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  align-items: stretch;
-  gap: 22px !important;
+.library-empty h2 { margin: 15px 0 3px; color: var(--profile-ink); font-size: 19px; }
+.library-empty p { margin: 0; color: var(--profile-muted); font-size: 11px; }
+.library-empty a { margin-top: 16px; color: var(--profile-secondary); font-size: 11px; font-weight: 900; text-decoration: none; }
+.library-error > span { color: #b42318; background: #fff0ee; }
+
+.library-loading .library-course { min-height: 240px; animation: none; }
+.library-loading article > span { background: linear-gradient(100deg,#e8edf1,#f8fafb,#e8edf1); background-size: 200%; animation: library-loading 1.2s infinite; }
+.library-loading article > div { display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px; }
+.library-loading i { height: 13px; border-radius: 5px; background: linear-gradient(100deg,#e8edf1,#f8fafb,#e8edf1); background-size: 200%; animation: library-loading 1.2s infinite; }
+.library-loading i:nth-child(1) { width: 35%; }.library-loading i:nth-child(2) { width: 85%; height: 28px; }.library-loading i:nth-child(3) { width: 65%; }
+
+@keyframes library-course-in { from { opacity: 0; transform: translateY(24px) scale(.985); } }
+@keyframes library-loading { to { background-position: -200% 0; } }
+
+@media (max-width: 1180px) {
+  .library-grid { grid-template-columns: 1fr; }
 }
 
-.card {
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  height: 97%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: 10px;
-  width: 87%;
+@media (max-width: 680px) {
+  .library-course { grid-template-columns: 145px minmax(0,1fr); }
+  .library-cover { min-height: 220px; }
+  .library-body { padding: 19px; }
+  .library-footer { align-items: flex-start; flex-direction: column; }
 }
 
-.card img {
-  width: 100%;
-  /* height: auto; */
-  object-fit: cover;
+@media (max-width: 480px) {
+  .library-course { grid-template-columns: 1fr; }
+  .library-cover { min-height: 190px; }
+  .library-cover > span { font-size: 115px; }
+  .library-footer { flex-direction: row; align-items: center; }
 }
 
-.card-body {
-  margin: 10px 10px;
+@media (prefers-reduced-motion: reduce) {
+  .library-course { animation: none; transition: none; }
 }
-
-.card-title {
-  font-family: "bold";
-  font-weight: 700;
-  font-size: 19px;
-  text-align: right;
-}
-
-.card-number {
-  background: var(--secondary-color);
-  width: 100px;
-  border-radius: 20px;
-  text-align: center;
-}
-
-.image-container {
-  position: relative;
-  width: 100%;
-  padding: 0;
-}
-
-.course-image {
-  width: 100%;
-  height: 230px;
-  object-fit: cover;
-}
-
-.overlay-text {
-  position: absolute;
-  top: 15%;
-  left: 18%;
-  transform: translate(-50%, -50%);
-  padding: 4px;
-  border-radius: 20px;
-  background: var(--secondary-color);
-  width: 95px;
-  height: 35px;
-  font-family: "bold";
-  font-weight: 700;
-  font-size: 18px;
-  color: #ffffff;
-  text-align: center;
-}
-
-.card-content {
-  display: flex;
-  justify-content: space-between;
-  margin: 5px 0px;
-}
-
-.card-text {
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 150%;
-  letter-spacing: 0%;
-  text-align: right;
-  vertical-align: middle;
-  color: #656b78;
-  font-family: "regular";
-}
-
-.card-text1 {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 150%;
-  letter-spacing: 0%;
-  text-align: right;
-  vertical-align: middle;
-  display: flex;
-  gap: 5px;
-  font-family: "regular";
-  color: #737e8a;
-}
-
-.card-one_footer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin: 10px 0;
-}
-.card-footer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-top: 1px solid #c2c2c2;
-  padding: 10px 0;
-}
-.card-name {
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: 0%;
-  text-align: right;
-  font-family: "bold";
-}
-
-.progress-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-
-.progress-bar {
-  flex-grow: 1;
-  height: 8px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress {
-  height: 100%;
-  background-color: var(--secondary-color);
-  transition: width 0.3s ease;
-}
-
-.progress-percentage {
-  font-weight: 400;
-  font-size: 14px;
-  color: #737e8a;
-  font-family: "regular";
-}
-
-/* Responsive Design */
-@media (max-width: 1440px) {
-  .cards-container {
-    grid-template-columns: repeat(3, 1fr);
-    width: 100%;
-  }
-  .card {
-    width: 100%;
-  }
-}
-@media (max-width: 1024px) {
-  .cards-container {
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-  }
-  .card {
-    width: 90%;
-  }
-}
-
-@media (max-width: 1100px) {
-  .profile-course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-}
-
-@media (max-width: 767px) {
-  .profile-course-grid { grid-template-columns: 1fr !important; }
-  .cards-container {
-    grid-template-columns: 1fr;
-    width: 100%;
-  }
-  .card {
-    width: 97%;
-  }
-}
-</style>
-
-<style>
-@import "swiper/css";
-@import "swiper/css/navigation";
 </style>

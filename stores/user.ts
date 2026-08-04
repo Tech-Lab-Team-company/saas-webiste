@@ -15,6 +15,12 @@ export const useUserStore = defineStore('user', {
     setImage(img: string) {
       this.image = img;
     },
+    markVerified() {
+      if (this.user) {
+        this.user.isVerified = true;
+        this.isAuth = true;
+      }
+    },
     logout() {
       this.user = null;
     //   this.image = null;
