@@ -4,10 +4,10 @@ import type {
   HomeImageApiDto,
   HomeHeroSectionApiDto,
   HomePageApiSources,
-  HomeSliderApiDto,
   HomeWebsiteSectionApiDto,
   HomeSectionState,
 } from '../types/homePage.types'
+import { HeroSectionTypeEnum } from '../types/homePage.types'
 import type {
   HomeBlogViewModel,
   HomeBookDetailsViewModel,
@@ -25,6 +25,7 @@ import type {
   HomePageViewModel,
   HomeSiteViewModel,
 } from '../models/HomePageViewModel'
+import { BookPriceTypeEnum, BookTypeEnum } from '../models/HomePageViewModel'
 import { homeBlogsMock } from '../mocks/homeBlogs.mock'
 import { createHomeLearningJourneyMock } from '../mocks/homeLearningJourney.mock'
 import { createHomeAboutTeacherMock } from '../mocks/homeAboutTeacher.mock'
@@ -79,32 +80,6 @@ const mapImage = (image: HomeImageApiDto | null): HomeImageViewModel | null => {
   }
 }
 
-const mapSliderApiDto = (value: unknown): HomeSliderApiDto | null => {
-  if (!isRecord(value)) {
-    return null
-  }
-
-  const media = isRecord(value.media) ? value.media : null
-
-  return {
-    id: toNullableNumber(value.id),
-    title: toNullableString(value.title),
-    subtitle: toNullableString(value.subtitle),
-    text: toNullableString(value.text),
-    link: toNullableString(value.link),
-    type: toNullableNumber(value.type),
-    style: toNullableNumber(value.style),
-    media: {
-      image: media
-        ? mapImageApiDto({ img: media.img, alt: media.alt })
-        : null,
-      mobileImage: media
-        ? mapImageApiDto({ img: media.mobile_img, alt: media.mobile_alt })
-        : null,
-    },
-  }
-}
-
 const mapFlexibleImageApiDto = (value: unknown, fallbackAlt: unknown = null): HomeImageApiDto | null => {
   if (typeof value === 'string') {
     return {
@@ -125,6 +100,7 @@ const mapHeroSectionApiDto = (value: unknown): HomeHeroSectionApiDto | null => {
 
   const hero: HomeHeroSectionApiDto = {
     id: toNullableNumber(value.id),
+    type: toNullableNumber(value.type),
     title: toNullableString(value.title),
     subtitle: toNullableString(value.subtitle ?? value.sub_title),
     description: toNullableString(value.description ?? value.text),
@@ -231,15 +207,6 @@ const mapBlogApiDto = (value: unknown): HomeBlogApiDto | null => {
   }
 }
 
-const mapHero = (slider: HomeSliderApiDto): HomeHeroViewModel => ({
-  title: slider.title,
-  subtitle: slider.subtitle,
-  description: slider.text,
-  link: slider.link,
-  image: mapImage(slider.media.image),
-  mobileImage: mapImage(slider.media.mobileImage),
-})
-
 const mapCustomHero = (hero: HomeHeroSectionApiDto): HomeHeroViewModel => ({
   title: hero.title,
   subtitle: hero.subtitle,
@@ -248,6 +215,20 @@ const mapCustomHero = (hero: HomeHeroSectionApiDto): HomeHeroViewModel => ({
   image: mapImage(hero.image),
   mobileImage: mapImage(hero.mobileImage),
 })
+
+export const mapHeroSection = (
+  value: unknown,
+  expectedType?: HeroSectionTypeEnum,
+): HomeHeroViewModel | null => {
+  const heroes = readHeroSections(value)
+    .map(mapHeroSectionApiDto)
+    .filter((item): item is HomeHeroSectionApiDto =>
+      item !== null && (expectedType === undefined || item.type === expectedType),
+    )
+  const hero = heroes[heroes.length - 1]
+
+  return hero ? mapCustomHero(hero) : null
+}
 
 const mapCourse = (course: HomeCourseApiDto): HomeCourseViewModel | null => {
   if (course.id === null || !course.title) {
@@ -385,26 +366,115 @@ const mapBook = (value: unknown): HomeBookViewModel | null => {
     return null
   }
 
+  const nestedBook = isRecord(value.book) ? value.book : null
   const id = toNullableNumber(value.id)
-  const title = toNullableString(value.title)
+  const nestedBookId = nestedBook ? toNullableNumber(nestedBook.id) : null
+  const title = toNullableString(value.title) ?? (nestedBook ? toNullableString(nestedBook.title) : null)
 
   if (id === null || !title) {
     return null
   }
 
+  const bookTypes = toArray(value.book_types)
+    .map((bookType) => {
+      if (!isRecord(bookType)) return null
+
+      const typeId = toNullableNumber(bookType.id)
+      const label = toNullableString(bookType.label)
+      const price = toNullableNumber(bookType.price)
+      if (typeId === null || !label || price === null) return null
+
+      return { id: typeId, label, price }
+    })
+    .filter((bookType): bookType is { id: number; label: string; price: number } => bookType !== null)
+
+  if (nestedBook && bookTypes.length === 0) {
+    const nestedPrices = [
+      { id: 1, label: 'كتاب إلكتروني', price: toNullableNumber(nestedBook.ebook_price) },
+      { id: 2, label: 'نسخة مطبوعة', price: toNullableNumber(nestedBook.paper_price) },
+      { id: 3, label: 'إلكتروني ومطبوع', price: toNullableNumber(nestedBook.both_price) },
+    ]
+
+    bookTypes.push(...nestedPrices.filter(
+      (type): type is { id: number; label: string; price: number } => type.price !== null,
+    ))
+  }
+
+  const priceType = nestedBook ? toNullableNumber(nestedBook.price_type) : null
+  const availablePrice = nestedBook
+    ? priceType === BookPriceTypeEnum.FREE
+      ? 0
+      : priceType === BookPriceTypeEnum.EBOOK
+        ? toNullableNumber(nestedBook.ebook_price) ?? 0
+        : priceType === BookPriceTypeEnum.PAPER
+          ? toNullableNumber(nestedBook.paper_price) ?? 0
+          : priceType === BookPriceTypeEnum.BOTH
+            ? toNullableNumber(nestedBook.both_price) ?? 0
+            : toNullableNumber(nestedBook.ebook_price)
+              ?? toNullableNumber(nestedBook.paper_price)
+              ?? toNullableNumber(nestedBook.both_price)
+              ?? 0
+    : null
+
+  const nestedBookType = nestedBook ? toNullableNumber(nestedBook.type) : null
+  const bookTypeLabel = nestedBookType === BookTypeEnum.EBOOK
+    ? 'كتاب إلكتروني'
+    : nestedBookType === BookTypeEnum.PAPER
+      ? 'نسخة مطبوعة'
+      : nestedBookType === BookTypeEnum.BOTH
+        ? 'إلكتروني ومطبوع'
+        : null
+  const priceTypeLabel = priceType === BookPriceTypeEnum.FREE
+    ? 'مجاني'
+    : priceType === BookPriceTypeEnum.EBOOK
+      ? 'نسخة إلكترونية'
+      : priceType === BookPriceTypeEnum.PAPER
+        ? 'نسخة مطبوعة'
+        : priceType === BookPriceTypeEnum.BOTH
+          ? 'النسختان'
+          : null
+
+  const steps = toArray(value.steps)
+    .map((step, index) => {
+      if (!isRecord(step)) return null
+      const stepId = toNullableNumber(step.id)
+      const stepTitle = toNullableString(step.title)
+      if (stepId === null || !stepTitle) return null
+
+      return {
+        id: stepId,
+        title: stepTitle,
+        description: toNullableString(step.description),
+        order: toNullableNumber(step.order) ?? index + 1,
+      }
+    })
+    .filter((step): step is NonNullable<typeof step> => step !== null)
+    .sort((first, second) => first.order - second.order)
+
   return {
     id,
-    bookId: toNullableNumber(value.book_id) ?? id,
-    image: toNullableString(value.image),
+    bookId: nestedBookId ?? toNullableNumber(value.book_id) ?? id,
+    image: toNullableString(value.image) ?? (nestedBook ? toNullableString(nestedBook.image) : null),
     numberOfPages: toNullableNumber(value.number_of_pages),
     title,
+    bookTitle: nestedBook ? toNullableString(nestedBook.title) ?? title : title,
+    bookDescription: nestedBook
+      ? toNullableString(nestedBook.description)
+      : toNullableString(value.description),
+    bookTypeLabel,
+    priceTypeLabel,
+    priceType: priceType as BookPriceTypeEnum | null,
     subtitle: toNullableString(value.subtitle),
     description: toNullableString(value.description),
-    isFree: toNullableBoolean(value.isFree ?? value.is_free) ?? false,
-    price: toNullableString(value.price) ?? '0',
-    currency: toNullableString(value.currency) ?? '',
-    bookType: toNullableNumber(value.book_type),
+    isFree: nestedBook
+      ? priceType === BookPriceTypeEnum.FREE || availablePrice === 0
+      : toNullableBoolean(value.isFree ?? value.is_free) ?? false,
+    price: nestedBook ? String(availablePrice) : toNullableString(value.price) ?? '0',
+    currency: nestedBook ? 'ج.م' : toNullableString(value.currency) ?? '',
+    bookTypes,
+    bookType: nestedBookType ?? toNullableNumber(value.book_type),
     invoiceLink: toSafeUrl(value.invoice_link),
+    steps,
   }
 }
 
@@ -444,8 +514,28 @@ export const mapBookDetails = (value: unknown): HomeBookDetailsViewModel | null 
 }
 
 export const mapBooksPage = (value: unknown): HomeBooksViewModel => {
+  if (Array.isArray(value)) {
+    const items = value
+      .map(mapBook)
+      .filter((book): book is HomeBookViewModel => book !== null)
+
+    return {
+      items,
+      pagination: {
+        ...createEmptyBooksPagination(),
+        perPage: items.length,
+        total: items.length,
+      },
+    }
+  }
+
   if (!isRecord(value)) {
     return createEmptyBooks()
+  }
+
+  const nestedBooks = value.books ?? value.items
+  if (Array.isArray(nestedBooks)) {
+    return mapBooksPage(nestedBooks)
   }
 
   const meta = isRecord(value.meta) ? value.meta : {}
@@ -705,30 +795,20 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
   const site = mapHomeSite(settings)
   const hero = (() => {
     if (sources.heroSections.kind === 'success') {
-      const customHeroes = readHeroSections(sources.heroSections.data)
-        .map(mapHeroSectionApiDto)
-        .filter((item): item is HomeHeroSectionApiDto => item !== null)
-      const customHero = customHeroes[customHeroes.length - 1]
+      const customHero = mapHeroSection(
+        sources.heroSections.data,
+        HeroSectionTypeEnum.HOME_API_WEBSITE,
+      )
 
       if (customHero) {
-        return { data: mapCustomHero(customHero), status: 'success' as const }
-      }
-    }
-
-    if (sources.sliders.kind === 'success') {
-      const slider = toArray(sources.sliders.data)
-        .map(mapSliderApiDto)
-        .find((item): item is HomeSliderApiDto => item !== null)
-
-      if (slider) {
-        return { data: mapHero(slider), status: 'success' as const }
+        return { data: customHero, status: 'success' as const }
       }
     }
 
     const mockHero = mapHeroSectionApiDto(createHomeHeroSectionMock(site)[0])
     const mockHeroViewModel = mockHero ? mapCustomHero(mockHero) : null
 
-    if (sources.heroSections.kind === 'error' && sources.sliders.kind === 'error') {
+    if (sources.heroSections.kind === 'error') {
       return mapSectionError<HomeHeroViewModel | null>(mockHeroViewModel, sources.heroSections.error)
     }
 

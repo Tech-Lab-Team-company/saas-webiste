@@ -559,7 +559,7 @@ onBeforeUnmount(() => {
   z-index: 1;
   display: grid;
   width: min(1280px, calc(100% - 48px));
-  min-height: max(700px, calc(100svh - 86px));
+  min-height: max(700px, calc(95svh - 86px));
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   align-items: center;
   gap: clamp(36px, 4vw, 64px);

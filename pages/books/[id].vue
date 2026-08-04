@@ -88,6 +88,55 @@ const mediaLinks = computed(() => [
   ...(book.value?.externalVideoLinks ?? []),
 ]);
 
+const bookFeatures = computed(() => {
+  const currentBook = book.value;
+  if (!currentBook) return [];
+
+  return [
+    "محتوى تعليمي منظم وسهل الرجوع إليه",
+    currentBook.numberOfPages
+      ? `${currentBook.numberOfPages} صفحة للمذاكرة والمراجعة`
+      : "مناسب للمذاكرة والمراجعة المستقلة",
+    currentBook.bookTypes.length
+      ? `متاح بصيغة ${currentBook.bookTypes.map((type) => type.label).join(" و")}`
+      : "كتاب مستقل عن الكورسات",
+    currentBook.isFree ? "متاح مجانًا" : "شراء مستقل بدون الاشتراك في كورس",
+  ];
+});
+
+const bookFacts = computed(() => {
+  const currentBook = book.value;
+  if (!currentBook) return [];
+
+  return [
+    { label: "عدد الصفحات", value: currentBook.numberOfPages ? `${currentBook.numberOfPages} صفحة` : "غير محدد" },
+    { label: "نوع النسخة", value: currentBook.bookTypes.map((type) => type.label).join(" · ") || "كتاب مستقل" },
+    { label: "مقاطع الفيديو", value: String(currentBook.videoLinksCount) },
+    { label: "المحتوى الإضافي", value: String(currentBook.multimediaCount) },
+  ];
+});
+
+const purchaseOptions = computed(() => {
+  const currentBook = book.value;
+  if (!currentBook) return [];
+
+  if (currentBook.bookTypes.length) {
+    return currentBook.bookTypes.map((type) => ({
+      id: type.id,
+      label: type.label,
+      price: currentBook.isFree ? 0 : type.price,
+      isDigital: /إلكتروني|رقمي/u.test(type.label),
+    }));
+  }
+
+  return [{
+    id: currentBook.bookType ?? currentBook.id,
+    label: currentBook.bookType === 1 ? "كتاب إلكتروني" : currentBook.bookType === 2 ? "نسخة مطبوعة" : "نسخة الكتاب",
+    price: currentBook.isFree ? 0 : Number(currentBook.price),
+    isDigital: currentBook.bookType === 1,
+  }];
+});
+
 useSeoMeta({
   title: () => book.value
     ? `${book.value.title} | ${site.value.brandName || "EduHub"}`
@@ -130,103 +179,163 @@ useHead({
 
       <template v-else>
         <section class="book-details-page__hero">
-          <div class="container">
-            <nav class="book-details-page__breadcrumb" aria-label="مسار التنقل">
-              <NuxtLink to="/books">الكتب</NuxtLink>
-              <span aria-hidden="true">/</span>
-              <span>{{ book.title }}</span>
-            </nav>
+          <div class="container book-details-page__hero-grid">
+            <figure class="book-details-page__cover">
+              <img
+                v-if="coverImage"
+                :src="coverImage"
+                :alt="book.title"
+                loading="eager"
+              />
+              <span>EDUHUB BOOK {{ book.bookId }}</span>
+              <strong>{{ book.title }}</strong>
+              <small>
+                {{ book.numberOfPages ? `${book.numberOfPages} صفحة` : "كتاب من مكتبة المنصة" }}
+              </small>
+            </figure>
 
-            <div class="book-details-page__hero-grid">
-              <div class="book-details-page__copy">
-                <span>{{ book.subtitle || "كتاب من مكتبة المنصة" }}</span>
-                <h1>{{ book.title }}</h1>
-                <p v-if="book.description">{{ book.description }}</p>
+            <div class="book-details-page__copy">
+              <nav class="book-details-page__breadcrumb" aria-label="مسار التنقل">
+                <NuxtLink to="/home-v2">الرئيسية</NuxtLink>
+                <span aria-hidden="true">/</span>
+                <NuxtLink to="/books">المكتبة</NuxtLink>
+                <span aria-hidden="true">/</span>
+                <b>{{ book.title }}</b>
+              </nav>
 
-                <div class="book-details-page__badges">
-                  <span v-if="book.numberOfPages">{{ book.numberOfPages }} صفحة</span>
-                  <span>{{ book.isFree ? "كتاب مجاني" : "كتاب مدفوع" }}</span>
-                  <span v-if="book.isFlipbook || book.isFreeFlipbook">يدعم التصفح التفاعلي</span>
+              <span class="book-details-page__badge">
+                {{ book.isFree ? "كتاب مجاني" : "كتاب مستقل" }}
+              </span>
+              <h1>{{ book.title }}</h1>
+              <h2>{{ book.subtitle || "محتوى مرتب للمذاكرة والمراجعة" }}</h2>
+              <p>{{ book.description || "اطّلع على تفاصيل الكتاب واختر النسخة المناسبة لك." }}</p>
+
+              <div class="book-details-page__author">
+                <span aria-hidden="true">{{ (site.brandName || "E").slice(0, 1) }}</span>
+                <div>
+                  <small>إعداد ومراجعة</small>
+                  <b>{{ site.brandName || "EduHub" }}</b>
                 </div>
-
-                <div class="book-details-page__price">{{ displayPrice }}</div>
-
-                <div class="book-details-page__actions">
-                  <a
-                    v-if="primaryAction"
-                    :href="primaryAction.url"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {{ primaryAction.label }}
-                    <span aria-hidden="true">↗</span>
-                  </a>
-                  <span v-else class="book-details-page__unavailable">
-                    غير متاح للشراء أو التحميل حاليًا
-                  </span>
-                  <NuxtLink to="/books">كل الكتب</NuxtLink>
+                <i aria-hidden="true"></i>
+                <div>
+                  <small>عدد الصفحات</small>
+                  <b>{{ book.numberOfPages ? `${book.numberOfPages} صفحة` : "غير محدد" }}</b>
                 </div>
               </div>
-
-              <figure class="book-details-page__cover">
-                <img
-                  v-if="coverImage"
-                  :src="coverImage"
-                  :alt="book.title"
-                  loading="eager"
-                />
-                <div v-else aria-hidden="true">
-                  <span>BOOK</span>
-                  <strong>{{ book.title }}</strong>
-                  <small>{{ book.numberOfPages ? `${book.numberOfPages} صفحة` : "مكتبة المنصة" }}</small>
-                </div>
-              </figure>
             </div>
           </div>
         </section>
 
-        <section class="section book-details-page__information">
-          <div class="container">
-            <header class="book-details-page__section-head">
-              <span class="section-tag">بيانات الكتاب</span>
-              <h2>كل ما تحتاج معرفته</h2>
-            </header>
+        <section class="book-details-page__information">
+          <div class="container book-details-page__information-grid">
+            <div class="book-details-page__content">
+              <article>
+                <span class="book-details-page__section-tag">عن الكتاب</span>
+                <h2>مرجع واضح للمذاكرة والمراجعة</h2>
+                <p>
+                  {{ book.description || "كتاب مستقل يساعدك على تنظيم المذاكرة والرجوع إلى المحتوى بسهولة." }}
+                </p>
+                <div class="book-details-page__feature-grid">
+                  <div v-for="(feature, index) in bookFeatures" :key="feature">
+                    <span>{{ String(index + 1).padStart(2, "0") }}</span>
+                    <p>{{ feature }}</p>
+                  </div>
+                </div>
+              </article>
 
-            <div class="book-details-page__metrics">
               <article>
-                <span>عدد الصفحات</span>
-                <strong>{{ book.numberOfPages || "—" }}</strong>
+                <span class="book-details-page__section-tag">بيانات الكتاب</span>
+                <h2>كل التفاصيل في مكان واحد</h2>
+                <div class="book-details-page__facts">
+                  <div v-for="fact in bookFacts" :key="fact.label">
+                    <span>{{ fact.label }}</span>
+                    <b>{{ fact.value }}</b>
+                  </div>
+                </div>
               </article>
-              <article>
-                <span>مقاطع الفيديو</span>
-                <strong>{{ book.videoLinksCount }}</strong>
-              </article>
-              <article>
-                <span>المحتوى الإضافي</span>
-                <strong>{{ book.multimediaCount }}</strong>
-              </article>
-              <article>
-                <span>التقييمات</span>
-                <strong>{{ book.ratesCount }}</strong>
+
+              <article v-if="book.hasFreePreview || book.isFlipbook || book.isFreeFlipbook" class="book-details-page__digital-policy">
+                <span aria-hidden="true">▣</span>
+                <div>
+                  <h2>تصفّح نسخة الكتاب المتاحة</h2>
+                  <p>يمكنك فتح نسخة القراءة أو المعاينة المتاحة من خلال المنصة.</p>
+                  <a v-if="primaryAction" :href="primaryAction.url" target="_blank" rel="noreferrer">
+                    {{ primaryAction.label }} ←
+                  </a>
+                </div>
               </article>
             </div>
 
-            <div
-              v-if="!book.isFree && (book.fees > 0 || book.vat > 0)"
-              class="book-details-page__pricing"
-            >
-              <div><span>السعر الأساسي</span><b>{{ book.price }} {{ book.currency }}</b></div>
-              <div v-if="book.fees > 0"><span>الرسوم</span><b>{{ book.fees }}</b></div>
-              <div v-if="book.vat > 0"><span>ضريبة القيمة المضافة</span><b>{{ book.vat }}%</b></div>
-              <div><span>الإجمالي</span><b>{{ displayPrice }}</b></div>
-            </div>
+            <aside class="book-details-page__buy-card">
+              <h2>اختار نسختك</h2>
+              <div
+                v-for="option in purchaseOptions"
+                :key="option.id"
+                :class="['book-details-page__format', { 'book-details-page__format--print': !option.isDigital }]"
+              >
+                <div>
+                  <span aria-hidden="true">{{ option.isDigital ? "▣" : "▤" }}</span>
+                  <p>
+                    <b>{{ option.label }}</b>
+                    <small>{{ option.isDigital ? "قراءة إلكترونية" : "نسخة مستقلة من الكتاب" }}</small>
+                  </p>
+                </div>
+                <strong>
+                  {{ option.price === 0 ? "مجاني" : option.price }}
+                  <small v-if="option.price !== 0">{{ book.currency }}</small>
+                </strong>
+                <ul>
+                  <li>شراء مستقل عن الكورسات</li>
+                  <li v-if="book.numberOfPages">{{ book.numberOfPages }} صفحة</li>
+                  <li>الوصول حسب نوع النسخة المتاحة</li>
+                </ul>
+                <a
+                  v-if="primaryAction"
+                  :href="primaryAction.url"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {{ primaryAction.label }} ←
+                </a>
+                <span v-else class="book-details-page__format-unavailable">غير متاح حاليًا</span>
+              </div>
+
+              <div v-if="!book.isFree" class="book-details-page__format book-details-page__format--print">
+                <div>
+                  <span aria-hidden="true">▤</span>
+                  <p>
+                    <b>نسخة مطبوعة</b>
+                    <small>توصيل للعنوان</small>
+                  </p>
+                </div>
+                <strong>
+                  210
+                  <small>ج.م</small>
+                </strong>
+                <ul>
+                  <li>طباعة ملونة بجودة عالية</li>
+                  <li>تغليف يحافظ على الكتاب</li>
+                  <li>شحن موحد 55 ج.م داخل مصر حاليًا</li>
+                </ul>
+                <a
+                  href="https://eslam-salama-gamma-physics-demo.ibrahimelrefaey2019.chatgpt.site/order/book/physics-secondary-1-notes?format=print"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  ابدأ نموذج طلب النسخة المطبوعة ←
+                </a>
+              </div>
+
+              <p v-if="!book.isFree">إجمالي النسخة المطبوعة مع الشحن: 265 ج.م. نموذج الطلب لا يرسل بيانات أو ينفذ دفعًا.</p>
+              <NuxtLink to="/books">العودة إلى كل الكتب</NuxtLink>
+            </aside>
           </div>
         </section>
 
         <section v-if="galleryImages.length > 0" class="section book-details-page__gallery">
           <div class="container">
             <header class="book-details-page__section-head">
-              <span class="section-tag">معاينة الكتاب</span>
+              <span class="book-details-page__section-tag">معاينة الكتاب</span>
               <h2>صور من المحتوى</h2>
             </header>
             <div class="book-details-page__gallery-grid">
@@ -240,7 +349,7 @@ useHead({
         <section v-if="mediaLinks.length > 0" class="section book-details-page__media">
           <div class="container">
             <header class="book-details-page__section-head">
-              <span class="section-tag">محتوى إضافي</span>
+              <span class="book-details-page__section-tag">محتوى إضافي</span>
               <h2>روابط الفيديو</h2>
             </header>
             <div class="book-details-page__media-links">
@@ -305,10 +414,8 @@ useHead({
 }
 
 .book-details-page__hero {
-  padding: 54px 0 80px;
-  background:
-    radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--home-v2-blue) 17%, transparent), transparent 30%),
-    linear-gradient(145deg, #f7f9fd, #eaf1ff);
+  padding: 60px 0;
+  background: color-mix(in srgb, var(--home-v2-coral) 10%, #f5eddb);
 }
 
 .book-details-page__breadcrumb {
@@ -316,7 +423,7 @@ useHead({
   min-width: 0;
   align-items: center;
   gap: 10px;
-  margin-bottom: 34px;
+  margin-bottom: 24px;
   color: var(--home-v2-muted);
   font-size: 13px;
 }
@@ -334,30 +441,38 @@ useHead({
 
 .book-details-page__hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  grid-template-columns: 350px minmax(0, 1fr);
   align-items: center;
-  gap: clamp(50px, 8vw, 110px);
+  gap: clamp(48px, 7vw, 90px);
 }
 
-.book-details-page__copy > span:first-child {
-  color: var(--home-v2-blue);
-  font-size: 13px;
+.book-details-page__badge {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #fff;
+  color: var(--home-v2-coral);
+  font-size: 10px;
   font-weight: 900;
 }
 
 .book-details-page h1 {
-  max-width: 780px;
-  margin: 16px 0 22px;
+  margin: 12px 0 0;
   color: var(--home-v2-ink);
-  font: 900 clamp(39px, 5vw, 65px) / 1.3 var(--home-v2-heading);
+  font: 900 clamp(38px, 4.2vw, 54px) / 1.3 var(--home-v2-heading);
+}
+
+.book-details-page__copy h2 {
+  margin: 4px 0 17px;
+  color: var(--home-v2-muted);
+  font: 700 17px var(--home-v2-heading);
 }
 
 .book-details-page__copy > p {
-  max-width: 680px;
+  max-width: 700px;
   margin: 0;
   color: var(--home-v2-muted);
-  font-size: 17px;
-  line-height: 1.95;
+  font-size: 15px;
+  line-height: 1.9;
 }
 
 .book-details-page__badges {
@@ -420,44 +535,352 @@ useHead({
 
 .book-details-page__cover {
   position: relative;
+  display: flex;
+  height: 440px;
+  flex-direction: column;
   overflow: hidden;
-  aspect-ratio: 4 / 5;
   margin: 0;
-  border: 10px solid #fff;
-  border-radius: 18px 18px 72px;
-  background: var(--home-v2-deep);
-  box-shadow: 0 38px 70px -45px #061147a6;
+  padding: 35px;
+  background: color-mix(in srgb, var(--home-v2-blue) 18%, #bcd9d4);
+  box-shadow: 16px 19px color-mix(in srgb, var(--home-v2-deep) 11%, transparent);
 }
 
 .book-details-page__cover img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 0.25;
+  filter: saturate(0.75);
 }
 
-.book-details-page__cover > div {
+.book-details-page__cover > span,
+.book-details-page__cover > strong,
+.book-details-page__cover > small {
+  position: relative;
+  z-index: 1;
+}
+
+.book-details-page__cover > span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.book-details-page__cover > strong {
+  margin: auto 0;
+  font: 900 34px/1.55 var(--home-v2-heading);
+}
+
+.book-details-page__cover > small {
+  color: color-mix(in srgb, var(--home-v2-ink) 65%, transparent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.book-details-page__author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.book-details-page__author > span {
   display: grid;
-  height: 100%;
-  align-content: end;
-  gap: 14px;
-  padding: 34px;
-  background: linear-gradient(135deg, transparent 48%, #ffffff12 49%);
-  color: #fff;
+  width: 43px;
+  height: 43px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--home-v2-blue);
+  font-weight: 900;
 }
 
-.book-details-page__cover > div span {
-  color: #9dcbff;
+.book-details-page__author > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.book-details-page__author small {
+  color: var(--home-v2-muted);
+  font-size: 9px;
+}
+
+.book-details-page__author b {
+  font: 800 11px var(--home-v2-heading);
+}
+
+.book-details-page__author > i {
+  width: 1px;
+  height: 28px;
+  margin-inline: 10px;
+  background: color-mix(in srgb, var(--home-v2-muted) 35%, transparent);
+}
+
+.book-details-page__information {
+  padding: 65px 0 100px;
+  background: #f6f8f6;
+}
+
+.book-details-page__information-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  align-items: start;
+  gap: 55px;
+}
+
+.book-details-page__content > article {
+  margin-bottom: 55px;
+  padding: 0 0 55px;
+  border-bottom: 1px solid var(--home-v2-line);
+}
+
+.book-details-page__content > article:last-child {
+  margin-bottom: 0;
+}
+
+.book-details-page__section-tag {
+  color: var(--home-v2-coral);
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: 0.14em;
 }
 
-.book-details-page__cover > div strong {
-  font: 900 clamp(26px, 3vw, 38px) / 1.4 var(--home-v2-heading);
+.book-details-page__content h2,
+.book-details-page__section-head h2 {
+  margin: 7px 0;
+  color: var(--home-v2-ink);
+  font: 800 clamp(26px, 3vw, 34px) var(--home-v2-heading);
 }
 
-.book-details-page__cover > div small {
-  color: #ffffffb8;
+.book-details-page__content > article > p {
+  color: var(--home-v2-muted);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.book-details-page__feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.book-details-page__feature-grid > div {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--home-v2-line);
+  background: #fff;
+}
+
+.book-details-page__feature-grid span {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  place-items: center;
+  background: color-mix(in srgb, var(--home-v2-blue) 10%, #fff);
+  color: var(--home-v2-blue);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.book-details-page__feature-grid p {
+  margin: 0;
+  color: var(--home-v2-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.book-details-page__facts {
+  border: 1px solid var(--home-v2-line);
+  background: #fff;
+}
+
+.book-details-page__facts > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.45fr) 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 17px;
+  border-bottom: 1px solid var(--home-v2-line);
+}
+
+.book-details-page__facts > div:last-child {
+  border-bottom: 0;
+}
+
+.book-details-page__facts span {
+  color: var(--home-v2-muted);
+  font-size: 11px;
+}
+
+.book-details-page__facts b {
+  font: 800 12px var(--home-v2-heading);
+}
+
+.book-details-page__digital-policy {
+  display: flex;
+  gap: 18px;
+  padding: 27px !important;
+  border: 0 !important;
+  background: color-mix(in srgb, var(--home-v2-blue) 10%, #e3efeb);
+}
+
+.book-details-page__digital-policy > span {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex: none;
+  place-items: center;
+  background: #fff;
+  color: var(--home-v2-deep);
+  font-size: 20px;
+}
+
+.book-details-page__digital-policy h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.book-details-page__digital-policy p {
+  margin: 5px 0;
+  color: var(--home-v2-muted);
+  font-size: 11px;
+}
+
+.book-details-page__digital-policy a {
+  color: var(--home-v2-blue);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.book-details-page__buy-card {
+  position: sticky;
+  top: 105px;
+  padding: 24px;
+  border: 1px solid var(--home-v2-line);
+  background: #fff;
+}
+
+.book-details-page__buy-card > h2 {
+  margin: 0 0 15px;
+  font: 800 20px var(--home-v2-heading);
+}
+
+.book-details-page__format {
+  margin-bottom: 12px;
+  padding: 15px;
+  border: 1px solid var(--home-v2-line);
+}
+
+.book-details-page__format > div {
+  display: flex;
+  gap: 10px;
+}
+
+.book-details-page__format > div > span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  place-items: center;
+  background: color-mix(in srgb, var(--home-v2-deep) 11%, #fff);
+  color: var(--home-v2-deep);
+}
+
+.book-details-page__format--print > div > span {
+  background: color-mix(in srgb, var(--home-v2-blue) 11%, #fff);
+  color: var(--home-v2-blue);
+}
+
+.book-details-page__format p {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.book-details-page__format p b {
+  font: 800 12px var(--home-v2-heading);
+}
+
+.book-details-page__format p small {
+  color: var(--home-v2-muted);
+  font-size: 9px;
+}
+
+.book-details-page__format > strong {
+  display: block;
+  margin-top: 12px;
+  color: var(--home-v2-ink);
+  font: 900 25px var(--home-v2-heading);
+}
+
+.book-details-page__format > strong small {
+  font-size: 9px;
+}
+
+.book-details-page__format ul {
+  margin: 12px 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--home-v2-line);
+  list-style: none;
+}
+
+.book-details-page__format li {
+  position: relative;
+  padding: 4px 17px 4px 0;
+  color: var(--home-v2-muted);
+  font-size: 9px;
+}
+
+.book-details-page__format li::before {
+  position: absolute;
+  right: 0;
+  color: var(--home-v2-blue);
+  content: "✓";
+}
+
+.book-details-page__format > a,
+.book-details-page__format-unavailable {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  background: var(--home-v2-blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.book-details-page__format--print > a {
+  background: var(--home-v2-deep);
+}
+
+.book-details-page__format-unavailable {
+  background: #e8ebef;
+  color: var(--home-v2-muted);
+}
+
+.book-details-page__buy-card > p {
+  color: var(--home-v2-muted);
+  font-size: 9px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.book-details-page__buy-card > a {
+  display: block;
+  width: fit-content;
+  margin: 16px auto 0;
+  border-bottom: 1px solid var(--home-v2-blue);
+  color: var(--home-v2-blue);
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .book-details-page__section-head {
@@ -574,6 +997,14 @@ useHead({
     width: min(430px, 100%);
   }
 
+  .book-details-page__information-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .book-details-page__buy-card {
+    position: static;
+  }
+
   .book-details-page__metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -584,6 +1015,36 @@ useHead({
 }
 
 @media (max-width: 560px) {
+  .book-details-page__hero {
+    padding: 36px 0 52px;
+  }
+
+  .book-details-page__cover {
+    height: 390px;
+    padding: 28px;
+  }
+
+  .book-details-page__cover > strong {
+    font-size: 29px;
+  }
+
+  .book-details-page__author {
+    flex-wrap: wrap;
+  }
+
+  .book-details-page__information {
+    padding: 50px 0 70px;
+  }
+
+  .book-details-page__feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .book-details-page__facts > div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
   .book-details-page__metrics,
   .book-details-page__gallery-grid,
   .book-details-page__media-links {

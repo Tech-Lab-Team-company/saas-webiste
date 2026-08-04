@@ -11,9 +11,7 @@ import {
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeBookViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
-definePageMeta({
-  layout: "home-v2",
-});
+definePageMeta({ layout: "home-v2" });
 
 const route = useRoute();
 const requestUrl = useRequestURL();
@@ -805,7 +803,7 @@ useHead({
 }
 
 .books-page__grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 390px));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px)));
   justify-content: start;
   gap: 24px;
 }

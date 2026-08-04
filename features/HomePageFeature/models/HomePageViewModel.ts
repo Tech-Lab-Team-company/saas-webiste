@@ -64,19 +64,48 @@ export interface HomeBlogViewModel {
   image: HomeImageViewModel | null
 }
 
+export enum BookTypeEnum {
+  EBOOK = 1,
+  PAPER = 2,
+  BOTH = 3,
+}
+
+export enum BookPriceTypeEnum {
+  FREE = 1,
+  EBOOK = 2,
+  PAPER = 3,
+  BOTH = 4,
+}
+
 export interface HomeBookViewModel {
   id: number
   bookId: number
   image: string | null
   numberOfPages: number | null
   title: string
+  bookTitle: string
+  bookDescription: string | null
+  bookTypeLabel: string | null
+  priceTypeLabel: string | null
+  priceType: BookPriceTypeEnum | null
   subtitle: string | null
   description: string | null
   isFree: boolean
   price: string
   currency: string
+  bookTypes: Array<{
+    id: number
+    label: string
+    price: number
+  }>
   bookType: number | null
   invoiceLink: string | null
+  steps: Array<{
+    id: number
+    title: string
+    description: string | null
+    order: number
+  }>
 }
 
 export interface HomeBooksViewModel {

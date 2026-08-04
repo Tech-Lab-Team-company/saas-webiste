@@ -13,17 +13,42 @@ let booksHasEntered = false;
 
 const featuredBook = computed(() => props.books.data.items[0] ?? null);
 
-const bookFeatures = [
-  { id: "01", title: "مستقلة عن الكورسات" },
-  { id: "02", title: "نسخة رقمية داخل التطبيق" },
-  { id: "03", title: "نسخة مطبوعة وتوصيل" },
-] as const;
-
 const priceLabel = computed(() => {
   const book = featuredBook.value;
   if (!book) return "";
   if (book.isFree || Number(book.price) === 0) return "مجاني";
   return `${book.price} ${book.currency}`.trim();
+});
+
+const bookFeatures = computed(() => {
+  const book = featuredBook.value;
+  if (!book) return [];
+
+  if (book.steps.length > 0) {
+    return book.steps.map((step, index) => ({
+      id: String(step.order || index + 1).padStart(2, "0"),
+      title: step.title,
+      description: step.description,
+    }));
+  }
+
+  return [
+    { id: "01", title: "مستقل عن الكورسات", description: null },
+    {
+      id: "02",
+      title:
+        book.bookTypes.map((type) => type.label).join(" · ") ||
+        "نسخة تعليمية مستقلة",
+      description: null,
+    },
+    {
+      id: "03",
+      title: book.numberOfPages
+        ? `${book.numberOfPages} صفحة`
+        : priceLabel.value,
+      description: null,
+    },
+  ];
 });
 
 const revealBooksSection = () => {
@@ -80,6 +105,17 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
     aria-label="مكتبة الكتب"
   >
     <div class="container">
+      <header class="home-v2-books__intro">
+        <div class="home-v2-books__heading">
+          <span>مكتبة مستقلة</span>
+          <h2>اختار مذكرتك.<br />على حسب <em>احتياجك.</em></h2>
+        </div>
+        <p>
+          كل مذكرة منتج مستقل عن الكورسات؛ شوف محتواها، اختار النوع المتاح، وخد
+          فقط اللي محتاجه.
+        </p>
+      </header>
+
       <article v-if="featuredBook" class="home-v2-books__feature">
         <div class="home-v2-books__cover">
           <img
@@ -90,16 +126,24 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
             decoding="async"
           />
           <div class="home-v2-books__cover-overlay">
-            <span class="home-v2-books__edition">GAMMA BOOKS 03</span>
+            <span class="home-v2-books__edition">
+              GAMMA NOTES
+              {{ String(featuredBook.bookType || 1).padStart(2, "0") }}
+            </span>
             <div class="home-v2-books__cover-title">
-              <strong>{{ featuredBook.title }}</strong>
-              <small v-if="featuredBook.numberOfPages">
-                {{ featuredBook.numberOfPages }} صفحة
+              <strong>{{ featuredBook.bookTitle }}</strong>
+              <small v-if="featuredBook.bookDescription">
+                {{ featuredBook.bookDescription }}
               </small>
             </div>
-            <span v-if="featuredBook.numberOfPages" class="home-v2-books__pages">
-              <b>{{ featuredBook.numberOfPages }}</b>
-              <small>صفحة</small>
+            <span class="home-v2-books__pages">
+              <b>{{ featuredBook.isFree ? "مجاني" : featuredBook.price }}</b>
+              <small v-if="!featuredBook.isFree">
+                {{ featuredBook.currency || "ج.م" }}
+                <template v-if="featuredBook.priceTypeLabel">
+                  {{ featuredBook.priceTypeLabel }}</template
+                >
+              </small>
             </span>
           </div>
         </div>
@@ -113,7 +157,10 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
           <ul class="home-v2-books__features">
             <li v-for="feature in bookFeatures" :key="feature.id">
               <small>{{ feature.id }}</small>
-              <strong>{{ feature.title }}</strong>
+              <span>
+                <strong>{{ feature.title }}</strong>
+                <p v-if="feature.description">{{ feature.description }}</p>
+              </span>
             </li>
           </ul>
           <div class="home-v2-books__actions">
@@ -124,13 +171,17 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
               تفاصيل الكتاب
               <span aria-hidden="true">←</span>
             </NuxtLink>
-            <NuxtLink to="/books" class="home-v2-books__secondary">كل الكتب</NuxtLink>
+            <NuxtLink to="/books" class="home-v2-books__secondary"
+              >كل الكتب</NuxtLink
+            >
           </div>
         </div>
       </article>
 
       <div v-else class="home-v2-books__empty" role="status">
-        <strong v-if="books.status === 'error'">تعذر تحميل الكتب في الوقت الحالي.</strong>
+        <strong v-if="books.status === 'error'"
+          >تعذر تحميل الكتب في الوقت الحالي.</strong
+        >
         <strong v-else>لا توجد كتب متاحة حاليًا.</strong>
         <p>يمكنك زيارة المكتبة لاحقًا للاطلاع على أحدث الكتب.</p>
         <NuxtLink to="/books">فتح مكتبة الكتب</NuxtLink>
@@ -141,7 +192,53 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
 
 <style scoped>
 .home-v2-books {
-  background: #eef4ff;
+  background: #edf3ff;
+}
+
+.home-v2-books__intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  align-items: end;
+  gap: clamp(42px, 8vw, 130px);
+  margin-bottom: clamp(38px, 5vw, 64px);
+}
+
+.home-v2-books__heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--home-v2-blue);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.home-v2-books__heading > span::before {
+  width: 28px;
+  height: 2px;
+  background: var(--home-v2-coral);
+  content: "";
+}
+
+.home-v2-books__intro h2 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--home-v2-ink);
+  font: 900 clamp(44px, 5.4vw, 76px) / 1.18 var(--home-v2-heading);
+  letter-spacing: -0.035em;
+}
+
+.home-v2-books__intro h2 em {
+  color: var(--home-v2-coral);
+  font-style: normal;
+}
+
+.home-v2-books__intro > p {
+  max-width: 430px;
+  margin: 0 0 8px;
+  color: var(--home-v2-muted);
+  font-size: 16px;
+  line-height: 2;
 }
 
 .home-v2-books__copy p,
@@ -160,11 +257,16 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 30px 80px -62px #06114799;
-  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease,
+    transform 0.35s ease;
 }
 
 .home-v2-books__feature:hover {
-  border-color: color-mix(in srgb, var(--home-v2-blue) 24%, var(--home-v2-line));
+  border-color: color-mix(
+    in srgb,
+    var(--home-v2-blue) 24%,
+    var(--home-v2-line)
+  );
   box-shadow: 0 38px 90px -58px #06114780;
   transform: translateY(-4px);
 }
@@ -181,8 +283,10 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  opacity: 0.28;
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 0.08;
+  filter: saturate(0.82) contrast(1.08);
 }
 
 .home-v2-books__cover-overlay {
@@ -194,6 +298,7 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   flex-direction: column;
   justify-content: space-between;
   padding: 40px 36px 34px;
+  background: linear-gradient(180deg, rgb(7 18 71 / 15%), rgb(7 18 71 / 96%));
   color: #fff;
 }
 
@@ -236,7 +341,10 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
 .home-v2-books__cover-title {
   position: relative;
   z-index: 1;
-  padding-inline-end: 54px;
+  max-width: 88%;
+  padding-inline-end: 76px;
+  margin-top: auto;
+  margin-bottom: 4px;
 }
 
 .home-v2-books__cover-title strong {
@@ -251,12 +359,14 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   display: block;
   margin-top: 8px;
   color: #ffffffb8;
+  font-size: 14px;
+  line-height: 1.7;
 }
 
 .home-v2-books__pages {
   position: absolute;
   z-index: 2;
-  bottom: 27px;
+  bottom: 28px;
   inset-inline-end: 26px;
   display: grid;
   width: 82px;
@@ -274,9 +384,12 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
 }
 
 .home-v2-books__pages small {
-  margin-top: 7px;
-  font-size: 9px;
+  /* margin-top: 7px; */
+  padding-inline: 5px;
+  font-size: 12px;
   font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
 }
 
 .home-v2-books__copy {
@@ -320,31 +433,41 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
 }
 
 .home-v2-books__features strong {
+  display: block;
   color: var(--home-v2-ink);
   font-size: 14px;
+  line-height: 1.65;
+}
+
+.home-v2-books__features p {
+  margin-top: 5px;
+  color: var(--home-v2-muted);
+  font-size: 11px;
+  line-height: 1.65;
 }
 
 .home-v2-books__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  align-items: center;
+  gap: 22px;
   margin-top: 2px;
 }
 
 .home-v2-books__primary,
-.home-v2-books__secondary,
-.home-v2-books__empty a {
+.home-v2-books__secondary {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 52px;
   align-items: center;
   justify-content: center;
-  padding: 0 24px;
-  border: 1px solid var(--home-v2-blue);
-  border-radius: 8px;
   font-weight: 800;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .home-v2-books__primary {
+  min-width: 178px;
+  padding: 0 22px;
   background: var(--home-v2-blue);
   color: #fff;
 }
@@ -353,9 +476,32 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   margin-inline-start: 18px;
 }
 
-.home-v2-books__secondary,
-.home-v2-books__empty a {
+.home-v2-books__secondary {
+  min-width: auto;
+  padding: 0;
+  border-bottom: 1px solid var(--home-v2-blue);
   color: var(--home-v2-blue);
+}
+
+.home-v2-books__primary:hover {
+  background: color-mix(in srgb, var(--home-v2-blue) 84%, #000);
+}
+
+.home-v2-books__secondary:hover {
+  border-color: var(--home-v2-coral);
+  color: var(--home-v2-coral);
+}
+
+.home-v2-books__empty a {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  border: 1px solid var(--home-v2-blue);
+  border-radius: 8px;
+  color: var(--home-v2-blue);
+  font-weight: 800;
 }
 
 .home-v2-books__empty {
@@ -372,6 +518,15 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
 }
 
 @media (max-width: 760px) {
+  .home-v2-books__intro {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .home-v2-books__intro h2 {
+    font-size: clamp(38px, 12vw, 56px);
+  }
+
   .home-v2-books__feature {
     grid-template-columns: 1fr;
     gap: 28px;

@@ -6,6 +6,29 @@ const props = defineProps<{
 }>()
 
 const route = useRoute()
+const router = useRouter()
+const userStore = useUserStore()
+
+const userImage = computed(() =>
+  userStore.image || userStore.user?.image || '/images/user.png',
+)
+
+const handleUserImageError = (event: Event) => {
+  const image = event.currentTarget as HTMLImageElement
+  if (!image.src.endsWith('/images/user.png')) {
+    image.src = '/images/user.png'
+  }
+}
+
+const handleLogout = async () => {
+  if (import.meta.client) {
+    localStorage.removeItem('auth')
+    localStorage.removeItem('user')
+  }
+
+  userStore.logout()
+  await router.push('/home-v2')
+}
 
 const headerDescription = computed(() => {
   const description = (props.site.description || 'منصة تعليمية منظمة').replace(/\s+/g, ' ').trim()
@@ -23,7 +46,11 @@ const navItems = computed(() => [
   { label: 'الكورسات', to: '/course' },
   { label: 'الكتب', to: '/books' },
   { label: 'المدونة', to: '/blogs' },
-  { label: 'عن المنصة', to: '/about-teacher' },
+  { label: 'التطبيق', to: '/app' },
+  {
+    label: props.site.brandName ? `عن ${props.site.brandName}` : 'عن المنصة',
+    to: '/about-teacher',
+  },
 ])
 
 const scrollProgress = ref(0)
@@ -85,12 +112,24 @@ onBeforeUnmount(() => {
 
       <nav class="home-v2-header__nav" aria-label="التنقل الرئيسي">
         <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to">{{ item.label }}</NuxtLink>
-        <a href="#app-status">التطبيق</a>
       </nav>
 
-      <div class="home-v2-header__actions">
+      <div v-if="!userStore.user" class="home-v2-header__actions">
         <NuxtLink to="/login" class="home-v2-header__login">دخول الطالب</NuxtLink>
         <NuxtLink to="/Auth/register" class="button">إنشاء حساب <span aria-hidden="true">←</span></NuxtLink>
+      </div>
+
+      <div v-else class="home-v2-header__actions home-v2-header__actions--student">
+        <NuxtLink to="/profile" class="home-v2-header__student" aria-label="الذهاب إلى الملف الشخصي">
+          <img :src="userImage" :alt="userStore.user.name" @error="handleUserImageError" />
+          <span>
+            <small>مساحة الطالب</small>
+            <b>{{ userStore.user.name }}</b>
+          </span>
+        </NuxtLink>
+        <button type="button" class="home-v2-header__logout" @click="handleLogout">
+          تسجيل الخروج
+        </button>
       </div>
     </div>
     <span
@@ -134,6 +173,75 @@ onBeforeUnmount(() => {
 .home-v2-header__actions {
   display: flex;
   align-items: center;
+}
+
+.home-v2-header__actions--student {
+  gap: 10px;
+}
+
+.home-v2-header__student {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 7px;
+  border-radius: 10px;
+  transition: background-color .2s ease;
+}
+
+.home-v2-header__student:hover {
+  background: var(--home-v2-blue-light);
+}
+
+.home-v2-header__student img {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #eef1f7;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--home-v2-blue) 20%, transparent);
+  object-fit: cover;
+}
+
+.home-v2-header__student > span {
+  display: grid;
+  max-width: 105px;
+  gap: 2px;
+}
+
+.home-v2-header__student small {
+  color: var(--home-v2-muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.home-v2-header__student b {
+  overflow: hidden;
+  color: var(--home-v2-ink);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-v2-header__logout {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--home-v2-blue);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--home-v2-blue);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+.home-v2-header__logout:hover {
+  background: var(--home-v2-blue);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .home-v2-header__content {
@@ -344,6 +452,19 @@ onBeforeUnmount(() => {
     border-radius: 10px;
     font-size: 12px;
   }
+
+  .home-v2-header__actions--student {
+    gap: 5px;
+  }
+
+  .home-v2-header__student > span {
+    display: none;
+  }
+
+  .home-v2-header__logout {
+    padding-inline: 9px;
+    font-size: 10px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -353,6 +474,11 @@ onBeforeUnmount(() => {
   .home-v2-header__nav a,
   .home-v2-header__login::after,
   .home-v2-header .button span {
+    transition: none;
+  }
+
+  .home-v2-header__student,
+  .home-v2-header__logout {
     transition: none;
   }
 }

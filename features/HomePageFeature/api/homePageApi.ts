@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
 import NetworkService from "~/base/core/networkStructure/networking/network_service";
+import { HeroSectionTypeEnum } from "../types/homePage.types";
 import type {
   HomeApiSourceResult,
   HomeDataError,
@@ -75,7 +76,6 @@ export class HomePageApi {
   async load(): Promise<HomePageApiSources> {
     const [
       heroSections,
-      sliders,
       courseSections,
       blogs,
       books,
@@ -83,11 +83,10 @@ export class HomePageApi {
       aboutTeacher,
       readySection,
     ] = await Promise.allSettled([
-      this.fetchHeroSections(),
-      this.fetchSliders(),
+      this.fetchHeroSections(HeroSectionTypeEnum.HOME_API_WEBSITE),
       this.fetchCourseSections(),
       this.fetchBlogs(),
-      this.fetchBooks(),
+      this.fetchHomeBookSection(),
       this.fetchLearningJourney(),
       this.fetchAboutTeacher(),
       this.fetchReadySection(),
@@ -95,7 +94,6 @@ export class HomePageApi {
 
     return {
       heroSections: toSourceResult(heroSections),
-      sliders: toSourceResult(sliders),
       courseSections: toSourceResult(courseSections),
       blogs: toSourceResult(blogs),
       books: toSourceResult(books),
@@ -125,16 +123,16 @@ export class HomePageApi {
     return this.post(ApiNames.Instance.fetch_books, {}, { page });
   }
 
+  private async fetchHomeBookSection(): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_home_book_section, { for_home: 1 });
+  }
+
   async fetchBookDetails(bookId: number): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_book_details, { book_id: bookId });
   }
 
-  private async fetchHeroSections(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_hero_sections, {});
-  }
-
-  private async fetchSliders(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_home_sliders, { type: 3 });
+  async fetchHeroSections(type: HeroSectionTypeEnum): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_hero_sections, { type });
   }
 
   private async fetchCourseSections(): Promise<unknown> {

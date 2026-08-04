@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import arabic_three from "@/assets/images/arabic_three.png";
-import note_one from "@/public/icons/note_one.vue";
-import note_two from "@/public/icons/note_two.vue";
-import user from "@/public/icons/user.vue";
 import CoursesParams from "~/features/FetchCourses/Core/Params/courses_params";
-import CoursesModel from "~/features/FetchCourses/Data/models/courses_model";
 import CoursesController from "~/features/FetchCourses/presentation/controllers/courses_controller";
+import HomeCourseCard from "~/components/home/v2/HomeCourseCard.vue";
+import type { HomeCourseViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
 // const cards = [
 //   {
@@ -95,6 +92,33 @@ const courseParams = new CoursesParams("2");
 const coursesController = CoursesController.getInstance();
 const state = await coursesController.FetchCourses(courseParams);
 
+const getCourseImage = (course: any) => {
+  const image = course?.image;
+  const source = typeof image === "string"
+    ? image
+    : image?.img || image?.image || image?.src || image?.url;
+
+  return source ? { src: source, alt: image?.alt || course.title || "" } : null;
+};
+
+const profileCourses = computed(() => (state.value.data ?? []).map((course): HomeCourseViewModel => ({
+  id: course.id,
+  title: course.title,
+  description: course.subtitle || null,
+  intro: null,
+  route: `/course/${course.id}`,
+  image: getCourseImage(course),
+  price: null,
+  currency: null,
+  isPaid: null,
+  isSubscribed: true,
+  teacher: course.teacher ? { id: course.teacher.id ?? null, name: course.teacher.name ?? null, image: null } : null,
+  sourceSubject: course.subject ? { id: course.subject.id ?? null, title: course.subject.title ?? null } : null,
+  videosCount: course.videos_number ?? 0,
+  documentsCount: course.docs_number ?? 0,
+  recordingsCount: null,
+})));
+
 watch(
   () => coursesController.state.value,
   (newValue) => {
@@ -112,62 +136,15 @@ watch(
     <template #success>
       <div class="profile-home">
         <div class="slider-wrapper">
-          <div class="cards-container">
-            <NuxtLink
-              class="card"
-              v-for="(course, index) in state.data"
-              :key="index"
-              :to="`/course/${course.id}`"
-            >
-              <div>
-                <div class="image-container">
-                  <img
-                    :src="course?.image?.img"
-                    alt="Card image"
-                    class="course-image"
-                  />
-
-                  <p class="overlay-text">{{ course?.subject?.title }}</p>
-                </div>
-                <div class="card-body" dir="rtl">
-                  <h5 class="card-title">{{ course?.title }}</h5>
-                  <div class="card-content">
-                    <p class="card-text">{{ course?.subtitle }}</p>
-                  </div>
-                  <div class="card-one_footer">
-                    <div class="card-text1">
-                      <p class="card-text1">
-                        <note_one />{{ course?.videos_number }} فيديو
-                      </p>
-                      <p class="card-text1">
-                        <note_two />{{ course?.docs_number }} ملف ورقي
-                      </p>
-                    </div>
-                    <div class="progress-container">
-                      <div class="progress-bar">
-                        <div
-                          class="progress"
-                          :style="{ width: course?.progress + '%' }"
-                        ></div>
-                      </div>
-                      <span class="progress-percentage"
-                        >{{ course?.progress }}%</span
-                      >
-                    </div>
-                  </div>
-                  <div class="card-footer">
-                    <span class="card-icon flex">
-                      <!-- <component :is="card.icon" /> -->
-                      <img
-                        :src="course?.teacher?.image?.image"
-                        :alt="course?.teacher?.image?.alt"
-                      />
-                    </span>
-                    <span class="card-name">{{ course?.teacher?.name }}</span>
-                  </div>
-                </div>
-              </div>
-            </NuxtLink>
+          <div class="cards-container profile-course-grid">
+            <HomeCourseCard
+              v-for="(course, index) in profileCourses"
+              :key="course.id"
+              :course="course"
+              :level-label="course.sourceSubject?.title || ''"
+              :index="index"
+              :progress="state.data[index]?.progress ?? 0"
+            />
           </div>
         </div>
       </div>
@@ -199,11 +176,17 @@ watch(
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   width: 90%;
-  gap: 10px;
+  gap: 22px;
   width: 100%;
   justify-items: center;
   align-items: center;
   direction: rtl;
+}
+
+.profile-course-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch;
+  gap: 22px !important;
 }
 
 .card {
@@ -372,7 +355,12 @@ watch(
   }
 }
 
+@media (max-width: 1100px) {
+  .profile-course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
 @media (max-width: 767px) {
+  .profile-course-grid { grid-template-columns: 1fr !important; }
   .cards-container {
     grid-template-columns: 1fr;
     width: 100%;

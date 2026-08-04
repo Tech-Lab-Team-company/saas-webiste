@@ -8,6 +8,14 @@ export interface HomeDataError {
 
 export type HomeSectionStatus = 'success' | 'empty' | 'error'
 
+export enum HeroSectionTypeEnum {
+  APP = 0,
+  WEBSITE = 1,
+  HOME_API_WEBSITE = 2,
+  COURSES_API_APP = 3,
+  ABOUT_API_WEBSITE = 4,
+}
+
 export interface HomeSectionState<T> {
   data: T
   status: HomeSectionStatus
@@ -23,22 +31,9 @@ export interface HomeImageApiDto {
   alt: string | null
 }
 
-export interface HomeSliderApiDto {
-  id: number | null
-  title: string | null
-  subtitle: string | null
-  text: string | null
-  link: string | null
-  type: number | null
-  style: number | null
-  media: {
-    image: HomeImageApiDto | null
-    mobileImage: HomeImageApiDto | null
-  }
-}
-
 export interface HomeHeroSectionApiDto {
   id: number | null
+  type: number | null
   title: string | null
   subtitle: string | null
   description: string | null
@@ -145,7 +140,11 @@ export interface HomeBookApiDto {
   end_date: string
   price: string
   currency: string
-  book_types: unknown[]
+  book_types: Array<{
+    id: number
+    label: string
+    price: number
+  }>
   book_type: number
   invoice_link: string
 }
@@ -193,7 +192,6 @@ export interface HomeBooksApiDto {
 
 export interface HomePageApiSources {
   heroSections: HomeApiSourceResult<unknown>
-  sliders: HomeApiSourceResult<unknown>
   courseSections: HomeApiSourceResult<unknown>
   blogs: HomeApiSourceResult<unknown>
   books: HomeApiSourceResult<unknown>

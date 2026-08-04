@@ -18,7 +18,7 @@ export const useHomePage = () => {
   const api = new HomePageApi(webDomain)
 
   const { data, pending, error, refresh } = useAsyncData<HomePageViewModel>(
-    `home-v2-data:dynamic-v2:${webDomain}`,
+    `home-v2-data:dynamic-v4:${webDomain}`,
     async () => mapHomePage(await api.load(), setting.value),
     {
       default: createEmptyHomePageViewModel,

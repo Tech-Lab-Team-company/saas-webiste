@@ -3,7 +3,14 @@ import { storeToRefs } from "pinia";
 import "./about-teacher.css";
 import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
 import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
-import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
+import { getWebDomain } from "~/constant/webDomain";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
+import {
+  mapHomeSite,
+  mapHeroSection,
+} from "~/features/HomePageFeature/mappers/homePageMapper";
+import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { HeroSectionTypeEnum } from "~/features/HomePageFeature/types/homePage.types";
 import AboutTeacherContactSection from "./sections/AboutTeacherContactSection.vue";
 import AboutTeacherCtaSection from "./sections/AboutTeacherCtaSection.vue";
 import AboutTeacherExperienceSection from "./sections/AboutTeacherExperienceSection.vue";
@@ -13,6 +20,20 @@ import AboutTeacherMethodSection from "./sections/AboutTeacherMethodSection.vue"
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
 
+const webDomain = getWebDomain();
+const api = new HomePageApi(webDomain);
+const { data: aboutHero } = await useAsyncData<HomeHeroViewModel | null>(
+  `about-v2-hero:${webDomain}:${HeroSectionTypeEnum.ABOUT_API_WEBSITE}`,
+  async () => mapHeroSection(
+    await api.fetchHeroSections(HeroSectionTypeEnum.ABOUT_API_WEBSITE),
+    HeroSectionTypeEnum.ABOUT_API_WEBSITE,
+  ),
+  {
+    default: () => null,
+    dedupe: "defer",
+  },
+);
+
 const site = computed(() => mapHomeSite(setting.value));
 const teacherName = computed(() => site.value.brandName || "مدرسك");
 const teacherRole = computed(
@@ -21,7 +42,12 @@ const teacherRole = computed(
     "مدرس متخصص يساعد طلاب المرحلة الثانوية على الفهم والتطبيق بثقة",
 );
 const teacherImage = computed(
-  () => site.value.cover?.src || site.value.logo?.src || "/images/logo.png",
+  () =>
+    aboutHero.value?.image?.src ||
+    aboutHero.value?.mobileImage?.src ||
+    site.value.cover?.src ||
+    site.value.logo?.src ||
+    "/images/logo.png",
 );
 
 const whatsappUrl = computed(() => {
@@ -39,10 +65,10 @@ const contactDescription = computed(
 );
 
 useSeoMeta({
-  title: () => `عن ${teacherName.value}`,
-  description: () => teacherRole.value,
-  ogTitle: () => `عن ${teacherName.value}`,
-  ogDescription: () => teacherRole.value,
+  title: () => aboutHero.value?.title || `عن ${teacherName.value}`,
+  description: () => aboutHero.value?.description || teacherRole.value,
+  ogTitle: () => aboutHero.value?.title || `عن ${teacherName.value}`,
+  ogDescription: () => aboutHero.value?.description || teacherRole.value,
   ogImage: () => teacherImage.value,
 });
 
@@ -97,6 +123,7 @@ onBeforeUnmount(() => revealObserver?.disconnect());
 
     <main class="about-teacher-main">
       <AboutTeacherHeroSection
+        :hero="aboutHero"
         :teacher-name="teacherName"
         :teacher-role="teacherRole"
         :teacher-image="teacherImage"

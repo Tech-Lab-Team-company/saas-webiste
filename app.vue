@@ -13,8 +13,9 @@ import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.v
 const router = useRouter();
 const route = useRoute();
 const isHomeV2 = computed(() =>
-  ["/home-v2", "/aboutus", "/about-teacher", "/books"].includes(route.path) ||
-  route.path.startsWith("/books/"),
+  ["/home-v2", "/aboutus", "/about-teacher", "/books", "/blogs", "/course", "/app"].includes(route.path) ||
+  route.path.startsWith("/books/") ||
+  route.path.startsWith("/blog-v2/"),
 );
 const UserStore = useUserStore();
 const {

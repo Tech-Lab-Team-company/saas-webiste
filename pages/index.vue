@@ -1,9 +1,5 @@
-<script setup lang="ts" >
-import homeStarting from '~/components/Home/home/homeStarting.vue';
+<script setup lang="ts">
+definePageMeta({
+  redirect: "/home-v2",
+});
 </script>
-<template>
-  <div>
-    <homeStarting />
-    <SharedCourseCard />
-  </div>
-</template>

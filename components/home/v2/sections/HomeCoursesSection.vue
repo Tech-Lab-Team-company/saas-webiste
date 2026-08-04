@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { gsap } from "gsap";
+import HomeCourseCard from "~/components/home/v2/HomeCourseCard.vue";
 import type {
   HomeCourseTabKey,
   HomeCourseViewModel,
@@ -9,11 +10,15 @@ import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage
 
 const props = defineProps<{
   courses: HomeSectionState<HomeCoursesViewModel>;
+  catalog?: boolean;
   loadCoursesByYear: (
     stageId: number,
     yearId: number,
   ) => Promise<HomeSectionState<HomeCourseViewModel[]>>;
 }>();
+
+const route = useRoute();
+const router = useRouter();
 
 const selectedTabKey = ref<HomeCourseTabKey | null>(null);
 const coursesByTab = ref<
@@ -25,7 +30,7 @@ const coursesSection = ref<HTMLElement | null>(null);
 const courseResults = ref<HTMLElement | null>(null);
 const sectionHasEntered = ref(false);
 let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
-const MAX_VISIBLE_COURSES = 6;
+const MAX_PREVIEW_COURSES = 6;
 
 const shouldReduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -47,13 +52,19 @@ const selectedCourses = computed<HomeSectionState<
 });
 
 const visibleCourses = computed(() =>
-  selectedCourses.value?.data.slice(0, MAX_VISIBLE_COURSES) ?? [],
+  props.catalog
+    ? selectedCourses.value?.data ?? []
+    : selectedCourses.value?.data.slice(0, MAX_PREVIEW_COURSES) ?? [],
 );
 
 const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
 
   if (!tab || loadingTabKey.value === tab.key) {
+    return;
+  }
+
+  if (selectedTabKey.value === tab.key && coursesByTab.value[tab.key]) {
     return;
   }
 
@@ -68,6 +79,11 @@ const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
   }
 
   selectedTabKey.value = tab.key;
+  if (props.catalog && String(route.query.year_id ?? "") !== String(tab.yearId)) {
+    await router.replace({
+      query: { ...route.query, year_id: String(tab.yearId) },
+    });
+  }
   loadingTabKey.value = tab.key;
   const requestId = (requestIds.value[tab.key] ?? 0) + 1;
   requestIds.value[tab.key] = requestId;
@@ -84,6 +100,29 @@ const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
     loadingTabKey.value = null;
   }
 };
+
+const selectCatalogYearFromRoute = () => {
+  if (!props.catalog || selectedTabKey.value || props.courses.data.tabs.length === 0) return;
+
+  const requestedYearId = Number(route.query.year_id);
+  const tab = props.courses.data.tabs.find((item) => item.yearId === requestedYearId)
+    ?? props.courses.data.tabs[0];
+
+  if (tab) void selectTab(tab.key);
+};
+
+onMounted(selectCatalogYearFromRoute);
+
+watch(
+  () => [route.query.year_id, props.courses.data.tabs.length],
+  () => {
+    if (!props.catalog) return;
+    const requestedYearId = Number(route.query.year_id);
+    const tab = props.courses.data.tabs.find((item) => item.yearId === requestedYearId);
+    if (tab && tab.key !== selectedTabKey.value) void selectTab(tab.key);
+    else if (!selectedTabKey.value) selectCatalogYearFromRoute();
+  },
+);
 
 const animateCourseResults = async () => {
   await nextTick();
@@ -360,7 +399,7 @@ onBeforeUnmount(() => {
               <span>المسار المختار</span>
               <h3>كورسات {{ selectedTab.label }}</h3>
             </div>
-            <b v-if="selectedCourses">{{ visibleCourses.length }} كورس</b>
+            <b v-if="selectedCourses">{{ selectedCourses.data.length }} كورس</b>
           </div>
 
           <div
@@ -397,57 +436,23 @@ onBeforeUnmount(() => {
           </div>
 
           <div v-else-if="selectedCourses" class="course-grid">
-            <NuxtLink
+            <HomeCourseCard
               v-for="(course, index) in visibleCourses"
               :key="course.id"
-              :to="course.route"
-              class="course-card"
-              :class="['mint', 'violet', 'sky', 'deep'][index % 4]"
+              :course="course"
+              :level-label="selectedTab.label"
+              :index="index"
+              :animate="false"
+              :interactive="false"
               @pointermove="tiltCourseCard"
               @pointerleave="resetCourseCard"
-            >
-              <div class="course-cover" :class="{ 'has-image': course.image }">
-                <NuxtImg
-                  v-if="course.image"
-                  :src="course.image.src"
-                  :alt="course.image.alt || course.title"
-                  width="680"
-                  height="452"
-                  loading="lazy"
-                />
-                <template v-else>
-                  <span class="course-code">PHYSICS COURSE</span>
-                  <span class="course-index">{{ String(index + 1).padStart(2, "0") }}</span>
-                  <span class="course-mark" aria-hidden="true">ف</span>
-                  <span class="level-pill">{{ selectedTab.label }}</span>
-                </template>
-              </div>
-
-              <div class="course-content">
-                <span class="teacher">
-                  {{ course.sourceSubject?.title || selectedTab.label }}
-                </span>
-                <h3>{{ course.title }}</h3>
-                <p v-if="course.description">{{ course.description }}</p>
-                <p v-else>شرح منظم ومراجعة مركزة تساعدك تفهم وتطبق بثقة.</p>
-                <div class="course-footer">
-                  <span>{{ course.videosCount ?? 0 }} درس</span>
-                  <b>
-                    {{
-                      course.price !== null && course.price > 0
-                        ? `${course.price} ${course.currency ?? ""}`
-                        : "مجاني"
-                    }}
-                  </b>
-                  <span class="course-arrow" aria-hidden="true">←</span>
-                </div>
-              </div>
-            </NuxtLink>
+            />
           </div>
         </template>
       </div>
 
       <NuxtLink
+        v-if="!catalog"
         :to="selectedTab ? `/course?year_id=${selectedTab.yearId}` : '/course'"
         class="all-courses"
       >
