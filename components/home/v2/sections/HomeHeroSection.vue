@@ -218,12 +218,12 @@ const setupHeroAnimation = () => {
     intro
       .from(".home-v2-hero__ambient", {
         autoAlpha: 0,
-        duration: 1.1,
+        duration: 1,
       })
       .from(
         ".home-v2-hero__kicker",
-        { autoAlpha: 0, x: 36, duration: 0.65 },
-        0.12,
+        { autoAlpha: 0, x: 36, duration: 0.58 },
+        0.08,
       )
       .from(
         ".home-v2-hero__title-line",
@@ -231,11 +231,11 @@ const setupHeroAnimation = () => {
           autoAlpha: 0,
           yPercent: 115,
           rotate: 2,
-          duration: 0.95,
-          stagger: 0.13,
+          duration: 0.88,
+          stagger: 0.1,
           ease: "expo.out",
         },
-        0.24,
+        0.18,
       )
       .fromTo(
         ".home-v2-hero__typewriter-underline",
@@ -243,20 +243,20 @@ const setupHeroAnimation = () => {
         {
           scaleX: 1,
           autoAlpha: 1,
-          duration: 0.85,
+          duration: 0.72,
           ease: "expo.out",
         },
-        0.82,
+        0.72,
       )
       .from(
         ".home-v2-hero__copy > p:not(.home-v2-hero__kicker)",
-        { autoAlpha: 0, y: 24, duration: 0.65 },
-        0.67,
+        { autoAlpha: 0, y: 24, duration: 0.58 },
+        0.58,
       )
       .from(
         ".home-v2-hero__actions > *",
-        { autoAlpha: 0, y: 18, duration: 0.55, stagger: 0.1 },
-        0.78,
+        { autoAlpha: 0, y: 18, duration: 0.48, stagger: 0.08 },
+        0.72,
       )
       .from(
         visual,
@@ -265,21 +265,21 @@ const setupHeroAnimation = () => {
           clipPath: "inset(48% 12% 48% 12% round 80px)",
           scale: 0.86,
           rotate: -3,
-          duration: 1.25,
-          ease: "expo.inOut",
+          duration: 1.08,
+          ease: "power3.out",
         },
-        0.16,
+        0.08,
       )
       .from(
         ".home-v2-hero__brand-logo",
         {
           autoAlpha: 0,
-          scale: 0,
+          scale: 0.35,
           rotate: -25,
-          duration: 0.7,
-          ease: "back.out(1.8)",
+          duration: 0.6,
+          ease: "back.out(1.35)",
         },
-        1.05,
+        0.88,
       )
       .fromTo(
         ".home-v2-hero__visual-shine",
@@ -287,7 +287,7 @@ const setupHeroAnimation = () => {
         {
           xPercent: -240,
           autoAlpha: 1,
-          duration: 1.05,
+          duration: 0.95,
           ease: "power2.inOut",
           onComplete: () => {
             gsap.set(".home-v2-hero__visual-shine", {
@@ -296,14 +296,14 @@ const setupHeroAnimation = () => {
             });
           },
         },
-        0.88,
+        0.76,
       );
 
     gsap.to(".home-v2-hero__ambient-orb--one", {
       x: 34,
       y: -26,
       scale: 1.08,
-      duration: 6.5,
+      duration: 8.5,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -312,15 +312,15 @@ const setupHeroAnimation = () => {
       x: -28,
       y: 34,
       scale: 0.92,
-      duration: 8,
+      duration: 10.5,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
     });
     gsap.to(visual, {
       y: -9,
-      duration: 3.8,
-      delay: 1.45,
+      duration: 4.8,
+      delay: 1.6,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -328,15 +328,15 @@ const setupHeroAnimation = () => {
 
     if (window.matchMedia("(pointer: fine)").matches) {
       const moveX = gsap.quickTo(visual, "x", {
-        duration: 0.8,
+        duration: 0.58,
         ease: "power3.out",
       });
       const rotateX = gsap.quickTo(visual, "rotationX", {
-        duration: 0.8,
+        duration: 0.58,
         ease: "power3.out",
       });
       const rotateY = gsap.quickTo(visual, "rotationY", {
-        duration: 0.8,
+        duration: 0.58,
         ease: "power3.out",
       });
 

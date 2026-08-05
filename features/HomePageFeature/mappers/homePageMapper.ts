@@ -607,6 +607,10 @@ const mapLearningJourney = (
     eyebrow: toNullableString(section.subtitle) ?? fallbackSection.subtitle,
     title: toNullableString(section.title) ?? fallbackSection.title,
     description: toNullableString(section.description) ?? fallbackSection.description,
+    textBackground:
+      toNullableString(section.text_background ?? section.textBackground) ??
+      fallbackSection.text_background ??
+      'PHYSICS',
     icon: mapImage(mapFlexibleImageApiDto(section.icon, section.title)),
     link: '/course',
     linkLabel: 'شاهد نموذج الطالب',
@@ -720,6 +724,7 @@ const createEmptySite = (): HomeSiteViewModel => ({
     youtube: null,
   },
   app: {
+    image: null,
     androidUrl: null,
     iosUrl: null,
   },
@@ -749,6 +754,9 @@ export const mapHomeSite = (settings: unknown): HomeSiteViewModel => {
       youtube: toNullableString(settings.youtube),
     },
     app: {
+      image:
+        mapImage(mapImageApiDto(settings.app_image)) ??
+        mapImage(mapImageApiDto(settings.appImage)),
       androidUrl: toNullableString(settings.play_store),
       iosUrl: toNullableString(settings.app_store),
     },

@@ -26,40 +26,40 @@ const revealCtaSection = () => {
         autoAlpha: 0,
         y: 44,
         scale: 0.975,
-        duration: 0.9,
-        ease: "expo.out",
+        duration: 0.84,
+        ease: "power3.out",
       })
       .from(
         ".home-v2-cta__pulse",
-        { autoAlpha: 0, scale: 0, duration: 0.7, ease: "back.out(1.7)" },
-        0.28,
+        { autoAlpha: 0, scale: 0.3, duration: 0.58, ease: "back.out(1.35)" },
+        0.22,
       )
       .from(
         ".home-v2-cta__panel > span:not(.home-v2-cta__pulse)",
-        { autoAlpha: 0, y: 14, duration: 0.45 },
-        0.38,
+        { autoAlpha: 0, y: 14, duration: 0.42 },
+        0.3,
       )
       .from(
         ".home-v2-cta h2",
-        { autoAlpha: 0, y: 30, duration: 0.72, ease: "expo.out" },
-        0.47,
+        { autoAlpha: 0, y: 30, duration: 0.68, ease: "power3.out" },
+        0.4,
       )
       .from(
         ".home-v2-cta__panel > p",
-        { autoAlpha: 0, y: 18, duration: 0.55 },
-        0.65,
+        { autoAlpha: 0, y: 18, duration: 0.52 },
+        0.56,
       )
       .from(
         ".home-v2-cta__actions > *",
-        { autoAlpha: 0, y: 14, scale: 0.96, duration: 0.48, stagger: 0.1 },
-        0.78,
+        { autoAlpha: 0, y: 14, scale: 0.96, duration: 0.45, stagger: 0.08 },
+        0.68,
       );
 
     gsap.to(".home-v2-cta__pulse", {
       scale: 1.08,
       opacity: 0.78,
-      duration: 2.2,
-      delay: 1.25,
+      duration: 2.7,
+      delay: 1.15,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -68,7 +68,7 @@ const revealCtaSection = () => {
 };
 
 useScrollTriggeredReveal(ctaSection, revealCtaSection, {
-  threshold: 0.2,
+  threshold: 0.12,
 });
 
 onBeforeUnmount(() => {

@@ -55,6 +55,7 @@ export interface HomeSectionResourceApiDto {
   title: string
   subtitle: string
   description: string
+  text_background?: string | null
   type: number
   icon: string | null
   children: HomeSectionResourceChildApiDto[]

@@ -15,6 +15,7 @@ const blogSection = ref<HTMLElement | null>(null);
 const blogGrid = ref<HTMLElement | null>(null);
 const blogHasEntered = ref(false);
 let blogAnimationContext: ReturnType<typeof gsap.context> | null = null;
+let blogHeadingHasRevealed = false;
 const cardVariants = ["navy", "blue", "coral"] as const;
 const cardMarkers = ["فهم", "05", "7D", "قوة", "وقت", "دقة"] as const;
 
@@ -41,7 +42,12 @@ const animateBlogCards = async () => {
   await nextTick();
 
   const grid = blogGrid.value;
-  if (!grid || !blogHasEntered.value || shouldReduceMotion()) return;
+  if (
+    !grid ||
+    !blogHasEntered.value ||
+    !blogHeadingHasRevealed ||
+    shouldReduceMotion()
+  ) return;
 
   const cards = Array.from(
     grid.querySelectorAll<HTMLElement>(".home-v2-blog__card"),
@@ -66,8 +72,8 @@ const animateBlogCards = async () => {
       y: 0,
       rotationZ: 0,
       scale: 1,
-      duration: 0.82,
-      stagger: 0.11,
+      duration: 0.76,
+      stagger: { amount: 0.42 },
       ease: "power3.out",
       clearProps: "opacity,visibility,transform",
     },
@@ -79,10 +85,10 @@ const animateBlogCards = async () => {
       scale: 1,
       rotation: 0,
       autoAlpha: 1,
-      duration: 0.7,
-      stagger: 0.1,
-      delay: 0.18,
-      ease: "back.out(1.7)",
+      duration: 0.54,
+      stagger: { amount: 0.34 },
+      delay: 0.16,
+      ease: "back.out(1.35)",
       clearProps: "opacity,visibility,transform",
     },
   );
@@ -102,29 +108,32 @@ const revealBlogSection = () => {
       .from(".home-v2-blog__heading .section-tag", {
         autoAlpha: 0,
         x: 30,
-        duration: 0.55,
+        duration: 0.5,
       })
       .from(
         ".home-v2-blog__heading h2",
-        { autoAlpha: 0, y: 38, duration: 0.82, ease: "expo.out" },
-        0.12,
+        { autoAlpha: 0, y: 38, duration: 0.76, ease: "power3.out" },
+        0.1,
       )
       .from(
         ".home-v2-blog__heading > div:last-child > *",
-        { autoAlpha: 0, y: 22, duration: 0.58, stagger: 0.1 },
-        0.28,
+        { autoAlpha: 0, y: 22, duration: 0.54, stagger: 0.08 },
+        0.24,
       );
 
     const placeholder = section.querySelector(".home-v2-blog__placeholder");
     if (placeholder) {
       timeline.from(
         placeholder,
-        { autoAlpha: 0, y: 32, scale: 0.98, duration: 0.72 },
-        0.48,
+        { autoAlpha: 0, y: 32, scale: 0.98, duration: 0.68 },
+        0.56,
       );
     }
 
-    void animateBlogCards();
+    timeline.call(() => {
+      blogHeadingHasRevealed = true;
+      void animateBlogCards();
+    }, undefined, 0.78);
   }, section);
 };
 
@@ -150,7 +159,7 @@ const focusBlogCard = (event: PointerEvent) => {
   gsap.to(marker, {
     scale: 1.055,
     rotation: 1.4,
-    duration: 0.5,
+    duration: 0.38,
     ease: "power3.out",
     overwrite: "auto",
   });
@@ -164,8 +173,8 @@ const resetBlogCard = (event: PointerEvent) => {
   gsap.to(marker, {
     scale: 1,
     rotation: 0,
-    duration: 0.65,
-    ease: "elastic.out(1, 0.6)",
+    duration: 0.44,
+    ease: "power3.out",
     overwrite: "auto",
     onComplete: () => gsap.set(marker, { clearProps: "transform" }),
   });
@@ -178,7 +187,7 @@ watch(
 );
 
 useScrollTriggeredReveal(blogSection, revealBlogSection, {
-  threshold: 0.16,
+  threshold: 0.1,
 });
 
 onBeforeUnmount(() => {

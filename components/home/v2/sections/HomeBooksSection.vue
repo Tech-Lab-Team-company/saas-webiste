@@ -11,6 +11,54 @@ const booksSection = ref<HTMLElement | null>(null);
 let booksAnimationContext: ReturnType<typeof gsap.context> | null = null;
 let booksHasEntered = false;
 
+const shouldReduceMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+type QuickMotion = ReturnType<typeof gsap.quickTo>;
+type BookMotionController = {
+  image: Element | null;
+  badge: Element | null;
+  imageX?: QuickMotion;
+  imageY?: QuickMotion;
+  imageScale?: QuickMotion;
+  badgeX?: QuickMotion;
+  badgeY?: QuickMotion;
+  badgeRotation?: QuickMotion;
+};
+
+const bookMotionControllers = new WeakMap<HTMLElement, BookMotionController>();
+const bookResetCalls = new Map<
+  HTMLElement,
+  ReturnType<typeof gsap.delayedCall>
+>();
+
+const getBookMotionController = (card: HTMLElement) => {
+  const image = card.querySelector(".home-v2-books__cover > img");
+  const badge = card.querySelector(".home-v2-books__pages");
+  const cached = bookMotionControllers.get(card);
+
+  if (cached?.image === image && cached.badge === badge) return cached;
+
+  const controller: BookMotionController = { image, badge };
+
+  if (image) {
+    const settings = { duration: 0.82, ease: "power3.out" };
+    controller.imageX = gsap.quickTo(image, "x", settings);
+    controller.imageY = gsap.quickTo(image, "y", settings);
+    controller.imageScale = gsap.quickTo(image, "scale", settings);
+  }
+
+  if (badge) {
+    const settings = { duration: 0.72, ease: "power3.out" };
+    controller.badgeX = gsap.quickTo(badge, "x", settings);
+    controller.badgeY = gsap.quickTo(badge, "y", settings);
+    controller.badgeRotation = gsap.quickTo(badge, "rotation", settings);
+  }
+
+  bookMotionControllers.set(card, controller);
+  return controller;
+};
+
 const featuredBook = computed(() => props.books.data.items[0] ?? null);
 
 const priceLabel = computed(() => {
@@ -56,45 +104,183 @@ const revealBooksSection = () => {
   if (!section || booksHasEntered) return;
 
   booksHasEntered = true;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (shouldReduceMotion()) return;
 
   booksAnimationContext = gsap.context(() => {
-    gsap
-      .timeline({ defaults: { ease: "power3.out" } })
+    const timeline = gsap
+      .timeline({ defaults: { ease: "power2.out" } })
+      .from(".home-v2-books__heading > span", {
+        autoAlpha: 0,
+        x: 28,
+        duration: 0.68,
+        clearProps: "opacity,visibility,transform",
+      })
       .from(
-        ".home-v2-books__feature",
+        ".home-v2-books__heading h2",
         {
           autoAlpha: 0,
           y: 38,
-          scale: 0.985,
+          duration: 1.05,
+          clearProps: "opacity,visibility,transform",
+        },
+        0.12,
+      )
+      .from(
+        ".home-v2-books__intro > p",
+        {
+          autoAlpha: 0,
+          y: 24,
+          duration: 0.82,
+          clearProps: "opacity,visibility,transform",
+        },
+        0.34,
+      );
+
+    if (featuredBook.value) {
+      timeline
+        .from(
+          ".home-v2-books__feature",
+          {
+            autoAlpha: 0,
+            y: 32,
+            scale: 0.99,
+            duration: 1.1,
+            clearProps: "opacity,visibility,transform",
+          },
+          0.52,
+        )
+        .from(
+          ".home-v2-books__cover",
+          {
+            clipPath: "inset(0 100% 0 0)",
+            duration: 1.15,
+            ease: "power3.inOut",
+            clearProps: "clip-path",
+          },
+          0.68,
+        )
+        .from(
+          ".home-v2-books__pages",
+          {
+            autoAlpha: 0,
+            scale: 0.72,
+            rotate: -6,
+            duration: 0.82,
+            ease: "power3.out",
+            clearProps: "opacity,visibility,transform",
+          },
+          1.08,
+        )
+        .from(
+          ".home-v2-books__copy > *",
+          {
+            autoAlpha: 0,
+            y: 16,
+            duration: 0.72,
+            stagger: 0.1,
+            clearProps: "opacity,visibility,transform",
+          },
+          0.92,
+        )
+        .from(
+          ".home-v2-books__features li",
+          {
+            autoAlpha: 0,
+            y: 12,
+            duration: 0.62,
+            stagger: 0.11,
+            clearProps: "opacity,visibility,transform",
+          },
+          1.28,
+        )
+        .fromTo(
+          ".home-v2-books__sheen",
+          { xPercent: 150, autoAlpha: 0 },
+          {
+            xPercent: -260,
+            autoAlpha: 0.72,
+            duration: 1.5,
+            ease: "power2.inOut",
+          },
+          1.1,
+        )
+        .to(
+          ".home-v2-books__sheen",
+          {
+            autoAlpha: 0,
+            duration: 0.32,
+            clearProps: "opacity,visibility,transform",
+          },
+          2.35,
+        );
+    } else {
+      timeline.from(
+        ".home-v2-books__empty",
+        {
+          autoAlpha: 0,
+          y: 28,
           duration: 0.85,
           clearProps: "opacity,visibility,transform",
         },
-        0,
-      )
-      .from(
-        ".home-v2-books__cover",
-        {
-          clipPath: "inset(0 100% 0 0)",
-          duration: 0.85,
-          ease: "expo.inOut",
-          clearProps: "clip-path",
-        },
-        0.18,
-      )
-      .from(
-        ".home-v2-books__copy > *",
-        { autoAlpha: 0, y: 18, duration: 0.52, stagger: 0.075 },
-        0.38,
+        0.5,
       );
+    }
   }, section);
 };
 
+const moveBookVisual = (event: PointerEvent) => {
+  if (event.pointerType === "touch" || shouldReduceMotion()) return;
+
+  const card = event.currentTarget as HTMLElement;
+  const bounds = card.getBoundingClientRect();
+  const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+  const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+  const controller = getBookMotionController(card);
+
+  bookResetCalls.get(card)?.kill();
+  bookResetCalls.delete(card);
+  controller.imageX?.(horizontal * 14);
+  controller.imageY?.(vertical * 10);
+  controller.imageScale?.(1.025);
+  controller.badgeX?.(horizontal * -8);
+  controller.badgeY?.(vertical * -8);
+  controller.badgeRotation?.(horizontal * -4);
+};
+
+const resetBookVisual = (event: PointerEvent) => {
+  const card = event.currentTarget as HTMLElement;
+  const controller = getBookMotionController(card);
+
+  controller.imageX?.(0);
+  controller.imageY?.(0);
+  controller.imageScale?.(1);
+  controller.badgeX?.(0);
+  controller.badgeY?.(0);
+  controller.badgeRotation?.(0);
+
+  bookResetCalls.get(card)?.kill();
+  const resetCall = gsap.delayedCall(0.92, () => {
+    if (!card.matches(":hover")) {
+      const targets = [controller.image, controller.badge].filter(Boolean);
+      gsap.set(targets, { clearProps: "transform" });
+    }
+    bookResetCalls.delete(card);
+  });
+  bookResetCalls.set(card, resetCall);
+};
+
 useScrollTriggeredReveal(booksSection, revealBooksSection, {
-  threshold: 0.18,
+  threshold: 0.12,
 });
 
-onBeforeUnmount(() => booksAnimationContext?.revert());
+onBeforeUnmount(() => {
+  booksAnimationContext?.revert();
+  bookResetCalls.forEach((call) => call.kill());
+  bookResetCalls.clear();
+  if (booksSection.value) {
+    gsap.killTweensOf(booksSection.value.querySelectorAll("*"));
+  }
+});
 </script>
 
 <template>
@@ -116,7 +302,12 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
         </p>
       </header>
 
-      <article v-if="featuredBook" class="home-v2-books__feature">
+      <article
+        v-if="featuredBook"
+        class="home-v2-books__feature"
+        @pointermove="moveBookVisual"
+        @pointerleave="resetBookVisual"
+      >
         <div class="home-v2-books__cover">
           <img
             v-if="featuredBook.image"
@@ -126,6 +317,7 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
             decoding="async"
           />
           <div class="home-v2-books__cover-overlay">
+            <span class="home-v2-books__sheen" aria-hidden="true" />
             <span class="home-v2-books__edition">
               GAMMA NOTES
               {{ String(featuredBook.bookType || 1).padStart(2, "0") }}
@@ -300,6 +492,24 @@ onBeforeUnmount(() => booksAnimationContext?.revert());
   padding: 40px 36px 34px;
   background: linear-gradient(180deg, rgb(7 18 71 / 15%), rgb(7 18 71 / 96%));
   color: #fff;
+}
+
+.home-v2-books__sheen {
+  position: absolute;
+  z-index: 3;
+  inset-block: -25%;
+  inset-inline-end: -22%;
+  width: 28%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 28%),
+    transparent
+  );
+  opacity: 0;
+  filter: blur(2px);
+  pointer-events: none;
+  transform: skewX(-18deg);
 }
 
 .home-v2-books__cover-overlay::before,

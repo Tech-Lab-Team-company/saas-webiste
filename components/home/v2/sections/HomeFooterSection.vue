@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { gsap } from 'gsap'
 import type { HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
 
 const props = defineProps<{
@@ -29,10 +30,145 @@ const brandSubtitle = computed(() => {
 const followLabel = computed(() =>
   props.site.brandName?.toLowerCase().includes('gamma') ? 'تابع مستر إسلام' : 'تابع المنصة',
 )
+
+const footerSection = ref<HTMLElement | null>(null)
+let footerAnimationContext: ReturnType<typeof gsap.context> | null = null
+let footerHasEntered = false
+
+const revealFooter = () => {
+  const footer = footerSection.value
+  if (!footer || footerHasEntered) return
+
+  footerHasEntered = true
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+  footerAnimationContext = gsap.context(() => {
+    const timeline = gsap
+      .timeline({ defaults: { ease: 'power2.out' } })
+      .from('.home-v2-footer__logo', {
+        autoAlpha: 0,
+        scale: 0.76,
+        rotation: -6,
+        duration: 0.84,
+        ease: 'power3.out',
+        clearProps: 'opacity,visibility,transform',
+      })
+      .from(
+        '.home-v2-footer__brand-copy > *',
+        {
+          autoAlpha: 0,
+          x: 22,
+          duration: 0.58,
+          stagger: 0.09,
+          clearProps: 'opacity,visibility,transform',
+        },
+        0.16,
+      )
+      .from(
+        '.home-v2-footer__description, .home-v2-footer__contacts',
+        {
+          autoAlpha: 0,
+          y: 20,
+          duration: 0.66,
+          stagger: 0.11,
+          clearProps: 'opacity,visibility,transform',
+        },
+        0.34,
+      )
+      .from(
+        '.home-v2-footer__links',
+        {
+          autoAlpha: 0,
+          y: 30,
+          duration: 0.74,
+          stagger: 0.14,
+          clearProps: 'opacity,visibility,transform',
+        },
+        0.34,
+      )
+      .from(
+        '.home-v2-footer__links > *',
+        {
+          autoAlpha: 0,
+          x: 18,
+          duration: 0.52,
+          stagger: 0.055,
+          clearProps: 'opacity,visibility,transform',
+        },
+        0.54,
+      )
+    const socialLabel = footer.querySelector('.home-v2-footer__social-block > b')
+    const socialLinks = footer.querySelectorAll('.home-v2-footer__socials > a')
+
+    if (socialLabel) {
+      timeline.from(
+        socialLabel,
+        {
+          autoAlpha: 0,
+          y: 12,
+          duration: 0.5,
+          clearProps: 'opacity,visibility,transform',
+        },
+        0.62,
+      )
+    }
+
+    if (socialLinks.length) {
+      timeline.from(
+        socialLinks,
+        {
+          autoAlpha: 0,
+          y: 16,
+          scale: 0.92,
+          duration: 0.64,
+          stagger: 0.09,
+          ease: 'power3.out',
+          clearProps: 'opacity,visibility,transform',
+        },
+        0.68,
+      )
+    }
+
+    timeline
+      .from(
+        '.home-v2-footer__bottom',
+        {
+          clipPath: 'inset(0 50% 0 50%)',
+          duration: 0.88,
+          ease: 'power2.inOut',
+          clearProps: 'clip-path',
+        },
+        0.9,
+      )
+      .from(
+        '.home-v2-footer__bottom > *',
+        {
+          autoAlpha: 0,
+          y: 14,
+          duration: 0.56,
+          stagger: 0.09,
+          clearProps: 'opacity,visibility,transform',
+        },
+        1.08,
+      )
+  }, footer)
+}
+
+useScrollTriggeredReveal(footerSection, revealFooter, {
+  threshold: 0.1,
+})
+
+onBeforeUnmount(() => {
+  footerAnimationContext?.revert()
+
+  if (footerSection.value) {
+    gsap.killTweensOf(footerSection.value.querySelectorAll('*'))
+  }
+})
 </script>
 
 <template>
-  <footer class="home-v2-footer">
+  <footer ref="footerSection" class="home-v2-footer">
     <div class="container home-v2-footer__grid">
       <div class="home-v2-footer__brand-column">
         <NuxtLink to="/" class="home-v2-footer__brand" :aria-label="`${site.brandName || 'EduHub'} — الرئيسية`">
@@ -272,7 +408,8 @@ const followLabel = computed(() =>
   color: #ffffffc7;
   font-size: 11px;
   font-weight: 800;
-  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  transition: border-color 0.3s ease, color 0.3s ease,
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-v2-footer__socials > a:hover {
@@ -347,7 +484,7 @@ const followLabel = computed(() =>
   color: #ffffffc7;
   font-size: 12px;
   font-weight: 800;
-  transition: color 0.18s;
+  transition: color 0.28s ease;
 }
 
 .home-v2-footer__legal a:hover {
@@ -360,7 +497,7 @@ const followLabel = computed(() =>
   align-items: center;
   color: #e6ba62;
   font-weight: 900;
-  transition: color 0.18s ease;
+  transition: color 0.28s ease;
 }
 
 .home-v2-footer__powered-by:hover,

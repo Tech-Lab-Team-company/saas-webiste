@@ -152,6 +152,7 @@ export interface HomeLearningJourneyViewModel {
   eyebrow: string
   title: string
   description: string
+  textBackground: string
   icon: HomeImageViewModel | null
   link: string
   linkLabel: string
@@ -200,6 +201,7 @@ export interface HomeSiteViewModel {
     youtube: string | null
   }
   app: {
+    image: HomeImageViewModel | null
     androidUrl: string | null
     iosUrl: string | null
   }

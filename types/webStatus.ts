@@ -22,6 +22,10 @@ export default interface WebStatus {
     allow_payment_gateway: boolean;
     expire_app: number;
     image: ImageModel;
+    app_image?: {
+        img: string;
+        alt: string;
+    };
     cover: ImageModel;
     address: string;
     primary_color: string;
@@ -46,4 +50,3 @@ export default interface WebStatus {
     allow_coupon:boolean;
     allow_complete_data:boolean;
 }
-

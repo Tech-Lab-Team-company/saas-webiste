@@ -1,7 +1,7 @@
 class ApiNames {
   private static _instance: ApiNames;
   // eslint-disable-next-line ~typescript-eslint/no-empty-function
-  private constructor() { }
+  private constructor() {}
   public static get Instance(): ApiNames {
     if (!this._instance) {
       this._instance = new ApiNames();
@@ -10,8 +10,6 @@ class ApiNames {
   }
 
   public baseUrl = "https://dev.saas.techlabeg.com/api/website/";
-  
-
 
   //auth
   public login = "login";
@@ -28,34 +26,29 @@ class ApiNames {
   // public resetPassword = "change_password";
 
   public setNewPassword = "reset_password";
-  
+
   //Education Stages
-  public educationstages =this.baseUrl + "fetch_education_type";
+  public educationstages = this.baseUrl + "fetch_education_type";
   public educationlevels = "fetch_stages";
-  
-  
+
   //Course Details
   public courseDetails = "course_details";
-  
-  
+
   //university
   public university = "fetch_universities";
   public colleges = "fetch_colleges";
   public college_department = "fetch_college_departments";
   public college_department_divisions = "fetch_college_department_divisions";
   public submit_education_data = "store_education_data";
-  
+
   // Exams
   public examDetails = "fetch_exam_details";
   public submit_question_answer = "submit_exam_question";
-
-
 
   //user
   public profile = "profile";
   public updateProfile = "update_profile";
   public updatePassword = "change_password";
-
 
   // home
   public categories = "categories";
@@ -106,9 +99,8 @@ class ApiNames {
   public voteReview = "vote";
   public inactiveListing = "disactive_listing";
 
-
   public addClaim = "add_claim";
-  public    addRate = "add_rate";
+  public addRate = "add_rate";
   public contactUs = "contact_us";
 
   // chats
@@ -118,7 +110,7 @@ class ApiNames {
 
   // terms
   public fetch_terms = "fetch_terms";
-  
+
   // privacy
   public fetch_privacy = "fetch_privacy";
 
@@ -130,14 +122,21 @@ class ApiNames {
 
   // Home V2
   // This endpoint is available on the development API only.
-  public fetch_hero_sections = "https://dev.saas.techlabeg.com/api/website/fetch_hero_sections";
-  public fetch_home_learning_journey = "https://dev.saas.techlabeg.com/api/website/fetch_home_learning_journey";
-  public fetch_about_teacher = "https://dev.saas.techlabeg.com/api/website/fetch_about_teacher";
-  public fetch_study_process = "https://dev.saas.techlabeg.com/api/website/fetch_study_process";
-  public fetch_ready_section = "https://dev.saas.techlabeg.com/api/website/fetch_ready_section";
-  public fetch_books = "https://dev.saas.techlabeg.com/api/website/fetch_Books";
-  public fetch_home_book_section = "https://dev.saas.techlabeg.com/api/website/fetch_home_book_section";
-  public fetch_book_details = "https://dev.saas.techlabeg.com/api/website/fetch_Book_Details";
+  public fetch_hero_sections =
+    "https://dev.saas.techlabeg.com/api/website/fetch_hero_sections";
+  public fetch_home_learning_journey =
+    "https://dev.saas.techlabeg.com/api/website/fetch_home_learning_journey";
+  public fetch_about_teacher =
+    "https://dev.saas.techlabeg.com/api/website/fetch_about_teacher";
+  public fetch_study_process =
+    "https://dev.saas.techlabeg.com/api/website/fetch_study_process";
+  public fetch_ready_section =
+    "https://dev.saas.techlabeg.com/api/website/fetch_ready_section";
+  public fetch_books = "https://dev.saas.techlabeg.com/api/website/fetch_books";
+  public fetch_home_book_section =
+    "https://dev.saas.techlabeg.com/api/website/fetch_home_book_section";
+  public fetch_book_details =
+    "https://dev.saas.techlabeg.com/api/website/fetch_book_details";
   public fetch_home_website_section = "fetch_home_website_section";
   public filter_courses = "filter_courses";
 
@@ -151,28 +150,20 @@ class ApiNames {
   public educationbasiclevels = this.baseUrl + "fetch_stages";
   public educationbasicstagesyear = this.baseUrl + "fetch_stage_years ";
   public educationbasicsubjects = this.baseUrl + "fetch_subjects";
-  
-  
+
   public paymentmethods = this.baseUrl + "fetch_payment_methods";
   public fetchchatbot = this.baseUrl + "fetch_chatbots";
   public chatbotmessages = this.baseUrl + "chat";
 
-  
-  public FetchGenralSubjects= this.baseUrl + "fetch_general_subjects";
-  public FetchGenralTeachers= this.baseUrl + "fetch_teachers ";
-  public CreateOnlinePayment= this.baseUrl + "create_payment_session ";
-  public CreateVerifyPayment= this.baseUrl + "verify_payment ";
+  public FetchGenralSubjects = this.baseUrl + "fetch_general_subjects";
+  public FetchGenralTeachers = this.baseUrl + "fetch_teachers ";
+  public CreateOnlinePayment = this.baseUrl + "create_payment_session ";
+  public CreateVerifyPayment = this.baseUrl + "verify_payment ";
 
-  
-  
   //Courses
   public fetch_courses = "fetch_my_courses";
 
-
-  
   public generalSubjects = "fetch_general_subjects ";
-
-
 }
 
 export { ApiNames };

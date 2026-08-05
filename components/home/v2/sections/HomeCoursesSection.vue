@@ -35,6 +35,49 @@ const MAX_PREVIEW_COURSES = 6;
 const shouldReduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+type QuickMotion = ReturnType<typeof gsap.quickTo>;
+type CourseCardMotionController = {
+  visual: Element | null;
+  cardXRotation: QuickMotion;
+  cardYRotation: QuickMotion;
+  cardY: QuickMotion;
+  visualX?: QuickMotion;
+  visualY?: QuickMotion;
+};
+
+const cardMotionControllers = new WeakMap<
+  HTMLElement,
+  CourseCardMotionController
+>();
+const cardResetCalls = new Map<
+  HTMLElement,
+  ReturnType<typeof gsap.delayedCall>
+>();
+
+const getCardMotionController = (card: HTMLElement) => {
+  const visual = card.querySelector(".course-cover img, .course-mark");
+  const cached = cardMotionControllers.get(card);
+
+  if (cached?.visual === visual) return cached;
+
+  const cardSettings = { duration: 0.65, ease: "power2.out" };
+  const controller: CourseCardMotionController = {
+    visual,
+    cardXRotation: gsap.quickTo(card, "rotationX", cardSettings),
+    cardYRotation: gsap.quickTo(card, "rotationY", cardSettings),
+    cardY: gsap.quickTo(card, "y", cardSettings),
+  };
+
+  if (visual) {
+    const visualSettings = { duration: 0.72, ease: "power2.out" };
+    controller.visualX = gsap.quickTo(visual, "x", visualSettings);
+    controller.visualY = gsap.quickTo(visual, "y", visualSettings);
+  }
+
+  cardMotionControllers.set(card, controller);
+  return controller;
+};
+
 const selectedTab = computed(
   () =>
     props.courses.data.tabs.find((tab) => tab.key === selectedTabKey.value) ??
@@ -73,8 +116,8 @@ const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
     const indexBadge = selectedButton.querySelector(".stage-option-index");
     gsap.fromTo(
       indexBadge,
-      { scale: 0.72, rotate: -8 },
-      { scale: 1, rotate: 0, duration: 0.55, ease: "back.out(2)" },
+      { scale: 0.82, rotate: -4 },
+      { scale: 1, rotate: 0, duration: 0.7, ease: "power3.out" },
     );
   }
 
@@ -144,18 +187,20 @@ const animateCourseResults = async () => {
     targets,
     {
       autoAlpha: 0,
-      y: 42,
-      scale: 0.965,
-      rotationX: 7,
+      y: 30,
+      scale: 0.98,
+      rotationX: 3,
     },
     {
       autoAlpha: 1,
       y: 0,
       scale: 1,
       rotationX: 0,
-      duration: 0.72,
-      stagger: 0.09,
-      ease: "power3.out",
+      duration: 0.92,
+      stagger: targets.length > 1
+        ? Math.min(0.1, 0.7 / (targets.length - 1))
+        : 0,
+      ease: "power2.out",
       clearProps: "opacity,visibility,transform",
     },
   );
@@ -169,61 +214,61 @@ const revealCoursesSection = () => {
   if (shouldReduceMotion()) return;
 
   coursesAnimationContext = gsap.context(() => {
-    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const timeline = gsap.timeline({ defaults: { ease: "power2.out" } });
 
     timeline
       .from(".split-heading .section-tag", {
         autoAlpha: 0,
-        x: 38,
-        duration: 0.55,
+        x: 30,
+        duration: 0.68,
       })
       .from(
         ".split-heading h2",
-        { autoAlpha: 0, y: 48, duration: 0.85, ease: "expo.out" },
-        0.12,
+        { autoAlpha: 0, y: 38, duration: 1.05 },
+        0.14,
       )
       .from(
         ".split-heading > p",
-        { autoAlpha: 0, y: 28, duration: 0.65 },
-        0.28,
+        { autoAlpha: 0, y: 24, duration: 0.82 },
+        0.38,
       )
       .from(
         ".home-course-picker",
         {
           autoAlpha: 0,
           clipPath: "inset(0 50% 0 50%)",
-          y: 28,
-          duration: 0.9,
-          ease: "expo.inOut",
+          y: 24,
+          duration: 1.15,
+          ease: "power3.inOut",
         },
-        0.42,
+        0.58,
       )
       .from(
         ".home-course-audiences button",
         {
           autoAlpha: 0,
-          y: 20,
-          scale: 0.92,
-          duration: 0.48,
-          stagger: 0.08,
+          y: 16,
+          scale: 0.96,
+          duration: 0.68,
+          stagger: 0.11,
         },
-        0.72,
+        0.92,
       )
       .from(
         ".home-course-result > *",
-        { autoAlpha: 0, y: 34, duration: 0.65 },
-        0.93,
+        { autoAlpha: 0, y: 28, duration: 0.82 },
+        1.16,
       )
       .from(
         ".all-courses",
-        { autoAlpha: 0, y: 18, duration: 0.5 },
-        1.05,
+        { autoAlpha: 0, y: 14, duration: 0.66 },
+        1.38,
       );
 
     gsap.to(".home-course-motion-orb--one", {
       x: 30,
       y: -24,
-      duration: 7,
+      duration: 9,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -231,7 +276,7 @@ const revealCoursesSection = () => {
     gsap.to(".home-course-motion-orb--two", {
       x: -26,
       y: 30,
-      duration: 8.5,
+      duration: 11,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -246,50 +291,38 @@ const tiltCourseCard = (event: PointerEvent) => {
   const bounds = card.getBoundingClientRect();
   const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
   const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+  const controller = getCardMotionController(card);
 
-  gsap.to(card, {
-    rotationY: horizontal * 5,
-    rotationX: vertical * -5,
-    y: -8,
-    duration: 0.45,
-    ease: "power2.out",
-    overwrite: "auto",
-  });
-  const coverVisual = card.querySelector(".course-cover img, .course-mark");
-  if (coverVisual) {
-    gsap.to(coverVisual, {
-      x: horizontal * 9,
-      y: vertical * 7,
-      duration: 0.55,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-  }
+  cardResetCalls.get(card)?.kill();
+  cardResetCalls.delete(card);
+  controller.cardYRotation(horizontal * 3.5);
+  controller.cardXRotation(vertical * -3.5);
+  controller.cardY(-6);
+  controller.visualX?.(horizontal * 9);
+  controller.visualY?.(vertical * 7);
 };
 
 const resetCourseCard = (event: PointerEvent) => {
   const card = event.currentTarget as HTMLElement;
+  const controller = getCardMotionController(card);
 
-  gsap.to(card, {
-    rotationX: 0,
-    rotationY: 0,
-    y: 0,
-    duration: 0.65,
-    ease: "elastic.out(1, 0.55)",
-    overwrite: "auto",
-    onComplete: () => gsap.set(card, { clearProps: "transform" }),
+  controller.cardXRotation(0);
+  controller.cardYRotation(0);
+  controller.cardY(0);
+  controller.visualX?.(0);
+  controller.visualY?.(0);
+
+  cardResetCalls.get(card)?.kill();
+  const resetCall = gsap.delayedCall(0.88, () => {
+    if (!card.matches(":hover")) {
+      gsap.set(card, { clearProps: "transform" });
+      if (controller.visual) {
+        gsap.set(controller.visual, { clearProps: "transform" });
+      }
+    }
+    cardResetCalls.delete(card);
   });
-  const coverVisual = card.querySelector(".course-cover img, .course-mark");
-  if (coverVisual) {
-    gsap.to(coverVisual, {
-      x: 0,
-      y: 0,
-      duration: 0.55,
-      ease: "power2.out",
-      overwrite: "auto",
-      onComplete: () => gsap.set(coverVisual, { clearProps: "transform" }),
-    });
-  }
+  cardResetCalls.set(card, resetCall);
 };
 
 watch(
@@ -304,11 +337,13 @@ watch(
 );
 
 useScrollTriggeredReveal(coursesSection, revealCoursesSection, {
-  threshold: 0.16,
+  threshold: 0.12,
 });
 
 onBeforeUnmount(() => {
   coursesAnimationContext?.revert();
+  cardResetCalls.forEach((call) => call.kill());
+  cardResetCalls.clear();
   if (coursesSection.value) {
     gsap.killTweensOf(coursesSection.value.querySelectorAll("*"));
   }
@@ -320,6 +355,7 @@ onBeforeUnmount(() => {
     id="courses"
     ref="coursesSection"
     class="section courses home-course-showcase"
+    :class="{ 'is-entered': sectionHasEntered }"
     aria-labelledby="home-v2-courses-title"
   >
     <div class="home-course-motion" aria-hidden="true">
@@ -709,7 +745,12 @@ onBeforeUnmount(() => {
   color: var(--coral);
   font-size: 34px;
   font-weight: 900;
-  animation: home-course-nudge 1.7s ease-in-out infinite;
+  animation: home-course-nudge 2.3s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.home-course-showcase.is-entered .home-course-empty-arrow {
+  animation-play-state: running;
 }
 
 .home-course-result-head {

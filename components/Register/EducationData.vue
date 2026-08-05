@@ -20,7 +20,6 @@ import SubmitEducationDataParams from "~/features/SubmitEducationData/Core/Param
 import FetchGeneralCoursesSubjectController from "~/features/FetchGeneralCourseSubject/presentation/controllers/fetch_general_course_subjects_controller";
 import FetchGeneralCoursesSubjectParams from "~/features/FetchGeneralCourseSubject/Core/Params/fetch_general_course_subjects_params";
 
-
 import EducationBasicLevelsController from "~/features/FetchBasicEducationStages/presentation/controllers/education_basic_levels_controller";
 import EducationBasicLevelsParams from "~/features/FetchBasicEducationStages/Core/Params/basic_education_levels_params";
 
@@ -30,8 +29,7 @@ import EducationBasicStagesYearParams from "~/features/FetchBasicStagesYear/Core
 import EducationBasicSubjectsController from "~/features/FetchBasicSubjects/presentation/controllers/education_basic_subjects_controller";
 import EducationBasicSubjectsParams from "~/features/FetchBasicSubjects/Core/Params/basic_education_subjects_params";
 
-
-const studentCategory = ref(0)
+const studentCategory = ref(0);
 
 const Eductaion_Type = ref<TitleModel[]>([]);
 const EducationCategory = ref<number>();
@@ -40,155 +38,207 @@ const Colleges = ref<TitleModel[]>([]);
 const CollegeDeprtment = ref<TitleModel[]>([]);
 const CollegeDeprtmentDivision = ref<TitleModel[]>([]);
 
-const userStore = useUserStore()
-
+const userStore = useUserStore();
 
 const FetchEducationStages = async () => {
-  const educationStagesParams = new EducationStagesParams(userStore?.user?.category_id);
+  const educationStagesParams = new EducationStagesParams(
+    userStore?.user?.category_id,
+  );
   const educationStagesController = EducationStagesController.getInstance();
-  const state = await educationStagesController.FetchEducationStages(educationStagesParams);
+  const state = await educationStagesController.FetchEducationStages(
+    educationStagesParams,
+  );
 
   if (state.value.data) {
     Eductaion_Type.value.push(...state.value.data);
   }
-}
+};
 
-watch(() => studentCategory.value,
+watch(
+  () => studentCategory.value,
   (NewValue) => {
     studentCategory.value = NewValue;
     FetchEducationStages();
-  })
-
-
-
+  },
+);
 
 const FetchUniversityEducationLevel = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value))
-  const universityParams = new UniversityParams(Number((data.target as HTMLSelectElement).value), 1);
+  console.log(Number((data.target as HTMLSelectElement).value));
+  const universityParams = new UniversityParams(
+    Number((data.target as HTMLSelectElement).value),
+    1,
+  );
   const universityController = UniversityController.getInstance();
-  const state = await universityController.FetchUniversity(universityParams)
-
+  const state = await universityController.FetchUniversity(universityParams);
 
   if (state.value.data) {
     University.value.push(...state.value.data);
   }
-}
+};
 
 const FetchColleges = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value))
-  const collegesParams = new CollegesParams(Number((data.target as HTMLSelectElement).value));
+  console.log(Number((data.target as HTMLSelectElement).value));
+  const collegesParams = new CollegesParams(
+    Number((data.target as HTMLSelectElement).value),
+  );
   const collegesController = CollegesController.getInstance();
-  const state = await collegesController.FetchColleges(collegesParams)
-
+  const state = await collegesController.FetchColleges(collegesParams);
 
   if (state.value.data) {
     Colleges.value.push(...state.value.data);
   }
-  console.log(Colleges.value)
-
-}
+  console.log(Colleges.value);
+};
 const FetchCollegesDeprtment = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value))
-  const collegeDetpartmentParams = new CollegeDetpartmentParams(Number((data.target as HTMLSelectElement).value));
+  console.log(Number((data.target as HTMLSelectElement).value));
+  const collegeDetpartmentParams = new CollegeDetpartmentParams(
+    Number((data.target as HTMLSelectElement).value),
+  );
   const collegeDepartmentController = CollegeDepartmentController.getInstance();
-  const state = await collegeDepartmentController.FetchCollegeDepartment(collegeDetpartmentParams)
-
+  const state = await collegeDepartmentController.FetchCollegeDepartment(
+    collegeDetpartmentParams,
+  );
 
   if (state.value.data) {
     CollegeDeprtment.value.push(...state.value.data);
   }
-  console.log(Colleges.value)
-
-}
+  console.log(Colleges.value);
+};
 const FetchCollegesDeprtmentDivisions = async (data: Event) => {
-  console.log(Number((data.target as HTMLSelectElement).value))
-  const collegeDetpartmentDivisionsParams = new CollegeDetpartmentDivisionsParams(Number((data.target as HTMLSelectElement).value));
-  const collegeDepartmentDivisionsController = CollegeDepartmentDivisionsController.getInstance();
-  const state = await collegeDepartmentDivisionsController.FetchCollegeDepartmentDivisions(collegeDetpartmentDivisionsParams)
-
+  console.log(Number((data.target as HTMLSelectElement).value));
+  const collegeDetpartmentDivisionsParams =
+    new CollegeDetpartmentDivisionsParams(
+      Number((data.target as HTMLSelectElement).value),
+    );
+  const collegeDepartmentDivisionsController =
+    CollegeDepartmentDivisionsController.getInstance();
+  const state =
+    await collegeDepartmentDivisionsController.FetchCollegeDepartmentDivisions(
+      collegeDetpartmentDivisionsParams,
+    );
 
   if (state.value.data) {
     CollegeDeprtmentDivision.value.push(...state.value.data);
   }
-
-
-}
+};
 
 onMounted(() => {
   FetchEducationStages();
-})
+});
 
 const SendUniversityData = async () => {
-    const EducationDataParams = new SubmitEducationDataParams(Eductaion_Type?.value?.[0]?.id, CollegeDeprtmentDivision.value?.[0]?.id, studentCategory?.value, University.value?.[0]?.id,
-      Colleges.value?.[0]?.id, CollegeDeprtment.value?.[0]?.id ,null , null , null);
-  const submitEducationDataController = SubmitEducationDataController.getInstance();
-  const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
-}
+  const EducationDataParams = new SubmitEducationDataParams(
+    Eductaion_Type?.value?.[0]?.id,
+    CollegeDeprtmentDivision.value?.[0]?.id,
+    studentCategory?.value,
+    University.value?.[0]?.id,
+    Colleges.value?.[0]?.id,
+    CollegeDeprtment.value?.[0]?.id,
+    null,
+    null,
+    null,
+  );
+  const submitEducationDataController =
+    SubmitEducationDataController.getInstance();
+  const state = await submitEducationDataController.SubmitEducationData(
+    EducationDataParams,
+  );
+};
 
 const SendGeneralData = async () => {
-  const EducationDataParams = new SubmitEducationDataParams(null,null,null,null,null,null,null , null , null );
-  const submitEducationDataController = SubmitEducationDataController.getInstance();
-  const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
-}
+  const EducationDataParams = new SubmitEducationDataParams(
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  );
+  const submitEducationDataController =
+    SubmitEducationDataController.getInstance();
+  const state = await submitEducationDataController.SubmitEducationData(
+    EducationDataParams,
+  );
+};
 
+const selectedSubject = ref();
+const Subjects = ref();
 
-
-
-const selectedSubject = ref()
-const Subjects = ref()
-
-
-
-const  BasicEducationCategory = ref<number | null>(null);
-const FetchEduciationLevels =async ()=>{
-  const educationBasicLevelsParams = new EducationBasicLevelsParams(BasicEducationCategory.value);
-  const educationBasicLevelsController = EducationBasicLevelsController.getInstance();
-  const state = await educationBasicLevelsController.FetchEducationBasicLevels(educationBasicLevelsParams);
-  if(state.value.data) {
+const BasicEducationCategory = ref<number | null>(null);
+const FetchEduciationLevels = async () => {
+  const educationBasicLevelsParams = new EducationBasicLevelsParams(
+    BasicEducationCategory.value,
+  );
+  const educationBasicLevelsController =
+    EducationBasicLevelsController.getInstance();
+  const state = await educationBasicLevelsController.FetchEducationBasicLevels(
+    educationBasicLevelsParams,
+  );
+  if (state.value.data) {
     Levels.value.push(...state.value.data);
-
   }
-
-}
-
-
+};
 
 const selectedLevel = ref<number | null>(null);
 const Levels = ref<TitleModel[]>([]);
-const FetchStage = async ()=>{
-  const educationBasicStagesYearParams = new EducationBasicStagesYearParams(selectedLevel.value)
-  const educationBasicStagesYearController = EducationBasicStagesYearController.getInstance();
-  const state = await educationBasicStagesYearController.FetchEducationBasicStagesYear(educationBasicStagesYearParams);
-  if(state.value.data) {
+const FetchStage = async () => {
+  const educationBasicStagesYearParams = new EducationBasicStagesYearParams(
+    selectedLevel.value,
+  );
+  const educationBasicStagesYearController =
+    EducationBasicStagesYearController.getInstance();
+  const state =
+    await educationBasicStagesYearController.FetchEducationBasicStagesYear(
+      educationBasicStagesYearParams,
+    );
+  if (state.value.data) {
     Stages.value.push(...state.value.data);
   }
-}
-
-
-
+};
 
 const selectedStage = ref<number | null>(null);
 const Stages = ref<TitleModel[]>([]);
-const FetchSubjects =async ()=>{
-  const educationBasicSubjectsParams = new EducationBasicSubjectsParams(userStore.user?.category_id , selectedStage.value);
-  const educationBasicSubjectsController = EducationBasicSubjectsController.getInstance();
+const FetchSubjects = async () => {
+  const educationBasicSubjectsParams = new EducationBasicSubjectsParams(
+    userStore.user?.category_id,
+    selectedStage.value,
+  );
+  const educationBasicSubjectsController =
+    EducationBasicSubjectsController.getInstance();
 
-  const state = await educationBasicSubjectsController.FetchEducationBasicSubjects(educationBasicSubjectsParams);
-  if(state.value.data) {
+  const state =
+    await educationBasicSubjectsController.FetchEducationBasicSubjects(
+      educationBasicSubjectsParams,
+    );
+  if (state.value.data) {
     BasicSubjects.value.push(...state.value.data);
   }
-}
-
+};
 
 const BasicSubjects = ref<TitleModel[]>([]);
 const selectedBasicSubject = ref<number | null>(null);
 
-const SendBasicData = async()=>{
- const EducationDataParams = new SubmitEducationDataParams(null,null,null,null,null,null,selectedStage.value , BasicEducationCategory.value , selectedLevel.value);
-  const submitEducationDataController = SubmitEducationDataController.getInstance();
-  const state = await submitEducationDataController.SubmitEducationData(EducationDataParams);
-}
-
+const SendBasicData = async () => {
+  const EducationDataParams = new SubmitEducationDataParams(
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    selectedStage.value,
+    BasicEducationCategory.value,
+    selectedLevel.value,
+  );
+  const submitEducationDataController =
+    SubmitEducationDataController.getInstance();
+  const state = await submitEducationDataController.SubmitEducationData(
+    EducationDataParams,
+  );
+};
 </script>
 
 <template>
@@ -201,149 +251,257 @@ const SendBasicData = async()=>{
       </p>
 
       <div class="inputs">
-        <label class="auth-field-label" for="education-account-type">نوع الدراسة</label>
+        <label class="auth-field-label" for="education-account-type"
+          >نوع الدراسة</label
+        >
         <div class="login-input">
-           <select id="education-account-type" class="student-select"
-           disabled
-          :value="userStore.user?.category_id == 1 ? StudentCategoryEnum.base : userStore.user?.category_id == 2 ? StudentCategoryEnum.university : StudentCategoryEnum.general"
+          <select
+            id="education-account-type"
+            class="student-select"
+            disabled
+            :value="
+              userStore.user?.category_id == 1
+                ? StudentCategoryEnum.base
+                : userStore.user?.category_id == 2
+                ? StudentCategoryEnum.university
+                : StudentCategoryEnum.general
+            "
           >
-            <option  :value="StudentCategoryEnum.base">اساسى</option>
+            <option :value="StudentCategoryEnum.base">اساسى</option>
             <option :value="StudentCategoryEnum.university">جامعى</option>
             <option :value="StudentCategoryEnum.general">عام</option>
           </select>
         </div>
       </div>
 
-
       <div class="inputs" v-if="userStore.user?.category_id == 2">
-        <label class="auth-field-label" for="education-category">نوع التعليم</label>
+        <label class="auth-field-label" for="education-category"
+          >نوع التعليم</label
+        >
         <div class="login-input">
-          <select id="education-category" class="student-select" v-model="EducationCategory" @change="FetchUniversityEducationLevel">
+          <select
+            id="education-category"
+            class="student-select"
+            v-model="EducationCategory"
+            @change="FetchUniversityEducationLevel"
+          >
             <option value="" disabled selected>نوع التعليم</option>
-            <option v-for="(item, index) in Eductaion_Type" :key="index" :value="item.id">{{ item.title }}</option>
-
+            <option
+              v-for="(item, index) in Eductaion_Type"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
+            </option>
           </select>
         </div>
       </div>
-
 
       <div class="inputs" v-if="userStore.user?.category_id == 1">
-        <label class="auth-field-label" for="basic-education-category">نوع التعليم</label>
+        <label class="auth-field-label" for="basic-education-category"
+          >نوع التعليم</label
+        >
         <div class="login-input">
-          <select id="basic-education-category" class="student-select" v-model="BasicEducationCategory" @change="FetchEduciationLevels">
+          <select
+            id="basic-education-category"
+            class="student-select"
+            v-model="BasicEducationCategory"
+            @change="FetchEduciationLevels"
+          >
             <!-- <option value="" disabled selected>نوع التعليم</option> -->
-            <option v-for="(item, index) in Eductaion_Type" :key="index" :value="item.id">{{ item.title }}</option>
-
+            <option
+              v-for="(item, index) in Eductaion_Type"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
+            </option>
           </select>
         </div>
       </div>
 
-
-
-
-      <div class="inputs" v-if=" userStore.user?.category_id == 2">
-        <label class="auth-field-label" for="education-university">الجامعة</label>
+      <div class="inputs" v-if="userStore.user?.category_id == 2">
+        <label class="auth-field-label" for="education-university"
+          >الجامعة</label
+        >
         <div class="login-input">
-          <select id="education-university" class="student-select" @change="FetchColleges">
+          <select
+            id="education-university"
+            class="student-select"
+            @change="FetchColleges"
+          >
             <option value="" disabled selected>جامعة</option>
-            <option v-for="(item, index) in University" :key="index" :value="item.id">{{ item.title }}</option>
-
+            <option
+              v-for="(item, index) in University"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
+            </option>
           </select>
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.category_id == 2">
+      <div class="inputs" v-if="userStore.user?.category_id == 2">
         <label class="auth-field-label" for="education-college">الكلية</label>
         <div class="login-input">
-          <select id="education-college" class="student-select" @change="FetchCollegesDeprtment">
+          <select
+            id="education-college"
+            class="student-select"
+            @change="FetchCollegesDeprtment"
+          >
             <option value="" disabled selected>الكلية</option>
-            <option v-for="(item, index) in Colleges" :key="index" :value="item.id">{{ item.title }}</option>
-
-
+            <option
+              v-for="(item, index) in Colleges"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
+            </option>
           </select>
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.category_id == 2">
+      <div class="inputs" v-if="userStore.user?.category_id == 2">
         <label class="auth-field-label" for="education-department">القسم</label>
         <div class="login-input">
-          <select id="education-department" class="student-select" @change="FetchCollegesDeprtmentDivisions">
+          <select
+            id="education-department"
+            class="student-select"
+            @change="FetchCollegesDeprtmentDivisions"
+          >
             <option value="" disabled selected>القسم</option>
-            <option v-for="(item, index) in CollegeDeprtment" :key="index" :value="item.id">{{ item.title }}</option>
+            <option
+              v-for="(item, index) in CollegeDeprtment"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
+            </option>
           </select>
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.category_id == 2">
+      <div class="inputs" v-if="userStore.user?.category_id == 2">
         <label class="auth-field-label" for="education-level">المستوى</label>
         <div class="login-input">
           <select id="education-level" class="student-select">
             <option value="" disabled selected>المستوى</option>
-            <option v-for="(item, index) in CollegeDeprtmentDivision" :key="index" :value="item.id">{{ item.title }}
+            <option
+              v-for="(item, index) in CollegeDeprtmentDivision"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
             </option>
           </select>
         </div>
       </div>
 
-
-
-      <div class="inputs" v-if=" userStore.user?.category_id == 1 && BasicEducationCategory">
-        <label class="auth-field-label" for="basic-education-level">المرحلة</label>
+      <div
+        class="inputs"
+        v-if="userStore.user?.category_id == 1 && BasicEducationCategory"
+      >
+        <label class="auth-field-label" for="basic-education-level"
+          >المرحلة</label
+        >
         <div class="login-input">
-          <select id="basic-education-level" class="student-select" v-model="selectedLevel" @change="FetchStage">
-            <option v-for="(item, index) in Levels" :key="index" :value="item.id">{{ item.title }}
+          <select
+            id="basic-education-level"
+            class="student-select"
+            v-model="selectedLevel"
+            @change="FetchStage"
+          >
+            <option
+              v-for="(item, index) in Levels"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
             </option>
           </select>
         </div>
       </div>
 
-      <div class="inputs" v-if=" userStore.user?.category_id == 1 && selectedLevel">
+      <div
+        class="inputs"
+        v-if="userStore.user?.category_id == 1 && selectedLevel"
+      >
         <label class="auth-field-label" for="basic-education-stage">الصف</label>
         <div class="login-input">
-          <select id="basic-education-stage" class="student-select" v-model="selectedStage" @change="FetchSubjects">
-            <option v-for="(item, index) in Stages" :key="index" :value="item.id">{{ item.title }}
+          <select
+            id="basic-education-stage"
+            class="student-select"
+            v-model="selectedStage"
+            @change="FetchSubjects"
+          >
+            <option
+              v-for="(item, index) in Stages"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
             </option>
           </select>
         </div>
       </div>
-      <div class="inputs" v-if=" userStore.user?.category_id == 1 && selectedStage">
-        <label class="auth-field-label" for="basic-education-subject">المادة</label>
+      <div
+        class="inputs"
+        v-if="userStore.user?.category_id == 1 && selectedStage"
+      >
+        <label class="auth-field-label" for="basic-education-subject"
+          >المادة</label
+        >
         <div class="login-input">
-          <select id="basic-education-subject" class="student-select" v-model="selectedBasicSubject" >
-            <option v-for="(item, index) in BasicSubjects" :key="index" :value="item.id">{{ item.title }}
+          <select
+            id="basic-education-subject"
+            class="student-select"
+            v-model="selectedBasicSubject"
+          >
+            <option
+              v-for="(item, index) in BasicSubjects"
+              :key="index"
+              :value="item.id"
+            >
+              {{ item.title }}
             </option>
           </select>
         </div>
       </div>
 
-
-
-
-      <div class="btns btns-home" @click="SendUniversityData"  v-if="userStore.user?.category_id == 2">
-        <button class="login-btn" >
+      <div
+        class="btns btns-home"
+        @click="SendUniversityData"
+        v-if="userStore.user?.category_id == 2"
+      >
+        <button class="login-btn">
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
         </button>
-
       </div>
-      <div class="btns btns-home" @click="SendGeneralData" v-if="userStore.user?.category_id == 3">
-        <button class="login-btn" >
+      <div
+        class="btns btns-home"
+        @click="SendGeneralData"
+        v-if="userStore.user?.category_id == 3"
+      >
+        <button class="login-btn">
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
         </button>
-
       </div>
-      <div class="btns btns-home" @click="SendBasicData" v-if="userStore.user?.category_id == 1">
-        <button class="login-btn" >
+      <div
+        class="btns btns-home"
+        @click="SendBasicData"
+        v-if="userStore.user?.category_id == 1"
+      >
+        <button class="login-btn">
           اختر فئاتك المفضله
           <LeftArrowIcon class="left-icon" />
         </button>
-
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
-.hidden{
+.hidden {
   display: none;
 }
 

@@ -39,9 +39,7 @@ const animateJourneySteps = async (delay = 0) => {
   const checks = Array.from(
     steps.querySelectorAll(".home-v2-learning-journey__check"),
   );
-  const rail = steps.querySelector(
-    ".home-v2-learning-journey__rail-value",
-  );
+  const rail = steps.querySelector(".home-v2-learning-journey__rail-value");
 
   gsap.killTweensOf([rail, ...articles, ...indexes, ...checks]);
 
@@ -50,7 +48,7 @@ const animateJourneySteps = async (delay = 0) => {
     timeline.fromTo(
       rail,
       { scaleY: 0 },
-      { scaleY: 1, duration: 1.25, ease: "power2.inOut" },
+      { scaleY: 1, duration: 1.1, ease: "power2.out" },
     );
   }
 
@@ -62,8 +60,8 @@ const animateJourneySteps = async (delay = 0) => {
         autoAlpha: 1,
         x: 0,
         y: 0,
-        duration: 0.68,
-        stagger: 0.16,
+        duration: 0.72,
+        stagger: { amount: 0.44 },
         ease: "power3.out",
         clearProps: "opacity,visibility,transform",
       },
@@ -76,9 +74,9 @@ const animateJourneySteps = async (delay = 0) => {
         autoAlpha: 1,
         scale: 1,
         rotation: 0,
-        duration: 0.52,
-        stagger: 0.16,
-        ease: "back.out(1.8)",
+        duration: 0.48,
+        stagger: { amount: 0.38 },
+        ease: "back.out(1.35)",
         clearProps: "opacity,visibility,transform",
       },
       0.18,
@@ -90,9 +88,9 @@ const animateJourneySteps = async (delay = 0) => {
         autoAlpha: 1,
         scale: 1,
         rotation: 0,
-        duration: 0.58,
-        stagger: 0.16,
-        ease: "back.out(2.1)",
+        duration: 0.5,
+        stagger: { amount: 0.38 },
+        ease: "back.out(1.4)",
         clearProps: "opacity,visibility,transform",
       },
       0.34,
@@ -113,32 +111,32 @@ const revealJourneySection = () => {
       .from(".home-v2-learning-journey__eyebrow", {
         autoAlpha: 0,
         x: 34,
-        duration: 0.58,
+        duration: 0.52,
       })
       .from(
         ".home-v2-learning-journey__title-line",
         {
           autoAlpha: 0,
           yPercent: 105,
-          duration: 0.82,
-          stagger: 0.13,
-          ease: "expo.out",
+          duration: 0.76,
+          stagger: 0.1,
+          ease: "power3.out",
         },
-        0.14,
+        0.12,
       )
       .from(
         ".home-v2-learning-journey__intro > p",
-        { autoAlpha: 0, y: 24, duration: 0.62 },
-        0.45,
+        { autoAlpha: 0, y: 24, duration: 0.56 },
+        0.4,
       )
       .from(
         ".home-v2-learning-journey__link",
-        { autoAlpha: 0, y: 18, scale: 0.96, duration: 0.58 },
-        0.58,
+        { autoAlpha: 0, y: 18, scale: 0.96, duration: 0.52 },
+        0.52,
       );
   }, section);
 
-  void animateJourneySteps(0.38);
+  void animateJourneySteps(0.3);
 };
 
 watch(
@@ -148,7 +146,7 @@ watch(
 );
 
 useScrollTriggeredReveal(journeySection, revealJourneySection, {
-  threshold: 0.16,
+  threshold: 0.1,
 });
 
 onBeforeUnmount(() => {
@@ -163,6 +161,7 @@ onBeforeUnmount(() => {
   <section
     ref="journeySection"
     class="section home-v2-learning-journey"
+    :data-background-text="journey.data.textBackground"
     aria-labelledby="home-v2-learning-journey-title"
   >
     <div class="container home-v2-learning-journey__grid">
@@ -201,12 +200,16 @@ onBeforeUnmount(() => {
           <span class="home-v2-learning-journey__rail-value" />
         </span>
         <article v-for="(item, index) in journey.data.items" :key="item.id">
-          <b class="home-v2-learning-journey__index">{{ String(index + 1).padStart(2, "0") }}</b>
+          <b class="home-v2-learning-journey__index">{{
+            String(index + 1).padStart(2, "0")
+          }}</b>
           <div>
             <h3>{{ item.title }}</h3>
             <p>{{ item.description }}</p>
           </div>
-          <span class="home-v2-learning-journey__check" aria-hidden="true">✓</span>
+          <span class="home-v2-learning-journey__check" aria-hidden="true"
+            >✓</span
+          >
         </article>
       </div>
     </div>
@@ -230,9 +233,9 @@ onBeforeUnmount(() => {
   position: absolute;
   z-index: -1;
   inset-inline-end: -18px;
-  bottom: -45px;
+  bottom: -10px;
   color: #ffffff08;
-  content: "PHYSICS";
+  content: attr(data-background-text);
   font: 900 clamp(100px, 14vw, 220px) / 0.8 var(--home-v2-heading);
   letter-spacing: -0.08em;
   pointer-events: none;
@@ -244,6 +247,7 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(360px, 0.78fr) minmax(0, 1.32fr);
   align-items: center;
   gap: clamp(70px, 9vw, 150px);
+  margin-bottom: 10px;
 }
 
 .home-v2-learning-journey .section-tag {
@@ -348,7 +352,8 @@ onBeforeUnmount(() => {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(var(--journey-gold), var(--journey-accent));
-  box-shadow: 0 0 12px color-mix(in srgb, var(--journey-accent) 65%, transparent);
+  box-shadow: 0 0 12px
+    color-mix(in srgb, var(--journey-accent) 65%, transparent);
   transform-origin: top center;
 }
 
@@ -371,7 +376,7 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-learning-journey__index {
-  align-self: start;
+  align-self: center;
   padding-top: 4px;
   color: var(--journey-gold);
   font: 900 12px var(--home-v2-heading);
@@ -388,12 +393,15 @@ onBeforeUnmount(() => {
   color: var(--journey-accent);
   font-size: 14px;
   font-weight: 900;
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--journey-background) 82%, transparent);
+  box-shadow: 0 0 0 5px
+    color-mix(in srgb, var(--journey-background) 82%, transparent);
   transition: color 0.25s ease, background-color 0.25s ease,
     transform 0.25s ease;
 }
 
-.home-v2-learning-journey__steps article:hover .home-v2-learning-journey__check {
+.home-v2-learning-journey__steps
+  article:hover
+  .home-v2-learning-journey__check {
   background: var(--journey-accent);
   color: #fff;
   transform: scale(1.08);

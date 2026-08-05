@@ -13,6 +13,7 @@ export const createHomeLearningJourneyMock = (
       title: 'أربع خطوات. رحلة واحدة مترابطة.',
       subtitle: `رحلة التعلّم مع ${teacherName}`,
       description: 'شرح مبسّط، تطبيق مستمر، اختبارات دورية ومتابعة تساعدك تمشي في المنهج بخطة واضحة.',
+      text_background: 'PHYSICS',
       type: 13,
       icon: null,
       children: [

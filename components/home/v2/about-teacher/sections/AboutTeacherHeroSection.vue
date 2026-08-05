@@ -26,6 +26,10 @@ const imageAlt = computed(
 
 <template>
   <section class="about-teacher-hero" aria-labelledby="about-teacher-title">
+    <div class="about-teacher-hero__ambient" aria-hidden="true">
+      <span class="about-teacher-hero__orb about-teacher-hero__orb--one" />
+      <span class="about-teacher-hero__orb about-teacher-hero__orb--two" />
+    </div>
     <div class="container about-teacher-hero__grid">
       <div class="about-teacher-hero__copy" data-about-reveal>
         <span class="about-teacher-eyebrow">{{ eyebrow }}</span>

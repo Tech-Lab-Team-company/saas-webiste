@@ -18,47 +18,47 @@ const revealAppSection = () => {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   appAnimationContext = gsap.context(() => {
-    const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const timeline = gsap.timeline({ defaults: { ease: "power2.out" } });
 
     timeline
       .from(".home-v2-app .section-tag", {
         autoAlpha: 0,
-        x: 28,
-        duration: 0.52,
+        x: 22,
+        duration: 0.68,
       })
       .from(
         ".home-v2-app h2",
-        { autoAlpha: 0, y: 34, duration: 0.78, ease: "expo.out" },
-        0.12,
+        { autoAlpha: 0, y: 28, duration: 0.95, ease: "power3.out" },
+        0.14,
       )
       .from(
         ".home-v2-app__grid > div > p",
-        { autoAlpha: 0, y: 20, duration: 0.6 },
-        0.34,
+        { autoAlpha: 0, y: 18, duration: 0.76 },
+        0.38,
       )
       .from(
         ".home-v2-app__actions > *",
-        { autoAlpha: 0, y: 14, duration: 0.48, stagger: 0.1 },
-        0.48,
+        { autoAlpha: 0, y: 12, duration: 0.64, stagger: 0.12 },
+        0.56,
       )
       .from(
         ".home-v2-app__phone",
         {
           autoAlpha: 0,
-          y: 42,
-          scale: 0.94,
-          rotation: -2.2,
-          duration: 0.95,
+          y: 34,
+          scale: 0.965,
+          rotation: -1.4,
+          duration: 1.08,
           ease: "power3.out",
           clearProps: "opacity,visibility,transform",
         },
-        0.22,
+        0.26,
       );
 
     gsap.to(".home-v2-app__ambient-glow--one", {
       x: 24,
       y: -18,
-      duration: 7,
+      duration: 9,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -66,7 +66,7 @@ const revealAppSection = () => {
     gsap.to(".home-v2-app__ambient-glow--two", {
       x: -20,
       y: 24,
-      duration: 8.5,
+      duration: 11,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
@@ -75,7 +75,7 @@ const revealAppSection = () => {
 };
 
 useScrollTriggeredReveal(appSection, revealAppSection, {
-  threshold: 0.18,
+  threshold: 0.12,
 });
 
 onBeforeUnmount(() => {
@@ -134,13 +134,16 @@ onBeforeUnmount(() => {
         class="home-v2-app__phone"
         :aria-label="`تطبيق ${site.brandName || 'المنصة'}`"
       >
-        <NuxtImg
-          src="/images/eslam-salama-app-screen.webp"
-          :alt="`واجهة تطبيق ${site.brandName || 'المنصة'}`"
-          width="380"
-          height="675"
-          loading="lazy"
-        />
+        <div class="home-v2-app__screen">
+          <NuxtImg
+            :src="site.app.image?.src || '/images/eslam-salama-app-screen.webp'"
+            :alt="site.app.image?.alt || `واجهة تطبيق ${site.brandName || 'المنصة'}`"
+            width="380"
+            height="675"
+            loading="lazy"
+          />
+        </div>
+        <figcaption>لقطة حقيقية من التطبيق</figcaption>
       </figure>
     </div>
   </section>
@@ -251,54 +254,90 @@ onBeforeUnmount(() => {
 
 .home-v2-app__phone {
   position: relative;
-  width: min(100%, 380px);
+  width: min(100%, 350px);
   margin: 0;
   justify-self: center;
-  overflow: hidden;
-  border: 1px solid #ffffff38;
-  border-radius: 26px;
-  background: #020b2a;
-  box-shadow: 24px 30px 0 #02061735, 0 30px 70px -34px #000c;
+  padding: 8px 8px 0;
+  border: 2px solid rgb(255 255 255 / 82%);
+  border-radius: 42px 42px 56px 56px;
+  background: linear-gradient(180deg, #fff, #f3f6ff);
+  box-shadow: 27px 30px 0 rgb(1 7 34 / 34%),
+    0 42px 80px -34px rgb(0 0 0 / 80%),
+    inset 0 0 0 1px rgb(20 40 94 / 8%);
   isolation: isolate;
+  transform: rotate(-1.4deg);
   transition: border-color 0.3s ease, box-shadow 0.3s ease,
-    transform 0.35s cubic-bezier(0.2, 0.75, 0.25, 1);
+    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.home-v2-app__phone::after {
+.home-v2-app__phone::before {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
+  inset: 8px 8px 60px;
+  border: 1px solid rgb(255 255 255 / 62%);
+  border-radius: 33px 33px 10px 10px;
+  box-shadow: inset 0 0 0 1px rgb(2 11 42 / 20%);
+  content: "";
+  pointer-events: none;
+}
+
+.home-v2-app__screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 33px 33px 10px 10px;
+  background: #020b2a;
+}
+
+.home-v2-app__screen::after {
+  position: absolute;
+  z-index: 2;
   inset: 0;
   background: linear-gradient(
     120deg,
-    transparent 38%,
-    #ffffff18 50%,
+    transparent 36%,
+    rgb(255 255 255 / 18%) 49%,
     transparent 62%
   );
   content: "";
   pointer-events: none;
-  transform: translateX(115%);
-  transition: transform 0.65s ease;
+  transform: translateX(125%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-v2-app__phone :deep(img) {
   display: block;
   width: 100%;
   height: auto;
-  transition: transform 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.45s ease;
+}
+
+.home-v2-app__phone figcaption {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px 8px;
+  color: var(--home-v2-deep);
+  font: 900 13px/1.4 var(--home-v2-heading);
+  text-align: center;
 }
 
 .home-v2-app__phone:hover {
-  border-color: #ffffff70;
-  box-shadow: 30px 36px 0 #0206172e, 0 38px 84px -34px #000e;
-  transform: translateY(-8px) rotate(-1deg);
+  border-color: #fff;
+  box-shadow: 31px 36px 0 rgb(1 7 34 / 29%),
+    0 50px 92px -36px rgb(0 0 0 / 90%),
+    inset 0 0 0 1px rgb(20 40 94 / 8%);
+  transform: translateY(-10px) rotate(-0.6deg);
 }
 
-.home-v2-app__phone:hover::after {
-  transform: translateX(-115%);
+.home-v2-app__phone:hover .home-v2-app__screen::after {
+  transform: translateX(-125%);
 }
 
 .home-v2-app__phone:hover :deep(img) {
-  transform: scale(1.025);
+  filter: saturate(1.04) contrast(1.02);
+  transform: scale(1.02);
 }
 
 @media (max-width: 760px) {
@@ -307,6 +346,7 @@ onBeforeUnmount(() => {
   }
 
   .home-v2-app__phone {
+    width: min(100%, 330px);
     margin-top: 10px;
   }
 }
@@ -314,7 +354,7 @@ onBeforeUnmount(() => {
 @media (prefers-reduced-motion: reduce) {
   .home-v2-app__actions a,
   .home-v2-app__phone,
-  .home-v2-app__phone::after,
+  .home-v2-app__screen::after,
   .home-v2-app__phone :deep(img) {
     transition: none;
   }

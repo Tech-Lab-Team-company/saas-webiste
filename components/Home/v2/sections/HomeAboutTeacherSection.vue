@@ -45,9 +45,9 @@ const animateHighlights = async (delay = 0) => {
       autoAlpha: 1,
       x: 0,
       y: 0,
-      duration: 0.58,
+      duration: 0.56,
       delay,
-      stagger: 0.13,
+      stagger: { amount: 0.38 },
       ease: "power3.out",
       clearProps: "opacity,visibility,transform",
     },
@@ -69,43 +69,43 @@ const revealAboutSection = () => {
         autoAlpha: 0,
         clipPath: "inset(8% 8% 92% 8% round 16px)",
         scale: 0.96,
-        duration: 1,
-        ease: "expo.inOut",
+        duration: 0.88,
+        ease: "power3.out",
       })
       .from(
         ".home-v2-about-teacher__corner",
-        { scale: 0, rotation: -18, duration: 0.65, ease: "back.out(1.8)" },
-        0.48,
-      )
-      .from(
-        ".home-v2-about-teacher__quote-mark",
-        { autoAlpha: 0, y: -20, scale: 0.7, duration: 0.55 },
-        0.55,
-      )
-      .from(
-        ".home-v2-about-teacher__quote > p",
-        { autoAlpha: 0, y: 30, duration: 0.72 },
-        0.62,
-      )
-      .from(
-        ".home-v2-about-teacher__experience",
-        { autoAlpha: 0, y: 22, duration: 0.62 },
-        0.76,
-      )
-      .from(
-        ".home-v2-about-teacher__content .section-tag",
-        { autoAlpha: 0, x: 30, duration: 0.52 },
-        0.28,
-      )
-      .from(
-        ".home-v2-about-teacher__content h2",
-        { autoAlpha: 0, y: 38, duration: 0.78, ease: "expo.out" },
+        { scale: 0.25, rotation: -18, duration: 0.56, ease: "back.out(1.35)" },
         0.4,
       )
       .from(
+        ".home-v2-about-teacher__quote-mark",
+        { autoAlpha: 0, y: -20, scale: 0.7, duration: 0.5 },
+        0.46,
+      )
+      .from(
+        ".home-v2-about-teacher__quote > p",
+        { autoAlpha: 0, y: 30, duration: 0.66 },
+        0.53,
+      )
+      .from(
+        ".home-v2-about-teacher__experience",
+        { autoAlpha: 0, y: 22, duration: 0.56 },
+        0.67,
+      )
+      .from(
+        ".home-v2-about-teacher__content .section-tag",
+        { autoAlpha: 0, x: 30, duration: 0.48 },
+        0.22,
+      )
+      .from(
+        ".home-v2-about-teacher__content h2",
+        { autoAlpha: 0, y: 38, duration: 0.72, ease: "power3.out" },
+        0.34,
+      )
+      .from(
         ".home-v2-about-teacher__content > p",
-        { autoAlpha: 0, y: 22, duration: 0.58 },
-        0.57,
+        { autoAlpha: 0, y: 22, duration: 0.54 },
+        0.49,
       )
       .from(
         ".home-v2-about-teacher__content ul",
@@ -114,19 +114,19 @@ const revealAboutSection = () => {
           y: 24,
           scaleY: 0.92,
           transformOrigin: "top center",
-          duration: 0.68,
+          duration: 0.62,
           ease: "power3.out",
         },
-        0.7,
+        0.61,
       )
       .from(
         ".home-v2-about-teacher__content > a",
-        { autoAlpha: 0, y: 16, duration: 0.52 },
-        1.08,
+        { autoAlpha: 0, y: 16, duration: 0.48 },
+        0.92,
       );
   }, section);
 
-  void animateHighlights(0.88);
+  void animateHighlights(0.72);
 };
 
 watch(
@@ -139,7 +139,7 @@ watch(
 );
 
 useScrollTriggeredReveal(aboutSection, revealAboutSection, {
-  threshold: 0.16,
+  threshold: 0.1,
 });
 
 onBeforeUnmount(() => {

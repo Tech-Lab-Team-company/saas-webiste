@@ -52,8 +52,8 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
         <section class="app-page__card" aria-labelledby="app-options-title">
           <div class="app-page__phone">
             <NuxtImg
-              src="/images/eslam-salama-app-screen.webp"
-              :alt="`واجهة تطبيق ${site.brandName || 'المنصة'}`"
+              :src="site.app.image?.src || '/images/eslam-salama-app-screen.webp'"
+              :alt="site.app.image?.alt || `واجهة تطبيق ${site.brandName || 'المنصة'}`"
               width="380"
               height="675"
               loading="eager"

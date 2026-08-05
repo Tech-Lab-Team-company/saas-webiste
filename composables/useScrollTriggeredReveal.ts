@@ -1,8 +1,9 @@
 import type { Ref } from "vue";
-import { onBeforeUnmount, onMounted } from "vue";
+import { onBeforeUnmount, onMounted, watch } from "vue";
 
 type ScrollTriggeredRevealOptions = {
   threshold?: number;
+  rootMargin?: string;
 };
 
 export const useScrollTriggeredReveal = (
@@ -11,47 +12,75 @@ export const useScrollTriggeredReveal = (
   options: ScrollTriggeredRevealOptions = {},
 ) => {
   let observer: IntersectionObserver | null = null;
-  let userHasScrolled = false;
-  let targetIsVisible = false;
+  let observedTarget: HTMLElement | null = null;
+  let stopWatchingTarget: ReturnType<typeof watch> | null = null;
   let hasRevealed = false;
+  const threshold = Math.min(1, Math.max(0, options.threshold ?? 0.12));
+  const rootMargin = options.rootMargin ?? "0px 0px -8% 0px";
 
-  const stopTracking = () => {
+  const disconnectObserver = () => {
     observer?.disconnect();
     observer = null;
-    window.removeEventListener("scroll", handleFirstScroll);
+    observedTarget = null;
   };
 
-  const tryReveal = () => {
-    if (hasRevealed || !userHasScrolled || !targetIsVisible) return;
+  const revealOnce = () => {
+    if (hasRevealed) return;
 
     hasRevealed = true;
-    stopTracking();
+    disconnectObserver();
     reveal();
   };
 
-  const handleFirstScroll = () => {
-    userHasScrolled = true;
-    tryReveal();
-  };
-
-  onMounted(() => {
-    window.addEventListener("scroll", handleFirstScroll, { passive: true });
-
-    if (!("IntersectionObserver" in window)) {
-      targetIsVisible = true;
+  const handleIntersection: IntersectionObserverCallback = ([entry]) => {
+    if (
+      !entry?.isIntersecting ||
+      entry.intersectionRatio + Number.EPSILON < threshold
+    ) {
       return;
     }
 
-    observer = new IntersectionObserver(
-      ([entry]) => {
-        targetIsVisible = Boolean(entry?.isIntersecting);
-        tryReveal();
-      },
-      { threshold: options.threshold ?? 0.16 },
-    );
+    revealOnce();
+  };
 
-    if (target.value) observer.observe(target.value);
+  const observeTarget = (nextTarget: HTMLElement | null) => {
+    if (hasRevealed || nextTarget === observedTarget) return;
+
+    if (observedTarget) observer?.unobserve(observedTarget);
+    observedTarget = nextTarget;
+
+    if (!nextTarget) return;
+
+    if (!("IntersectionObserver" in window)) {
+      revealOnce();
+      return;
+    }
+
+    if (!observer) {
+      try {
+        observer = new IntersectionObserver(handleIntersection, {
+          threshold,
+          rootMargin,
+        });
+      } catch {
+        revealOnce();
+        return;
+      }
+    }
+
+    observer.observe(nextTarget);
+  };
+
+  onMounted(() => {
+    stopWatchingTarget = watch(target, observeTarget, {
+      immediate: true,
+      flush: "post",
+    });
   });
 
-  onBeforeUnmount(stopTracking);
+  onBeforeUnmount(() => {
+    stopWatchingTarget?.();
+    stopWatchingTarget = null;
+    disconnectObserver();
+  });
 };
