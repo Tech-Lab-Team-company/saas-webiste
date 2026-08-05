@@ -77,6 +77,15 @@ export enum BookPriceTypeEnum {
   BOTH = 4,
 }
 
+export interface HomeBookStepViewModel {
+  id: number
+  title: string
+  subtitle: string | null
+  description: string | null
+  image: string | null
+  order: number
+}
+
 export interface HomeBookViewModel {
   id: number
   bookId: number
@@ -100,12 +109,7 @@ export interface HomeBookViewModel {
   }>
   bookType: number | null
   invoiceLink: string | null
-  steps: Array<{
-    id: number
-    title: string
-    description: string | null
-    order: number
-  }>
+  steps: HomeBookStepViewModel[]
 }
 
 export interface HomeBooksViewModel {
@@ -121,6 +125,13 @@ export interface HomeBooksViewModel {
 }
 
 export interface HomeBookDetailsViewModel extends HomeBookViewModel {
+  attachments: Array<{
+    id: number
+    file: string
+    type: number | null
+  }>
+  startDate: string | null
+  endDate: string | null
   images: string[]
   certificatesCount: number
   videoLinks: string[]
@@ -140,6 +151,21 @@ export interface HomeBookDetailsViewModel extends HomeBookViewModel {
   hasFreePreview: boolean
   isFreeFlipbook: boolean
   freeBookUrl: string | null
+}
+
+export interface HomeWebsiteSectionBookViewModel {
+  id: number
+  forHome: boolean
+  title: string
+  subtitle: string | null
+  description: string | null
+  image: string | null
+  steps: HomeBookStepViewModel[]
+}
+
+export interface HomeBookDetailsResourceViewModel {
+  book: HomeBookDetailsViewModel
+  websiteSectionBook: HomeWebsiteSectionBookViewModel | null
 }
 
 export interface HomeLearningJourneyItemViewModel {

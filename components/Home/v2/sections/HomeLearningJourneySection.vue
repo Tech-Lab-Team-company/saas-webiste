@@ -164,17 +164,17 @@ onBeforeUnmount(() => {
     :data-background-text="journey.data.textBackground"
     aria-labelledby="home-v2-learning-journey-title"
   >
-    <div class="container home-v2-learning-journey__grid">
+    <div class="container home-v2-learning-journey__grid">  
       <div class="home-v2-learning-journey__intro">
         <div class="home-v2-learning-journey__eyebrow">
-          <img
+          <!-- <img
             v-if="journey.data.icon"
             class="home-v2-learning-journey__icon"
-            :src="journey.data.icon.src"
+            :src="journey.data.icon.src"  
             :alt="journey.data.icon.alt"
             loading="lazy"
             decoding="async"
-          />
+          /> -->
           <span class="section-tag">{{ journey.data.eyebrow }}</span>
         </div>
         <h2 id="home-v2-learning-journey-title">

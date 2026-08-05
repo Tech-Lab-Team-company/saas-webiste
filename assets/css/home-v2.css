@@ -8,6 +8,9 @@
   --home-v2-coral: #ef7a63;
   --home-v2-muted: #4f617c;
   --home-v2-line: #081b3a24;
+  --home-v2-surface: #fff;
+  --home-v2-surface-raised: #fff;
+  --home-v2-shadow: rgb(6 17 71 / 40%);
   --home-v2-heading: Cairo, Tahoma, Arial, sans-serif;
   --home-v2-body: Tajawal, Tahoma, Arial, sans-serif;
   min-width: 0;
@@ -17,6 +20,249 @@
   font-family: var(--home-v2-body);
   font-size: 16px;
   line-height: 1.65;
+}
+
+.home-v2,
+.home-v2 :is(.home-v2-header, section, article, details) {
+  transition: background-color 0.32s ease, border-color 0.32s ease,
+    color 0.32s ease, box-shadow 0.32s ease;
+}
+
+/* App-wide dark theme for every current and future V2 page. */
+html[data-theme='dark'] .home-v2 {
+  --home-v2-ink: var(--app-text) !important;
+  --home-v2-deep: var(--app-accent-secondary) !important;
+  --home-v2-blue: var(--app-accent) !important;
+  --home-v2-blue-light: color-mix(in srgb, var(--app-accent) 24%, #17233a) !important;
+  --home-v2-paper: var(--app-bg) !important;
+  --home-v2-cream: var(--app-bg-muted) !important;
+  --home-v2-muted: var(--app-muted) !important;
+  --home-v2-line: var(--app-line) !important;
+  --home-v2-surface: var(--app-surface) !important;
+  --home-v2-surface-raised: var(--app-surface-raised) !important;
+  --home-v2-shadow: var(--app-shadow) !important;
+  color-scheme: dark;
+  background: var(--home-v2-paper);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header {
+  border-color: var(--home-v2-line);
+  background: color-mix(in srgb, var(--home-v2-paper) 90%, transparent);
+  box-shadow: 0 12px 35px -28px var(--home-v2-shadow);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header--scrolled {
+  background: color-mix(in srgb, var(--home-v2-surface) 94%, transparent);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header__nav {
+  border-color: var(--home-v2-line);
+  background: color-mix(in srgb, var(--home-v2-surface-raised) 92%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header__nav a {
+  color: var(--home-v2-muted);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header__nav a:hover,
+html[data-theme='dark'] .home-v2 .home-v2-header__nav a.router-link-active {
+  background: color-mix(in srgb, var(--home-v2-blue) 17%, var(--home-v2-surface));
+  color: var(--home-v2-ink);
+  box-shadow: 0 5px 16px -10px var(--home-v2-shadow);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header__logout {
+  border-color: color-mix(in srgb, var(--home-v2-blue) 72%, var(--home-v2-line));
+  background: var(--home-v2-surface);
+  color: var(--home-v2-blue);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-header__logout:hover {
+  background: var(--home-v2-blue);
+  color: #07101f;
+}
+
+html[data-theme='dark'] .home-v2 :is(
+  .home-v2-header__login,
+  .home-v2-header__student,
+  .home-course-audiences button,
+  .home-course-card,
+  .course-card,
+  .home-v2-blog__card,
+  .home-v2-books__feature,
+  .home-v2-books__empty,
+  .home-v2-faq details,
+  .home-v2-faq details[open]
+) {
+  border-color: var(--home-v2-line);
+  background: var(--home-v2-surface);
+  color: var(--home-v2-ink);
+  box-shadow: 0 18px 42px -34px var(--home-v2-shadow);
+}
+
+html[data-theme='dark'] .home-v2 :is(
+  .home-course-audiences button:hover,
+  .home-v2-blog__card:hover,
+  .home-v2-blog__card:focus-within,
+  .home-v2-faq details:hover
+) {
+  border-color: color-mix(in srgb, var(--home-v2-blue) 45%, var(--home-v2-line));
+  background: var(--home-v2-surface-raised);
+}
+
+html[data-theme='dark'] .home-v2 .home-course-audiences button.active {
+  border-color: color-mix(in srgb, var(--home-v2-blue) 78%, white);
+  background: var(--home-v2-deep);
+  color: #fff;
+}
+
+html[data-theme='dark'] .home-v2 .home-course-picker {
+  border-color: var(--home-v2-line);
+  background: color-mix(
+    in srgb,
+    var(--home-v2-blue) 9%,
+    var(--home-v2-surface)
+  );
+}
+
+html[data-theme='dark'] .home-v2 .home-course-picker h3,
+html[data-theme='dark'] .home-v2 .home-course-picker .stage-option-label {
+  color: var(--home-v2-ink);
+}
+
+html[data-theme='dark'] .home-v2 .home-course-picker > div:first-child > p,
+html[data-theme='dark'] .home-v2 .home-course-audiences small {
+  color: var(--home-v2-muted);
+  opacity: 1;
+}
+
+html[data-theme='dark'] .home-v2 .home-course-audiences button.active .stage-option-label,
+html[data-theme='dark'] .home-v2 .home-course-audiences button.active small {
+  color: #fff;
+}
+
+html[data-theme='dark'] .home-v2 .course-card .course-cover {
+  border-color: var(--home-v2-line);
+  background: color-mix(
+    in srgb,
+    var(--home-v2-blue) 14%,
+    var(--home-v2-surface-raised)
+  );
+  color: var(--home-v2-ink);
+}
+
+html[data-theme='dark'] .home-v2 .course-card.violet .course-cover {
+  background: color-mix(
+    in srgb,
+    var(--home-v2-deep) 28%,
+    var(--home-v2-surface)
+  );
+}
+
+html[data-theme='dark'] .home-v2 .course-card.sky .course-cover {
+  background: color-mix(
+    in srgb,
+    var(--home-v2-blue) 22%,
+    var(--home-v2-surface)
+  );
+}
+
+html[data-theme='dark'] .home-v2 .course-card.deep .course-cover {
+  background: var(--home-v2-deep);
+  color: #fff;
+}
+
+html[data-theme='dark'] .home-v2 .course-card .level-pill {
+  border-color: var(--home-v2-line);
+  background: color-mix(
+    in srgb,
+    var(--home-v2-surface-raised) 92%,
+    transparent
+  );
+  color: var(--home-v2-ink);
+}
+
+html[data-theme='dark'] .home-v2 .course-card .course-content p {
+  color: var(--home-v2-muted);
+}
+
+html[data-theme='dark'] .home-v2 .course-card .course-footer > b {
+  color: var(--home-v2-blue);
+}
+
+html[data-theme='dark'] .home-v2 .course-card .course-arrow {
+  background: var(--home-v2-blue);
+  color: #07101f;
+}
+
+html[data-theme='dark'] .home-v2 :is(
+  .home-course-empty,
+  .home-course-message,
+  .home-v2-blog__placeholder
+) {
+  border-color: var(--home-v2-line);
+  background: linear-gradient(135deg, var(--home-v2-surface), var(--home-v2-cream));
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-books {
+  background: color-mix(in srgb, var(--app-brand-primary) 11%, var(--home-v2-paper));
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-about-teacher {
+  background: var(--home-v2-cream);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-about-teacher__quote {
+  background: color-mix(in srgb, var(--app-brand-primary) 18%, var(--home-v2-surface));
+}
+
+html[data-theme='dark'] .home-v2 :is(
+  .home-v2-about-teacher__quote > p,
+  .home-v2-about-teacher__content .section-tag,
+  .home-v2-about-teacher h2,
+  .home-v2-about-teacher li
+) {
+  color: var(--home-v2-ink);
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-faq {
+  background: linear-gradient(180deg, var(--home-v2-paper), var(--home-v2-cream));
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-faq__toggle {
+  background: color-mix(in srgb, var(--home-v2-blue) 18%, var(--home-v2-surface));
+}
+
+html[data-theme='dark'] .home-v2 .home-v2-app__phone {
+  border-color: var(--home-v2-line);
+  background: linear-gradient(180deg, var(--home-v2-surface-raised), var(--home-v2-surface));
+}
+
+@media (max-width: 860px) {
+  html[data-theme='dark'] .home-v2 .home-v2-header__nav {
+    border-color: var(--home-v2-line);
+    background: var(--home-v2-surface);
+    box-shadow: 0 24px 50px -30px var(--home-v2-shadow);
+  }
+}
+
+@media (max-width: 980px) {
+  .home-v2 > main {
+    margin-top: 51px;
+  }
+
+  html[data-theme='dark'] .home-v2 .home-v2-header__mobile-nav {
+    border-color: var(--home-v2-line);
+    background: color-mix(in srgb, var(--home-v2-surface) 96%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-v2,
+  .home-v2 :is(.home-v2-header, section, article, details) {
+    transition: none;
+  }
 }
 
 .home-v2,

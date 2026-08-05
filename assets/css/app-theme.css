@@ -1,0 +1,247 @@
+:root {
+  --app-brand-primary: var(--primary-color, #28366c);
+  --app-brand-secondary: var(--secondary-color, #3a3e7e);
+  --app-accent: var(--primary-color, #28366c);
+  --app-accent-secondary: var(--secondary-color, #3a3e7e);
+  --app-bg: #fbfcff;
+  --app-bg-muted: #f2f6fc;
+  --app-surface: #fff;
+  --app-surface-raised: #fff;
+  --app-text: #081b3a;
+  --app-muted: #4f617c;
+  --app-line: rgb(8 27 58 / 14%);
+  --app-shadow: rgb(6 17 71 / 40%);
+  --app-footer-bg: color-mix(in srgb, var(--app-brand-secondary) 82%, #071020);
+}
+
+html {
+  color-scheme: light;
+  background: var(--app-bg);
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+html,
+body,
+#__nuxt {
+  min-height: 100%;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color .3s ease, color .3s ease;
+}
+
+html .footer-container {
+  background-color: var(--app-footer-bg) !important;
+  color: #fff !important;
+  transition: background-color .3s ease;
+}
+
+html[data-theme='dark'] body,
+html[data-theme='dark'] #__nuxt,
+html[data-theme='dark'] :is(
+  .profile-layout,
+  .profile-home-layout,
+  .home-v2-layout,
+  .auth-unified-shell
+) {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .header .header-container,
+html[data-theme='dark'] .footer-container {
+  border-color: var(--app-line);
+  background-color: var(--app-surface);
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .header .header-container :is(.nav-link, .user-name) {
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .header .header-container .nav-link:hover,
+html[data-theme='dark'] .header .header-container .nav-link.active {
+  color: var(--app-accent);
+}
+
+html[data-theme='dark'] :is(.login-home-redesign, .login-home-form-panel) {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .login-home-form-panel {
+  background-image: radial-gradient(
+    circle at 10% 8%,
+    color-mix(in srgb, var(--app-accent-secondary) 15%, transparent) 0 2px,
+    transparent 3px
+  );
+}
+
+html[data-theme='dark'] :is(
+  .login-home-form-wrap h1,
+  .login-home-label,
+  .login-home-notice strong,
+  .login-home-benefits strong
+) {
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] :is(
+  .login-home-lead,
+  .login-home-notice small,
+  .login-home-options,
+  .login-home-options a,
+  .login-home-benefits small
+) {
+  color: var(--app-muted);
+}
+
+html[data-theme='dark'] .login-home-notice {
+  border-color: var(--app-line);
+  background: color-mix(in srgb, var(--app-accent-secondary) 12%, var(--app-surface));
+}
+
+html[data-theme='dark'] :is(
+  .login-home-divider::before,
+  .login-home-divider::after,
+  .login-home-benefits-title::before,
+  .login-home-benefits-title::after
+) {
+  background: var(--app-line);
+}
+
+/* Shared legacy surfaces. These selectors also cover new conventionally named cards. */
+html[data-theme='dark'] :is(
+  .card,
+  [class$='-card'],
+  [class*='__card'],
+  .dialog-container,
+  .dropdown-content,
+  .sidebar,
+  [class*='sidebar'],
+  .pagination,
+  .breadcrumb-wrapper,
+  .p-dialog,
+  .p-dialog-content,
+  .p-popover,
+  .p-menu,
+  .p-datatable,
+  .p-datatable-header,
+  .p-datatable-tbody > tr,
+  .p-paginator
+) {
+  border-color: var(--app-line) !important;
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  box-shadow: 0 18px 44px -36px var(--app-shadow);
+}
+
+html[data-theme='dark'] :is(
+  header:not(.home-v2-hero *),
+  nav:not(.home-v2-hero *),
+  .header,
+  [class*='header-container']
+) {
+  border-color: var(--app-line);
+}
+
+html[data-theme='dark'] :is(
+  h1, h2, h3, h4, h5, h6,
+  label,
+  legend,
+  th,
+  .title,
+  [class$='__title'],
+  [class$='-title']
+) {
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] :is(
+  p,
+  small,
+  td,
+  .description,
+  .subtitle,
+  [class$='__description'],
+  [class$='__subtitle'],
+  [class$='__meta']
+) {
+  border-color: var(--app-line);
+}
+
+html[data-theme='dark'] :is(input, textarea, select, .p-inputtext, .p-select) {
+  border-color: var(--app-line) !important;
+  background: var(--app-surface-raised) !important;
+  color: var(--app-text) !important;
+  caret-color: var(--app-accent);
+}
+
+html[data-theme='dark'] :is(input, textarea)::placeholder {
+  color: var(--app-muted) !important;
+  opacity: .78;
+}
+
+html[data-theme='dark'] :is(input, textarea, select):focus {
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent) 18%, transparent);
+}
+
+html[data-theme='dark'] :is(
+  table,
+  thead,
+  tbody,
+  tr,
+  td,
+  th,
+  hr,
+  fieldset
+) {
+  border-color: var(--app-line) !important;
+}
+
+html[data-theme='dark'] :is(.banner, .second-banner) {
+  border-color: var(--app-line);
+  background-color: var(--app-bg-muted);
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] :is(
+  .page,
+  [class$='-page'],
+  [class$='__page'],
+  .content-wrapper,
+  .main-content
+) {
+  border-color: var(--app-line);
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] :is(.dropdown-item, .pagination .page):hover {
+  background-color: var(--app-surface-raised) !important;
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] :is(a, button):focus-visible {
+  outline-color: var(--app-accent);
+}
+
+html[data-theme='dark'] img {
+  color-scheme: only light;
+}
+
+html[data-theme='dark'] .p-dialog-mask {
+  background: rgb(0 0 0 / 68%);
+  backdrop-filter: blur(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}

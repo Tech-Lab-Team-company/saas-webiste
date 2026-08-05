@@ -237,7 +237,7 @@
   place-items: center;
   border: 1px dashed var(--about-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--home-v2-surface);
   color: var(--home-v2-muted);
   font-weight: 800;
 }
@@ -259,7 +259,7 @@
   padding: 27px;
   border: 1px solid var(--about-line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--home-v2-surface);
   box-shadow: 0 16px 40px -38px rgb(6 17 71 / 45%);
   transition: border-color 0.36s ease, box-shadow 0.36s ease,
     transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
@@ -294,6 +294,7 @@
 
 .about-teacher-principles h3 {
   margin: 42px 0 8px;
+  color: var(--home-v2-ink);
   font: 800 20px var(--home-v2-heading);
 }
 
@@ -315,7 +316,7 @@
   overflow: hidden;
   border: 1px solid var(--about-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--home-v2-surface);
   box-shadow: 0 20px 50px -44px rgb(6 17 71 / 45%);
   transition: border-color 0.36s ease, box-shadow 0.36s ease,
     transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
@@ -380,6 +381,7 @@
 
 .about-teacher-stage-card__content h3 {
   margin: 15px 0 6px;
+  color: var(--home-v2-ink);
   font: 800 20px var(--home-v2-heading);
 }
 
@@ -400,7 +402,7 @@
   padding: 25px 28px;
   border: 1px solid var(--about-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--home-v2-surface);
   box-shadow: 0 18px 46px -42px rgb(6 17 71 / 45%);
   transition: border-color 0.36s ease, box-shadow 0.36s ease,
     transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
@@ -427,6 +429,7 @@
 
 .about-teacher-contact__card h3 {
   margin: 0 0 6px;
+  color: var(--home-v2-ink);
   font: 800 20px var(--home-v2-heading);
 }
 

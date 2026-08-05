@@ -3,12 +3,13 @@ import { storeToRefs } from "pinia";
 import "~/assets/css/home-v2.css";
 import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
 import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
+import BuyBookDialog from "~/components/Books/BuyBookDialog.vue";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
-  mapBookDetails,
+  mapBookDetailsResource,
   mapHomeSite,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
-import type { HomeBookDetailsViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import type { HomeBookDetailsResourceViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
 definePageMeta({
   layout: "home-v2",
@@ -32,8 +33,8 @@ const bookId = computed(() => {
 });
 
 const api = new HomePageApi(webDomain);
-const { data: book, pending, error, refresh } = await useAsyncData<
-  HomeBookDetailsViewModel | null
+const { data: bookDetails, pending, error, refresh } = await useAsyncData<
+  HomeBookDetailsResourceViewModel | null
 >(
   `book-details:${webDomain}:${bookId.value ?? "invalid"}`,
   async () => {
@@ -41,7 +42,7 @@ const { data: book, pending, error, refresh } = await useAsyncData<
       throw createError({ statusCode: 404, statusMessage: "Book not found" });
     }
 
-    return mapBookDetails(await api.fetchBookDetails(bookId.value));
+    return mapBookDetailsResource(await api.fetchBookDetails(bookId.value));
   },
   {
     default: () => null,
@@ -51,7 +52,21 @@ const { data: book, pending, error, refresh } = await useAsyncData<
 
 watch(bookId, () => refresh());
 
-const coverImage = computed(() => book.value?.images[0] || book.value?.image || null);
+const book = computed(() => bookDetails.value?.book ?? null);
+const websiteSectionBook = computed(
+  () => bookDetails.value?.websiteSectionBook ?? null,
+);
+const bookSteps = computed(() =>
+  websiteSectionBook.value?.steps.length
+    ? websiteSectionBook.value.steps
+    : book.value?.steps ?? [],
+);
+const coverImage = computed(() =>
+  book.value?.image
+  || book.value?.images[0]
+  || websiteSectionBook.value?.image
+  || null,
+);
 const galleryImages = computed(() => book.value?.images ?? []);
 const displayPrice = computed(() => {
   const currentBook = book.value;
@@ -83,10 +98,24 @@ const primaryAction = computed(() => {
   return null;
 });
 
-const mediaLinks = computed(() => [
+const mediaLinks = computed(() => [...new Set([
+  ...(book.value?.attachments.map((attachment) => attachment.file) ?? []),
   ...(book.value?.videoLinks ?? []),
   ...(book.value?.externalVideoLinks ?? []),
-]);
+])]);
+
+const formatBookDate = (date: string | null): string => {
+  if (!date) return "غير محدد";
+
+  const parsedDate = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) return date;
+
+  return new Intl.DateTimeFormat("ar-EG", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(parsedDate);
+};
 
 const bookFeatures = computed(() => {
   const currentBook = book.value;
@@ -111,6 +140,10 @@ const bookFacts = computed(() => {
   return [
     { label: "عدد الصفحات", value: currentBook.numberOfPages ? `${currentBook.numberOfPages} صفحة` : "غير محدد" },
     { label: "نوع النسخة", value: currentBook.bookTypes.map((type) => type.label).join(" · ") || "كتاب مستقل" },
+    { label: "السعر", value: displayPrice.value || "غير محدد" },
+    { label: "متاح من", value: formatBookDate(currentBook.startDate) },
+    { label: "متاح حتى", value: formatBookDate(currentBook.endDate) },
+    { label: "المرفقات", value: String(currentBook.attachments.length) },
     { label: "مقاطع الفيديو", value: String(currentBook.videoLinksCount) },
     { label: "المحتوى الإضافي", value: String(currentBook.multimediaCount) },
   ];
@@ -141,9 +174,13 @@ useSeoMeta({
   title: () => book.value
     ? `${book.value.title} | ${site.value.brandName || "EduHub"}`
     : `تفاصيل الكتاب | ${site.value.brandName || "EduHub"}`,
-  description: () => book.value?.description || "تفاصيل الكتاب ومحتواه وسعره.",
+  description: () => book.value?.description
+    || websiteSectionBook.value?.description
+    || "تفاصيل الكتاب ومحتواه وسعره.",
   ogTitle: () => book.value?.title,
-  ogDescription: () => book.value?.description || undefined,
+  ogDescription: () => book.value?.description
+    || websiteSectionBook.value?.description
+    || undefined,
   ogImage: () => coverImage.value || undefined,
 });
 
@@ -204,11 +241,15 @@ useHead({
               </nav>
 
               <span class="book-details-page__badge">
-                {{ book.isFree ? "كتاب مجاني" : "كتاب مستقل" }}
+                {{ websiteSectionBook?.title || (book.isFree ? "كتاب مجاني" : "كتاب مستقل") }}
               </span>
               <h1>{{ book.title }}</h1>
-              <h2>{{ book.subtitle || "محتوى مرتب للمذاكرة والمراجعة" }}</h2>
-              <p>{{ book.description || "اطّلع على تفاصيل الكتاب واختر النسخة المناسبة لك." }}</p>
+              <h2>
+                {{ book.subtitle || websiteSectionBook?.subtitle || "محتوى مرتب للمذاكرة والمراجعة" }}
+              </h2>
+              <p>
+                {{ book.description || websiteSectionBook?.description || "اطّلع على تفاصيل الكتاب واختر النسخة المناسبة لك." }}
+              </p>
 
               <div class="book-details-page__author">
                 <span aria-hidden="true">{{ (site.brandName || "E").slice(0, 1) }}</span>
@@ -239,6 +280,51 @@ useHead({
                   <div v-for="(feature, index) in bookFeatures" :key="feature">
                     <span>{{ String(index + 1).padStart(2, "0") }}</span>
                     <p>{{ feature }}</p>
+                  </div>
+                </div>
+              </article>
+
+              <article v-if="bookSteps.length" class="book-details-page__steps-section">
+                <div class="book-details-page__steps-heading">
+                  <div>
+                    <span class="book-details-page__section-tag">
+                      {{ websiteSectionBook?.title || "خطوات الكتاب" }}
+                    </span>
+                    <h2>
+                      {{ websiteSectionBook?.subtitle || "استفد من الكتاب خطوة بخطوة" }}
+                    </h2>
+                    <p v-if="websiteSectionBook?.description">
+                      {{ websiteSectionBook.description }}
+                    </p>
+                  </div>
+                  <img
+                    v-if="websiteSectionBook?.image"
+                    :src="websiteSectionBook.image"
+                    :alt="websiteSectionBook.title"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div class="book-details-page__steps-grid">
+                  <div
+                    v-for="(step, index) in bookSteps"
+                    :key="step.id"
+                    class="book-details-page__step-card"
+                  >
+                    <figure>
+                      <img
+                        v-if="step.image"
+                        :src="step.image"
+                        :alt="step.title"
+                        loading="lazy"
+                      />
+                      <span v-else>{{ String(index + 1).padStart(2, "0") }}</span>
+                    </figure>
+                    <div>
+                      <small v-if="step.subtitle">{{ step.subtitle }}</small>
+                      <h3>{{ step.title }}</h3>
+                      <p v-if="step.description">{{ step.description }}</p>
+                    </div>
                   </div>
                 </div>
               </article>
@@ -290,43 +376,24 @@ useHead({
                   <li>الوصول حسب نوع النسخة المتاحة</li>
                 </ul>
                 <a
-                  v-if="primaryAction"
+                  v-if="option.price === 0 && primaryAction"
                   :href="primaryAction.url"
                   target="_blank"
                   rel="noreferrer"
                 >
                   {{ primaryAction.label }} ←
                 </a>
+                <BuyBookDialog
+                  v-else-if="option.price > 0"
+                  :book-id="book.bookId"
+                  :title="book.title"
+                  :price="option.price"
+                  :currency="book.currency"
+                  :option-label="option.label"
+                  @purchased="refresh"
+                />
                 <span v-else class="book-details-page__format-unavailable">غير متاح حاليًا</span>
               </div>
-
-              <div v-if="!book.isFree" class="book-details-page__format book-details-page__format--print">
-                <div>
-                  <span aria-hidden="true">▤</span>
-                  <p>
-                    <b>نسخة مطبوعة</b>
-                    <small>توصيل للعنوان</small>
-                  </p>
-                </div>
-                <strong>
-                  210
-                  <small>ج.م</small>
-                </strong>
-                <ul>
-                  <li>طباعة ملونة بجودة عالية</li>
-                  <li>تغليف يحافظ على الكتاب</li>
-                  <li>شحن موحد 55 ج.م داخل مصر حاليًا</li>
-                </ul>
-                <a
-                  href="https://eslam-salama-gamma-physics-demo.ibrahimelrefaey2019.chatgpt.site/order/book/physics-secondary-1-notes?format=print"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  ابدأ نموذج طلب النسخة المطبوعة ←
-                </a>
-              </div>
-
-              <p v-if="!book.isFree">إجمالي النسخة المطبوعة مع الشحن: 265 ج.م. نموذج الطلب لا يرسل بيانات أو ينفذ دفعًا.</p>
               <NuxtLink to="/books">العودة إلى كل الكتب</NuxtLink>
             </aside>
           </div>
@@ -350,7 +417,7 @@ useHead({
           <div class="container">
             <header class="book-details-page__section-head">
               <span class="book-details-page__section-tag">محتوى إضافي</span>
-              <h2>روابط الفيديو</h2>
+              <h2>المرفقات وروابط الفيديو</h2>
             </header>
             <div class="book-details-page__media-links">
               <a
@@ -360,7 +427,7 @@ useHead({
                 target="_blank"
                 rel="noreferrer"
               >
-                مشاهدة الفيديو {{ index + 1 }}
+                فتح المحتوى {{ index + 1 }}
                 <span aria-hidden="true">↗</span>
               </a>
             </div>
@@ -694,6 +761,96 @@ useHead({
   color: var(--home-v2-muted);
   font-size: 11px;
   line-height: 1.7;
+}
+
+.book-details-page__steps-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.book-details-page__steps-heading > div {
+  flex: 1;
+}
+
+.book-details-page__steps-heading p {
+  max-width: 680px;
+  margin: 8px 0 0;
+  color: var(--home-v2-muted);
+  font-size: 14px;
+  line-height: 2;
+}
+
+.book-details-page__steps-heading > img {
+  width: 130px;
+  height: 100px;
+  flex: none;
+  border: 1px solid var(--home-v2-line);
+  object-fit: cover;
+}
+
+.book-details-page__steps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.book-details-page__step-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  min-height: 132px;
+  overflow: hidden;
+  border: 1px solid var(--home-v2-line);
+  background: var(--home-v2-surface);
+}
+
+.book-details-page__step-card figure {
+  display: grid;
+  min-height: 132px;
+  margin: 0;
+  place-items: center;
+  background: color-mix(in srgb, var(--home-v2-blue) 12%, var(--home-v2-surface));
+}
+
+.book-details-page__step-card figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.book-details-page__step-card figure span {
+  color: var(--home-v2-blue);
+  font: 900 23px var(--home-v2-heading);
+}
+
+.book-details-page__step-card > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px;
+}
+
+.book-details-page__step-card small {
+  margin-bottom: 4px;
+  color: var(--home-v2-coral);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.book-details-page__step-card h3 {
+  margin: 0;
+  color: var(--home-v2-ink);
+  font: 800 16px/1.5 var(--home-v2-heading);
+}
+
+.book-details-page__step-card p {
+  margin: 5px 0 0;
+  color: var(--home-v2-muted);
+  font-size: 10px;
+  line-height: 1.8;
 }
 
 .book-details-page__facts {
@@ -1038,6 +1195,18 @@ useHead({
 
   .book-details-page__feature-grid {
     grid-template-columns: 1fr;
+  }
+
+  .book-details-page__steps-heading > img {
+    display: none;
+  }
+
+  .book-details-page__steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .book-details-page__step-card {
+    grid-template-columns: 78px minmax(0, 1fr);
   }
 
   .book-details-page__facts > div {

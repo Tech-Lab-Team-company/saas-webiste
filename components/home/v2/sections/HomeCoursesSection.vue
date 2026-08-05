@@ -586,7 +586,7 @@ onBeforeUnmount(() => {
   margin-bottom: 32px;
   padding: 24px 28px;
   border: 1px solid var(--line);
-  background: #edf4f1;
+  background: color-mix(in srgb, var(--teal) 6%, var(--paper));
 }
 
 .home-course-picker > div:first-child {
@@ -605,7 +605,13 @@ onBeforeUnmount(() => {
 
 .home-course-picker h3 {
   margin: 5px 0 3px;
+  color: var(--ink);
   font: 900 20px/1.4 var(--heading);
+}
+
+.home-course-picker > div:first-child > p {
+  color: var(--home-v2-muted);
+  font-weight: 600;
 }
 
 .home-course-audiences {
@@ -673,6 +679,7 @@ onBeforeUnmount(() => {
 }
 
 .stage-option-label {
+  color: inherit;
   font: 800 15px/1.4 var(--heading);
   white-space: nowrap;
 }

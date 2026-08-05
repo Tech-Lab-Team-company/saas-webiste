@@ -44,6 +44,7 @@ class ApiNames {
   // Exams
   public examDetails = "fetch_exam_details";
   public submit_question_answer = "submit_exam_question";
+  public fetch_my_exams = "fetch_my_exams";
 
   //user
   public profile = "profile";
@@ -135,8 +136,9 @@ class ApiNames {
   public fetch_books = "https://dev.saas.techlabeg.com/api/website/fetch_books";
   public fetch_home_book_section =
     "https://dev.saas.techlabeg.com/api/website/fetch_home_book_section";
-  public fetch_book_details =
-    "https://dev.saas.techlabeg.com/api/website/fetch_book_details";
+  public fetch_home_websection_book_details =
+    "https://dev.saas.techlabeg.com/api/website/fetch_home_websection_book_details";
+  public buy_product = this.baseUrl + "v3/buy_product";
   public fetch_home_website_section = "fetch_home_website_section";
   public filter_courses = "filter_courses";
 

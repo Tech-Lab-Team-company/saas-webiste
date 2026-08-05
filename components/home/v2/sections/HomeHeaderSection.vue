@@ -110,8 +110,14 @@ onBeforeUnmount(() => {
         </span>
       </NuxtLink>
 
-      <nav class="home-v2-header__nav" aria-label="التنقل الرئيسي">
-        <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to">{{ item.label }}</NuxtLink>
+      <nav
+        id="home-v2-primary-navigation"
+        class="home-v2-header__nav"
+        aria-label="التنقل الرئيسي"
+      >
+        <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to">
+          {{ item.label }}
+        </NuxtLink>
       </nav>
 
       <div v-if="!userStore.user" class="home-v2-header__actions">
@@ -132,6 +138,11 @@ onBeforeUnmount(() => {
         </button>
       </div>
     </div>
+    <nav class="home-v2-header__mobile-nav" aria-label="التنقل الرئيسي للموبايل">
+      <NuxtLink v-for="item in navItems" :key="`mobile-${item.to}`" :to="item.to">
+        {{ item.label }}
+      </NuxtLink>
+    </nav>
     <span
       class="home-v2-header__progress-track"
       role="progressbar"
@@ -245,6 +256,7 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-header__content {
+  position: relative;
   min-height: 86px;
   gap: clamp(16px, 2vw, 30px);
   transition: min-height 0.25s ease;
@@ -252,6 +264,10 @@ onBeforeUnmount(() => {
 
 .home-v2-header--scrolled .home-v2-header__content {
   min-height: 72px;
+}
+
+.home-v2-header__mobile-nav {
+  display: none;
 }
 
 .home-v2-header__brand {
@@ -416,6 +432,43 @@ onBeforeUnmount(() => {
 @media (max-width: 980px) {
   .home-v2-header__nav {
     display: none;
+  }
+
+  .home-v2-header__mobile-nav {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    overflow-x: auto;
+    padding: 6px max(15px, calc((100vw - 1180px) / 2));
+    border-top: 1px solid var(--home-v2-line);
+    background: color-mix(in srgb, var(--home-v2-surface) 94%, transparent);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .home-v2-header__mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-v2-header__mobile-nav a {
+    display: flex;
+    min-height: 38px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    border-radius: 999px;
+    color: var(--home-v2-muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .home-v2-header__mobile-nav a:hover,
+  .home-v2-header__mobile-nav a.router-link-active {
+    background: color-mix(in srgb, var(--home-v2-blue) 16%, var(--home-v2-surface));
+    color: var(--home-v2-ink);
   }
 }
 

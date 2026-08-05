@@ -134,6 +134,16 @@ const uploadImage = async () => {
         <p>كورساتي</p>
       </NuxtLink>
       <NuxtLink
+        :to="{ name: 'profileexams' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-file-edit" />
+        </span>
+        <p>اختباراتي</p>
+      </NuxtLink>
+      <NuxtLink
         :to="{ name: 'profilesubjectinfo' }"
         exact-active-class="active"
         class="profile-option"

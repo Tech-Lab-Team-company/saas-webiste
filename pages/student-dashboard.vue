@@ -59,9 +59,19 @@ const today = computed(() =>
     month: "long",
   }).format(new Date()),
 );
-const featuredCourse = computed(() => courses.value[0]);
+const courseProgress = (course?: CoursesModel): number => {
+  if (!course) return 0;
+
+  const value = Number(course.percentage ?? course.progress ?? 0);
+  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+};
+const displayCourseProgress = (course?: CoursesModel): string =>
+  String(Math.round(courseProgress(course)));
+const featuredCourse = computed(() =>
+  courses.value.find((course) => course.is_last === true),
+);
 const completedCourses = computed(
-  () => courses.value.filter((course) => Number(course.progress) >= 100).length,
+  () => courses.value.filter((course) => courseProgress(course) >= 100).length,
 );
 
 const courseImage = (course: CoursesModel) => {
@@ -128,7 +138,10 @@ onMounted(async () => {
           <section class="dashboard-heading">
             <div>
               <span class="dashboard-date"><i />{{ today }}</span>
-              <h1>أهلًا، {{ studentName }} 👋</h1>
+              <h1>
+                أهلًا، {{ studentName }}
+                <span class="welcome-wave" role="img" aria-label="مرحبًا">👋</span>
+              </h1>
               <p v-if="educationDetails">
                 هنا ستجد المحتوى المناسب لـ {{ educationDetails }}.
               </p>
@@ -154,15 +167,12 @@ onMounted(async () => {
                 <div class="featured-progress">
                   <div>
                     <span>نسبة الإنجاز</span
-                    ><b>{{ Number(featuredCourse.progress) || 0 }}%</b>
+                    ><b>{{Math.round(courseProgress(featuredCourse)) }}%</b>
                   </div>
                   <div class="progress">
                     <i
                       :style="{
-                        width: `${Math.min(
-                          100,
-                          Number(featuredCourse.progress) || 0,
-                        )}%`,
+                        width: `${courseProgress(featuredCourse)}%`,
                       }"
                     />
                   </div>
@@ -195,6 +205,16 @@ onMounted(async () => {
               <span /><span /><span />
             </section>
 
+            <section v-else-if="courses.length" class="empty-feature">
+              <span class="empty-icon">▶</span>
+              <div>
+                <small>ابدأ التعلّم</small>
+                <h2>لم تبدأ أي كورس بعد</h2>
+                <p>اختر أحد كورساتك، وبعد البدء سيظهر آخر كورس هنا تلقائيًا.</p>
+              </div>
+              <NuxtLink :to="courseRoute(courses[0].id)">ابدأ أول كورس ←</NuxtLink>
+            </section>
+
             <section v-else class="empty-feature">
               <span class="empty-icon">▤</span>
               <div>
@@ -215,16 +235,12 @@ onMounted(async () => {
                 <div
                   class="score-ring"
                   :style="{
-                    '--score': `${
-                      featuredCourse
-                        ? Math.min(100, Number(featuredCourse.progress) || 0)
-                        : 0
-                    }%`,
+                    '--score': `${courseProgress(featuredCourse)}%`,
                   }"
                 >
                   <span
                     >{{
-                      featuredCourse ? Number(featuredCourse.progress) || 0 : 0
+                      displayCourseProgress(featuredCourse)
                     }}<small>%</small></span
                   >
                 </div>
@@ -291,7 +307,7 @@ onMounted(async () => {
                   <span class="subject-badge">{{
                     course.subject?.title || educationLabel
                   }}</span>
-                  <span v-if="Number(course.progress)" class="resume-badge"
+                  <span v-if="course.is_last" class="resume-badge"
                     >متابعة</span
                   >
                 </div>
@@ -310,15 +326,12 @@ onMounted(async () => {
                     <div class="card-progress">
                       <div>
                         <span>التقدم</span
-                        ><b>{{ Number(course.progress) || 0 }}%</b>
+                        ><b>{{ displayCourseProgress(course) }}%</b>
                       </div>
                       <div class="progress">
                         <i
                           :style="{
-                            width: `${Math.min(
-                              100,
-                              Number(course.progress) || 0,
-                            )}%`,
+                            width: `${courseProgress(course)}%`,
                           }"
                         />
                       </div>
@@ -345,9 +358,9 @@ onMounted(async () => {
 .student-dashboard-main {
   --navy: var(--profile-primary, var(--primary-color, #28366c));
   --primary: var(--profile-secondary, var(--secondary-color, #3a3e7e));
-  --primary-soft: var(--profile-secondary-soft, color-mix(in srgb, var(--primary) 11%, white));
-  --muted: #6c7890;
-  --border: #e5eaf2;
+  --primary-soft: var(--profile-secondary-soft, color-mix(in srgb, var(--primary) 11%, var(--profile-surface, white)));
+  --muted: var(--profile-muted, #6c7890);
+  --border: var(--profile-border, #e5eaf2);
   width: min(1240px, calc(100% - 56px));
   padding-top: 38px;
 }
@@ -376,10 +389,19 @@ onMounted(async () => {
 }
 .dashboard-heading h1 {
   margin: 7px 0 2px;
-  color: var(--navy);
+  color: var(--profile-ink);
   font-size: clamp(28px, 3vw, 40px);
   font-weight: 900;
   line-height: 1.35;
+}
+.welcome-wave {
+  display: inline-block;
+  transform-origin: 72% 72%;
+  animation: welcome-wave 2s ease-in-out infinite;
+  will-change: transform;
+}
+.dashboard-heading:hover .welcome-wave {
+  animation-duration: 1.45s;
 }
 .dashboard-heading p {
   margin: 0;
@@ -392,10 +414,10 @@ onMounted(async () => {
   align-items: center;
   gap: 18px;
   padding: 0 20px;
-  border: 1px solid #dfe6f0;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--navy);
-  background: white;
+  color: var(--profile-ink);
+  background: var(--profile-surface);
   font-weight: 800;
   text-decoration: none;
   box-shadow: 0 8px 25px #17315e08;
@@ -490,7 +512,7 @@ onMounted(async () => {
   height: 6px;
   overflow: hidden;
   border-radius: 6px;
-  background: #e8edf5;
+  background: var(--border);
 }
 .progress i {
   display: block;
@@ -542,14 +564,14 @@ onMounted(async () => {
   padding: 23px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--profile-surface);
   box-shadow: 0 15px 38px color-mix(in srgb, var(--navy) 6%, transparent);
 }
 .summary-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--navy);
+  color: var(--profile-ink);
   font-weight: 800;
 }
 .summary-head i {
@@ -577,18 +599,18 @@ onMounted(async () => {
   flex: 0 0 88px;
   place-items: center;
   border-radius: 50%;
-  background: conic-gradient(var(--primary) var(--score), #eaf0f7 0);
+  background: conic-gradient(var(--primary) var(--score), var(--border) 0);
 }
 .score-ring::before {
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--profile-surface);
   content: "";
 }
 .score-ring > span {
   position: absolute;
-  color: var(--navy);
+  color: var(--profile-ink);
   font-size: 21px;
   font-weight: 900;
 }
@@ -600,7 +622,7 @@ onMounted(async () => {
   flex-direction: column;
 }
 .summary-score b {
-  color: var(--navy);
+  color: var(--profile-ink);
   font-size: 14px;
 }
 .summary-score small {
@@ -634,7 +656,7 @@ onMounted(async () => {
   margin: 0;
 }
 .summary-stats b {
-  color: var(--navy);
+  color: var(--profile-ink);
   font-size: 17px;
   line-height: 1;
 }
@@ -651,12 +673,12 @@ onMounted(async () => {
   gap: 18px;
   padding: 40px;
   border-radius: 18px;
-  background: #e9eef6;
+  background: var(--profile-surface-raised);
 }
 .featured-loader span {
   height: 16px;
   border-radius: 6px;
-  background: linear-gradient(90deg, #dfe5ef, #f7f9fc, #dfe5ef);
+  background: linear-gradient(90deg, var(--profile-surface), var(--profile-surface-raised), var(--profile-surface));
   background-size: 200%;
   animation: loading 1.3s infinite;
 }
@@ -678,7 +700,7 @@ onMounted(async () => {
   padding: 34px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--profile-surface);
 }
 .empty-feature .empty-icon {
   display: grid;
@@ -693,7 +715,7 @@ onMounted(async () => {
 }
 .empty-feature h2 {
   margin: 5px 0;
-  color: var(--navy);
+  color: var(--profile-ink);
 }
 .empty-feature p {
   margin: 0;
@@ -701,7 +723,7 @@ onMounted(async () => {
 }
 .empty-feature a {
   margin-right: auto;
-  color: #fff;
+  color: var(--profile-on-action);
   background: var(--primary);
   padding: 11px 15px;
   text-decoration: none;
@@ -721,7 +743,7 @@ onMounted(async () => {
 }
 .section-head h2 {
   margin: 2px 0 0;
-  color: var(--navy);
+  color: var(--profile-ink);
   font-size: 27px;
 }
 .section-head p {
@@ -755,7 +777,7 @@ onMounted(async () => {
   border: 1px solid var(--border);
   border-radius: 15px;
   color: inherit;
-  background: #fff;
+  background: var(--profile-surface);
   text-decoration: none;
   box-shadow: 0 12px 32px color-mix(in srgb, var(--navy) 6%, transparent);
   transition: 0.25s ease;
@@ -856,7 +878,7 @@ onMounted(async () => {
   font-weight: 900;
 }
 .teacher-line small {
-  color: #64738b;
+  color: var(--muted);
   font-weight: 700;
 }
 .course-info h3 {
@@ -864,7 +886,7 @@ onMounted(async () => {
   overflow: hidden;
   min-height: 49px;
   margin: 10px 0 5px;
-  color: var(--navy);
+  color: var(--profile-ink);
   font-size: 16px;
   line-height: 1.55;
   -webkit-box-orient: vertical;
@@ -883,7 +905,7 @@ onMounted(async () => {
 .course-meta {
   display: flex;
   gap: 15px;
-  color: #68768d;
+  color: var(--muted);
   font-size: 10px;
 }
 .card-footer {
@@ -892,7 +914,7 @@ onMounted(async () => {
   gap: 13px;
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid #edf0f5;
+  border-top: 1px solid var(--border);
 }
 .card-progress {
   flex: 1;
@@ -905,7 +927,7 @@ onMounted(async () => {
   font-size: 10px;
 }
 .card-progress b {
-  color: var(--navy);
+  color: var(--profile-ink);
 }
 .card-arrow {
   display: grid;
@@ -919,14 +941,14 @@ onMounted(async () => {
   transition: 0.2s;
 }
 .course-card:hover .card-arrow {
-  color: #fff;
+  color: var(--profile-on-action);
   background: var(--primary);
 }
 .loading-grid span {
   height: 400px;
   border: 1px solid var(--border);
   border-radius: 15px;
-  background: linear-gradient(100deg, #e9edf4, #f9fafc, #e9edf4);
+  background: linear-gradient(100deg, var(--profile-surface), var(--profile-surface-raised), var(--profile-surface));
   background-size: 200%;
   animation: loading 1.3s infinite;
 }
@@ -937,9 +959,9 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  border: 1px dashed #cad5e5;
-  color: var(--navy);
-  background: #fff;
+  border: 1px dashed var(--border);
+  color: var(--profile-ink);
+  background: var(--profile-surface);
 }
 .empty-list > span {
   color: var(--primary);
@@ -953,6 +975,34 @@ onMounted(async () => {
 @keyframes loading {
   to {
     background-position: -200% 0;
+  }
+}
+@keyframes welcome-wave {
+  0%, 55%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  8% {
+    transform: rotate(18deg) scale(1.10);
+  }
+  16% {
+    transform: rotate(-10deg) scale(1.10);
+  }
+  24% {
+    transform: rotate(16deg) scale(1.10);
+  }
+  32% {
+    transform: rotate(-7deg) scale(1.08);
+  }
+  40% {
+    transform: rotate(10deg) scale(1.06);
+  }
+  48% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-wave {
+    animation: none;
   }
 }
 @media (max-width: 1180px) {

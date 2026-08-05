@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import ThemeToggle from '~/components/ThemeToggle.vue'
-import HomeHeader from '~/components/home/HomeHeader.vue'
-import HomeHero from '~/components/home/HomeHero.vue'
-import HomeCourses from '~/components/home/HomeCourses.vue'
-import HomeNotes from '~/components/home/HomeNotes.vue'
-import HomeBlog from '~/components/home/HomeBlog.vue'
-import HomeExperience from '~/components/home/HomeExperience.vue'
-import HomeStory from '~/components/home/HomeStory.vue'
-import HomeAppStatus from '~/components/home/HomeAppStatus.vue'
-import HomeFaq from '~/components/home/HomeFaq.vue'
-import HomeCta from '~/components/home/HomeCta.vue'
-import HomeFooter from '~/components/home/HomeFooter.vue'
+import HomeHeader from '../components/home/HomeHeader.vue'
+import HomeHero from '../components/home/HomeHero.vue'
+import HomeCourses from '../components/home/HomeCourses.vue'
+import HomeNotes from '../components/home/HomeNotes.vue'
+import HomeBlog from '../components/home/HomeBlog.vue'
+import HomeExperience from '../components/home/HomeExperience.vue'
+import HomeStory from '../components/home/HomeStory.vue'
+import HomeAppStatus from '../components/home/HomeAppStatus.vue'
+import HomeFaq from '../components/home/HomeFaq.vue'
+import HomeCta from '../components/home/HomeCta.vue'
+import HomeFooter from '../components/home/HomeFooter.vue'
 
 useSeoMeta({
   title: 'Gamma Physics | إسلام سلامة',
@@ -30,8 +29,6 @@ useHead({
 </script>
 
 <template>
-  <ThemeToggle />
-
   <main>
     <HomeHeader />
     <HomeHero />

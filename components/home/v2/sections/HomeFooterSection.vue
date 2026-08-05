@@ -296,8 +296,12 @@ onBeforeUnmount(() => {
 <style scoped>
 .home-v2-footer {
   padding-top: 70px;
-  background: #061147;
+  background: var(
+    --app-footer-bg,
+    color-mix(in srgb, var(--home-v2-deep) 82%, #071020)
+  );
   color: #fff;
+  transition: background-color .3s ease;
 }
 
 .home-v2-footer__grid {

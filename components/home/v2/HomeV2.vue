@@ -26,6 +26,18 @@ const props = defineProps<{
     yearId: number,
   ) => Promise<HomeSectionState<HomeCourseViewModel[]>>;
 }>();
+
+const themeStyles = computed(() => {
+  const primary = props.home.site.colors.primary || "#28366c";
+  const secondary = props.home.site.colors.secondary || "#3a3e7e";
+  return {
+    "--home-v2-brand-primary": primary,
+    "--home-v2-brand-secondary": secondary,
+    "--home-v2-blue": primary,
+    "--home-v2-deep": secondary,
+    "--home-v2-blue-light": `color-mix(in srgb, ${primary} 14%, white)`,
+  };
+});
 </script>
 
 <template>
@@ -33,13 +45,7 @@ const props = defineProps<{
     class="home-v2"
     dir="rtl"
     :data-home-pending="props.pending ? 'true' : 'false'"
-    :style="{
-      '--home-v2-blue': props.home.site.colors.primary || '#28366c',
-      '--home-v2-deep': props.home.site.colors.secondary || '#3a3e7e',
-      '--home-v2-blue-light': `color-mix(in srgb, ${
-        props.home.site.colors.primary || '#28366c'
-      } 14%, white)`,
-    }"
+    :style="themeStyles"
   >
     <HomeHeaderSection :site="props.home.site" />
     <main>

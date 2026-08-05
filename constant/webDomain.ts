@@ -18,7 +18,7 @@ export function getWebDomain(): string {
 // almaherinenglish.com
 // hadybazeed.com
 // mrbackend.eduhubco.com
-// https://mr-eslamsalama.com/
+// https://mr-eslamsalama.com
 // garhy-academy.com
 // mr-mohamedkarawya.com
 // physics-beyts.azcourses.org

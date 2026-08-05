@@ -106,7 +106,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   padding: 156px 0 90px;
   background:
     radial-gradient(circle at 15% 17%, color-mix(in srgb, var(--home-v2-blue) 22%, transparent), transparent 30%),
-    linear-gradient(135deg, color-mix(in srgb, var(--home-v2-blue) 8%, #f8f6ee) 0%, #f7f8f4 48%, color-mix(in srgb, var(--home-v2-blue) 10%, #eef4f1) 100%);
+    linear-gradient(135deg, color-mix(in srgb, var(--home-v2-blue) 8%, var(--home-v2-cream)) 0%, var(--home-v2-paper) 48%, color-mix(in srgb, var(--home-v2-blue) 10%, var(--home-v2-cream)) 100%);
   overflow: hidden;
 }
 
@@ -117,7 +117,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .app-page__intro p, .app-page__content > p { margin: 0; color: var(--home-v2-muted); line-height: 1.9; }
 .app-page__intro p { font-size: 16px; }
 
-.app-page__card { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: 362px; overflow: hidden; border: 1px solid var(--home-v2-line); background: #fff; box-shadow: 0 30px 75px -48px color-mix(in srgb, var(--home-v2-deep) 55%, transparent); animation: app-card-in .8s .12s cubic-bezier(.2,.8,.2,1) both; }
+.app-page__card { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: 362px; overflow: hidden; border: 1px solid var(--home-v2-line); background: var(--home-v2-surface); box-shadow: 0 30px 75px -48px color-mix(in srgb, var(--home-v2-deep) 55%, transparent); animation: app-card-in .8s .12s cubic-bezier(.2,.8,.2,1) both; }
 .app-page__phone { position: relative; display: flex; min-height: 362px; justify-content: center; align-items: center; overflow: hidden; background: linear-gradient(160deg, var(--home-v2-deep), color-mix(in srgb, var(--home-v2-blue) 65%, #06112f)); }
 .app-page__phone::before, .app-page__phone::after { position: absolute; width: 140px; height: 140px; border-radius: 50%; background: rgb(255 255 255 / 13%); content: ""; }
 .app-page__phone::before { top: -82px; right: -25px; }
@@ -135,9 +135,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .app-page__steps span { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; color: var(--home-v2-blue); background: var(--home-v2-blue-light); font-weight: 900; }
 
 .app-page__links { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 10px; margin-top: 18px; animation: app-fade-up .65s .55s both; }
-.app-page__links a, .app-page__link-disabled { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 11px 17px; border: 1px solid color-mix(in srgb, var(--home-v2-blue) 30%, #ccd8d4); background: #fff; color: var(--home-v2-ink); font-size: 14px; font-weight: 900; box-shadow: 0 8px 22px rgb(12 35 68 / 6%); transition: transform .22s ease, color .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease; }
+.app-page__links a, .app-page__link-disabled { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 11px 17px; border: 1px solid color-mix(in srgb, var(--home-v2-blue) 30%, var(--home-v2-line)); background: var(--home-v2-surface); color: var(--home-v2-ink); font-size: 14px; font-weight: 900; box-shadow: 0 8px 22px rgb(12 35 68 / 6%); transition: transform .22s ease, color .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease; }
 .app-page__links a:hover { border-color: var(--home-v2-blue); background: var(--home-v2-blue); color: #fff; box-shadow: 0 13px 28px color-mix(in srgb, var(--home-v2-blue) 28%, transparent); transform: translateY(-3px); }
 .app-page__links .app-page__store-button { min-width: 176px; justify-content: flex-start; gap: 11px; border-color: var(--home-v2-blue); background: linear-gradient(135deg, var(--home-v2-blue), var(--home-v2-deep)); color: #fff; }
+:global(html[data-theme="dark"]) .app-page__links a:hover { color: #07101f; }
+:global(html[data-theme="dark"]) .app-page__links .app-page__store-button { color: #fff; }
 .app-page__store-button > span:last-child { display: grid; text-align: right; line-height: 1.1; }
 .app-page__store-button small { color: rgb(255 255 255 / 72%); font-size: 10px; font-weight: 700; }
 .app-page__store-button b { margin-top: 3px; font: 900 16px/1 var(--home-v2-heading); }

@@ -9,6 +9,7 @@ import FetchPaymentMethodController from "./features/fetch_payment_methods/prese
 import { getWebDomain } from "~/constant/webDomain";
 import Error from "./error.vue";
 import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
+import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -18,6 +19,7 @@ const isHomeV2 = computed(() =>
   route.path.startsWith("/blog-v2/"),
 );
 const UserStore = useUserStore();
+const { theme, isDark, toggleTheme } = useAppTheme();
 const {
   data: webStatus,
   pending,
@@ -37,15 +39,79 @@ const {
 
   // console.log("WebStatus:", getWebDomain());
 
-  const DefaultPrimaryColor = "#28366c";
-  const DefaultSecondColor = "#3a3e7e";
-
-  const PrimaryColor = response?.data?.primary_color || DefaultPrimaryColor;
-  const SecondColor = response?.data?.secondary_color || DefaultSecondColor;
-  const style = document.createElement("style");
-  style.innerHTML = `:root { --primary-color: ${PrimaryColor}; --secondary-color: ${SecondColor}; }`;
-  document.head.appendChild(style);
   return response.data;
+});
+
+const normalizeThemeColor = (value: string | null | undefined, fallback: string) =>
+  value && /^#[0-9a-f]{3,8}$/iu.test(value.trim()) ? value.trim() : fallback;
+
+const primaryColor = computed(() =>
+  normalizeThemeColor(webStatus.value?.primary_color, "#28366c"),
+);
+const secondaryColor = computed(() =>
+  normalizeThemeColor(webStatus.value?.secondary_color, "#3a3e7e"),
+);
+
+const themeVariables = computed<Record<string, string>>(() => ({
+  "--primary-color": primaryColor.value,
+  "--secondary-color": secondaryColor.value,
+  "--app-brand-primary": primaryColor.value,
+  "--app-brand-secondary": secondaryColor.value,
+  "--app-accent": isDark.value
+    ? `color-mix(in srgb, ${primaryColor.value} 58%, #9fc2ff)`
+    : primaryColor.value,
+  "--app-accent-secondary": isDark.value
+    ? `color-mix(in srgb, ${secondaryColor.value} 65%, #7183b7)`
+    : secondaryColor.value,
+  "--app-bg": isDark.value
+    ? `color-mix(in srgb, ${primaryColor.value} 6%, #080b12)`
+    : "#fbfcff",
+  "--app-bg-muted": isDark.value
+    ? `color-mix(in srgb, ${secondaryColor.value} 8%, #0d111b)`
+    : "#f2f6fc",
+  "--app-surface": isDark.value
+    ? `color-mix(in srgb, ${primaryColor.value} 10%, #131824)`
+    : "#ffffff",
+  "--app-surface-raised": isDark.value
+    ? `color-mix(in srgb, ${primaryColor.value} 13%, #19202e)`
+    : "#ffffff",
+  "--app-text": isDark.value ? "#f3f6fc" : "#081b3a",
+  "--app-muted": isDark.value ? "#aab6ca" : "#4f617c",
+  "--app-line": isDark.value
+    ? "rgb(205 220 245 / 16%)"
+    : "rgb(8 27 58 / 14%)",
+  "--app-shadow": isDark.value
+    ? "rgb(0 0 0 / 72%)"
+    : "rgb(6 17 71 / 40%)",
+  "--app-footer-bg": isDark.value
+    ? `color-mix(in srgb, ${secondaryColor.value} 24%, #070a11)`
+    : `color-mix(in srgb, ${secondaryColor.value} 82%, #071020)`,
+}));
+
+const themeInlineStyle = computed(() =>
+  Object.entries(themeVariables.value)
+    .map(([property, value]) => `${property}:${value}`)
+    .join(";"),
+);
+
+useHead(() => ({
+  htmlAttrs: {
+    "data-theme": theme.value,
+    style: themeInlineStyle.value,
+  },
+}));
+
+watchEffect(() => {
+  const activeTheme = theme.value;
+  const activeVariables = themeVariables.value;
+
+  if (!import.meta.client) return;
+
+  const documentRoot = document.documentElement;
+  documentRoot.dataset.theme = activeTheme;
+  Object.entries(activeVariables).forEach(([property, value]) => {
+    documentRoot.style.setProperty(property, value);
+  });
 });
 
 
@@ -129,6 +195,7 @@ UserSettingStore.setSetting(webStatus.value!);
       <!-- <LoaderDialog v-if="!pending" /> -->
     </NuxtLayout>
   </div>
+  <AppThemeToggle :is-dark="isDark" @toggle="toggleTheme" />
 </template>
 
 <style scoped lang="scss">

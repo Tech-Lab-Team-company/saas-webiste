@@ -1,15 +1,27 @@
 .profile-redesign-page {
   --profile-primary: var(--primary-color, #061147);
   --profile-secondary: var(--secondary-color, #1671e8);
-  --profile-secondary-soft: color-mix(in srgb, var(--profile-secondary) 11%, white);
-  --profile-ink: #17343c;
-  --profile-muted: #7c9196;
-  --profile-border: #dfe7e5;
-  --profile-canvas: #f4f7f6;
+  --profile-secondary-soft: color-mix(in srgb, var(--profile-secondary) 11%, var(--app-surface, white));
+  --profile-ink: var(--app-text, #17343c);
+  --profile-muted: var(--app-muted, #7c9196);
+  --profile-border: var(--app-line, #dfe7e5);
+  --profile-canvas: var(--app-bg, #f4f7f6);
+  --profile-surface: var(--app-surface, #fff);
+  --profile-surface-raised: var(--app-surface-raised, #fbfcfc);
+  --profile-action: var(--profile-primary);
+  --profile-on-action: #fff;
   min-height: 100vh;
   background: var(--profile-canvas);
   color: var(--profile-ink);
   font-family: "Cairo", sans-serif;
+}
+
+html[data-theme="dark"] .profile-redesign-page {
+  --profile-primary: var(--app-footer-bg, #070a11);
+  --profile-secondary: var(--app-accent, #9fc2ff);
+  --profile-action: var(--profile-secondary);
+  --profile-on-action: #07101f;
+  color-scheme: dark;
 }
 
 body:has(.profile-redesign-page) .header,
@@ -60,7 +72,7 @@ body:has(.profile-redesign-page) {
   gap: 24px;
   padding: 16px clamp(24px, 4vw, 62px);
   border-bottom: 1px solid var(--profile-border);
-  background: #fff;
+  background: var(--profile-surface);
 }
 
 .profile-redesign-page .profile-topbar-copy {
@@ -85,9 +97,9 @@ body:has(.profile-redesign-page) {
   align-items: center;
   gap: 8px;
   padding: 9px 14px;
-  border: 1px solid color-mix(in srgb, var(--profile-secondary) 24%, white);
+  border: 1px solid color-mix(in srgb, var(--profile-secondary) 24%, var(--profile-surface));
   background: var(--profile-secondary-soft);
-  color: var(--profile-primary);
+  color: var(--profile-secondary);
   font-size: 12px;
   font-weight: 800;
 }
@@ -137,7 +149,7 @@ body:has(.profile-redesign-page) {
   padding: clamp(24px, 3vw, 38px);
   border: 1px solid var(--profile-border);
   border-radius: 0;
-  background: #fff;
+  background: var(--profile-surface);
   direction: rtl;
 }
 
@@ -199,7 +211,7 @@ body:has(.profile-redesign-page) {
   border: 1px solid var(--profile-border);
   border-radius: 0;
   outline: none;
-  background: #fbfcfc;
+  background: var(--profile-surface-raised);
   color: var(--profile-ink);
   font-family: inherit;
   font-size: 13px;
@@ -208,7 +220,7 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-password-card .profile-input-container input.input:focus {
   border-color: var(--profile-secondary);
-  background: #fff;
+  background: var(--profile-surface);
   box-shadow: 0 0 0 3px var(--profile-secondary-soft);
 }
 
@@ -220,10 +232,10 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-password-card button.primary-button-2 {
   min-width: 170px;
   padding: 13px 22px;
-  border: 1px solid var(--profile-primary);
+  border: 1px solid var(--profile-action);
   border-radius: 0;
-  background: var(--profile-primary);
-  color: #fff !important;
+  background: var(--profile-action);
+  color: var(--profile-on-action) !important;
   font-family: inherit;
   font-size: 12px;
   font-weight: 800;
@@ -266,7 +278,7 @@ body:has(.profile-redesign-page) {
   min-height: 49px;
   border: 1px solid var(--profile-border);
   border-radius: 0;
-  background-color: #fbfcfc;
+  background-color: var(--profile-surface-raised);
   color: var(--profile-ink);
   font-family: inherit;
 }
@@ -279,7 +291,8 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-subject-card .btns-home .login-btn {
   min-height: 49px;
   border-radius: 0;
-  background: var(--profile-primary);
+  background: var(--profile-action);
+  color: var(--profile-on-action);
   font-family: inherit;
 }
 
@@ -300,7 +313,7 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-summary-card,
 .profile-redesign-page .profile-data-card {
   border: 1px solid var(--profile-border);
-  background: #fff;
+  background: var(--profile-surface);
   direction: rtl;
 }
 
@@ -318,7 +331,7 @@ body:has(.profile-redesign-page) {
   margin: 0 auto 18px;
   border-radius: 50%;
   background: var(--profile-secondary-soft);
-  color: var(--profile-primary);
+  color: var(--profile-secondary);
   font-size: 29px;
   font-weight: 900;
 }
@@ -426,7 +439,7 @@ body:has(.profile-redesign-page) {
   border: 1px solid var(--profile-border);
   border-radius: 0;
   outline: none;
-  background: #fbfcfc;
+  background: var(--profile-surface-raised);
   color: var(--profile-ink);
   font-family: inherit;
   font-size: 13px;
@@ -436,7 +449,7 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:focus {
   border-color: var(--profile-secondary);
-  background: #fff;
+  background: var(--profile-surface);
   box-shadow: 0 0 0 3px var(--profile-secondary-soft);
 }
 
@@ -445,7 +458,7 @@ body:has(.profile-redesign-page) {
   min-width: 66px;
   border: 1px solid var(--profile-border);
   border-inline-start: 0;
-  background: #fff;
+  background: var(--profile-surface);
   color: var(--profile-secondary);
   font-family: inherit;
   font-size: 11px;
@@ -479,10 +492,10 @@ body:has(.profile-redesign-page) {
   min-width: 150px;
   margin: 0;
   padding: 13px 20px;
-  border: 1px solid var(--profile-primary);
+  border: 1px solid var(--profile-action);
   border-radius: 0;
-  background: var(--profile-primary);
-  color: #fff;
+  background: var(--profile-action);
+  color: var(--profile-on-action);
   font-family: inherit;
   font-size: 12px;
   font-weight: 800;
@@ -929,7 +942,7 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page {
   background:
     radial-gradient(circle at 8% 4%, color-mix(in srgb, var(--profile-secondary) 8%, transparent), transparent 28%),
-    linear-gradient(145deg, color-mix(in srgb, var(--profile-primary) 2%, #f7f9f9), var(--profile-canvas));
+    linear-gradient(145deg, color-mix(in srgb, var(--profile-primary) 2%, var(--profile-canvas)), var(--profile-canvas));
 }
 
 .profile-redesign-page .profile-dashboard-workspace {
@@ -946,8 +959,8 @@ body:has(.profile-redesign-page) {
   position: sticky;
   top: 0;
   z-index: 20;
-  border-color: color-mix(in srgb, var(--profile-primary) 10%, white);
-  background: color-mix(in srgb, white 92%, transparent);
+  border-color: color-mix(in srgb, var(--profile-primary) 10%, var(--profile-border));
+  background: color-mix(in srgb, var(--profile-surface) 92%, transparent);
   box-shadow: 0 8px 28px color-mix(in srgb, var(--profile-primary) 6%, transparent);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
@@ -1003,7 +1016,7 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-summary-card,
 .profile-redesign-page .profile-data-card {
   overflow: hidden;
-  border-color: color-mix(in srgb, var(--profile-primary) 12%, white);
+  border-color: color-mix(in srgb, var(--profile-primary) 12%, var(--profile-border));
   border-radius: 18px;
   box-shadow: 0 16px 42px color-mix(in srgb, var(--profile-primary) 7%, transparent);
   transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
@@ -1012,7 +1025,7 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-section-card:hover,
 .profile-redesign-page .profile-summary-card:hover,
 .profile-redesign-page .profile-data-card:hover {
-  border-color: color-mix(in srgb, var(--profile-secondary) 28%, white);
+  border-color: color-mix(in srgb, var(--profile-secondary) 28%, var(--profile-border));
   box-shadow: 0 22px 52px color-mix(in srgb, var(--profile-primary) 10%, transparent);
   transform: translateY(-2px);
 }
@@ -1055,7 +1068,7 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-password-card .profile-input-container input.input:hover,
 .profile-redesign-page .profile-subject-card .login-input select.student-select:hover {
   border-color: color-mix(in srgb, var(--profile-secondary) 38%, var(--profile-border));
-  background: #fff;
+  background: var(--profile-surface);
 }
 
 .profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:focus,
@@ -1071,7 +1084,7 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-input-container button:hover {
   background: var(--profile-secondary-soft);
-  color: var(--profile-primary);
+  color: var(--profile-secondary);
 }
 
 .profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes,
@@ -1099,7 +1112,7 @@ body:has(.profile-redesign-page) {
 }
 
 .profile-redesign-page .profile-courses-card .card:hover {
-  border-color: color-mix(in srgb, var(--profile-secondary) 30%, white);
+  border-color: color-mix(in srgb, var(--profile-secondary) 30%, var(--profile-border));
   box-shadow: 0 20px 42px color-mix(in srgb, var(--profile-primary) 12%, transparent);
   transform: translateY(-5px);
 }

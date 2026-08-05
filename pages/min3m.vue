@@ -7549,7 +7549,7 @@ html[data-theme="dark"] .teacher-book-art > i {
 }
 
 @media (width<=820px) {
-  body: has(.student-app) .theme-toggle {
+body:has(.student-app) .theme-toggle {
     bottom: calc(82px + env(safe-area-inset-bottom));
   }
 }
@@ -7899,7 +7899,7 @@ body:not(:has(.student-app)) .theme-toggle-label {
 }
 
 @media (width<=680px) {
-  body: has(.catalog-header) .theme-toggle {
+body:has(.catalog-header) .theme-toggle {
     top: max(13px, env(safe-area-inset-top, 0px));
   }
 
@@ -7979,7 +7979,7 @@ body:not(:has(.student-app)) .theme-toggle-label {
 }
 
 @media (width<=620px) {
-  body: has(.site-header) .theme-toggle {
+body:has(.site-header) .theme-toggle {
     top: max(16px, env(safe-area-inset-top, 0px));
   }
 
@@ -9384,7 +9384,7 @@ html[data-theme="dark"] .home-course-showcase .course-card.deep .course-cover {
 }
 
 @media (width<=820px) {
-  .home-course-showcase.course-card: last-child {
+.home-course-showcase.course-card:last-child {
     grid-column: auto;
   }
 

@@ -116,9 +116,9 @@ const courseRoute = (course: CoursesModel) => ({
   min-width: 0;
   grid-template-columns: 190px minmax(0, 1fr);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--profile-primary) 12%, white);
+  border: 1px solid var(--profile-border);
   border-radius: 0;
-  background: #fff;
+  background: var(--profile-surface);
   box-shadow: none;
   animation: library-course-in 0.58s cubic-bezier(.2,.8,.2,1) both;
   animation-delay: calc(var(--order) * 70ms);
@@ -126,7 +126,7 @@ const courseRoute = (course: CoursesModel) => ({
 }
 
 .library-course:hover {
-  border-color: color-mix(in srgb, var(--profile-secondary) 35%, white);
+  border-color: color-mix(in srgb, var(--profile-secondary) 35%, var(--profile-border));
   box-shadow: 0 12px 28px color-mix(in srgb, var(--profile-primary) 8%, transparent);
   transform: translateY(-3px);
 }
@@ -137,18 +137,18 @@ const courseRoute = (course: CoursesModel) => ({
   min-height: 240px;
   place-items: center;
   overflow: hidden;
-  color: var(--profile-primary);
-  background: color-mix(in srgb, var(--profile-secondary) 20%, white);
+  color: var(--profile-ink);
+  background: color-mix(in srgb, var(--profile-secondary) 20%, var(--profile-surface));
 }
 
 .library-cover.tone-1 {
-  color: var(--profile-primary);
-  background: color-mix(in srgb, var(--profile-primary) 17%, white);
+  color: var(--profile-ink);
+  background: color-mix(in srgb, var(--profile-primary) 17%, var(--profile-surface));
 }
 
 .library-cover.tone-2 {
-  color: var(--profile-primary);
-  background: color-mix(in srgb, var(--profile-secondary) 15%, #f4dfaa);
+  color: var(--profile-ink);
+  background: color-mix(in srgb, var(--profile-secondary) 15%, var(--profile-surface-raised));
 }
 
 .library-cover::after {
@@ -215,7 +215,7 @@ const courseRoute = (course: CoursesModel) => ({
   overflow: hidden;
   color: var(--profile-secondary);
   padding: 7px 10px;
-  background: color-mix(in srgb, var(--profile-secondary) 9%, white);
+  background: color-mix(in srgb, var(--profile-secondary) 9%, var(--profile-surface));
   font-size: 9px;
   font-weight: 900;
   text-align: right;
@@ -253,7 +253,7 @@ const courseRoute = (course: CoursesModel) => ({
   gap: 14px;
   margin-top: auto;
   padding-top: 16px;
-  border-top: 1px solid color-mix(in srgb, var(--profile-primary) 9%, white);
+  border-top: 1px solid var(--profile-border);
 }
 
 .library-footer small {
@@ -304,12 +304,12 @@ const courseRoute = (course: CoursesModel) => ({
 .library-empty h2 { margin: 15px 0 3px; color: var(--profile-ink); font-size: 19px; }
 .library-empty p { margin: 0; color: var(--profile-muted); font-size: 11px; }
 .library-empty a { margin-top: 16px; color: var(--profile-secondary); font-size: 11px; font-weight: 900; text-decoration: none; }
-.library-error > span { color: #b42318; background: #fff0ee; }
+.library-error > span { color: #ff8f83; background: color-mix(in srgb, #b42318 18%, var(--profile-surface)); }
 
 .library-loading .library-course { min-height: 240px; animation: none; }
-.library-loading article > span { background: linear-gradient(100deg,#e8edf1,#f8fafb,#e8edf1); background-size: 200%; animation: library-loading 1.2s infinite; }
+.library-loading article > span { background: linear-gradient(100deg,var(--profile-surface),var(--profile-surface-raised),var(--profile-surface)); background-size: 200%; animation: library-loading 1.2s infinite; }
 .library-loading article > div { display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px; }
-.library-loading i { height: 13px; border-radius: 5px; background: linear-gradient(100deg,#e8edf1,#f8fafb,#e8edf1); background-size: 200%; animation: library-loading 1.2s infinite; }
+.library-loading i { height: 13px; border-radius: 5px; background: linear-gradient(100deg,var(--profile-surface),var(--profile-surface-raised),var(--profile-surface)); background-size: 200%; animation: library-loading 1.2s infinite; }
 .library-loading i:nth-child(1) { width: 35%; }.library-loading i:nth-child(2) { width: 85%; height: 28px; }.library-loading i:nth-child(3) { width: 65%; }
 
 @keyframes library-course-in { from { opacity: 0; transform: translateY(24px) scale(.985); } }

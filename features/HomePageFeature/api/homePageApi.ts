@@ -128,7 +128,9 @@ export class HomePageApi {
   }
 
   async fetchBookDetails(bookId: number): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_book_details, { book_id: bookId });
+    return this.post(ApiNames.Instance.fetch_home_websection_book_details, {
+      book_id: bookId,
+    });
   }
 
   async fetchHeroSections(type: HeroSectionTypeEnum): Promise<unknown> {

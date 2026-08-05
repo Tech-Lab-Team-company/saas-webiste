@@ -631,7 +631,7 @@ const SendBasicData = async () => {
 <style scoped lang="scss">
 .subject-info {
   border-radius: 20px;
-  background-color: #f6f6f6;
+  background-color: var(--profile-surface);
   padding: 20px;
   box-sizing: border-box;
   direction: rtl;
@@ -644,12 +644,12 @@ const SendBasicData = async () => {
   p:first-child {
     font-size: 20px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--profile-ink);
   }
 
   p:last-child {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--profile-muted);
     line-height: 1.6;
   }
 }
@@ -663,7 +663,7 @@ const SendBasicData = async () => {
   background-image: linear-gradient(
     to left,
     var(--secondary-color) 0% 20%,
-    #e6e6e6 60%
+    var(--profile-border) 60%
   );
   margin-left: auto;
 }
@@ -686,10 +686,10 @@ const SendBasicData = async () => {
     padding: 12px 14px;
     padding-left: 40px;
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    background: #f9fafb;
+    border: 1px solid var(--profile-border);
+    background: var(--profile-surface-raised);
     font-size: 14px;
-    color: #111827;
+    color: var(--profile-ink);
     transition: all 0.25s ease;
     appearance: none;
     cursor: pointer;
@@ -700,20 +700,20 @@ const SendBasicData = async () => {
     background-position: left 12px center; /* RTL */
 
     &:hover {
-      background-color: #f3f4f6;
+      background-color: var(--profile-surface);
     }
 
     &:focus {
-      border-color: #093a8a;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(9, 58, 138, 0.1);
+      border-color: var(--profile-secondary);
+      background: var(--profile-surface);
+      box-shadow: 0 0 0 3px var(--profile-secondary-soft);
       outline: none;
     }
 
     &:disabled {
-      background: #e5e7eb;
+      background: var(--profile-border);
       cursor: not-allowed;
-      color: #9ca3af;
+      color: var(--profile-muted);
     }
   }
 
@@ -733,9 +733,9 @@ const SendBasicData = async () => {
   top: -8px;
   left: 10px;
   font-size: 11px;
-  background: #fff;
+  background: var(--profile-surface);
   padding: 0 5px;
-  color: #093a8a;
+  color: var(--profile-secondary);
 }
 
 .hidden {
@@ -751,7 +751,7 @@ const SendBasicData = async () => {
     padding: 13px;
     border-radius: 14px;
     border: none;
-    background: linear-gradient(135deg, #3a3e7e 60%, #3a3e7e 40%);
+    background: linear-gradient(135deg, var(--profile-primary), var(--profile-secondary));
     color: #fff;
     font-weight: 600;
     font-size: 14px;

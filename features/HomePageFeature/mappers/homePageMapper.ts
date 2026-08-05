@@ -10,7 +10,9 @@ import type {
 import { HeroSectionTypeEnum } from '../types/homePage.types'
 import type {
   HomeBlogViewModel,
+  HomeBookDetailsResourceViewModel,
   HomeBookDetailsViewModel,
+  HomeBookStepViewModel,
   HomeBookViewModel,
   HomeBooksViewModel,
   HomeAboutTeacherViewModel,
@@ -24,6 +26,7 @@ import type {
   HomeLearningJourneyViewModel,
   HomePageViewModel,
   HomeSiteViewModel,
+  HomeWebsiteSectionBookViewModel,
 } from '../models/HomePageViewModel'
 import { BookPriceTypeEnum, BookTypeEnum } from '../models/HomePageViewModel'
 import { homeBlogsMock } from '../mocks/homeBlogs.mock'
@@ -444,11 +447,13 @@ const mapBook = (value: unknown): HomeBookViewModel | null => {
       return {
         id: stepId,
         title: stepTitle,
+        subtitle: toNullableString(step.subtitle),
         description: toNullableString(step.description),
+        image: toSafeUrl(step.image),
         order: toNullableNumber(step.order) ?? index + 1,
       }
     })
-    .filter((step): step is NonNullable<typeof step> => step !== null)
+    .filter((step): step is HomeBookStepViewModel => step !== null)
     .sort((first, second) => first.order - second.order)
 
   return {
@@ -491,6 +496,23 @@ export const mapBookDetails = (value: unknown): HomeBookDetailsViewModel | null 
 
   return {
     ...book,
+    attachments: toArray(value.attachments)
+      .map((attachment) => {
+        if (!isRecord(attachment)) return null
+
+        const id = toNullableNumber(attachment.id)
+        const file = toSafeUrl(attachment.file)
+        if (id === null || !file) return null
+
+        return {
+          id,
+          file,
+          type: toNullableNumber(attachment.type),
+        }
+      })
+      .filter((attachment): attachment is NonNullable<typeof attachment> => attachment !== null),
+    startDate: toNullableString(value.start_date),
+    endDate: toNullableString(value.end_date),
     images: mapUrlList(value.images),
     certificatesCount: toArray(value.certificates).length,
     videoLinks: mapUrlList(value.video_link),
@@ -510,6 +532,67 @@ export const mapBookDetails = (value: unknown): HomeBookDetailsViewModel | null 
     hasFreePreview: toNullableNumber(value.has_free) === 1,
     isFreeFlipbook: toNullableNumber(value.is_free_flipbook) === 1,
     freeBookUrl: toSafeUrl(value.free_book_url),
+  }
+}
+
+const mapWebsiteSectionBook = (value: unknown): HomeWebsiteSectionBookViewModel | null => {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const id = toNullableNumber(value.id)
+  const title = toNullableString(value.title)
+  if (id === null || !title) {
+    return null
+  }
+
+  const steps = toArray(value.steps)
+    .map((step, index) => {
+      if (!isRecord(step)) return null
+
+      const stepId = toNullableNumber(step.id)
+      const stepTitle = toNullableString(step.title)
+      if (stepId === null || !stepTitle) return null
+
+      return {
+        id: stepId,
+        title: stepTitle,
+        subtitle: toNullableString(step.subtitle),
+        description: toNullableString(step.description),
+        image: toSafeUrl(step.image),
+        order: toNullableNumber(step.order) ?? index + 1,
+      }
+    })
+    .filter((step): step is HomeBookStepViewModel => step !== null)
+    .sort((first, second) => first.order - second.order)
+
+  return {
+    id,
+    forHome: toNullableBoolean(value.for_home)
+      ?? toNullableNumber(value.for_home) === 1,
+    title,
+    subtitle: toNullableString(value.subtitle),
+    description: toNullableString(value.description),
+    image: toSafeUrl(value.image),
+    steps,
+  }
+}
+
+export const mapBookDetailsResource = (
+  value: unknown,
+): HomeBookDetailsResourceViewModel | null => {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const book = mapBookDetails(value.book)
+  if (!book) {
+    return null
+  }
+
+  return {
+    book,
+    websiteSectionBook: mapWebsiteSectionBook(value.website_section_book),
   }
 }
 

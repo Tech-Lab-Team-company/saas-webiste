@@ -22,7 +22,7 @@ export default defineNuxtConfig({
         preset: Aura,
           options: {
             prefix: 'p',
-            darkModeSelector: false,
+            darkModeSelector: '[data-theme="dark"]',
             cssLayer: false
         }
       }
@@ -56,6 +56,7 @@ export default defineNuxtConfig({
   css: [
     'primeicons/primeicons.css',
     "@/assets/style/main.min.css",
+    "@/assets/css/app-theme.css",
     '@twicpics/components/style.css',
     'swiper/swiper-bundle.css'
   ],
@@ -66,6 +67,4 @@ export default defineNuxtConfig({
   }
 
 })
-
-
 
