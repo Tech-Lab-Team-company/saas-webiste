@@ -70,9 +70,9 @@ const activetab = ref(1)
 
 const emit = defineEmits(['coursechanged']);
 
-const sendactivetab = (activetabvalue: number, link: string, title: string, description: string) => {
+const sendactivetab = (activetabvalue: number, sessionId: number, link: string, title: string, description: string) => {
   activetab.value = activetabvalue;
-  emit('coursechanged', { activetabvalue: activetabvalue, link: link, title: title, description: description });
+  emit('coursechanged', { activetabvalue, sessionId, link, title, description });
 }
 const toast = useToast();
 
@@ -82,7 +82,7 @@ const isdisabled = ref(false)
 
 const selectedSessionIndex = ref<number | null>(null);
 
-function handleSessionClick(index: number, link: string, title: string, text: string, show: boolean, sessionPaid: boolean) {
+function handleSessionClick(index: number, sessionId: number, link: string, title: string, text: string, show: boolean, sessionPaid: boolean) {
   if (!userStore.user) {
     toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
     // return;
@@ -97,7 +97,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       if (!sessionPaid && !props.isSubscribed) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+        sendactivetab(0, sessionId, link, title, text);
         visible.value = false;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -111,7 +111,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       else if ((props.isSubscribed && props.isPaied)) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+        sendactivetab(0, sessionId, link, title, text);
         visible.value = false;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -119,7 +119,7 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       else if ((!props.isPaied)) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+        sendactivetab(0, sessionId, link, title, text);
         visible.value = false;
       }
     }
@@ -169,7 +169,7 @@ const handelExam = (isFinished: boolean) => {
       <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
         <div class="course-body-details" :key="thirdindex"
           :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
-          @click="handleSessionClick(thirdindex, session?.link, session?.title, session?.text, session?.web_show_video, session?.is_paid)">
+          @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, session?.web_show_video, session?.is_paid)">
 
           <component :is="getIconByType(session?.type)" />
           <div class="session-name session-name2">

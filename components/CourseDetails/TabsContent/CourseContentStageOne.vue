@@ -71,9 +71,9 @@ const activetab = ref(1)
 
 const emit = defineEmits(['coursechanged']);
 
-const sendactivetab = (activetabvalue: number, link: string, title: string, description: string) => {
+const sendactivetab = (activetabvalue: number, sessionId: number, link: string, title: string, description: string) => {
   activetab.value = activetabvalue;
-  emit('coursechanged', { activetabvalue: activetabvalue, link: link, title: title, description: description });
+  emit('coursechanged', { activetabvalue, sessionId, link, title, description });
 }
 
 const userStore = useUserStore()
@@ -83,7 +83,7 @@ const selectedSessionIndex = ref<number | null>(null);
 const toast = useToast();
 const isdisabled = ref(false)
 
-function handleSessionClick(index: number, link: string, title: string, text: string, show: boolean) {
+function handleSessionClick(index: number, sessionId: number, link: string, title: string, text: string, show: boolean) {
   if (!userStore.user) {
     toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
     // return;
@@ -102,14 +102,14 @@ function handleSessionClick(index: number, link: string, title: string, text: st
       else if (props.isSubscribed && props.isPaied) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+        sendactivetab(0, sessionId, link, title, text);
         visible.value = false;
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       else if ((!props.isPaied)) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, link, title, text);
+        sendactivetab(0, sessionId, link, title, text);
         visible.value = false;
       }
     }
@@ -136,7 +136,7 @@ const GotoExam = (examId:number , StartTime:string , EndTime:string , CourseId:n
 
     <div class="course-body-details"
       :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
-      @click="handleSessionClick(Number(index), session?.link, session?.title, session?.text, session?.web_show_video)">
+      @click="handleSessionClick(Number(index), session?.id, session?.link, session?.title, session?.text, session?.web_show_video)">
       <component :is="getIconByType(session?.type)" />
       <div class="session-name">
         <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>

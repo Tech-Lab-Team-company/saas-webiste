@@ -186,6 +186,8 @@ onBeforeUnmount(() => {
   align-items: center;
 }
 
+
+
 .home-v2-header__actions--student {
   gap: 10px;
 }
@@ -260,6 +262,7 @@ onBeforeUnmount(() => {
   min-height: 86px;
   gap: clamp(16px, 2vw, 30px);
   transition: min-height 0.25s ease;
+  justify-content: space-between;
 }
 
 .home-v2-header--scrolled .home-v2-header__content {

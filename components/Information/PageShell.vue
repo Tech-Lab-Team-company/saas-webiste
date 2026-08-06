@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 
 defineProps<{
@@ -33,8 +31,6 @@ const navigation = [
       '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="site" />
-
     <main class="information-page__main">
       <header class="information-page__hero">
         <div class="container information-page__hero-content">
@@ -71,7 +67,6 @@ const navigation = [
       </section>
     </main>
 
-    <HomeFooterSection :site="site" />
   </div>
 </template>
 

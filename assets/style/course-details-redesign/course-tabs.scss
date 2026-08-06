@@ -5,6 +5,8 @@
   --course-muted: #6f7c75;
   --course-border: #dfe6e1;
   --course-paper: #fbfcfa;
+  --course-surface: #fff;
+  --course-surface-raised: #f4f7f5;
   --course-heading: "Cairo", sans-serif;
   --course-body: "Tajawal", sans-serif;
   min-width: 0;
@@ -13,6 +15,19 @@
   background: var(--course-paper);
   color: var(--course-ink);
   font-family: var(--course-body);
+}
+
+:global(html[data-theme="dark"]) .course-details-page {
+  --course-accent: var(--app-accent);
+  --course-accent-soft: color-mix(in srgb, var(--course-accent) 13%, var(--course-surface-raised));
+  --course-ink: var(--app-text);
+  --course-muted: var(--app-muted);
+  --course-border: var(--app-line);
+  --course-paper: color-mix(in srgb, var(--app-brand-primary) 3%, #05070b);
+  --course-surface: color-mix(in srgb, var(--app-brand-primary) 8%, #10141d);
+  --course-surface-raised: color-mix(in srgb, var(--app-brand-primary) 11%, #171c27);
+  color-scheme: dark;
+  background: var(--course-paper);
 }
 
 :global(body:has(.course-details-page) .banner) {
@@ -36,6 +51,27 @@
   padding: 0;
   border: 0;
   background: transparent;
+}
+
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-tabs {
+  order: 0;
+}
+
+.curriculum-section {
+  order: 1;
+}
+
+.course-overview {
+  order: 2;
+}
+
+.teacher-section {
+  order: 3;
 }
 
 .detail-tabs {
@@ -71,17 +107,17 @@
 .detail-tabs a:hover,
 .detail-tabs a:focus-visible,
 .detail-tabs a.active-tab,
-.detail-tabs .nav-overview {
+.detail-tabs .nav-curriculum {
   color: var(--course-accent);
   outline: none;
 }
 
-.course-details-page:has(#course-curriculum:target) .nav-overview,
-.course-details-page:has(#course-teacher:target) .nav-overview {
+.course-details-page:has(#course-overview:target) .nav-curriculum,
+.course-details-page:has(#course-teacher:target) .nav-curriculum {
   color: var(--course-muted);
 }
 
-.course-details-page:has(#course-curriculum:target) .nav-curriculum,
+.course-details-page:has(#course-overview:target) .nav-overview,
 .course-details-page:has(#course-teacher:target) .nav-teacher {
   color: var(--course-accent);
 }
@@ -139,7 +175,7 @@
   overflow: hidden;
   border: 1px solid var(--course-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--course-surface);
 }
 
 .detail-numbers > div {
@@ -268,7 +304,65 @@
   margin: 28px 0 36px;
   overflow: hidden;
   border-bottom: 1px solid var(--course-border);
-  background: #fff;
+  background: var(--course-surface);
+}
+
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-content-panel),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-content-header),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-content-body),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-class-header),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-class-body),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-body-details),
+:global(html[data-theme="dark"]) .course-details-page :deep(.panels),
+:global(html[data-theme="dark"]) .course-details-page :deep(.panel-header),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-live-container),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-url-container),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-exam-container),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-video-text),
+:global(html[data-theme="dark"]) .course-details-page :deep(.notes-input) {
+  border-color: var(--course-border) !important;
+  background: var(--course-surface) !important;
+  color: var(--course-ink) !important;
+}
+
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-content-header),
+:global(html[data-theme="dark"]) .course-details-page :deep(.accordion-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-class-header),
+:global(html[data-theme="dark"]) .course-details-page :deep(.homework-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.homework-content-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.homework-upload-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.live-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.url-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.exam-title),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-video-text-title) {
+  color: var(--course-ink) !important;
+}
+
+:global(html[data-theme="dark"]) .course-details-page :deep(.accordion-count),
+:global(html[data-theme="dark"]) .course-details-page :deep(.session-name p),
+:global(html[data-theme="dark"]) .course-details-page :deep(.homework-content),
+:global(html[data-theme="dark"]) .course-details-page :deep(.homework-content-subtitle),
+:global(html[data-theme="dark"]) .course-details-page :deep(.live-date),
+:global(html[data-theme="dark"]) .course-details-page :deep(.url-description),
+:global(html[data-theme="dark"]) .course-details-page :deep(.exam-date),
+:global(html[data-theme="dark"]) .course-details-page :deep(.degree),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-video-text-description) {
+  color: var(--course-muted) !important;
+}
+
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-class-container),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-body-details),
+:global(html[data-theme="dark"]) .course-details-page :deep(.p-accordioncontent-content),
+:global(html[data-theme="dark"]) .course-details-page :deep(.homework-content-subtitle),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-video-text) {
+  border-color: var(--course-border) !important;
+}
+
+:global(html[data-theme="dark"]) .course-details-page :deep(.chapter-index),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-body-details:hover),
+:global(html[data-theme="dark"]) .course-details-page :deep(.course-body-details.active) {
+  background: color-mix(in srgb, var(--course-accent) 12%, var(--course-surface-raised)) !important;
+  color: var(--course-accent) !important;
 }
 
 .is-viewing-course-content :deep(.course-hero-shell),

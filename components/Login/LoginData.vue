@@ -4,8 +4,10 @@ import LoginController from '~/features/LoginFeature/presentation/controllers/lo
 import countries from "~/data/countries.json";
 import FetchPaymentMethodsParams from '~/features/fetch_payment_methods/Core/Params/fetch_payment_methods_params';
 import FetchPaymentMethodController from '~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller';
+import { rememberAuthRedirect, sanitizeAuthRedirect } from '~/utils/authRedirect';
 
 const router = useRouter();
+const route = useRoute();
 definePageMeta({
     layout: 'login'
 });
@@ -13,6 +15,15 @@ const UserSettingStore = useSettingStore();
 const Credential = ref('');
 const LoginPassword = ref('');
 const selectedCountry = ref(UserSettingStore?.setting?.country_code);
+const redirectPath = computed(() => sanitizeAuthRedirect(route.query.redirect));
+const registerTarget = computed(() => ({
+    path: '/Auth/register',
+    ...(redirectPath.value ? { query: { redirect: redirectPath.value } } : {}),
+}));
+
+onMounted(() => {
+    rememberAuthRedirect(route.query.redirect);
+});
 
 
 
@@ -30,6 +41,7 @@ const FetchPaymentMethod = async () => {
 };
 
 const LoginData = async () => {
+    rememberAuthRedirect(route.query.redirect);
     window.localStorage.clear();
     const loginParams = new LoginParams(Credential.value, LoginPassword.value);
     const loginController = LoginController.getInstance();
@@ -148,6 +160,15 @@ const handleKeyPress = (event: KeyboardEvent) => {
                         <span>{{ $t('دخول مساحة الطالب') }}</span>
                         <span aria-hidden="true">←</span>
                     </button>
+
+                    <nuxt-link class="login-home-guest" to="/home-v2">
+                        <span class="pi pi-globe" aria-hidden="true" />
+                        <span>
+                            <strong>{{ $t('المتابعة كزائر') }}</strong>
+                            <small>{{ $t('استكشف الموقع بدون تسجيل الدخول') }}</small>
+                        </span>
+                        <span class="pi pi-arrow-left" aria-hidden="true" />
+                    </nuxt-link>
                 </div>
 
                 <div class="login-home-benefits-title">
@@ -180,7 +201,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
 
                 <p class="login-home-register">
                     {{ $t('ليس لديك حساب؟') }}
-                    <nuxt-link to="/Auth/register">{{ $t('إنشاء حساب') }}</nuxt-link>
+                    <nuxt-link :to="registerTarget">{{ $t('إنشاء حساب') }}</nuxt-link>
                 </p>
             </div>
         </section>

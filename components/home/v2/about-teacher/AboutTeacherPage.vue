@@ -2,8 +2,6 @@
 import { gsap } from "gsap";
 import { storeToRefs } from "pinia";
 import "./about-teacher.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
@@ -302,6 +300,7 @@ const animateSectionHeading = (
 
 const animateMethod = (section: HTMLElement) => {
   const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+  const grid = section.querySelector<HTMLElement>(".about-teacher-principles");
   const cards = Array.from(
     section.querySelectorAll<HTMLElement>(".about-teacher-principles article"),
   );
@@ -309,34 +308,68 @@ const animateMethod = (section: HTMLElement) => {
   animateSectionHeading(section, timeline);
 
   if (cards.length) {
+    if (grid) {
+      gsap.set(grid, { perspective: 900 });
+    }
+
+    const cardNumbers = cards
+      .map((card) => card.querySelector<HTMLElement>(":scope > span"))
+      .filter((target): target is HTMLElement => Boolean(target));
+    const cardContent = cards.flatMap((card) =>
+      Array.from(card.querySelectorAll<HTMLElement>("h3, p")),
+    );
+
     timeline
       .fromTo(
         cards,
-        { autoAlpha: 0, y: 38, scale: 0.975 },
+        {
+          autoAlpha: 0,
+          x: (index) => (index % 2 === 0 ? 42 : -42),
+          y: 56,
+          scale: 0.92,
+          rotation: (index) => (index % 2 === 0 ? 3.5 : -3.5),
+          rotationX: -8,
+          transformOrigin: "50% 100%",
+        },
         {
           autoAlpha: 1,
+          x: 0,
           y: 0,
           scale: 1,
-          duration: 0.86,
-          stagger: cappedStagger(cards.length),
+          rotation: 0,
+          rotationX: 0,
+          duration: 0.95,
+          stagger: cappedStagger(cards.length, 0.14, 0.7),
+          ease: "back.out(1.2)",
           clearProps: "opacity,visibility,transform",
         },
-        0.46,
+        0.4,
       )
       .fromTo(
-        cards
-          .map((card) => card.querySelector(":scope > span"))
-          .filter((target): target is Element => Boolean(target)),
-        { autoAlpha: 0, scale: 0.72, rotate: -6 },
+        cardNumbers,
+        { autoAlpha: 0, scale: 0.55, rotate: -24 },
         {
           autoAlpha: 1,
           scale: 1,
           rotate: 0,
-          duration: 0.62,
-          stagger: cappedStagger(cards.length, 0.1, 0.48),
+          duration: 0.68,
+          stagger: cappedStagger(cards.length, 0.12, 0.58),
+          ease: "back.out(2)",
           clearProps: "opacity,visibility,transform",
         },
-        0.68,
+        0.66,
+      )
+      .fromTo(
+        cardContent,
+        { autoAlpha: 0, y: 20 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.62,
+          stagger: cappedStagger(cardContent.length, 0.055, 0.64),
+          clearProps: "opacity,visibility,transform",
+        },
+        0.76,
       );
   }
 };
@@ -624,8 +657,6 @@ onBeforeUnmount(() => {
       '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="site" />
-
     <main class="about-teacher-main">
       <AboutTeacherHeroSection
         :hero="aboutHero"
@@ -644,6 +675,5 @@ onBeforeUnmount(() => {
       <AboutTeacherCtaSection />
     </main>
 
-    <HomeFooterSection :site="site" />
   </div>
 </template>

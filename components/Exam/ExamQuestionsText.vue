@@ -10,10 +10,8 @@ import type QuestionsModel from "~/features/FetchExams/Data/models/questions_mod
 const SelectedAnswer = ref<string[]>([]);
 const CorrectAnswers = ref<(boolean | null)[]>([]);
 const QuestionIndex = ref(0);
-const Answer = ref();
-
 const props = defineProps({
-  QuestionDetails: {
+  questionDetailsData: {
     type: Object as () => ExamDetailsModel | null,
     default: null,
   },
@@ -23,10 +21,10 @@ const props = defineProps({
 });
 const RemainingTimeMinutes = ref<Number>(props.remainingTimeMinutes ?? 0);
 
-const questionDetails = ref(props.QuestionDetails);
+const questionDetails = ref(props.questionDetailsData);
 
 watch(
-  () => props.QuestionDetails,
+  () => props.questionDetailsData,
   (newValue) => {
     questionDetails.value = newValue;
     // GetExamShuffleStatus();
@@ -48,9 +46,6 @@ const checkIsCorrectAnswer = (answerId: number, question: QuestionsModel) => {
   // const question = [...questionDetails.value?.questions[QuestionIndex.value]];
 
   // console.log(question, "question");
-  console.log(answerId, "id");
-  console.log(question, "question");
-
   return question?.answers?.find((answer) => answer.id === answerId)?.correct;
 };
 
@@ -195,12 +190,21 @@ const selectAnswer = (answerId: number) => {
   // Clear correctness state if user changes answer
   CorrectAnswers.value[QuestionIndex.value] = null;
 };
+
+const answerLabels = ["أ", "ب", "ج", "د", "هـ", "و", "ز", "ح"];
+const answerLabel = (index: number) => answerLabels[index] || `${index + 1}`;
 </script>
 
 <template>
-  <div class="question-container" v-if="QuestionDetails">
+  <div
+    v-if="questionDetails?.questions?.length"
+    class="question-container"
+  >
     <div class="question-title">
-      <p class="question-number">{{ `السؤال ${QuestionIndex + 1}` }}</p>
+      <div class="question-number">
+        <span>{{ `السؤال ${QuestionIndex + 1}` }}</span>
+        <small>من {{ questionDetails.questions.length }}</small>
+      </div>
 
       <img
         v-if="questionDetails?.questions[QuestionIndex].image"
@@ -259,8 +263,14 @@ const selectAnswer = (answerId: number) => {
                     : 'danger'
                   : '',
               ]"
-              v-html="answer?.answer"
-            ></label>
+            >
+              <span class="answer-choice__marker">{{ answerLabel(index) }}</span>
+              <span
+                class="answer-choice__content"
+                dir="auto"
+                v-html="answer?.answer"
+              ></span>
+            </label>
 
             <input
               class="answer"
@@ -297,8 +307,19 @@ const selectAnswer = (answerId: number) => {
                     : 'danger'
                   : '',
               ]"
-              v-html="answer?.answer"
-            ></label>
+            >
+              <span class="answer-choice__marker">{{ answerLabel(index) }}</span>
+              <span
+                class="answer-choice__content"
+                dir="auto"
+                v-html="answer?.answer"
+              ></span>
+              <i
+                v-if="SelectedAnswer[QuestionIndex] == `${answer.id}`"
+                class="pi pi-check answer-choice__check"
+                aria-hidden="true"
+              ></i>
+            </label>
             <input
               class="answer"
               :checked="selected[QuestionIndex] === answer.id"
@@ -316,6 +337,7 @@ const selectAnswer = (answerId: number) => {
     <div class="btns">
       <!-- Previous Button (Only for shuffle/edit exams) -->
       <button
+        type="button"
         v-if="canNavigateBack && QuestionIndex > 0"
         @click="DeacreseIndes"
       >
@@ -325,6 +347,7 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Next Button (No Submit - for shuffle/edit exams) -->
       <button
+        type="button"
         v-if="
           canNavigateBack &&
           QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
@@ -337,6 +360,7 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Submit Answer Button (Manual submit - for shuffle/edit exams) -->
       <button
+        type="button"
         v-if="
           canNavigateBack &&
           QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
@@ -349,6 +373,7 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Next Button (With Submit - for standard exams) -->
       <button
+        type="button"
         v-if="
           !canNavigateBack &&
           QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
@@ -362,9 +387,10 @@ const selectAnswer = (answerId: number) => {
 
       <!-- Final Submit Button (For all exam types at the end) -->
       <button
+        type="button"
         v-if="QuestionIndex === (questionDetails?.questions?.length ?? 0) - 1"
         :class="
-          !canNavigateBack || QuestionDetails?.questions?.length < 2
+          !canNavigateBack || questionDetails?.questions?.length < 2
             ? 'w-50'
             : ''
         "
@@ -373,6 +399,11 @@ const selectAnswer = (answerId: number) => {
         {{ $t("ارسال الاجابة و انهاء الامتحان") }}
       </button>
     </div>
+  </div>
+
+  <div v-else class="no-content question-container">
+    <i class="pi pi-list-check" aria-hidden="true"></i>
+    <p>لا توجد أسئلة متاحة في هذا الامتحان.</p>
   </div>
 </template>
 
@@ -531,6 +562,27 @@ img {
   }
 }
 
+.no-content.question-container {
+  min-height: 260px;
+  height: auto;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+
+  i {
+    color: var(--home-v2-blue, var(--primary-color, #28366c));
+    font-size: 38px;
+  }
+
+  p {
+    width: auto;
+    margin: 0;
+    color: var(--home-v2-muted, var(--app-muted, #65738a));
+  }
+}
+
 .finish-btn {
   display: flex;
   justify-content: center;
@@ -556,5 +608,351 @@ img {
 .danger {
   background-color: #dc354588 !important;
   border: 2px solid #dc3545 !important;
+}
+
+/* Modern exam card overrides */
+.question-container {
+  padding: clamp(20px, 4vw, 38px);
+  color: var(--home-v2-ink, var(--app-text, #081b3a));
+  border: 1px solid var(--home-v2-line, var(--app-line, #e2e7ef));
+  border-radius: 24px;
+  background: var(--home-v2-surface, var(--app-surface, #fff));
+  box-shadow: 0 20px 60px rgb(8 27 58 / 8%);
+}
+
+.question-title {
+  align-items: stretch !important;
+  gap: 0 !important;
+  margin-bottom: 28px;
+
+  > img {
+    display: block;
+    width: min(100%, 640px);
+    max-height: 380px;
+    margin: 20px auto;
+    object-fit: contain;
+    border: 1px solid var(--home-v2-line, var(--app-line, #e2e7ef));
+    border-radius: 18px;
+  }
+}
+
+.question-container .question-title .question-number {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  width: auto;
+  min-height: 34px;
+  margin: 0 0 18px;
+  padding: 7px 12px;
+  color: var(--home-v2-blue, var(--primary-color, #28366c));
+  border-radius: 999px;
+  background-image: none;
+  background: color-mix(in srgb, var(--home-v2-blue, #28366c) 11%, transparent);
+  font-size: 14px;
+  font-weight: 800;
+
+  small {
+    padding-inline-start: 8px;
+    color: var(--home-v2-muted, var(--app-muted, #65738a));
+    border-inline-start: 1px solid var(--home-v2-line, var(--app-line, #dfe5ee));
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+.question-container .question-title .question-text {
+  width: min(100%, 920px);
+  margin: 0;
+  color: var(--home-v2-ink, var(--app-text, #081b3a));
+  font-size: clamp(19px, 2.4vw, 25px);
+  font-weight: 750;
+  line-height: 1.85;
+  text-align: start;
+  overflow-wrap: anywhere;
+
+  :deep(p) {
+    margin: 0;
+  }
+}
+
+.question-container .questions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  justify-content: stretch;
+  width: min(100%, 920px);
+  margin: 26px auto 0;
+  gap: 14px;
+}
+
+.question-container .questions .question {
+  display: block;
+  width: 100%;
+}
+
+.question-container .questions .question .answer-text {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: start;
+
+  label {
+    position: relative;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 24px;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    min-height: 76px;
+    padding: 13px 14px;
+    color: var(--home-v2-ink, var(--app-text, #081b3a));
+    border: 1px solid var(--home-v2-line, var(--app-line, #dfe5ee));
+    border-radius: 17px;
+    background: var(--home-v2-surface, var(--app-surface, #fff));
+    cursor: pointer;
+    transition: border-color 180ms ease, background-color 180ms ease,
+      transform 180ms ease, box-shadow 180ms ease;
+
+    &:hover {
+      border-color: color-mix(in srgb, var(--home-v2-blue, #28366c) 42%, transparent);
+      background: color-mix(in srgb, var(--home-v2-blue, #28366c) 4%, var(--home-v2-surface, #fff));
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgb(8 27 58 / 8%);
+    }
+
+    &.selected {
+      border: 2px solid var(--home-v2-blue, var(--primary-color, #28366c));
+      background: color-mix(
+        in srgb,
+        var(--home-v2-blue, #28366c) 9%,
+        var(--home-v2-surface, #fff)
+      );
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--home-v2-blue, #28366c) 12%, transparent);
+
+      .answer-choice__marker {
+        color: #fff;
+        border-color: var(--home-v2-blue, var(--primary-color, #28366c));
+        background: var(--home-v2-blue, var(--primary-color, #28366c));
+      }
+    }
+
+    :deep(p) {
+      margin: 0;
+    }
+  }
+
+  .answer {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.answer-choice__marker {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: var(--home-v2-blue, var(--primary-color, #28366c));
+  border: 1px solid color-mix(in srgb, var(--home-v2-blue, #28366c) 24%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--home-v2-blue, #28366c) 8%, transparent);
+  font-size: 16px;
+  font-weight: 850;
+  transition: inherit;
+}
+
+.answer-choice__content {
+  min-width: 0;
+  color: inherit;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+
+  :deep(p) {
+    margin: 0;
+  }
+}
+
+.answer-choice__check {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: #fff;
+  border-radius: 50%;
+  background: var(--home-v2-blue, var(--primary-color, #28366c));
+  font-size: 11px;
+}
+
+.questions-img {
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.questions-img .question-img .question-img {
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--home-v2-line, var(--app-line, #e2e7ef));
+  border-radius: 18px;
+  background: var(--home-v2-paper, var(--app-bg-muted, #f7f9fc));
+
+  img {
+    width: min(100%, 360px);
+    height: auto;
+    max-height: 260px;
+    margin-inline: auto;
+    object-fit: contain;
+    border-radius: 13px;
+  }
+
+  label {
+    width: 100%;
+    margin: 0;
+    color: var(--home-v2-ink, var(--app-text, #081b3a));
+    border-color: var(--home-v2-line, var(--app-line, #e2e7ef));
+    background: var(--home-v2-surface, var(--app-surface, #fff));
+  }
+}
+
+label.success,
+.success {
+  color: #16733b !important;
+  border-color: #28a745 !important;
+  background: color-mix(in srgb, #28a745 14%, var(--home-v2-surface, #fff)) !important;
+}
+
+label.success .answer-choice__marker {
+  color: #fff;
+  border-color: #28a745;
+  background: #28a745;
+}
+
+label.danger,
+.danger {
+  color: #b22f3b !important;
+  border-color: #dc3545 !important;
+  background: color-mix(in srgb, #dc3545 13%, var(--home-v2-surface, #fff)) !important;
+}
+
+label.danger .answer-choice__marker {
+  color: #fff;
+  border-color: #dc3545;
+  background: #dc3545;
+}
+
+.question-container .btns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid var(--home-v2-line, var(--app-line, #e2e7ef));
+
+  button {
+    justify-content: center;
+    min-width: 148px;
+    width: auto;
+    min-height: 48px;
+    margin-top: 0;
+    padding: 11px 20px;
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 13px;
+    background: var(--home-v2-blue, var(--primary-color, #28366c));
+    cursor: pointer;
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--home-v2-blue, #28366c) 18%, transparent);
+
+    :deep(svg path) {
+      stroke: currentColor;
+    }
+
+    &:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--home-v2-blue, #28366c) 30%, transparent);
+      outline-offset: 3px;
+    }
+
+    &:last-child {
+      background: #df6249;
+      box-shadow: 0 10px 24px rgb(223 98 73 / 20%);
+    }
+
+    &.btn-submit {
+      color: var(--home-v2-blue, var(--primary-color, #28366c));
+      border-color: color-mix(in srgb, var(--home-v2-blue, #28366c) 28%, transparent);
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+}
+
+.w-full,
+.w-50 {
+  width: auto !important;
+}
+
+@media (max-width: 620px) {
+  .question-container {
+    padding: 20px 15px;
+    border-radius: 18px;
+  }
+
+  .question-title {
+    margin-bottom: 22px;
+  }
+
+  .question-container .questions {
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+  }
+
+  .question-container .questions .question .answer-text label {
+    grid-template-columns: 38px minmax(0, 1fr) 22px;
+    gap: 10px;
+    min-height: 66px;
+    padding: 10px;
+  }
+
+  .answer-choice__marker {
+    width: 38px;
+    height: 38px;
+  }
+
+  .answer-choice__content {
+    font-size: 15px;
+  }
+
+  .question-container .btns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    button {
+      min-width: 0;
+      width: 100% !important;
+      padding-inline: 10px;
+      font-size: 13px;
+    }
+
+    button:only-child,
+    .w-full,
+    .w-50,
+    .btn-submit:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .questions .question .answer-text label,
+  .btns button {
+    transition: none;
+  }
 }
 </style>

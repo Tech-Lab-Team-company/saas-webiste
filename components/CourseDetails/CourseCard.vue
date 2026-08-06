@@ -63,6 +63,10 @@ const JoinCourse = async () => {
       detail: "يجب تسجيل الدخول",
       life: 3000,
     });
+    await router.push({
+      path: "/login",
+      query: { redirect: router.currentRoute.value.fullPath },
+    });
   }
   if (Status.value) {
     emit("Changestatus");

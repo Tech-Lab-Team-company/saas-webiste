@@ -222,6 +222,9 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 20px;
   margin-top: 24px;
+  @media (max-width: 760px) {
+    justify-content: centerrefact ;
+  }
 }
 
 .home-v2-app__actions a {

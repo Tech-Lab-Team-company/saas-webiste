@@ -291,6 +291,90 @@
   transform: translateY(-1px);
 }
 
+.login-home-guest {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 58px;
+  margin-top: 11px;
+  padding: 10px 15px;
+  border: 1px solid #d3ddeb;
+  background: #fff;
+  color: var(--primary-color, #28366c);
+  text-decoration: none;
+  transition: border-color 180ms ease, background-color 180ms ease,
+    box-shadow 180ms ease, transform 180ms ease;
+}
+
+.login-home-guest > .pi-globe {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 9px;
+  background: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 10%,
+    #fff
+  );
+  color: var(--secondary-color, #3a3e7e);
+  font-size: 14px;
+}
+
+.login-home-guest > span:nth-child(2) {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.login-home-guest strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.login-home-guest small {
+  color: #8190a6;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.login-home-guest > .pi-arrow-left {
+  color: #9aa8bb;
+  font-size: 12px;
+  transition: transform 180ms ease;
+}
+
+.login-home-guest:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 46%,
+    #d3ddeb
+  );
+  background: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 4%,
+    #fff
+  );
+  box-shadow: 0 10px 24px rgb(22 43 78 / 8%);
+  transform: translateY(-1px);
+}
+
+.login-home-guest:hover > .pi-arrow-left {
+  transform: translateX(-3px);
+}
+
+.login-home-guest:focus-visible {
+  outline: 3px solid color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 25%,
+    transparent
+  );
+  outline-offset: 3px;
+}
+
 .login-home-benefits-title {
   margin-block: 28px 20px;
   color: #8b97aa;
@@ -356,6 +440,16 @@
 }
 
 .login-home-visual {
+  --login-visual-accent: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 22%,
+    #fff
+  );
+  --login-visual-accent-soft: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 12%,
+    #fff
+  );
   grid-area: visual;
   direction: rtl;
   position: sticky;
@@ -367,7 +461,25 @@
   overflow: hidden;
   padding: 48px clamp(40px, 6vw, 112px);
   background:
-    linear-gradient(145deg, var(--primary-color, #28366c), color-mix(in srgb, var(--primary-color, #28366c) 72%, var(--secondary-color, #3a3e7e)));
+    radial-gradient(
+      circle at 78% 36%,
+      rgba(255, 255, 255, 0.09),
+      transparent 25rem
+    ),
+    radial-gradient(
+      circle at 8% 94%,
+      color-mix(in srgb, var(--login-visual-accent) 12%, transparent),
+      transparent 24rem
+    ),
+    linear-gradient(
+      145deg,
+      var(--primary-color, #28366c),
+      color-mix(
+        in srgb,
+        var(--primary-color, #28366c) 76%,
+        var(--secondary-color, #3a3e7e)
+      )
+    );
   color: #fff;
 }
 
@@ -410,7 +522,7 @@
 .login-home-brand small {
   display: -webkit-box;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 10px;
   line-height: 1.6;
   -webkit-box-orient: vertical;
@@ -427,7 +539,7 @@
 .login-home-visual-copy > span {
   display: block;
   margin-bottom: 28px;
-  color: var(--secondary-color, #3a3e7e);
+  color: var(--login-visual-accent-soft);
   font-size: 14px;
   font-weight: 900;
 }
@@ -444,14 +556,15 @@
 }
 
 .login-home-visual-copy h2 strong {
-  color: var(--secondary-color, #3a3e7e);
+  color: var(--login-visual-accent);
   font: inherit;
+  text-shadow: 0 12px 38px rgba(0, 0, 0, 0.16);
 }
 
 .login-home-visual-copy > p {
   width: min(100%, 520px);
   margin: 28px 0 0;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.76);
   font-size: 15px;
   line-height: 2;
 }
@@ -464,7 +577,7 @@
 }
 
 .login-home-stage-count strong {
-  color: var(--secondary-color, #3a3e7e);
+  color: var(--login-visual-accent);
   font-size: 34px;
   font-weight: 900;
   line-height: 1;
@@ -473,7 +586,7 @@
 .login-home-stage-count span {
   padding-inline-start: 16px;
   border-inline-start: 1px solid rgba(255, 255, 255, 0.18);
-  color: rgba(255, 255, 255, 0.54);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 11px;
   line-height: 1.7;
 }
@@ -485,7 +598,11 @@
   bottom: -270px;
   width: 470px;
   height: 470px;
-  border: 1px solid color-mix(in srgb, var(--secondary-color, #3a3e7e) 30%, transparent);
+  border: 1px solid color-mix(
+    in srgb,
+    var(--login-visual-accent) 30%,
+    transparent
+  );
   border-radius: 50%;
   pointer-events: none;
 }

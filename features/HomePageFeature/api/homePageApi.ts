@@ -119,6 +119,16 @@ export class HomePageApi {
     });
   }
 
+  async fetchStages(): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_stages, {});
+  }
+
+  async fetchStageYears(stageId: number): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_stage_years, {
+      stage_id: stageId,
+    });
+  }
+
   async fetchBooks(page = 1): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_books, {}, { page });
   }
@@ -141,8 +151,19 @@ export class HomePageApi {
     return this.post(ApiNames.Instance.fetch_home_website_section, { type: 1 });
   }
 
-  private async fetchBlogs(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_blogs, {});
+  async fetchBlogs(hashtagId?: number): Promise<unknown> {
+    return this.post(
+      ApiNames.Instance.fetch_blogs,
+      hashtagId ? { hashtag_id: hashtagId } : {},
+    );
+  }
+
+  async fetchBlog(slug: string): Promise<unknown> {
+    return this.post(ApiNames.Instance.show_blog, { slug });
+  }
+
+  async fetchHashtags(): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_hashtags, {});
   }
 
   private async fetchLearningJourney(): Promise<unknown> {
@@ -159,7 +180,7 @@ export class HomePageApi {
 
   private async post(
     url: string,
-    data: Record<string, number | null>,
+    data: Record<string, number | string | null>,
     queryParams?: Record<string, number>,
   ): Promise<unknown> {
     const response = await NetworkService.instance.post({

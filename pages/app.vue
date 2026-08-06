@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 
 definePageMeta({ layout: "home-v2" });
@@ -36,8 +34,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
       '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="site" />
-
     <main class="app-page__main">
       <div class="app-page__wrap">
         <header class="app-page__intro">
@@ -96,7 +92,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
       </div>
     </main>
 
-    <HomeFooterSection :site="site" />
   </div>
 </template>
 

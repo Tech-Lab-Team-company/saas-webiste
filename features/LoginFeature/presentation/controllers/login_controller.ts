@@ -9,6 +9,7 @@ import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import LoginParams from "~/features/LoginFeature/Core/Params/login_params";
+import { consumeAuthRedirect } from "~/utils/authRedirect";
 
 export default class LoginController extends ControllerInterface<UserModel> {
   private static instance: LoginController;
@@ -26,7 +27,6 @@ export default class LoginController extends ControllerInterface<UserModel> {
   async login(params: LoginParams, router: any) {
     // useLoaderStore().setLoadingWithDialog();
     try {
-      const router = useRouter();
       const dataState: DataState<UserModel> = await this.LoginUseCase.call(
         params,
       );
@@ -41,8 +41,10 @@ export default class LoginController extends ControllerInterface<UserModel> {
         const userStore = useUserStore();
         if (this.state.value.data) {
           await userStore.setUser(this.state.value.data);
-          console.log("login");
-          await router.push("/student-dashboard");
+          const redirect = consumeAuthRedirect(
+            router.currentRoute.value.query.redirect,
+          );
+          await router.replace(redirect || "/student-dashboard");
         }
       } else {
         throw new Error(this.state.value.error?.title);

@@ -20,6 +20,7 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 
+const selectedStageId = ref<number | null>(null);
 const selectedTabKey = ref<HomeCourseTabKey | null>(null);
 const coursesByTab = ref<
   Partial<Record<HomeCourseTabKey, HomeSectionState<HomeCourseViewModel[]>>>
@@ -84,6 +85,19 @@ const selectedTab = computed(
     null,
 );
 
+const selectedStage = computed(
+  () =>
+    props.courses.data.stages.find(
+      (stage) => stage.id === selectedStageId.value,
+    ) ?? null,
+);
+
+const availableYearTabs = computed(() =>
+  props.courses.data.tabs.filter(
+    (tab) => tab.stageId === selectedStageId.value,
+  ),
+);
+
 const selectedCourses = computed<HomeSectionState<
   HomeCourseViewModel[]
 > | null>(() => {
@@ -99,6 +113,28 @@ const visibleCourses = computed(() =>
     ? selectedCourses.value?.data ?? []
     : selectedCourses.value?.data.slice(0, MAX_PREVIEW_COURSES) ?? [],
 );
+
+const selectStage = async (stageId: number) => {
+  if (selectedStageId.value === stageId) return;
+
+  selectedStageId.value = stageId;
+  selectedTabKey.value = null;
+
+  if (props.catalog) {
+    const firstYear = props.courses.data.tabs.find(
+      (tab) => tab.stageId === stageId,
+    );
+
+    if (firstYear) {
+      await selectTab(firstYear.key);
+    } else {
+      const { year_id: _yearId, ...query } = route.query;
+      await router.replace({
+        query: { ...query, stage_id: String(stageId) },
+      });
+    }
+  }
+};
 
 const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
@@ -121,10 +157,19 @@ const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
     );
   }
 
+  selectedStageId.value = tab.stageId;
   selectedTabKey.value = tab.key;
-  if (props.catalog && String(route.query.year_id ?? "") !== String(tab.yearId)) {
+  if (
+    props.catalog &&
+    (String(route.query.stage_id ?? "") !== String(tab.stageId) ||
+      String(route.query.year_id ?? "") !== String(tab.yearId))
+  ) {
     await router.replace({
-      query: { ...route.query, year_id: String(tab.yearId) },
+      query: {
+        ...route.query,
+        stage_id: String(tab.stageId),
+        year_id: String(tab.yearId),
+      },
     });
   }
   loadingTabKey.value = tab.key;
@@ -145,11 +190,15 @@ const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
 };
 
 const selectCatalogYearFromRoute = () => {
-  if (!props.catalog || selectedTabKey.value || props.courses.data.tabs.length === 0) return;
+  if (!props.catalog || props.courses.data.tabs.length === 0) return;
 
   const requestedYearId = Number(route.query.year_id);
-  const tab = props.courses.data.tabs.find((item) => item.yearId === requestedYearId)
-    ?? props.courses.data.tabs[0];
+  const requestedStageId = Number(route.query.stage_id);
+  const tab = props.courses.data.tabs.find(
+    (item) => item.yearId === requestedYearId,
+  ) ?? props.courses.data.tabs.find(
+    (item) => item.stageId === requestedStageId,
+  ) ?? props.courses.data.tabs[0];
 
   if (tab) void selectTab(tab.key);
 };
@@ -157,11 +206,20 @@ const selectCatalogYearFromRoute = () => {
 onMounted(selectCatalogYearFromRoute);
 
 watch(
-  () => [route.query.year_id, props.courses.data.tabs.length],
+  () => [
+    route.query.stage_id,
+    route.query.year_id,
+    props.courses.data.tabs.map((tab) => tab.key).join(","),
+  ],
   () => {
     if (!props.catalog) return;
     const requestedYearId = Number(route.query.year_id);
-    const tab = props.courses.data.tabs.find((item) => item.yearId === requestedYearId);
+    const requestedStageId = Number(route.query.stage_id);
+    const tab = props.courses.data.tabs.find(
+      (item) => item.yearId === requestedYearId,
+    ) ?? props.courses.data.tabs.find(
+      (item) => item.stageId === requestedStageId,
+    );
     if (tab && tab.key !== selectedTabKey.value) void selectTab(tab.key);
     else if (!selectedTabKey.value) selectCatalogYearFromRoute();
   },
@@ -367,32 +425,80 @@ onBeforeUnmount(() => {
         <div>
           <span class="section-tag">اختار نقطة البداية</span>
           <h2 id="home-v2-courses-title">
-            ابدأ من صفك.<br />وكمل <em>بخطة واضحة.</em>
+            ابدأ من مرحلتك.<br />وكمل <em>بخطة واضحة.</em>
           </h2>
         </div>
         <p>
-          كل صف له منهجه وسرعته. اختار مرحلتك علشان تشوف كورساتها
-          ومراجعاتها فقط.
+          كل مرحلة لها سنواتها ومساراتها. اختار مرحلتك وسنتك علشان تشوف
+          الكورسات المناسبة ليك فقط.
         </p>
       </div>
 
       <div class="home-course-picker">
         <div>
           <span>خطوتك الأولى</span>
-          <h3 id="home-v2-stage-title">أنت في أنهي صف؟</h3>
+          <h3 id="home-v2-stage-title">اختار مرحلتك التعليمية</h3>
           <p id="home-v2-stage-help">
-            اختار صفك وهنعرض لك الكورسات المناسبة له فورًا.
+            المراحل هنا بتتغير تلقائيًا حسب إعدادات المنصة.
           </p>
         </div>
 
         <div
+          v-if="courses.data.taxonomyStatus === 'success'"
           class="home-course-audiences"
           role="group"
           aria-labelledby="home-v2-stage-title"
           aria-describedby="home-v2-stage-help"
         >
           <button
-            v-for="(tab, index) in courses.data.tabs"
+            v-for="(stage, index) in courses.data.stages"
+            :key="stage.id"
+            type="button"
+            :class="{ active: selectedStageId === stage.id }"
+            :aria-pressed="selectedStageId === stage.id"
+            aria-controls="home-v2-course-results"
+            @click="selectStage(stage.id)"
+          >
+            <span class="stage-option-index" aria-hidden="true">
+              {{ String(index + 1).padStart(2, "0") }}
+            </span>
+            <span class="stage-option-label">{{ stage.label }}</span>
+            <small>اختار</small>
+          </button>
+        </div>
+
+        <div
+          v-else
+          class="home-course-taxonomy-state"
+          :class="{ 'is-error': courses.data.taxonomyStatus === 'error' }"
+          role="status"
+        >
+          <strong v-if="courses.data.taxonomyStatus === 'loading'">
+            جاري تحميل المراحل والسنوات...
+          </strong>
+          <template v-else-if="courses.data.taxonomyStatus === 'error'">
+            <strong>تعذر تحميل المراحل التعليمية</strong>
+            <span>{{ courses.data.taxonomyError }}</span>
+          </template>
+          <strong v-else>لا توجد مراحل تعليمية متاحة حاليًا</strong>
+        </div>
+      </div>
+
+      <div v-if="selectedStage" class="home-course-picker home-course-year-picker">
+        <div>
+          <span>خطوتك الثانية</span>
+          <h3 id="home-v2-year-title">اختار السنة الدراسية</h3>
+          <p>سنوات {{ selectedStage.label }} المتاحة على المنصة.</p>
+        </div>
+
+        <div
+          v-if="availableYearTabs.length"
+          class="home-course-audiences"
+          role="group"
+          aria-labelledby="home-v2-year-title"
+        >
+          <button
+            v-for="(tab, index) in availableYearTabs"
             :key="tab.key"
             type="button"
             :class="{ active: selectedTabKey === tab.key }"
@@ -407,6 +513,10 @@ onBeforeUnmount(() => {
             <small>{{ loadingTabKey === tab.key ? "جاري التحميل" : "اختار" }}</small>
           </button>
         </div>
+
+        <div v-else class="home-course-taxonomy-state">
+          <strong>لا توجد سنوات دراسية متاحة لهذه المرحلة</strong>
+        </div>
       </div>
 
       <div
@@ -417,13 +527,16 @@ onBeforeUnmount(() => {
         aria-live="polite"
       >
         <div v-if="!selectedTab" class="home-course-empty">
-          <span class="home-course-empty-step" aria-hidden="true">01</span>
+          <span class="home-course-empty-step" aria-hidden="true">
+            {{ selectedStage ? "02" : "01" }}
+          </span>
           <div>
             <span>البداية من هنا</span>
-            <h3>اختار صفك من فوق</h3>
+            <h3>
+              {{ selectedStage ? "اختار السنة الدراسية" : "اختار مرحلتك من فوق" }}
+            </h3>
             <p>
-              هنظهر لك الكورسات المناسبة من غير ما نخلط لك مناهج باقي
-              الصفوف.
+              هنظهر لك الكورسات المناسبة للمرحلة والسنة المختارتين فقط.
             </p>
           </div>
           <span class="home-course-empty-arrow" aria-hidden="true">↑</span>
@@ -489,7 +602,7 @@ onBeforeUnmount(() => {
 
       <NuxtLink
         v-if="!catalog"
-        :to="selectedTab ? `/course?year_id=${selectedTab.yearId}` : '/course'"
+        :to="selectedTab ? `/course?stage_id=${selectedTab.stageId}&year_id=${selectedTab.yearId}` : '/course'"
         class="all-courses"
       >
         {{ selectedTab ? `كل كورسات ${selectedTab.label}` : "صفحة كل الكورسات" }}
@@ -589,6 +702,11 @@ onBeforeUnmount(() => {
   background: color-mix(in srgb, var(--teal) 6%, var(--paper));
 }
 
+.home-course-year-picker {
+  margin-top: -18px;
+  background: color-mix(in srgb, var(--deep) 5%, var(--paper));
+}
+
 .home-course-picker > div:first-child {
   min-width: 270px;
 }
@@ -616,18 +734,48 @@ onBeforeUnmount(() => {
 
 .home-course-audiences {
   display: grid;
-  width: min(100%, 600px);
-  grid-template-columns: repeat(3, minmax(142px, 1fr));
+  width: min(100%, 720px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 8px;
+}
+
+.home-course-taxonomy-state {
+  width: min(100%, 720px);
+  display: flex;
+  min-height: 74px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border: 1px dashed color-mix(in srgb, var(--teal) 35%, transparent);
+  background: var(--home-v2-surface);
+  color: var(--home-v2-muted);
+  text-align: center;
+}
+
+.home-course-taxonomy-state strong {
+  color: var(--ink);
+  font: 800 13px/1.5 var(--heading);
+}
+
+.home-course-taxonomy-state span {
+  font-size: 11px;
+}
+
+.home-course-taxonomy-state.is-error {
+  border-color: color-mix(in srgb, var(--coral) 55%, transparent);
 }
 
 .home-course-audiences button {
   display: grid;
-  min-height: 74px;
+  min-width: 0;
+  min-height: 82px;
   grid-template-columns: 48px minmax(0, 1fr);
   grid-template-rows: 1fr auto;
   align-items: center;
   gap: 2px 12px;
+  overflow: hidden;
   padding: 7px;
   border: 1px solid #12313929;
   background: #fff;
@@ -679,9 +827,15 @@ onBeforeUnmount(() => {
 }
 
 .stage-option-label {
+  min-width: 0;
+  display: -webkit-box;
+  overflow: hidden;
   color: inherit;
-  font: 800 15px/1.4 var(--heading);
-  white-space: nowrap;
+  font: 800 14px/1.45 var(--heading);
+  overflow-wrap: anywhere;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .home-course-audiences small {
@@ -1043,7 +1197,8 @@ onBeforeUnmount(() => {
   }
 
   .home-course-picker > div:first-child,
-  .home-course-audiences {
+  .home-course-audiences,
+  .home-course-taxonomy-state {
     width: 100%;
     min-width: 0;
   }
@@ -1067,7 +1222,7 @@ onBeforeUnmount(() => {
   }
 
   .home-course-audiences {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
   }
 
   .home-course-audiences button {
@@ -1084,7 +1239,9 @@ onBeforeUnmount(() => {
   }
 
   .stage-option-label {
+    display: block;
     font-size: 13px;
+    -webkit-line-clamp: unset;
   }
 
   .course-grid {

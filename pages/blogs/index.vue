@@ -1,15 +1,33 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
-import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
-import { homeBlogsMock } from "~/features/HomePageFeature/mocks/homeBlogs.mock";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
+import {
+  mapBlogsPage,
+  mapHomeSite,
+} from "~/features/HomePageFeature/mappers/homePageMapper";
 
 definePageMeta({ layout: "home-v2" });
 
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));
-const blogs = homeBlogsMock;
+const requestUrl = useRequestURL();
+const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
+  requestUrl.hostname,
+)
+  ? "mr-eslamsalama.com"
+  : requestUrl.hostname;
+const api = new HomePageApi(webDomain);
+const {
+  data: blogs,
+  pending,
+  error,
+  refresh,
+} = await useAsyncData(
+  `blogs-page:${webDomain}`,
+  async () => mapBlogsPage(await api.fetchBlogs()),
+  { default: () => [] },
+);
 const tones = ["navy", "blue", "coral"] as const;
 const markers = ["فهم", "05", "7D", "قوة", "وقت", "دقة"] as const;
 
@@ -25,9 +43,191 @@ const formatDate = (date: string | null) => {
   }).format(parsedDate);
 };
 
+const blogPageRef = ref<HTMLElement | null>(null);
+let blogAnimationContext: ReturnType<typeof gsap.context> | null = null;
+let blogSectionObserver: IntersectionObserver | null = null;
+
+const animateBlogCards = (section: HTMLElement) => {
+  const headingItems = section.querySelectorAll<HTMLElement>(
+    ".blog-listing__section-heading > *",
+  );
+  const cards = section.querySelectorAll<HTMLElement>(".blog-listing__card");
+  const markers = section.querySelectorAll<HTMLElement>(
+    ".blog-listing__visual > strong",
+  );
+  const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+  timeline
+    .fromTo(
+      headingItems,
+      { autoAlpha: 0, y: 30 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.72,
+        stagger: 0.1,
+        clearProps: "opacity,visibility,transform",
+      },
+    )
+    .fromTo(
+      cards,
+      { autoAlpha: 0, y: 56, scale: 0.96, rotationX: -7 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        rotationX: 0,
+        duration: 0.82,
+        stagger: 0.12,
+        clearProps: "opacity,visibility,transform",
+      },
+      0.25,
+    )
+    .fromTo(
+      markers,
+      { autoAlpha: 0, scale: 0.72, rotation: -8 },
+      {
+        autoAlpha: 1,
+        scale: 1,
+        rotation: 0,
+        duration: 0.68,
+        stagger: 0.1,
+        ease: "back.out(1.7)",
+        clearProps: "opacity,visibility,transform",
+      },
+      0.52,
+    );
+};
+
+onMounted(() => {
+  const root = blogPageRef.value;
+  if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  blogAnimationContext = gsap.context(() => {
+    const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+    const heroCopy = root.querySelectorAll<HTMLElement>(
+      ".blog-listing__eyebrow, .blog-listing__hero-copy h1, .blog-listing__hero-copy > p, .blog-listing__hero-meta > span",
+    );
+    const method = root.querySelector<HTMLElement>(".blog-listing__method");
+    const methodContent = root.querySelectorAll<HTMLElement>(
+      ".blog-listing__method > span, .blog-listing__method > strong, .blog-listing__method li",
+    );
+    const articleHeadingItems = root.querySelectorAll<HTMLElement>(
+      ".blog-listing__section-heading > *",
+    );
+    const articleCards = root.querySelectorAll<HTMLElement>(
+      ".blog-listing__card",
+    );
+    const articleMarkers = root.querySelectorAll<HTMLElement>(
+      ".blog-listing__visual > strong",
+    );
+
+    // Keep the article reveal ready until the reader actually reaches it.
+    gsap.set(articleHeadingItems, { autoAlpha: 0, y: 30 });
+    gsap.set(articleCards, {
+      autoAlpha: 0,
+      y: 56,
+      scale: 0.96,
+      rotationX: -7,
+    });
+    gsap.set(articleMarkers, {
+      autoAlpha: 0,
+      scale: 0.72,
+      rotation: -8,
+    });
+
+    heroTimeline
+      .fromTo(
+        heroCopy,
+        { autoAlpha: 0, x: 38, y: 18 },
+        {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          duration: 0.76,
+          stagger: 0.1,
+          clearProps: "opacity,visibility,transform",
+        },
+      )
+      .fromTo(
+        method,
+        { autoAlpha: 0, x: -52, y: 30, scale: 0.92, rotation: -2.5 },
+        {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotation: 0,
+          duration: 0.95,
+          ease: "back.out(1.25)",
+          clearProps: "opacity,visibility,transform",
+        },
+        0.16,
+      )
+      .fromTo(
+        methodContent,
+        { autoAlpha: 0, y: 22 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.58,
+          stagger: 0.08,
+          clearProps: "opacity,visibility,transform",
+        },
+        0.48,
+      );
+
+    if (method) {
+      gsap.to(method, {
+        y: -7,
+        duration: 3.2,
+        delay: 1.55,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+    }
+  }, root);
+
+  const articleSection = root.querySelector<HTMLElement>(".blog-listing__main");
+  const articleTrigger = root.querySelector<HTMLElement>(
+    ".blog-listing__section-heading",
+  );
+  if (!articleSection || !articleTrigger) return;
+
+  const revealArticles = () => {
+    blogAnimationContext?.add(() => animateBlogCards(articleSection));
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    revealArticles();
+    return;
+  }
+
+  blogSectionObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry?.isIntersecting) return;
+      revealArticles();
+      blogSectionObserver?.disconnect();
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -40% 0px" },
+  );
+  blogSectionObserver.observe(articleTrigger);
+});
+
+onBeforeUnmount(() => {
+  blogSectionObserver?.disconnect();
+  blogAnimationContext?.revert();
+  blogSectionObserver = null;
+  blogAnimationContext = null;
+});
+
 useSeoMeta({
   title: () => `المدونة | ${site.value.brandName || "EduHub"}`,
-  description: "مقالات عملية للمذاكرة وحل المسائل والمراجعة بخطوات قابلة للتطبيق.",
+  description:
+    "مقالات عملية للمذاكرة وحل المسائل والمراجعة بخطوات قابلة للتطبيق.",
 });
 
 useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
@@ -35,35 +235,45 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
 <template>
   <div
+    ref="blogPageRef"
     class="home-v2 blog-listing"
     dir="rtl"
     :style="{
       '--home-v2-blue': site.colors.primary || '#28366c',
       '--home-v2-deep': site.colors.secondary || '#3a3e7e',
-      '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
+      '--home-v2-blue-light': `color-mix(in srgb, ${
+        site.colors.primary || '#28366c'
+      } 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="site" />
-
     <main class="blog-listing__page">
       <header class="blog-listing__hero">
         <div class="container blog-listing__hero-grid">
           <div class="blog-listing__hero-copy">
-            <span class="blog-listing__eyebrow">مدونة {{ site.brandName || "EduHub" }}</span>
+            <span class="blog-listing__eyebrow"
+              >مدونة {{ site.brandName || "EduHub" }}</span
+            >
             <h1>فكّر في الفيزياء.<br /><em>مش تحفظها.</em></h1>
             <p>
               أفكار عملية للمذاكرة وحل المسائل والمراجعة، مكتوبة بخطوات تقدر
               تبدأ تطبقها من جلستك الجاية.
             </p>
             <div class="blog-listing__hero-meta" aria-label="معلومات المدونة">
-              <span><b>{{ blogs.length }}</b> مقالات عملية</span>
+              <span
+                ><b>{{ blogs.length }}</b> مقالات عملية</span
+              >
               <span><b>100%</b> قراءة مجانية</span>
             </div>
           </div>
 
-          <div class="blog-listing__method" aria-label="طريقة التعلم في المدونة">
+          <div
+            class="blog-listing__method"
+            aria-label="طريقة التعلم في المدونة"
+          >
             <span>قاعدة بسيطة</span>
-            <strong>افهم الفكرة،<br />حل بإيدك،<br /><em>راجع خطأك.</em></strong>
+            <strong
+              >افهم الفكرة،<br />حل بإيدك،<br /><em>راجع خطأك.</em></strong
+            >
             <ol>
               <li><b>01</b><span>فهم</span></li>
               <li><b>02</b><span>تطبيق</span></li>
@@ -78,7 +288,9 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
           <header class="blog-listing__section-heading">
             <div>
               <span>ابدأ بالمشكلة اللي بتقابلك</span>
-              <h2 id="blog-listing-title">مقالات قصيرة، وخطوات قابلة للتطبيق.</h2>
+              <h2 id="blog-listing-title">
+                مقالات قصيرة، وخطوات قابلة للتطبيق.
+              </h2>
             </div>
             <p>كل مقال مستقل؛ اختار الموضوع المناسب لك وابدأ منه مباشرة.</p>
           </header>
@@ -102,20 +314,32 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
                 <div class="blog-listing__card-body">
                   <div class="blog-listing__card-meta">
                     <span>{{ blog.subtitle || "مدونة الفيزياء" }}</span>
-                    <time v-if="blog.date" :datetime="blog.date">{{ formatDate(blog.date) }}</time>
+                    <time v-if="blog.date" :datetime="blog.date">{{
+                      formatDate(blog.date)
+                    }}</time>
                   </div>
                   <h2>{{ blog.title }}</h2>
                   <p>{{ blog.description }}</p>
-                  <span class="blog-listing__read">اقرأ المقال <i aria-hidden="true">←</i></span>
+                  <span class="blog-listing__read"
+                    >اقرأ المقال <i aria-hidden="true">←</i></span
+                  >
                 </div>
               </NuxtLink>
             </article>
           </div>
+          <div v-if="pending" class="blog-listing__state" role="status">
+            جاري تحميل المقالات…
+          </div>
+          <div v-else-if="error" class="blog-listing__state" role="alert">
+            <p>تعذر تحميل المقالات في الوقت الحالي.</p>
+            <button type="button" @click="refresh">إعادة المحاولة</button>
+          </div>
+          <div v-else-if="!blogs.length" class="blog-listing__state">
+            لا توجد مقالات متاحة حاليًا.
+          </div>
         </div>
       </section>
     </main>
-
-    <HomeFooterSection :site="site" />
   </div>
 </template>
 
@@ -126,6 +350,30 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   overflow: clip;
   background: var(--home-v2-paper);
   color: var(--home-v2-ink);
+}
+
+.blog-listing__state {
+  margin-top: 28px;
+  padding: 30px;
+  border: 1px solid var(--home-v2-line);
+  border-radius: 12px;
+  background: var(--home-v2-surface);
+  color: var(--home-v2-muted);
+  text-align: center;
+}
+
+.blog-listing__state p {
+  margin: 0 0 12px;
+}
+.blog-listing__state button {
+  padding: 9px 15px;
+  border: 1px solid var(--home-v2-blue);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--home-v2-blue);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 900;
 }
 
 .blog-listing__hero {
@@ -531,7 +779,8 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   .blog-listing__method {
     min-height: 300px;
     padding: 26px;
-    box-shadow: 12px 12px color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
+    box-shadow: 12px 12px
+      color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
   }
 
   .blog-listing__method > strong {

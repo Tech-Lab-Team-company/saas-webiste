@@ -11,8 +11,6 @@ import HomeBlogSection from "./sections/HomeBlogSection.vue";
 import HomeCoursesSection from "./sections/HomeCoursesSection.vue";
 import HomeCtaSection from "./sections/HomeCtaSection.vue";
 import HomeFaqSection from "./sections/HomeFaqSection.vue";
-import HomeFooterSection from "./sections/HomeFooterSection.vue";
-import HomeHeaderSection from "./sections/HomeHeaderSection.vue";
 import HomeHeroSection from "./sections/HomeHeroSection.vue";
 import HomeBooksSection from "./sections/HomeBooksSection.vue";
 import HomeLearningJourneySection from "~/components/Home/v2/sections/HomeLearningJourneySection.vue";
@@ -47,7 +45,6 @@ const themeStyles = computed(() => {
     :data-home-pending="props.pending ? 'true' : 'false'"
     :style="themeStyles"
   >
-    <HomeHeaderSection :site="props.home.site" />
     <main>
       <HomeHeroSection :hero="props.home.hero" :site="props.home.site" />
       <HomeCoursesSection
@@ -62,6 +59,5 @@ const themeStyles = computed(() => {
       <HomeFaqSection />
       <HomeCtaSection :cta="props.home.cta" />
     </main>
-    <HomeFooterSection :site="props.home.site" />
   </div>
 </template>

@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import HomeCoursesSection from "~/components/home/v2/sections/HomeCoursesSection.vue";
 import { useHomePage } from "~/features/HomePageFeature/composables/useHomePage";
 
@@ -28,20 +26,18 @@ useHead({
       '--home-v2-blue-light': `color-mix(in srgb, ${home.site.colors.primary || '#28366c'} 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="home.site" />
-
     <main class="course-page__main">
       <header class="course-page__hero">
         <span class="course-page__hero-ring" aria-hidden="true" />
         <span class="course-page__hero-word" aria-hidden="true">COURSES</span>
         <div class="container course-page__hero-grid">
           <div class="course-page__hero-title">
-            <span>فيزياء أولى · ثانية · ثالثة ثانوي</span>
-            <h1>كل صف ليه<br /><em>خطة واضحة.</em></h1>
+            <span>كل المراحل والسنوات في مكان واحد</span>
+            <h1>اختار مرحلتك.<br /><em>وابدأ كورسك.</em></h1>
           </div>
           <p>
-            اختار صفك الأول، وهتلاقي كورسات الفيزياء المتاحة لمرحلتك مع
-            {{ home.site.brandName || "المنصة" }} من غير خلط بين الصفوف.
+            اختار المرحلة والسنة الدراسية، واكتشف الكورسات المناسبة لمسارك من
+            المحتوى المتاح على {{ home.site.brandName || "المنصة" }}.
           </p>
         </div>
       </header>
@@ -53,7 +49,6 @@ useHead({
       />
     </main>
 
-    <HomeFooterSection :site="home.site" />
   </div>
 </template>
 

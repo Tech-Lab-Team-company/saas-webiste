@@ -8,6 +8,9 @@
   --course-muted: #6f7c75;
   --course-border: #dfe6e1;
   --course-paper: #fbfcfa;
+  --course-surface: #fff;
+  --course-surface-raised: #f4f7f5;
+  --course-action-text: #fff;
   --course-heading: "Cairo", sans-serif;
   --course-body: "Tajawal", sans-serif;
   width: 100%;
@@ -16,6 +19,20 @@
   background: var(--course-paper);
   color: var(--course-ink);
   font-family: var(--course-body);
+}
+
+:global(html[data-theme="dark"]) .course-card-layout {
+  --course-accent: var(--app-accent);
+  --course-accent-dark: color-mix(in srgb, var(--app-brand-secondary) 28%, #05070b);
+  --course-accent-soft: color-mix(in srgb, var(--course-accent) 10%, #0a0d13);
+  --course-ink: var(--app-text);
+  --course-muted: var(--app-muted);
+  --course-border: var(--app-line);
+  --course-paper: color-mix(in srgb, var(--app-brand-primary) 3%, #05070b);
+  --course-surface: color-mix(in srgb, var(--app-brand-primary) 8%, #10141d);
+  --course-surface-raised: color-mix(in srgb, var(--app-brand-primary) 11%, #171c27);
+  --course-action-text: #07101f;
+  color-scheme: dark;
 }
 
 .public-detail-hero {
@@ -74,7 +91,8 @@
   padding: 6px 10px;
   border: 0;
   border-radius: 0;
-  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid var(--course-border);
+  background: color-mix(in srgb, var(--course-surface) 88%, transparent);
   color: var(--course-ink);
   font-size: 12px;
   font-weight: 800;
@@ -144,8 +162,9 @@
   flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
-  background: #fff;
-  color: var(--course-accent-dark);
+  border: 1px solid var(--course-border);
+  background: var(--course-surface);
+  color: var(--course-accent);
   font: 900 16px var(--course-heading);
 }
 
@@ -237,6 +256,10 @@
   background: var(--course-paper);
 }
 
+:global(html[data-theme="dark"]) .course-body-shell.course-detail-main {
+  background: var(--course-paper) !important;
+}
+
 .detail-layout {
   width: min(1180px, calc(100% - 48px));
   margin-inline: auto;
@@ -252,25 +275,31 @@
 
 .course-details-sidebar {
   min-width: 0;
-  align-self: stretch;
+  align-self: start;
+  height: fit-content;
   margin-top: -48px;
+  background: transparent !important;
 }
 
 .course-details-sidebar__inner {
   position: sticky;
   top: 24px;
+  height: fit-content;
+  background: transparent !important;
 }
 
 .enroll-card {
   position: relative;
   z-index: 7;
   width: 100%;
+  height: fit-content;
   padding: 14px 22px 22px;
   overflow: hidden;
   border: 1px solid var(--course-border);
   border-radius: 0;
-  background: #fff;
-  box-shadow: 0 28px 55px -45px rgba(18, 49, 57, 0.55);
+  background: var(--course-surface);
+  color: var(--course-ink);
+  box-shadow: 0 28px 60px -42px var(--app-shadow, rgba(18, 49, 57, 0.55));
 }
 
 .enroll-cover {
@@ -305,8 +334,8 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #fff;
-  color: var(--course-accent-dark);
+  background: var(--course-surface-raised);
+  color: var(--course-accent);
   box-shadow: 0 12px 28px rgba(18, 49, 57, 0.2);
 }
 
@@ -409,7 +438,7 @@
   border: 1px solid var(--course-accent);
   border-radius: 0;
   background: var(--course-accent);
-  color: #fff;
+  color: var(--course-action-text);
   font-family: var(--course-heading);
   font-size: 12px;
   font-weight: 800;
@@ -417,16 +446,16 @@
 
 .btns-container > .payment-btn,
 .final-cta-actions > .payment-btn {
-  background: #fff;
+  background: var(--course-surface-raised);
   color: var(--course-accent);
 }
 
 .btns-container > .btn-disabled,
 .final-cta-actions > .btn-disabled,
 .payment-dialog :deep(.btn-disabled) {
-  border-color: #dce3de;
-  background: #eef2ef;
-  color: #7d8781;
+  border-color: var(--course-border);
+  background: var(--course-surface-raised);
+  color: var(--course-muted);
   cursor: not-allowed;
 }
 

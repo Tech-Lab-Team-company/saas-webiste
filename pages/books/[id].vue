@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import BuyBookDialog from "~/components/Books/BuyBookDialog.vue";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
@@ -10,6 +8,14 @@ import {
   mapHomeSite,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeBookDetailsResourceViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+
+interface BookMediaItem {
+  key: string;
+  url: string;
+  label: string;
+  sessionId: number | null;
+  type: number | null;
+}
 
 definePageMeta({
   layout: "home-v2",
@@ -84,25 +90,74 @@ const primaryAction = computed(() => {
   if (!currentBook) return null;
 
   if (currentBook.hasFreePreview && currentBook.freeBookUrl) {
-    return { url: currentBook.freeBookUrl, label: "قراءة النسخة المجانية" };
+    return { url: currentBook.freeBookUrl, label: "قراءة النسخة المجانية", kind: "reader" as const };
   }
 
-  if (currentBook.isFree && currentBook.bookUrl) {
-    return { url: currentBook.bookUrl, label: "تحميل الكتاب" };
+  if (
+    currentBook.bookUrl &&
+    (currentBook.isFree || currentBook.allowStatus === 1 || currentBook.orderStatus === 1)
+  ) {
+    return { url: currentBook.bookUrl, label: "قراءة الكتاب", kind: "reader" as const };
   }
 
   if (currentBook.invoiceLink) {
-    return { url: currentBook.invoiceLink, label: "شراء الكتاب" };
+    return { url: currentBook.invoiceLink, label: "شراء الكتاب", kind: "external" as const };
   }
 
   return null;
 });
 
-const mediaLinks = computed(() => [...new Set([
-  ...(book.value?.attachments.map((attachment) => attachment.file) ?? []),
-  ...(book.value?.videoLinks ?? []),
-  ...(book.value?.externalVideoLinks ?? []),
-])]);
+const mediaItems = computed<BookMediaItem[]>(() => {
+  const currentBook = book.value;
+  if (!currentBook) return [];
+
+  const items: BookMediaItem[] = [];
+  const seenUrls = new Set<string>();
+  const addItem = (item: BookMediaItem) => {
+    if (seenUrls.has(item.url)) return;
+    seenUrls.add(item.url);
+    items.push(item);
+  };
+
+  currentBook.attachments.forEach((attachment, index) => {
+    addItem({
+      key: `attachment-${attachment.id}`,
+      url: attachment.file,
+      label: `مرفق الكتاب ${index + 1}`,
+      sessionId: attachment.id,
+      type: attachment.type,
+    });
+  });
+  currentBook.videoLinks.forEach((url, index) => {
+    addItem({
+      key: `video-${index}-${url}`,
+      url,
+      label: `فيديو الكتاب ${index + 1}`,
+      sessionId: null,
+      type: 4,
+    });
+  });
+  currentBook.externalVideoLinks.forEach((url, index) => {
+    addItem({
+      key: `external-${index}-${url}`,
+      url,
+      label: `فيديو خارجي ${index + 1}`,
+      sessionId: null,
+      type: 4,
+    });
+  });
+
+  return items;
+});
+
+const isReaderOpen = ref(false);
+const activeMedia = ref<BookMediaItem | null>(null);
+const openReader = () => {
+  if (primaryAction.value?.kind === "reader") isReaderOpen.value = true;
+};
+const openMedia = (item: BookMediaItem) => {
+  activeMedia.value = item;
+};
 
 const formatBookDate = (date: string | null): string => {
   if (!date) return "غير محدد";
@@ -202,8 +257,6 @@ useHead({
       '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="site" />
-
     <main class="book-details-page__main">
       <div v-if="pending" class="container book-details-page__state" role="status">
         جاري تحميل تفاصيل الكتاب...
@@ -345,7 +398,19 @@ useHead({
                 <div>
                   <h2>تصفّح نسخة الكتاب المتاحة</h2>
                   <p>يمكنك فتح نسخة القراءة أو المعاينة المتاحة من خلال المنصة.</p>
-                  <a v-if="primaryAction" :href="primaryAction.url" target="_blank" rel="noreferrer">
+                  <button
+                    v-if="primaryAction?.kind === 'reader'"
+                    type="button"
+                    @click="openReader"
+                  >
+                    {{ primaryAction.label }} ←
+                  </button>
+                  <a
+                    v-else-if="primaryAction"
+                    :href="primaryAction.url"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {{ primaryAction.label }} ←
                   </a>
                 </div>
@@ -375,8 +440,15 @@ useHead({
                   <li v-if="book.numberOfPages">{{ book.numberOfPages }} صفحة</li>
                   <li>الوصول حسب نوع النسخة المتاحة</li>
                 </ul>
+                <button
+                  v-if="option.price === 0 && primaryAction?.kind === 'reader'"
+                  type="button"
+                  @click="openReader"
+                >
+                  {{ primaryAction.label }} ←
+                </button>
                 <a
-                  v-if="option.price === 0 && primaryAction"
+                  v-else-if="option.price === 0 && primaryAction"
                   :href="primaryAction.url"
                   target="_blank"
                   rel="noreferrer"
@@ -413,37 +485,56 @@ useHead({
           </div>
         </section>
 
-        <section v-if="mediaLinks.length > 0" class="section book-details-page__media">
+        <section v-if="mediaItems.length > 0" class="section book-details-page__media">
           <div class="container">
             <header class="book-details-page__section-head">
               <span class="book-details-page__section-tag">محتوى إضافي</span>
               <h2>المرفقات وروابط الفيديو</h2>
             </header>
             <div class="book-details-page__media-links">
-              <a
-                v-for="(link, index) in mediaLinks"
-                :key="link"
-                :href="link"
-                target="_blank"
-                rel="noreferrer"
+              <button
+                v-for="(item, index) in mediaItems"
+                :key="item.key"
+                type="button"
+                @click="openMedia(item)"
               >
                 فتح المحتوى {{ index + 1 }}
-                <span aria-hidden="true">↗</span>
-              </a>
+                <span aria-hidden="true">←</span>
+              </button>
             </div>
           </div>
         </section>
       </template>
     </main>
 
-    <HomeFooterSection :site="site" />
+    <BookReaderDialog
+      v-if="isReaderOpen && book && primaryAction?.kind === 'reader'"
+      :url="primaryAction.url"
+      :book-id="book.bookId"
+      :title="book.title"
+      :total-pages="book.numberOfPages"
+      @close="isReaderOpen = false"
+    />
+    <BookMediaDialog
+      v-if="activeMedia"
+      :key="activeMedia.key"
+      :item="activeMedia"
+      @close="activeMedia = null"
+    />
+
   </div>
 </template>
 
 <style scoped>
 .book-details-page {
+  --book-details-action-text: #fff;
   min-height: 100vh;
   background: var(--home-v2-paper);
+  color: var(--home-v2-ink);
+}
+
+:global(html[data-theme="dark"]) .book-details-page {
+  --book-details-action-text: #07101f;
 }
 
 .book-details-page__main {
@@ -476,13 +567,13 @@ useHead({
   padding: 11px 22px;
   border-radius: 8px;
   background: var(--home-v2-blue);
-  color: #fff;
+  color: var(--book-details-action-text);
   font-weight: 800;
 }
 
 .book-details-page__hero {
   padding: 60px 0;
-  background: color-mix(in srgb, var(--home-v2-coral) 10%, #f5eddb);
+  background: color-mix(in srgb, var(--home-v2-coral) 10%, var(--home-v2-cream));
 }
 
 .book-details-page__breadcrumb {
@@ -508,7 +599,7 @@ useHead({
 
 .book-details-page__hero-grid {
   display: grid;
-  grid-template-columns: 350px minmax(0, 1fr);
+  grid-template-columns: 300px minmax(0, 1fr);
   align-items: center;
   gap: clamp(48px, 7vw, 90px);
 }
@@ -516,12 +607,18 @@ useHead({
 .book-details-page__badge {
   display: inline-block;
   padding: 6px 10px;
-  background: #fff;
+  border: 1px solid var(--home-v2-line);
+  background: var(--home-v2-surface);
   color: var(--home-v2-coral);
   font-size: 10px;
   font-weight: 900;
 }
-
+.book-details-page__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
 .book-details-page h1 {
   margin: 12px 0 0;
   color: var(--home-v2-ink);
@@ -553,7 +650,7 @@ useHead({
   padding: 7px 11px;
   border: 1px solid color-mix(in srgb, var(--home-v2-blue) 18%, transparent);
   border-radius: 999px;
-  background: #fff;
+  background: var(--home-v2-surface);
   color: var(--home-v2-muted);
   font-size: 12px;
   font-weight: 800;
@@ -587,7 +684,7 @@ useHead({
 
 .book-details-page__actions > a:first-child {
   background: var(--home-v2-blue);
-  color: #fff;
+  color: var(--book-details-action-text);
 }
 
 .book-details-page__actions > a:last-child {
@@ -596,7 +693,7 @@ useHead({
 }
 
 .book-details-page__unavailable {
-  background: #e4e8ef;
+  background: var(--home-v2-surface-raised);
   color: var(--home-v2-muted);
 }
 
@@ -608,7 +705,8 @@ useHead({
   overflow: hidden;
   margin: 0;
   padding: 35px;
-  background: color-mix(in srgb, var(--home-v2-blue) 18%, #bcd9d4);
+  background: color-mix(in srgb, var(--home-v2-blue) 18%, var(--home-v2-surface-raised));
+  color: var(--home-v2-ink);
   box-shadow: 16px 19px color-mix(in srgb, var(--home-v2-deep) 11%, transparent);
 }
 
@@ -661,7 +759,8 @@ useHead({
   flex: none;
   place-items: center;
   border-radius: 50%;
-  background: #fff;
+  border: 1px solid var(--home-v2-line);
+  background: var(--home-v2-surface);
   color: var(--home-v2-blue);
   font-weight: 900;
 }
@@ -689,7 +788,8 @@ useHead({
 
 .book-details-page__information {
   padding: 65px 0 100px;
-  background: #f6f8f6;
+  background: color-mix(in srgb, var(--home-v2-cream) 72%, var(--home-v2-paper));
+  color: var(--home-v2-ink);
 }
 
 .book-details-page__information-grid {
@@ -741,7 +841,7 @@ useHead({
   align-items: center;
   padding: 16px;
   border: 1px solid var(--home-v2-line);
-  background: #fff;
+  background: var(--home-v2-surface);
 }
 
 .book-details-page__feature-grid span {
@@ -750,7 +850,7 @@ useHead({
   height: 32px;
   flex: none;
   place-items: center;
-  background: color-mix(in srgb, var(--home-v2-blue) 10%, #fff);
+  background: color-mix(in srgb, var(--home-v2-blue) 12%, var(--home-v2-surface-raised));
   color: var(--home-v2-blue);
   font-size: 9px;
   font-weight: 900;
@@ -855,7 +955,8 @@ useHead({
 
 .book-details-page__facts {
   border: 1px solid var(--home-v2-line);
-  background: #fff;
+  background: var(--home-v2-surface);
+  color: var(--home-v2-ink);
 }
 
 .book-details-page__facts > div {
@@ -885,7 +986,7 @@ useHead({
   gap: 18px;
   padding: 27px !important;
   border: 0 !important;
-  background: color-mix(in srgb, var(--home-v2-blue) 10%, #e3efeb);
+  background: color-mix(in srgb, var(--home-v2-blue) 12%, var(--home-v2-surface));
 }
 
 .book-details-page__digital-policy > span {
@@ -894,7 +995,8 @@ useHead({
   height: 50px;
   flex: none;
   place-items: center;
-  background: #fff;
+  border: 1px solid var(--home-v2-line);
+  background: var(--home-v2-surface-raised);
   color: var(--home-v2-deep);
   font-size: 20px;
 }
@@ -910,10 +1012,15 @@ useHead({
   font-size: 11px;
 }
 
-.book-details-page__digital-policy a {
+.book-details-page__digital-policy a,
+.book-details-page__digital-policy button {
+  padding: 0;
   color: var(--home-v2-blue);
+  border: 0;
+  background: transparent;
   font-size: 10px;
   font-weight: 900;
+  cursor: pointer;
 }
 
 .book-details-page__buy-card {
@@ -921,7 +1028,8 @@ useHead({
   top: 105px;
   padding: 24px;
   border: 1px solid var(--home-v2-line);
-  background: #fff;
+  background: var(--home-v2-surface);
+  color: var(--home-v2-ink);
 }
 
 .book-details-page__buy-card > h2 {
@@ -946,12 +1054,12 @@ useHead({
   height: 36px;
   flex: none;
   place-items: center;
-  background: color-mix(in srgb, var(--home-v2-deep) 11%, #fff);
+  background: color-mix(in srgb, var(--home-v2-deep) 16%, var(--home-v2-surface-raised));
   color: var(--home-v2-deep);
 }
 
 .book-details-page__format--print > div > span {
-  background: color-mix(in srgb, var(--home-v2-blue) 11%, #fff);
+  background: color-mix(in srgb, var(--home-v2-blue) 16%, var(--home-v2-surface-raised));
   color: var(--home-v2-blue);
 }
 
@@ -1003,23 +1111,27 @@ useHead({
 }
 
 .book-details-page__format > a,
+.book-details-page__format > button,
 .book-details-page__format-unavailable {
   display: flex;
   min-height: 42px;
   align-items: center;
   justify-content: center;
   background: var(--home-v2-blue);
-  color: #fff;
+  color: var(--book-details-action-text);
+  border: 0;
   font-size: 10px;
   font-weight: 900;
+  cursor: pointer;
 }
 
-.book-details-page__format--print > a {
+.book-details-page__format--print > a,
+.book-details-page__format--print > button {
   background: var(--home-v2-deep);
 }
 
 .book-details-page__format-unavailable {
-  background: #e8ebef;
+  background: var(--home-v2-surface-raised);
   color: var(--home-v2-muted);
 }
 
@@ -1063,7 +1175,7 @@ useHead({
   padding: 24px;
   border: 1px solid var(--home-v2-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--home-v2-surface);
 }
 
 .book-details-page__metrics span {
@@ -1082,7 +1194,7 @@ useHead({
   margin-top: 28px;
   border: 1px solid var(--home-v2-line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--home-v2-surface);
 }
 
 .book-details-page__pricing div {
@@ -1101,7 +1213,7 @@ useHead({
 }
 
 .book-details-page__gallery {
-  background: #eef4ff;
+  background: color-mix(in srgb, var(--home-v2-blue) 8%, var(--home-v2-paper));
 }
 
 .book-details-page__gallery-grid {
@@ -1114,7 +1226,7 @@ useHead({
   overflow: hidden;
   aspect-ratio: 4 / 3;
   margin: 0;
-  border: 8px solid #fff;
+  border: 8px solid var(--home-v2-surface);
   border-radius: 12px;
   box-shadow: 0 20px 48px -38px #06114799;
 }
@@ -1131,7 +1243,8 @@ useHead({
   gap: 14px;
 }
 
-.book-details-page__media-links a {
+.book-details-page__media-links a,
+.book-details-page__media-links button {
   display: flex;
   min-height: 62px;
   align-items: center;
@@ -1140,8 +1253,9 @@ useHead({
   padding: 0 20px;
   border: 1px solid var(--home-v2-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--home-v2-surface);
   color: var(--home-v2-blue);
+  cursor: pointer;
   font-weight: 800;
 }
 

@@ -18,11 +18,15 @@ import { ref } from 'vue';
 import { useSettingStore } from "~/stores/setting";
 
 // Props
-const props = defineProps<{ video: string }>();
+const props = defineProps<{
+  video: string;
+  sessionId?: number | null;
+}>();
 
 // State
 const isPiP = ref(false);
 const playerInstance = ref<any>(null);
+const watchHistory = useCourseWatchHistory(() => props.sessionId);
 
 // Methods
 function TogglePip() {
@@ -50,6 +54,11 @@ const videoId = ref(getYoutubeVideoId(props.video))
 const settingStore = useSettingStore();
 const VideoBlurScreen = ref(true)
 
+const onPausedChange = (event: CustomEvent<boolean>) => {
+  VideoBlurScreen.value = event.detail;
+  watchHistory.handlePausedChange(event);
+};
+
 // function playVideo() {
 //   if (playerInstance.value) {
 //     playerInstance.value.play();
@@ -67,7 +76,12 @@ watch(() => props.video, (newVal) => {
   <br>
   <div :class="isPiP ? 'video-player-pip' : 'video-player'">
     <Player theme="dark" id="myVideo" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
-      @click="VideoBlurScreen = !VideoBlurScreen" @vmPlay="VideoBlurScreen = false" @vmPause="VideoBlurScreen = true"
+      @click="VideoBlurScreen = !VideoBlurScreen"
+      @vmPlay="VideoBlurScreen = false"
+      @vmPausedChange="onPausedChange"
+      @vmDurationChange="watchHistory.updateDuration"
+      @vmCurrentTimeChange="watchHistory.updateCurrentTime"
+      @vmPlaybackEnded="watchHistory.markPlaybackEnded"
       :paused="VideoBlurScreen">
       <div @click="VideoBlurScreen = false" v-if="VideoBlurScreen" class="overlay">
         <!-- <img :src="settingStore.setting?.image?.img" class="logo-image" alt=""> -->

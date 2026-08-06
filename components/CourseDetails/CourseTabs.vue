@@ -16,6 +16,7 @@ const route = useRoute();
 const tab_value = ref("content");
 const activetab = ref({});
 const videoLink = ref({
+  sessionId: null as number | null,
   videoLink: "",
   title: "",
   description: "",
@@ -47,12 +48,14 @@ const Data = (data: {
   link: string;
   title: string;
   description: string;
+  sessionId: number;
 }) => {
   // console.log(data, "data")
   activetab.value = data.activetabvalue;
   videoLink.value.videoLink = data.link;
   videoLink.value.title = data.title;
   videoLink.value.description = data.description;
+  videoLink.value.sessionId = data.sessionId;
 };
 
 let timer: any = null;
@@ -124,7 +127,6 @@ onUnmounted(() => {
         <section class="course-tabs">
           <div class="tabs-container">
             <nav class="section-navigation detail-tabs" :aria-label="$t('course_sections')">
-              <a class="nav-overview" href="#course-overview">{{ $t("about_course") }}</a>
               <a
                 class="nav-curriculum"
                 href="#course-curriculum"
@@ -132,6 +134,7 @@ onUnmounted(() => {
               >
                 {{ $t("course_curriculum") }}
               </a>
+              <a class="nav-overview" href="#course-overview">{{ $t("about_course") }}</a>
               <a
                 href="#course-curriculum"
                 v-if="CardData?.homeworks?.length"

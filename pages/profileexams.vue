@@ -19,19 +19,16 @@ useHead({
   htmlAttrs: { lang: "ar", dir: "rtl" },
 });
 
-const route = useRoute();
-const router = useRouter();
 const userStore = useUserStore();
 const examsController = FetchMyExamsController.getInstance();
 const coursesController = CoursesController.getInstance();
 
 const exams = ref(new MyExamsResource([], []));
 const courses = ref<CoursesModel[]>([]);
+const courseFilterSelect = ref<HTMLSelectElement | null>(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
-const selectedCourseId = ref(
-  typeof route.query.course_id === "string" ? route.query.course_id : "",
-);
+const selectedCourseId = ref("");
 
 const attendedExams = computed(() =>
   exams.value.lastExams.filter((exam) => exam.attended),
@@ -73,7 +70,8 @@ const formatTime = (value: string) => {
 };
 
 const examCourseId = (exam: MyExamModel) =>
-  exam.courseId || (selectedCourseId.value ? Number(selectedCourseId.value) : null);
+  exam.courseId ||
+  (selectedCourseId.value ? Number(selectedCourseId.value) : null);
 
 const examRoute = (exam: MyExamModel) => {
   const courseId = examCourseId(exam);
@@ -113,15 +111,20 @@ const loadExams = async () => {
 };
 
 const applyCourseFilter = async () => {
-  const query = { ...route.query };
-  if (selectedCourseId.value) query.course_id = selectedCourseId.value;
-  else delete query.course_id;
-  await router.replace({ query });
   await loadExams();
 };
 
+const focusCourseFilter = () => {
+  courseFilterSelect.value?.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+  courseFilterSelect.value?.focus({ preventScroll: true });
+};
+
 onMounted(async () => {
-  await Promise.allSettled([loadCourses(), loadExams()]);
+  await loadCourses();
+  await loadExams();
 });
 </script>
 
@@ -149,7 +152,11 @@ onMounted(async () => {
 
             <label class="course-filter">
               <span>تصفية حسب الكورس</span>
-              <select v-model="selectedCourseId" @change="applyCourseFilter">
+              <select
+                ref="courseFilterSelect"
+                v-model="selectedCourseId"
+                @change="applyCourseFilter"
+              >
                 <option value="">جميع الكورسات</option>
                 <option v-for="course in courses" :key="course.id" :value="String(course.id)">
                   {{ course.title }}
@@ -213,7 +220,14 @@ onMounted(async () => {
                   <NuxtLink v-if="examRoute(exam)" :to="examRoute(exam)!">
                     ابدأ الاختبار <span>←</span>
                   </NuxtLink>
-                  <p v-else class="exam-course-note">افتح الاختبار من صفحة الكورس المرتبط به.</p>
+                  <button
+                    v-else
+                    type="button"
+                    class="exam-route-fallback"
+                    @click="focusCourseFilter"
+                  >
+                    اختر الكورس للبدء <span>←</span>
+                  </button>
                 </article>
               </div>
 
@@ -311,7 +325,7 @@ onMounted(async () => {
 .exam-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0 18px; padding: 15px 0; border-block: 1px solid var(--profile-border); }
 .exam-meta span { display: flex; flex-direction: column; color: var(--profile-muted); text-align: center; font-size: 9px; }
 .exam-meta b { color: var(--profile-ink); font-size: 15px; }
-.current-exam-card > a, .exam-state button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 18px; padding: 0 17px; border: 0; border-radius: 9px; background: var(--profile-action); color: var(--profile-on-action); cursor: pointer; font: 900 11px Cairo, sans-serif; text-decoration: none; }
+.current-exam-card > a, .current-exam-card > .exam-route-fallback, .exam-state button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 18px; padding: 0 17px; border: 0; border-radius: 9px; background: var(--profile-action); color: var(--profile-on-action); cursor: pointer; font: 900 11px Cairo, sans-serif; text-decoration: none; }
 .exam-course-note { margin: 0; color: var(--profile-muted); font-size: 10px; }
 .exam-history-list { display: grid; gap: 14px; }
 .exam-result-card { display: grid; grid-template-columns: 132px minmax(0, 1fr); align-items: center; gap: 24px; padding: 22px; border: 1px solid var(--profile-border); border-radius: 16px; background: var(--profile-surface); }

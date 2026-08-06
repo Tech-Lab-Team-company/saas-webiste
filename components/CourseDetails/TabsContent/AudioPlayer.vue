@@ -2,13 +2,18 @@
 import WaveSurfer from 'wavesurfer.js'
 
 const props = defineProps({
-    src: String
+    src: String,
+    sessionId: {
+      type: Number,
+      default: null,
+    },
 })
 const waveform = ref(null)
 let wavesurfer: WaveSurfer | null = null
 const isPlaying = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
+const watchHistory = useCourseWatchHistory(() => props.sessionId)
 
 const audioUrl = computed(() => props.src || '')
 
@@ -26,19 +31,27 @@ onMounted(() => {
 
   wavesurfer.on('ready', () => {
     duration.value = wavesurfer.getDuration()
+    watchHistory.updateDuration(duration.value)
   })
 
   wavesurfer.on('audioprocess', () => {
     currentTime.value = wavesurfer.getCurrentTime()
+    watchHistory.updateCurrentTime(currentTime.value)
   })
 
   wavesurfer.on('seek', () => {
     currentTime.value = wavesurfer.getCurrentTime()
+    watchHistory.updateCurrentTime(currentTime.value)
+  })
+
+  wavesurfer.on('pause', () => {
+    void watchHistory.saveProgress(true)
   })
 
   wavesurfer.on('finish', () => {
     isPlaying.value = false
     currentTime.value = duration.value
+    watchHistory.markPlaybackEnded()
   })
 })
 

@@ -143,6 +143,16 @@ const uploadImage = async () => {
         </span>
         <p>اختباراتي</p>
       </NuxtLink>
+      <!-- <NuxtLink
+        to="/questions"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-question-circle" />
+        </span>
+        <p>بنك الأسئلة</p>
+      </NuxtLink> -->
       <NuxtLink
         :to="{ name: 'profilesubjectinfo' }"
         exact-active-class="active"
@@ -163,15 +173,29 @@ const uploadImage = async () => {
         </span>
         <p>تغيير كلمة المرور</p>
       </NuxtLink>
-      <li
-        class="profile-option"
+      <NuxtLink
+        to="/home-v2"
+        class="profile-option profile-site-return"
+        aria-label="الانتقال إلى الموقع الرئيسي"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-external-link" />
+        </span>
+        <span class="profile-option-copy">
+          <p>الموقع الرئيسي</p>
+          <small>العودة إلى واجهة المنصة</small>
+        </span>
+      </NuxtLink>
+      <button
+        type="button"
+        class="profile-option profile-logout"
         @click="handleLogout"
       >
         <span class="profile-icon profile-option-icon" aria-hidden="true">
           <i class="pi pi-sign-out" />
         </span>
         <p>تسجيل الخروج</p>
-      </li>
+      </button>
     </ul>
 
     <div class="profile-sidebar-help">

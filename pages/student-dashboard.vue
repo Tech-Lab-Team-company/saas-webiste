@@ -22,7 +22,7 @@ const userStore = useUserStore();
 const courses = ref<CoursesModel[]>([]);
 const isLoading = ref(true);
 const coursesError = ref("");
-const { animateCourseCards } = useStudentDashboardMotion();
+const { animateCourseCards, animateSummaryScore } = useStudentDashboardMotion();
 
 const user = computed(() => userStore.user);
 const studentName = computed(
@@ -114,6 +114,7 @@ onMounted(async () => {
 
   await fetchStudentCourses();
   await animateCourseCards();
+  await animateSummaryScore();
 });
 </script>
 
@@ -140,7 +141,9 @@ onMounted(async () => {
               <span class="dashboard-date"><i />{{ today }}</span>
               <h1>
                 أهلًا، {{ studentName }}
-                <span class="welcome-wave" role="img" aria-label="مرحبًا">👋</span>
+                <span class="welcome-wave" role="img" aria-label="مرحبًا">
+                  <img width="65"  src="/images/waving-hand.png" alt="مرحبًا" />
+                </span>
               </h1>
               <p v-if="educationDetails">
                 هنا ستجد المحتوى المناسب لـ {{ educationDetails }}.
@@ -234,15 +237,21 @@ onMounted(async () => {
               <div class="summary-score">
                 <div
                   class="score-ring"
+                  :data-score="courseProgress(featuredCourse)"
                   :style="{
                     '--score': `${courseProgress(featuredCourse)}%`,
                   }"
+                  role="progressbar"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  :aria-valuenow="Math.round(courseProgress(featuredCourse))"
+                  :aria-label="`نسبة تقدم الكورس ${displayCourseProgress(featuredCourse)} بالمائة`"
                 >
-                  <span
-                    >{{
+                  <span>
+                    <span class="score-ring__value">{{
                       displayCourseProgress(featuredCourse)
-                    }}<small>%</small></span
-                  >
+                    }}</span><small>%</small>
+                  </span>
                 </div>
                 <div>
                   <b>{{ completedCourses ? "أداء رائع!" : "واصل التقدّم" }}</b
@@ -253,14 +262,14 @@ onMounted(async () => {
                 <div>
                   <span>▤</span>
                   <p>
-                    <b>{{ courses.length }}</b
+                    <b class="summary-stat-value" :data-count="courses.length">{{ courses.length }}</b
                     ><small>كورسات مسجلة</small>
                   </p>
                 </div>
                 <div>
                   <span>✓</span>
                   <p>
-                    <b>{{ completedCourses }}</b
+                    <b class="summary-stat-value" :data-count="completedCourses">{{ completedCourses }}</b
                     ><small>كورسات مكتملة</small>
                   </p>
                 </div>
@@ -393,6 +402,9 @@ onMounted(async () => {
   font-size: clamp(28px, 3vw, 40px);
   font-weight: 900;
   line-height: 1.35;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .welcome-wave {
   display: inline-block;
@@ -768,6 +780,9 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
+}
+.course-grid {
+  perspective: 1200px;
 }
 .course-card {
   display: flex;

@@ -30,9 +30,12 @@ class ApiNames {
   //Education Stages
   public educationstages = this.baseUrl + "fetch_education_type";
   public educationlevels = "fetch_stages";
+  public fetch_stages = "fetch_stages";
+  public fetch_stage_years = "fetch_stage_years";
 
   //Course Details
   public courseDetails = "course_details";
+  public send_user_watch = "send_user_watch";
 
   //university
   public university = "fetch_universities";
@@ -69,6 +72,7 @@ class ApiNames {
 
   //blog
   public blog = "blog-details";
+  public show_blog = "show_blog";
   public blogComments = "fetch_blog_comments";
   public addBlogComment = "make_comment";
 
@@ -120,6 +124,7 @@ class ApiNames {
 
   // blogs card
   public fetch_blogs = "fetch_blogs";
+  public fetch_hashtags = "fetch_hashtags";
 
   // Home V2
   // This endpoint is available on the development API only.

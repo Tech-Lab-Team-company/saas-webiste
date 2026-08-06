@@ -240,6 +240,161 @@ html[data-theme='dark'] .p-dialog-mask {
   backdrop-filter: blur(4px);
 }
 
+/* Course details contains legacy scoped styles, so its theme tokens must be
+   established globally to keep the complete content area in dark mode. */
+html[data-theme='dark'] :is(.course-card-layout, .course-details-page) {
+  --course-accent: var(--app-accent);
+  --course-accent-dark: color-mix(in srgb, var(--app-brand-secondary) 28%, #05070b);
+  --course-accent-soft: color-mix(in srgb, var(--app-accent) 11%, var(--app-bg-muted));
+  --course-ink: var(--app-text);
+  --course-muted: var(--app-muted);
+  --course-border: var(--app-line);
+  --course-paper: var(--app-bg);
+  --course-surface: var(--app-surface);
+  --course-surface-raised: var(--app-surface-raised);
+  --course-action-text: #07101f;
+  color-scheme: dark;
+  background-color: var(--app-bg) !important;
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .public-detail-hero,
+  .course-detail-main,
+  .course-body-shell,
+  .course-main-content,
+  .course-tabs,
+  .tabs-container,
+  .detail-content,
+  .detail-tabs,
+  .detail-content > article
+) {
+  border-color: var(--app-line);
+  background-color: var(--app-bg) !important;
+  color: var(--app-text);
+}
+
+html[data-theme='dark'] .course-card-layout .public-detail-hero {
+  background-color: color-mix(in srgb, var(--app-accent) 9%, var(--app-bg-muted)) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .detail-numbers,
+  .detail-numbers > div,
+  .teacher-profile,
+  .course-viewer
+) {
+  border-color: var(--app-line) !important;
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .course-content-container,
+  .course-content-panel,
+  .course-content-header,
+  .course-content-body,
+  .course-class-container,
+  .course-class-panel,
+  .course-class-header,
+  .course-class-body,
+  .course-body-details
+) {
+  border-color: var(--app-line) !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .course-card-layout .course-video-text {
+  border-color: var(--app-line) !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .course-card-layout .course-video-text-title {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .course-card-layout .course-video-text-description {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .course-card-layout .course-body-details:hover,
+html[data-theme='dark'] .course-card-layout .course-body-details.active {
+  border-color: color-mix(in srgb, var(--app-accent) 35%, var(--app-line)) !important;
+  background: color-mix(in srgb, var(--app-accent) 12%, var(--app-surface-raised)) !important;
+  color: var(--app-accent) !important;
+}
+
+html[data-theme='dark'] .course-details-page:has(#course-overview:target) .detail-tabs .nav-curriculum,
+html[data-theme='dark'] .course-details-page:has(#course-teacher:target) .detail-tabs .nav-curriculum {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .course-details-page:has(#course-overview:target) .detail-tabs .nav-overview,
+html[data-theme='dark'] .course-details-page:has(#course-teacher:target) .detail-tabs .nav-teacher {
+  color: var(--app-accent) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .accordion-title,
+  .course-content-header,
+  .course-class-header,
+  .session-name,
+  .session-name p
+) {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .accordion-count,
+  .session-name p + p
+) {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .course-details-sidebar,
+  .course-details-sidebar__inner
+) {
+  height: fit-content;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .detail-tabs a,
+  .overview-description,
+  .overview-description *,
+  .platform-key,
+  .platform-key span,
+  .detail-numbers small,
+  .teacher-profile p,
+  .teacher-description,
+  .teacher-description *
+) {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .section-heading-block h2,
+  .detail-numbers strong,
+  .teacher-profile h2
+) {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .course-card-layout :is(
+  .detail-section-tag,
+  .detail-tabs a:hover,
+  .detail-tabs a:focus-visible,
+  .detail-tabs a.active-tab,
+  .detail-tabs .nav-curriculum,
+  .teacher-role
+) {
+  color: var(--app-accent) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body {
     transition: none;

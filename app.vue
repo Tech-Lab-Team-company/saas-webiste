@@ -13,10 +13,19 @@ import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 
 const router = useRouter();
 const route = useRoute();
+const isCourseDetailsPage = computed(() =>
+  /^\/course\/[^/]+\/?$/u.test(route.path),
+);
+const isCourseExamPage = computed(() =>
+  /^\/course\/[^/]+\/(?!timer(?:\/|$))[^/]+\/?$/u.test(route.path),
+);
 const isHomeV2 = computed(() =>
   ["/home-v2", "/aboutus", "/about-teacher", "/books", "/blogs", "/course", "/app"].includes(route.path) ||
   route.path.startsWith("/books/") ||
-  route.path.startsWith("/blog-v2/"),
+  route.path.startsWith("/blogs/") ||
+  route.path.startsWith("/blog-v2/") ||
+  isCourseDetailsPage.value ||
+  isCourseExamPage.value,
 );
 const UserStore = useUserStore();
 const { theme, isDark, toggleTheme } = useAppTheme();

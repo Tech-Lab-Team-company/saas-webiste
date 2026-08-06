@@ -230,41 +230,45 @@ const submit = async () => {
   gap: 12px;
   border: 0;
   border-radius: 8px;
-  background: var(--home-v2-blue, var(--primary-color));
-  color: #fff;
+  background: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
+  color: var(--book-details-action-text, #fff);
   font: 800 14px var(--home-v2-heading, inherit);
   cursor: pointer;
 }
 .buy-book-trigger span { transition: transform .2s ease; }
 .buy-book-trigger:hover span { transform: translateX(-4px); }
+:global(html[data-theme="dark"]) .buy-book-dialog__submit,
+:global(html[data-theme="dark"]) .buy-book-dialog__success button {
+  color: #07101f;
+}
 .buy-book-dialog__header { display: grid; gap: 3px; }
-.buy-book-dialog__header span { color: var(--home-v2-ink, #172033); font-weight: 900; }
-.buy-book-dialog__header small { color: #70778a; font-size: 12px; }
+.buy-book-dialog__header span { color: var(--home-v2-ink, var(--app-text, #172033)); font-weight: 900; }
+.buy-book-dialog__header small { color: var(--home-v2-muted, var(--app-muted, #70778a)); font-size: 12px; }
 .buy-book-dialog__form { display: grid; gap: 20px; }
-.buy-book-dialog__summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px; border-radius: 10px; background: #f7f5ef; }
+.buy-book-dialog__summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 10px; background: var(--home-v2-cream, var(--app-bg-muted, #f7f5ef)); }
 .buy-book-dialog__summary div { display: grid; gap: 4px; }
-.buy-book-dialog__summary small, .buy-book-dialog__section-title small { color: #747b8b; }
-.buy-book-dialog__summary b { color: var(--home-v2-blue, var(--primary-color)); font-size: 20px; }
+.buy-book-dialog__summary small, .buy-book-dialog__section-title small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); }
+.buy-book-dialog__summary b { color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); font-size: 20px; }
 .buy-book-dialog__modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; padding: 0; border: 0; }
 .buy-book-dialog__modes legend { grid-column: 1 / -1; margin-bottom: 6px; font-weight: 900; }
-.buy-book-dialog__modes label, .buy-book-dialog__methods label { display: flex; align-items: center; gap: 10px; padding: 13px; border: 1px solid #e2e4ea; border-radius: 9px; cursor: pointer; }
-.buy-book-dialog__modes label.active, .buy-book-dialog__methods label.active { border-color: var(--home-v2-blue, var(--primary-color)); background: color-mix(in srgb, var(--home-v2-blue, #28366c) 6%, white); }
+.buy-book-dialog__modes label, .buy-book-dialog__methods label { display: flex; align-items: center; gap: 10px; padding: 13px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 9px; background: var(--home-v2-surface, var(--app-surface, #fff)); cursor: pointer; }
+.buy-book-dialog__modes label.active, .buy-book-dialog__methods label.active { border-color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 12%, var(--home-v2-surface, var(--app-surface, #fff))); }
 .buy-book-dialog__modes span, .buy-book-dialog__methods span { display: grid; gap: 2px; }
-.buy-book-dialog__modes small, .buy-book-dialog__methods small { color: #747b8b; font-size: 11px; }
+.buy-book-dialog__modes small, .buy-book-dialog__methods small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; }
 .buy-book-dialog__section-title { display: grid; gap: 2px; }
 .buy-book-dialog__methods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .buy-book-dialog__methods img { width: 38px; height: 38px; border-radius: 7px; object-fit: contain; }
 .buy-book-dialog__account { display: grid; gap: 7px; font-weight: 800; }
-.buy-book-dialog__account input { min-height: 48px; padding: 0 14px; border: 1px solid #d9dce4; border-radius: 8px; outline: none; direction: ltr; text-align: right; }
-.buy-book-dialog__account input:focus { border-color: var(--home-v2-blue, var(--primary-color)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue, #28366c) 12%, transparent); }
-.buy-book-dialog__account small, .buy-book-dialog__hint, .buy-book-dialog__privacy { margin: 0; color: #747b8b; font-size: 11px; }
-.buy-book-dialog__error { margin: 0; padding: 10px 12px; border-radius: 7px; background: #fff0f0; color: #a22727; font-size: 13px; }
+.buy-book-dialog__account input { min-height: 48px; padding: 0 14px; border: 1px solid var(--home-v2-line, var(--app-line, #d9dce4)); border-radius: 8px; background: var(--home-v2-surface-raised, var(--app-surface-raised, #fff)); color: var(--home-v2-ink, var(--app-text, #172033)); outline: none; direction: ltr; text-align: right; }
+.buy-book-dialog__account input:focus { border-color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 12%, transparent); }
+.buy-book-dialog__account small, .buy-book-dialog__hint, .buy-book-dialog__privacy { margin: 0; color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; }
+.buy-book-dialog__error { margin: 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, #dc4a4a 35%, transparent); border-radius: 7px; background: color-mix(in srgb, #dc4a4a 12%, var(--app-surface, #fff)); color: color-mix(in srgb, #dc4a4a 70%, var(--app-text, #172033)); font-size: 13px; }
 .buy-book-dialog__submit:disabled { opacity: .55; cursor: wait; }
 .buy-book-dialog__privacy { text-align: center; }
 .buy-book-dialog__success { display: grid; place-items: center; gap: 10px; padding: 24px 5px 8px; text-align: center; }
-.buy-book-dialog__success > span { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 50%; background: #e6f6ec; color: #25834a; font-size: 28px; font-weight: 900; }
+.buy-book-dialog__success > span { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 50%; background: color-mix(in srgb, #32a762 15%, var(--app-surface, #fff)); color: color-mix(in srgb, #32a762 78%, var(--app-text, #172033)); font-size: 28px; font-weight: 900; }
 .buy-book-dialog__success h3, .buy-book-dialog__success p { margin: 0; }
-.buy-book-dialog__success p { max-width: 410px; color: #747b8b; line-height: 1.8; }
+.buy-book-dialog__success p { max-width: 410px; color: var(--home-v2-muted, var(--app-muted, #747b8b)); line-height: 1.8; }
 .buy-book-dialog__success button { width: 160px; margin-top: 10px; }
 @media (max-width: 560px) {
   .buy-book-dialog__modes, .buy-book-dialog__methods { grid-template-columns: 1fr; }

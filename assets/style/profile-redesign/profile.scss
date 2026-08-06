@@ -1,7 +1,11 @@
 .profile-redesign-page {
   --profile-primary: var(--primary-color, #061147);
   --profile-secondary: var(--secondary-color, #1671e8);
-  --profile-secondary-soft: color-mix(in srgb, var(--profile-secondary) 11%, var(--app-surface, white));
+  --profile-secondary-soft: color-mix(
+    in srgb,
+    var(--profile-secondary) 11%,
+    var(--app-surface, white)
+  );
   --profile-ink: var(--app-text, #17343c);
   --profile-muted: var(--app-muted, #7c9196);
   --profile-border: var(--app-line, #dfe7e5);
@@ -97,7 +101,8 @@ body:has(.profile-redesign-page) {
   align-items: center;
   gap: 8px;
   padding: 9px 14px;
-  border: 1px solid color-mix(in srgb, var(--profile-secondary) 24%, var(--profile-surface));
+  border: 1px solid
+    color-mix(in srgb, var(--profile-secondary) 24%, var(--profile-surface));
   background: var(--profile-secondary-soft);
   color: var(--profile-secondary);
   font-size: 12px;
@@ -186,8 +191,12 @@ body:has(.profile-redesign-page) {
   margin: 0;
 }
 
-.profile-redesign-page .profile-password-card .profile-info-container:first-child,
-.profile-redesign-page .profile-password-card .profile-info-container:last-child {
+.profile-redesign-page
+  .profile-password-card
+  .profile-info-container:first-child,
+.profile-redesign-page
+  .profile-password-card
+  .profile-info-container:last-child {
   grid-column: 1 / -1;
 }
 
@@ -203,7 +212,10 @@ body:has(.profile-redesign-page) {
   width: 100%;
 }
 
-.profile-redesign-page .profile-password-card .profile-input-container input.input {
+.profile-redesign-page
+  .profile-password-card
+  .profile-input-container
+  input.input {
   width: 100% !important;
   height: 49px;
   margin: 0;
@@ -218,13 +230,19 @@ body:has(.profile-redesign-page) {
   text-align: right;
 }
 
-.profile-redesign-page .profile-password-card .profile-input-container input.input:focus {
+.profile-redesign-page
+  .profile-password-card
+  .profile-input-container
+  input.input:focus {
   border-color: var(--profile-secondary);
   background: var(--profile-surface);
   box-shadow: 0 0 0 3px var(--profile-secondary-soft);
 }
 
-.profile-redesign-page .profile-password-card .profile-info-container:last-child .profile-input-container {
+.profile-redesign-page
+  .profile-password-card
+  .profile-info-container:last-child
+  .profile-input-container {
   justify-content: flex-start;
   padding-top: 4px;
 }
@@ -273,7 +291,10 @@ body:has(.profile-redesign-page) {
   padding: 28px 0 0;
 }
 
-.profile-redesign-page .profile-subject-card .login-input select.student-select {
+.profile-redesign-page
+  .profile-subject-card
+  .login-input
+  select.student-select {
   width: 100%;
   min-height: 49px;
   border: 1px solid var(--profile-border);
@@ -283,7 +304,10 @@ body:has(.profile-redesign-page) {
   font-family: inherit;
 }
 
-.profile-redesign-page .profile-subject-card .login-input select.student-select:focus {
+.profile-redesign-page
+  .profile-subject-card
+  .login-input
+  select.student-select:focus {
   border-color: var(--profile-secondary);
   box-shadow: 0 0 0 3px var(--profile-secondary-soft);
 }
@@ -423,48 +447,86 @@ body:has(.profile-redesign-page) {
   font-weight: 800;
 }
 
-.profile-redesign-page .profile-input-container {
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-input-container {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
   align-items: stretch;
-  gap: 0;
+  gap: 8px;
 }
 
-.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input {
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-info-container
+  .profile-input-container
+  input.input {
   width: 100%;
   min-width: 0;
   height: 49px;
   margin: 0;
   padding: 10px 14px;
   border: 1px solid var(--profile-border);
-  border-radius: 0;
+  border-radius: 10px;
   outline: none;
   background: var(--profile-surface-raised);
   color: var(--profile-ink);
   font-family: inherit;
   font-size: 13px;
   text-align: right;
-  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease,
+    background 180ms ease;
 }
 
-.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:focus {
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-info-container
+  .profile-input-container
+  input.input:focus {
   border-color: var(--profile-secondary);
   background: var(--profile-surface);
   box-shadow: 0 0 0 3px var(--profile-secondary-soft);
 }
 
-.profile-redesign-page .profile-input-container button {
-  flex: 0 0 auto;
-  min-width: 66px;
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-input-container
+  button {
+  width: 72px;
+  min-width: 0;
   border: 1px solid var(--profile-border);
-  border-inline-start: 0;
-  background: var(--profile-surface);
+  border-radius: 10px;
+  background: var(--profile-secondary-soft);
   color: var(--profile-secondary);
   font-family: inherit;
   font-size: 11px;
   font-weight: 800;
   text-decoration: none;
   cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease,
+    transform 180ms ease;
+}
+
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-input-container
+  button:hover,
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-input-container
+  button:focus-visible {
+  border-color: var(--profile-secondary);
+  background: var(--profile-secondary);
+  color: var(--profile-on-action);
+  outline: none;
+  transform: translateY(-1px);
 }
 
 .profile-redesign-page .profile-card-actions {
@@ -488,7 +550,11 @@ body:has(.profile-redesign-page) {
   margin: 0;
 }
 
-.profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes {
+.profile-redesign-page
+  .profile-data-card
+  .profile-card-actions
+  .button
+  .btn-save-changes {
   min-width: 150px;
   margin: 0;
   padding: 13px 20px;
@@ -500,10 +566,15 @@ body:has(.profile-redesign-page) {
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: background 180ms ease, border-color 180ms ease,
+    transform 180ms ease;
 }
 
-.profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes:hover {
+.profile-redesign-page
+  .profile-data-card
+  .profile-card-actions
+  .button
+  .btn-save-changes:hover {
   border-color: var(--profile-secondary);
   background: var(--profile-secondary);
   transform: translateY(-1px);
@@ -524,7 +595,8 @@ body:has(.profile-redesign-page) {
   background: var(--profile-primary);
   color: #fff;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--profile-secondary) 72%, white) transparent;
+  scrollbar-color: color-mix(in srgb, var(--profile-secondary) 72%, white)
+    transparent;
   scrollbar-gutter: stable;
 }
 
@@ -546,7 +618,8 @@ body:has(.profile-redesign-page) {
   background-clip: padding-box;
 }
 
-.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar-thumb:hover {
+.profile-redesign-page
+  .profile-sidebar-container::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--profile-secondary) 48%, white);
   background-clip: padding-box;
 }
@@ -604,7 +677,11 @@ body:has(.profile-redesign-page) {
   position: relative;
 }
 
-.profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container .person-data .profile-image-container img.course-image {
+.profile-redesign-page
+  .profile-dashboard-sidebar.profile-sidebar-container
+  .person-data
+  .profile-image-container
+  img.course-image {
   width: 72px !important;
   height: 72px !important;
   display: block;
@@ -627,7 +704,11 @@ body:has(.profile-redesign-page) {
   cursor: pointer;
 }
 
-.profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container .person-data .profile-image-container .edit-icon {
+.profile-redesign-page
+  .profile-dashboard-sidebar.profile-sidebar-container
+  .person-data
+  .profile-image-container
+  .edit-icon {
   inset-inline-start: auto !important;
   right: auto !important;
   left: -2px !important;
@@ -692,15 +773,27 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-sidebar-container .profile-option:hover,
 .profile-redesign-page .profile-sidebar-container .profile-option.active,
-.profile-redesign-page .profile-sidebar-container .profile-option.router-link-exact-active {
+.profile-redesign-page
+  .profile-sidebar-container
+  .profile-option.router-link-exact-active {
   border-inline-start-color: var(--profile-secondary);
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
-.profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container .profile-options .profile-option.active,
-.profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container .profile-options .profile-option.router-link-exact-active {
-  background: color-mix(in srgb, var(--profile-secondary) 30%, var(--profile-primary));
+.profile-redesign-page
+  .profile-dashboard-sidebar.profile-sidebar-container
+  .profile-options
+  .profile-option.active,
+.profile-redesign-page
+  .profile-dashboard-sidebar.profile-sidebar-container
+  .profile-options
+  .profile-option.router-link-exact-active {
+  background: color-mix(
+    in srgb,
+    var(--profile-secondary) 30%,
+    var(--profile-primary)
+  );
   color: #fff;
 }
 
@@ -712,7 +805,10 @@ body:has(.profile-redesign-page) {
   font-weight: 800;
 }
 
-.profile-redesign-page .profile-sidebar-container .profile-option .profile-icon {
+.profile-redesign-page
+  .profile-sidebar-container
+  .profile-option
+  .profile-icon {
   order: 1;
   width: 18px;
   height: 18px;
@@ -721,6 +817,98 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-sidebar-container .profile-option svg path {
   stroke: currentColor !important;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-site-return {
+  min-height: 64px;
+  margin-top: 16px;
+  border: 1px solid rgba(130, 181, 255, 0.28);
+  border-inline-start-width: 1px;
+  text-align: center;
+  background: linear-gradient(
+    135deg,
+    rgba(75, 132, 214, 0.2),
+    rgba(255, 255, 255, 0.06)
+  );
+  color: #d8e8ff;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-site-return:hover {
+  border-color: rgba(145, 193, 255, 0.58);
+  background: linear-gradient(
+    135deg,
+    rgba(75, 132, 214, 0.34),
+    rgba(255, 255, 255, 0.1)
+  );
+  color: #fff;
+}
+
+.profile-redesign-page
+  .profile-sidebar-container
+  .profile-site-return
+  .profile-option-icon {
+  border-color: rgba(157, 201, 255, 0.5);
+  background: rgba(114, 172, 248, 0.16);
+  color: #cfe4ff;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-option-copy {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-option-copy small {
+  color: rgba(216, 232, 255, 0.62);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-logout {
+  width: 100%;
+  margin-top: 7px;
+  border: 1px solid rgba(255, 105, 105, 0.22);
+  border-inline-start-width: 1px;
+  background: rgba(216, 62, 62, 0.09);
+  color: #ffaaaa;
+  font-family: inherit;
+  text-align: start;
+}
+
+.profile-redesign-page .profile-sidebar-container .profile-logout:hover {
+  border-color: rgba(255, 120, 120, 0.56);
+  background: rgba(207, 52, 52, 0.24);
+  color: #fff;
+}
+
+.profile-redesign-page
+  .profile-sidebar-container
+  .profile-logout
+  .profile-option-icon {
+  border-color: rgba(255, 125, 125, 0.42);
+  background: rgba(216, 62, 62, 0.14);
+  color: #ffaaaa;
+}
+
+.profile-redesign-page
+  .profile-dashboard-sidebar.profile-sidebar-container
+  .profile-options
+  .profile-site-return:hover
+  .profile-option-icon {
+  border-color: #9dc9ff;
+  background: #6faaf5;
+  color: #fff;
+}
+
+.profile-redesign-page
+  .profile-dashboard-sidebar.profile-sidebar-container
+  .profile-options
+  .profile-logout:hover
+  .profile-option-icon {
+  border-color: #e25353;
+  background: #d83e3e;
+  color: #fff;
 }
 
 .profile-redesign-page .profile-sidebar-help {
@@ -849,7 +1037,9 @@ body:has(.profile-redesign-page) {
     scrollbar-width: none;
   }
 
-  .profile-redesign-page .profile-sidebar-container .profile-options::-webkit-scrollbar {
+  .profile-redesign-page
+    .profile-sidebar-container
+    .profile-options::-webkit-scrollbar {
     display: none;
   }
 
@@ -864,7 +1054,9 @@ body:has(.profile-redesign-page) {
   }
 
   .profile-redesign-page .profile-sidebar-container .profile-option.active,
-  .profile-redesign-page .profile-sidebar-container .profile-option.router-link-exact-active {
+  .profile-redesign-page
+    .profile-sidebar-container
+    .profile-option.router-link-exact-active {
     border-bottom-color: var(--profile-secondary);
   }
 
@@ -891,8 +1083,12 @@ body:has(.profile-redesign-page) {
     grid-template-columns: 1fr;
   }
 
-  .profile-redesign-page .profile-password-card .profile-info-container:first-child,
-  .profile-redesign-page .profile-password-card .profile-info-container:last-child {
+  .profile-redesign-page
+    .profile-password-card
+    .profile-info-container:first-child,
+  .profile-redesign-page
+    .profile-password-card
+    .profile-info-container:last-child {
     grid-column: auto;
   }
 
@@ -940,9 +1136,16 @@ body:has(.profile-redesign-page) {
 
 /* Shared professional finish and motion for every profile dashboard page. */
 .profile-redesign-page {
-  background:
-    radial-gradient(circle at 8% 4%, color-mix(in srgb, var(--profile-secondary) 8%, transparent), transparent 28%),
-    linear-gradient(145deg, color-mix(in srgb, var(--profile-primary) 2%, var(--profile-canvas)), var(--profile-canvas));
+  background: radial-gradient(
+      circle at 8% 4%,
+      color-mix(in srgb, var(--profile-secondary) 8%, transparent),
+      transparent 28%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--profile-primary) 2%, var(--profile-canvas)),
+      var(--profile-canvas)
+    );
 }
 
 .profile-redesign-page .profile-dashboard-workspace {
@@ -952,16 +1155,25 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container {
   z-index: 25;
-  box-shadow: -18px 0 50px color-mix(in srgb, var(--profile-primary) 22%, transparent);
+  box-shadow: -18px 0 50px
+    color-mix(in srgb, var(--profile-primary) 22%, transparent);
 }
 
 .profile-redesign-page .profile-dashboard-topbar {
   position: sticky;
+  display: flex;
+  align-items: center !important;
+  // justify-content: space-between;
   top: 0;
   z-index: 20;
-  border-color: color-mix(in srgb, var(--profile-primary) 10%, var(--profile-border));
+  border-color: color-mix(
+    in srgb,
+    var(--profile-primary) 10%,
+    var(--profile-border)
+  );
   background: color-mix(in srgb, var(--profile-surface) 92%, transparent);
-  box-shadow: 0 8px 28px color-mix(in srgb, var(--profile-primary) 6%, transparent);
+  box-shadow: 0 8px 28px
+    color-mix(in srgb, var(--profile-primary) 6%, transparent);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
 }
@@ -978,7 +1190,8 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-topbar-status:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--profile-secondary) 14%, transparent);
+  box-shadow: 0 8px 20px
+    color-mix(in srgb, var(--profile-secondary) 14%, transparent);
 }
 
 .profile-redesign-page .profile-topbar-status > span {
@@ -1016,25 +1229,38 @@ body:has(.profile-redesign-page) {
 .profile-redesign-page .profile-summary-card,
 .profile-redesign-page .profile-data-card {
   overflow: hidden;
-  border-color: color-mix(in srgb, var(--profile-primary) 12%, var(--profile-border));
+  border-color: color-mix(
+    in srgb,
+    var(--profile-primary) 12%,
+    var(--profile-border)
+  );
   border-radius: 18px;
-  box-shadow: 0 16px 42px color-mix(in srgb, var(--profile-primary) 7%, transparent);
-  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  box-shadow: 0 16px 42px
+    color-mix(in srgb, var(--profile-primary) 7%, transparent);
+  transition: border-color 220ms ease, box-shadow 220ms ease,
+    transform 220ms ease;
 }
 
 .profile-redesign-page .profile-section-card:hover,
 .profile-redesign-page .profile-summary-card:hover,
 .profile-redesign-page .profile-data-card:hover {
-  border-color: color-mix(in srgb, var(--profile-secondary) 28%, var(--profile-border));
-  box-shadow: 0 22px 52px color-mix(in srgb, var(--profile-primary) 10%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--profile-secondary) 28%,
+    var(--profile-border)
+  );
+  box-shadow: 0 22px 52px
+    color-mix(in srgb, var(--profile-primary) 10%, transparent);
   transform: translateY(-2px);
 }
 
 .profile-redesign-page .profile-summary-avatar {
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--profile-secondary) 18%, transparent);
-  transition: transform 240ms cubic-bezier(.2, .8, .2, 1), box-shadow 240ms ease;
+  box-shadow: 0 12px 28px
+    color-mix(in srgb, var(--profile-secondary) 18%, transparent);
+  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 240ms ease;
 }
 
 .profile-redesign-page .profile-summary-avatar::after {
@@ -1049,31 +1275,72 @@ body:has(.profile-redesign-page) {
 }
 
 .profile-redesign-page .profile-summary-card:hover .profile-summary-avatar {
-  box-shadow: 0 16px 34px color-mix(in srgb, var(--profile-secondary) 24%, transparent);
+  box-shadow: 0 16px 34px
+    color-mix(in srgb, var(--profile-secondary) 24%, transparent);
   transform: translateY(-4px) scale(1.035);
 }
 
-.profile-redesign-page .profile-summary-card:hover .profile-summary-avatar::after {
+.profile-redesign-page
+  .profile-summary-card:hover
+  .profile-summary-avatar::after {
   left: 120%;
 }
 
-.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input,
-.profile-redesign-page .profile-password-card .profile-input-container input.input,
-.profile-redesign-page .profile-subject-card .login-input select.student-select {
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-info-container
+  .profile-input-container
+  input.input,
+.profile-redesign-page
+  .profile-password-card
+  .profile-input-container
+  input.input,
+.profile-redesign-page
+  .profile-subject-card
+  .login-input
+  select.student-select {
   border-radius: 10px;
-  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease,
+    background 180ms ease, transform 180ms ease;
 }
 
-.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:hover,
-.profile-redesign-page .profile-password-card .profile-input-container input.input:hover,
-.profile-redesign-page .profile-subject-card .login-input select.student-select:hover {
-  border-color: color-mix(in srgb, var(--profile-secondary) 38%, var(--profile-border));
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-info-container
+  .profile-input-container
+  input.input:hover,
+.profile-redesign-page
+  .profile-password-card
+  .profile-input-container
+  input.input:hover,
+.profile-redesign-page
+  .profile-subject-card
+  .login-input
+  select.student-select:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--profile-secondary) 38%,
+    var(--profile-border)
+  );
   background: var(--profile-surface);
 }
 
-.profile-redesign-page .profile-data-card .profile-home-information .profile-info-container .profile-input-container input.input:focus,
-.profile-redesign-page .profile-password-card .profile-input-container input.input:focus,
-.profile-redesign-page .profile-subject-card .login-input select.student-select:focus {
+.profile-redesign-page
+  .profile-data-card
+  .profile-home-information
+  .profile-info-container
+  .profile-input-container
+  input.input:focus,
+.profile-redesign-page
+  .profile-password-card
+  .profile-input-container
+  input.input:focus,
+.profile-redesign-page
+  .profile-subject-card
+  .login-input
+  select.student-select:focus {
   transform: translateY(-1px);
 }
 
@@ -1087,58 +1354,90 @@ body:has(.profile-redesign-page) {
   color: var(--profile-secondary);
 }
 
-.profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes,
+.profile-redesign-page
+  .profile-data-card
+  .profile-card-actions
+  .button
+  .btn-save-changes,
 .profile-redesign-page .profile-password-card button.primary-button-2,
 .profile-redesign-page .profile-subject-card .btns-home .login-btn {
   border-radius: 10px;
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--profile-primary) 18%, transparent);
-  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  box-shadow: 0 10px 24px
+    color-mix(in srgb, var(--profile-primary) 18%, transparent);
+  transition: background 180ms ease, border-color 180ms ease,
+    box-shadow 180ms ease, transform 180ms ease;
 }
 
-.profile-redesign-page .profile-data-card .profile-card-actions .button .btn-save-changes:hover,
+.profile-redesign-page
+  .profile-data-card
+  .profile-card-actions
+  .button
+  .btn-save-changes:hover,
 .profile-redesign-page .profile-password-card button.primary-button-2:hover,
 .profile-redesign-page .profile-subject-card .btns-home .login-btn:hover {
   border-color: var(--profile-secondary);
   background: var(--profile-secondary);
-  box-shadow: 0 14px 30px color-mix(in srgb, var(--profile-secondary) 24%, transparent);
+  box-shadow: 0 14px 30px
+    color-mix(in srgb, var(--profile-secondary) 24%, transparent);
   transform: translateY(-2px);
 }
 
 .profile-redesign-page .profile-courses-card .card {
   overflow: hidden;
   border-radius: 14px;
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--profile-primary) 6%, transparent);
-  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  box-shadow: 0 12px 28px
+    color-mix(in srgb, var(--profile-primary) 6%, transparent);
+  transition: border-color 220ms ease, box-shadow 220ms ease,
+    transform 220ms ease;
 }
 
 .profile-redesign-page .profile-courses-card .card:hover {
-  border-color: color-mix(in srgb, var(--profile-secondary) 30%, var(--profile-border));
-  box-shadow: 0 20px 42px color-mix(in srgb, var(--profile-primary) 12%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--profile-secondary) 30%,
+    var(--profile-border)
+  );
+  box-shadow: 0 20px 42px
+    color-mix(in srgb, var(--profile-primary) 12%, transparent);
   transform: translateY(-5px);
 }
 
 .profile-redesign-page .profile-sidebar-container .profile-option {
   border-radius: 10px;
-  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease,
+    transform 180ms ease;
 }
 
 .profile-redesign-page .profile-sidebar-container .profile-option:hover {
   transform: translateX(-3px);
 }
 
-.profile-redesign-page .profile-sidebar-container .profile-image-container img.course-image {
+.profile-redesign-page
+  .profile-sidebar-container
+  .profile-image-container
+  img.course-image {
   box-shadow: 0 12px 30px #0000002e;
-  transition: transform 250ms cubic-bezier(.2, .8, .2, 1), box-shadow 250ms ease;
+  transition: transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 250ms ease;
 }
 
-.profile-redesign-page .profile-sidebar-container .profile-image-container:hover img.course-image {
+.profile-redesign-page
+  .profile-sidebar-container
+  .profile-image-container:hover
+  img.course-image {
   box-shadow: 0 17px 38px #0000003d;
   transform: scale(1.045) rotate(-1deg);
 }
 
 @keyframes profile-status-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--profile-secondary) 34%, transparent); }
-  50% { box-shadow: 0 0 0 6px transparent; }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0
+      color-mix(in srgb, var(--profile-secondary) 34%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

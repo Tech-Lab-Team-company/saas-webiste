@@ -1,0 +1,120 @@
+.course-live-container {
+  display: flex;
+  width: 100%;
+  margin: 12px 0 0;
+  padding: 16px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid #e5e9f0;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.course-live-container.not-live {
+  border-color: #edf0f4;
+  background: #fafbfc;
+  color: #7b8494;
+}
+
+.live-rate {
+  flex: 0 0 auto;
+}
+
+.btns button {
+  min-height: 42px;
+  padding: 9px 20px;
+  border-radius: 11px;
+  background: var(--primary-color, #237a57);
+  color: #fff;
+  font-weight: 700;
+}
+
+.live-container {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 13px;
+  margin: 0;
+}
+
+.course-live-content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.live-title {
+  color: #172033;
+  font-size: 16px;
+  font-weight: 800;
+  text-align: start;
+}
+
+.live-date-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px 14px;
+  margin: 0;
+}
+
+.live-title.live-date {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #717b8c;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.live-icon {
+  width: 13px;
+}
+
+.live-img {
+  flex: 0 0 auto;
+  width: 46px;
+}
+
+@media (max-width: 640px) {
+  .course-live-container {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px;
+  }
+  .live-container,
+  .live-rate,
+  .live-rate a,
+  .btns,
+  .btns button {
+    width: 100%;
+  }
+}
+.course-live-container .btns button {
+  min-height: 42px;
+  padding: 9px 20px;
+  border-radius: 11px;
+  background: var(--primary-color, #237a57);
+}
+
+.course-live-container .course-live-content .live-title {
+  justify-content: flex-start;
+  color: #172033;
+  font-size: 16px;
+  text-align: start;
+}
+
+.course-live-container .course-live-content .live-title.live-date {
+  color: #717b8c;
+  font-size: 11px;
+}
+
+.course-live-container .course-live-content .live-date-container {
+  justify-content: flex-start;
+  margin: 0;
+}/*# sourceMappingURL=course-live.min.css.map */

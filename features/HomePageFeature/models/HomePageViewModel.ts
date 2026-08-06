@@ -39,18 +39,27 @@ export interface HomeCourseViewModel {
   recordingsCount: number | null
 }
 
-export type HomeCourseTabKey = 'first-secondary' | 'second-secondary' | 'third-secondary'
+export type HomeCourseTabKey = string
+
+export interface HomeCourseStageViewModel {
+  id: number
+  label: string
+}
 
 export interface HomeCourseTabViewModel {
   key: HomeCourseTabKey
   label: string
   stageId: number
+  stageLabel: string
   yearId: number
   courses: HomeCourseViewModel[]
 }
 
 export interface HomeCoursesViewModel {
+  stages: HomeCourseStageViewModel[]
   tabs: HomeCourseTabViewModel[]
+  taxonomyStatus: 'loading' | 'success' | 'empty' | 'error'
+  taxonomyError: string | null
   unassignedCourses: HomeCourseViewModel[]
 }
 

@@ -319,7 +319,7 @@ const setupHeroAnimation = () => {
     });
     gsap.to(visual, {
       y: -9,
-      duration: 4.8,
+      duration: 2.4,
       delay: 1.6,
       repeat: -1,
       yoyo: true,
@@ -862,13 +862,43 @@ onBeforeUnmount(() => {
     margin-bottom: 48px;
   }
 
+  .home-v2-hero__actions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
   .home-v2-hero__actions > * {
-    min-width: min(100%, 190px);
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    gap: 8px;
+    padding-inline: 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .home-v2-hero__actions > * span {
+    flex: 0 0 auto;
+    font-size: 14px;
   }
 
   .home-v2-hero__ambient-grid {
     background-size: 38px 38px;
     opacity: 0.35;
+  }
+}
+
+@media (max-width: 360px) {
+  .home-v2-hero__actions {
+    gap: 7px;
+  }
+
+  .home-v2-hero__actions > * {
+    gap: 5px;
+    padding-inline: 8px;
+    font-size: 12px;
   }
 }
 

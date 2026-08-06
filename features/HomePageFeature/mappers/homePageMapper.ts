@@ -18,6 +18,7 @@ import type {
   HomeAboutTeacherViewModel,
   HomeCtaViewModel,
   HomeCourseTabViewModel,
+  HomeCourseStageViewModel,
   HomeCourseViewModel,
   HomeCoursesViewModel,
   HomeHeroViewModel,
@@ -29,7 +30,6 @@ import type {
   HomeWebsiteSectionBookViewModel,
 } from '../models/HomePageViewModel'
 import { BookPriceTypeEnum, BookTypeEnum } from '../models/HomePageViewModel'
-import { homeBlogsMock } from '../mocks/homeBlogs.mock'
 import { createHomeLearningJourneyMock } from '../mocks/homeLearningJourney.mock'
 import { createHomeAboutTeacherMock } from '../mocks/homeAboutTeacher.mock'
 import { createHomeHeroSectionMock } from '../mocks/homeHeroSection.mock'
@@ -283,32 +283,53 @@ export const mapHomeCourseList = (value: unknown): HomeCourseViewModel[] => {
   return [...courses.values()]
 }
 
-const createFixedCourseTabs = (): HomeCourseTabViewModel[] => [
-  {
-    key: 'first-secondary',
-    label: 'الصف الأول الثانوي',
-    stageId: 4,
-    yearId: 9,
-    courses: [],
-  },
-  {
-    key: 'second-secondary',
-    label: 'الصف الثاني الثانوي',
-    stageId: 4,
-    yearId: 10,
-    courses: [],
-  },
-  {
-    key: 'third-secondary',
-    label: 'الصف الثالث الثانوي',
-    stageId: 4,
-    yearId: 11,
-    courses: [],
-  },
-]
+export const mapHomeCourseStages = (value: unknown): HomeCourseStageViewModel[] => {
+  const stages = new Map<number, HomeCourseStageViewModel>()
+
+  toArray(value).forEach((item) => {
+    if (!isRecord(item)) return
+
+    const id = toNullableNumber(item.id)
+    const label = toNullableString(item.title ?? item.label ?? item.name)
+    if (id === null || !label || stages.has(id)) return
+
+    stages.set(id, { id, label })
+  })
+
+  return [...stages.values()]
+}
+
+export const mapHomeCourseYears = (
+  stage: HomeCourseStageViewModel,
+  value: unknown,
+): HomeCourseTabViewModel[] => {
+  const years = new Map<number, HomeCourseTabViewModel>()
+
+  toArray(value).forEach((item) => {
+    if (!isRecord(item)) return
+
+    const yearId = toNullableNumber(item.id)
+    const label = toNullableString(item.title ?? item.label ?? item.name)
+    if (yearId === null || !label || years.has(yearId)) return
+
+    years.set(yearId, {
+      key: `stage-${stage.id}-year-${yearId}`,
+      label,
+      stageId: stage.id,
+      stageLabel: stage.label,
+      yearId,
+      courses: [],
+    })
+  })
+
+  return [...years.values()]
+}
 
 const createEmptyCourses = (): HomeCoursesViewModel => ({
-  tabs: createFixedCourseTabs(),
+  stages: [],
+  tabs: [],
+  taxonomyStatus: 'loading',
+  taxonomyError: null,
   unassignedCourses: [],
 })
 
@@ -329,7 +350,10 @@ const mapCourses = (sections: HomeWebsiteSectionApiDto[]): HomeCoursesViewModel 
     })
 
   return {
-    tabs: createFixedCourseTabs(),
+    stages: [],
+    tabs: [],
+    taxonomyStatus: 'loading',
+    taxonomyError: null,
     unassignedCourses: [...uniqueCourses.values()],
   }
 }
@@ -349,6 +373,13 @@ const mapBlog = (blog: HomeBlogApiDto): HomeBlogViewModel | null => {
     image: mapImage(blog.attachments[0] ?? null),
   }
 }
+
+export const mapBlogsPage = (value: unknown): HomeBlogViewModel[] =>
+  toArray(value)
+    .map(mapBlogApiDto)
+    .filter((blog): blog is HomeBlogApiDto => blog !== null)
+    .map(mapBlog)
+    .filter((blog): blog is HomeBlogViewModel => blog !== null)
 
 const createEmptyBooksPagination = (): HomeBooksViewModel['pagination'] => ({
   currentPage: 1,
@@ -924,23 +955,14 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
 
   const blogs = (() => {
     if (sources.blogs.kind === 'error') {
-      return {
-        data: homeBlogsMock,
-        status: 'success' as const,
-      }
+      return mapSectionError<HomeBlogViewModel[]>([], sources.blogs.error)
     }
 
-    const mappedBlogs = toArray(sources.blogs.data)
-      .map(mapBlogApiDto)
-      .filter((blog): blog is HomeBlogApiDto => blog !== null)
-      .map(mapBlog)
-      .filter((blog): blog is HomeBlogViewModel => blog !== null)
-
-    const visibleBlogs = mappedBlogs.length > 0 ? mappedBlogs : homeBlogsMock
+    const mappedBlogs = mapBlogsPage(sources.blogs.data)
 
     return {
-      data: visibleBlogs,
-      status: 'success' as const,
+      data: mappedBlogs,
+      status: mappedBlogs.length > 0 ? ('success' as const) : ('empty' as const),
     }
   })()
 

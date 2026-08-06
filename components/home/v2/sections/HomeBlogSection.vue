@@ -187,7 +187,8 @@ watch(
 );
 
 useScrollTriggeredReveal(blogSection, revealBlogSection, {
-  threshold: 0.1,
+  threshold: 0.18,
+  rootMargin: "0px 0px -22% 0px",
 });
 
 onBeforeUnmount(() => {

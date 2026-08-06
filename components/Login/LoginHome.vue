@@ -3,9 +3,23 @@
 // import iphoneIcon from '../../public/icons/iphoneIcon.vue';
 // import { ref } from "vue";
 
-// const router = useRouter();
+import { rememberAuthRedirect, sanitizeAuthRedirect } from '~/utils/authRedirect';
 
 const UserSettingStore = useSettingStore();
+const route = useRoute();
+const redirectPath = computed(() => sanitizeAuthRedirect(route.query.redirect));
+const loginTarget = computed(() => ({
+  path: '/login/loginhome',
+  ...(redirectPath.value ? { query: { redirect: redirectPath.value } } : {}),
+}));
+const registerTarget = computed(() => ({
+  path: '/Auth/register',
+  ...(redirectPath.value ? { query: { redirect: redirectPath.value } } : {}),
+}));
+
+onMounted(() => {
+  rememberAuthRedirect(route.query.redirect);
+});
 </script>
 
 <template>
@@ -25,12 +39,12 @@ const UserSettingStore = useSettingStore();
       <p>{{ $t(`${UserSettingStore.setting?.description}`) }}</p>
 
       <div class="btns">
-        <nuxt-link class="nuxt-link-btn" to="/login/loginhome"
+        <nuxt-link class="nuxt-link-btn" :to="loginTarget"
           ><button class="login-btn">
             {{ $t("تسجيل الدخول") }}
           </button></nuxt-link
         >
-        <nuxt-link class="nuxt-link-btn" to="/Auth/register">
+        <nuxt-link class="nuxt-link-btn" :to="registerTarget">
           <button class="create-account-btn">
             {{ $t("انشاء حساب") }}
           </button></nuxt-link

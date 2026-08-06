@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import { gsap } from "gsap";
 import { storeToRefs } from "pinia";
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
-import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   createEmptyBooks,
@@ -95,6 +94,61 @@ const selectedGradeLabel = computed(() =>
   grades.find((grade) => grade.key === selectedGrade.value)?.label || "كل الصفوف",
 );
 
+const heroBooksRef = ref<HTMLElement | null>(null);
+let heroBooksAnimationContext: ReturnType<typeof gsap.context> | null = null;
+
+onMounted(() => {
+  if (!heroBooksRef.value) return;
+
+  heroBooksAnimationContext = gsap.context(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) return;
+
+    const cards = gsap.utils.toArray<HTMLElement>("i", heroBooksRef.value);
+    const badge = heroBooksRef.value?.querySelector<HTMLElement>(":scope > span");
+    const finalRotations = [-7, 0, 8];
+
+    const timeline = gsap.timeline({
+      defaults: { ease: "back.out(1.35)" },
+    });
+
+    cards.forEach((card, index) => {
+      timeline.fromTo(
+        card,
+        {
+          autoAlpha: 0,
+          y: 105,
+          scale: 0.72,
+          rotation: index === 0 ? 18 : index === 2 ? -18 : 0,
+          transformOrigin: "50% 100%",
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          rotation: finalRotations[index],
+          duration: 0.9,
+        },
+        index * 0.13,
+      );
+    });
+
+    if (badge) {
+      timeline.fromTo(
+        badge,
+        { autoAlpha: 0, y: 18, scale: 0.82 },
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.8)" },
+        "-=0.3",
+      );
+    }
+  }, heroBooksRef.value);
+});
+
+onBeforeUnmount(() => {
+  heroBooksAnimationContext?.revert();
+  heroBooksAnimationContext = null;
+});
+
 useSeoMeta({
   title: () => `الكتب | ${site.value.brandName || "EduHub"}`,
   description: "تصفح جميع الكتب والمراجع التعليمية المتاحة على المنصة.",
@@ -118,8 +172,6 @@ useHead({
       '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
     }"
   >
-    <HomeHeaderSection :site="site" />
-
     <main>
       <header class="books-page__hero">
         <div class="container books-page__hero-layout">
@@ -129,7 +181,7 @@ useHead({
             <p>كتب ومذكرات تعليمية منظمة؛ اختار الكتاب المناسب واطّلع على تفاصيله وعدد صفحاته وسعره.</p>
           </div>
 
-          <div class="books-page__hero-books" aria-hidden="true">
+          <div ref="heroBooksRef" class="books-page__hero-books" aria-hidden="true">
             <i />
             <i />
             <i />
@@ -209,23 +261,23 @@ useHead({
                 class="books-page__cover-link"
                 :to="`/books/${book.bookId}`"
                 :aria-label="`عرض تفاصيل ${book.title}`"
-              >
-                <div :class="['books-page__cover', `books-page__cover--${coverTone(book)}`]">
-                  <img
-                    v-if="book.image"
-                    :src="book.image"
-                    :alt="book.title"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <template v-else>
-                    <span>EDUCATIONAL BOOK</span>
-                    <b>{{ book.title }}</b>
-                    <small>{{ site.brandName || "منصة التعليم" }}</small>
-                  </template>
-                  <em>{{ book.isFree ? "مجاني" : "متاح الآن" }}</em>
-                </div>
-              </NuxtLink>
+              />
+
+              <div :class="['books-page__cover', `books-page__cover--${coverTone(book)}`]">
+                <img
+                  v-if="book.image"
+                  :src="book.image"
+                  :alt="book.title"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <template v-else>
+                  <span>EDUCATIONAL BOOK</span>
+                  <b>{{ book.title }}</b>
+                  <small>{{ site.brandName || "منصة التعليم" }}</small>
+                </template>
+                <em>{{ book.isFree ? "مجاني" : "متاح الآن" }}</em>
+              </div>
 
               <div class="books-page__card-body">
                 <span>{{ book.subtitle || "كتاب من مكتبة المنصة" }}</span>
@@ -241,10 +293,10 @@ useHead({
                     <b>{{ priceLabel(book) }}</b>
                   </div>
                 </div>
-                <NuxtLink class="books-page__details" :to="`/books/${book.bookId}`">
+                <span class="books-page__details">
                   تفاصيل الكتاب
                   <span aria-hidden="true">←</span>
-                </NuxtLink>
+                </span>
               </div>
             </article>
           </div>
@@ -300,7 +352,6 @@ useHead({
       </section>
     </main>
 
-    <HomeFooterSection :site="site" />
   </div>
 </template>
 
@@ -809,6 +860,7 @@ useHead({
 }
 
 .books-page__card {
+  position: relative;
   display: flex;
   overflow: hidden;
   flex-direction: column;
@@ -816,6 +868,7 @@ useHead({
   border-radius: 8px;
   background: var(--home-v2-surface);
   box-shadow: 0 22px 48px -42px #06114799;
+  cursor: pointer;
 }
 
 .books-page__card:hover {
@@ -824,11 +877,19 @@ useHead({
 
 .books-page__card .books-page__cover-link {
   display: block;
-  min-height: 0;
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  min-height: 100%;
   margin: 0;
   border-radius: 0;
   background: transparent;
   color: inherit;
+}
+
+.books-page__card .books-page__cover-link:focus-visible {
+  outline: 3px solid var(--home-v2-blue);
+  outline-offset: -4px;
 }
 
 .books-page__cover {
@@ -970,7 +1031,7 @@ useHead({
   font-weight: 900;
 }
 
-.books-page__details:hover span {
+.books-page__card:hover .books-page__details span {
   transform: translateX(-4px);
 }
 

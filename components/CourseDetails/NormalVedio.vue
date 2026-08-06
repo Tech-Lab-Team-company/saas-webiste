@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { Player, Video, DefaultUi, DefaultControls } from '@vime/vue-next';
 import '@vime/core/themes/default.css';
 
-const props = defineProps<{ video: string }>();
+const props = defineProps<{
+    video: string;
+    sessionId?: number | null;
+}>();
 const videoRef = ref<HTMLVideoElement | null>(null);
 const playerRef = ref<any>(null);
+const watchHistory = useCourseWatchHistory(() => props.sessionId);
 
 watch(
     () => props.video,
@@ -27,7 +31,16 @@ const onPlaybackReady = () => {
 
 <template>
     <div class="Video-container">
-        <Player ref="playerRef" playsinline @vPlaybackReady="onPlaybackReady" style="width: 100%; height: 100%;">
+        <Player
+            ref="playerRef"
+            playsinline
+            style="width: 100%; height: 100%;"
+            @vPlaybackReady="onPlaybackReady"
+            @vmDurationChange="watchHistory.updateDuration"
+            @vmCurrentTimeChange="watchHistory.updateCurrentTime"
+            @vmPausedChange="watchHistory.handlePausedChange"
+            @vmPlaybackEnded="watchHistory.markPlaybackEnded"
+        >
             <Video ref="videoRef" style="width: 100%; height: 100%;">
                 <source :data-src="props.video" type="video/mp4" />
             </Video>

@@ -1,22 +1,23 @@
 <script setup lang="ts">
-
-import { useUserStore } from "~/stores/user";
 import Youtube from "~/components/CourseDetails/Youtube.vue";
 import AudioPlayer from "./TabsContent/AudioPlayer.vue";
 import NormalVedio from "./NormalVedio.vue";
 
+interface CourseVideoSelection {
+  sessionId: number | null;
+  videoLink: string;
+  title: string;
+  description: string;
+}
+
 const props = defineProps({
   CourseVideoLink: {
-    type: Object as () => {
-      videoLink: string,
-      title: string,
-      description: string
-    } | null,
-    default: ''
+    type: Object as () => CourseVideoSelection | null,
+    default: null,
   }
 });
 
-const CourseVideoLink = ref(props.CourseVideoLink);
+const CourseVideoLink = computed(() => props.CourseVideoLink);
 
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
@@ -38,9 +39,6 @@ const embedVideoLink = computed(() => {
   return CourseVideoLink.value?.videoLink || '';
 });
 
-const playVideo = ref(false)
-
-
 const pdfIframe = ref<HTMLIFrameElement | null>(null);
 
 function openFullscreen() {
@@ -61,8 +59,18 @@ function openFullscreen() {
 <template>
 
   <div class="course-video-container">
-    <Youtube :video="embedVideoLink" v-if="fileType === 'youtube'" />
-    <NormalVedio :video="embedVideoLink" v-if="fileType === 'video'" />
+    <Youtube
+      v-if="fileType === 'youtube'"
+      :key="`youtube-${CourseVideoLink?.sessionId}`"
+      :video="embedVideoLink"
+      :session-id="CourseVideoLink?.sessionId"
+    />
+    <NormalVedio
+      v-else-if="fileType === 'video'"
+      :key="`video-${CourseVideoLink?.sessionId}`"
+      :video="embedVideoLink"
+      :session-id="CourseVideoLink?.sessionId"
+    />
     <div class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
       <iframe ref="pdfIframe" width="100%" height="600" :src="embedVideoLink" frameborder="0" allowfullscreen></iframe>
       <div class="flex justify-end">
@@ -77,7 +85,12 @@ function openFullscreen() {
         :src="CourseVideoLink?.videoLink"
         style="width: 100%;"
     ></audio> -->
-    <AudioPlayer v-else-if="fileType === 'audio'" :src="CourseVideoLink?.videoLink" />
+    <AudioPlayer
+      v-else-if="fileType === 'audio'"
+      :key="`audio-${CourseVideoLink?.sessionId}`"
+      :src="CourseVideoLink?.videoLink"
+      :session-id="CourseVideoLink?.sessionId"
+    />
     <div v-else>
       <p>Unsupported file type</p>
     </div>
