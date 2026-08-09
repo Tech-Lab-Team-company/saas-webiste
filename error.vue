@@ -50,10 +50,11 @@ const reloadPage = () => {
   if (import.meta.client) window.location.reload();
 };
 
-useHead(() => ({
-  title: `${errorContent.value.eyebrow} | المنصة`,
-  meta: [{ name: "robots", content: "noindex, nofollow" }],
-}));
+useSeoMeta({
+  title: () => `${errorContent.value.eyebrow} | المنصة`,
+  description: () => errorContent.value.description,
+  robots: "noindex, follow",
+});
 </script>
 
 <template>

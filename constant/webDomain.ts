@@ -2,7 +2,15 @@ export function getWebDomain(): string {
   const configuredWebLink = String(
     useRuntimeConfig().public.webLink || "",
   ).trim();
-  if (!configuredWebLink) return "";
+  const requestHostname = () => {
+    try {
+      return useRequestURL().hostname;
+    } catch {
+      return "";
+    }
+  };
+
+  if (!configuredWebLink) return requestHostname();
 
   try {
     const url = configuredWebLink.includes("://")
@@ -13,7 +21,7 @@ export function getWebDomain(): string {
     return configuredWebLink
       .replace(/^https?:\/\//i, "")
       .split("/")[0]
-      .trim();
+      .trim() || requestHostname();
   }
 }
 

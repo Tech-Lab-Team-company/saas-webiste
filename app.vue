@@ -8,7 +8,6 @@ import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();
 const requestUrl = useRequestURL();
-const ErrorPage = defineAsyncComponent(() => import("./error.vue"));
 const LazyMainDialog = defineAsyncComponent(
   () => import("./base/persention/Dialogs/MainDialogs/MainDialog.vue"),
 );
@@ -39,23 +38,33 @@ const isHomeV2 = computed(() =>
   isCourseExamPage.value,
 );
 const { theme, isDark, toggleTheme } = useAppTheme();
+const SettingStore = useSettingStore();
 const {
   data: webStatus,
   pending,
-  error,
-} = await useAsyncData("webStatus", async () => {
-  const response = await $fetch<{
-    data: WebStatus;
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_web_status`, {
-    method: "GET",
-    headers: {
-      "web-domain": getWebDomain(),
-    },
-  });
-  return response.data;
+} = await useAsyncData<WebStatus | null>("webStatus", async () => {
+  try {
+    const response = await $fetch<{
+      data: WebStatus;
+      message: string;
+      status: number;
+    }>(`${baseUrl}/fetch_web_status`, {
+      method: "GET",
+      headers: {
+        "web-domain": getWebDomain() || requestUrl.hostname,
+      },
+    });
+    return response.data ?? null;
+  } catch (requestError) {
+    // Site settings enhance branding, but a temporary API failure must never
+    // replace an indexable page with the global noindex error document.
+    if (import.meta.dev) {
+      console.warn("Unable to load web status; using SEO defaults.", requestError);
+    }
+    return null;
+  }
 }, {
+  default: () => null,
   dedupe: "defer",
 });
 
@@ -124,7 +133,6 @@ watchEffect(() => {
   });
 });
 
-const SettingStore = useSettingStore();
 watch(webStatus, (value) => {
   if (value) SettingStore.setSetting(value);
 }, {
@@ -303,8 +311,7 @@ onMounted(() => {
       <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
       <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" />
       <LazyToast v-if="!isHomeV2" />
-      <NuxtPage v-if="!error" />
-      <ErrorPage v-else />
+      <NuxtPage />
       <LazyMainDialog v-if="!pending && !isHomeV2" />
     </NuxtLayout>
   </div>
