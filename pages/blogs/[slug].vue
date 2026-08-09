@@ -32,6 +32,7 @@ interface ApiBlogDetails {
 definePageMeta({ layout: "home-v2" });
 
 const route = useRoute();
+const requestUrl = useRequestURL();
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));
 const slug = computed(() => String(route.params.slug || ""));
@@ -137,6 +138,49 @@ const formattedDate = computed(() => {
   }).format(parsedDate);
 });
 
+const articleOrigin = computed(() =>
+  webDomain ? `https://${webDomain}` : requestUrl.origin,
+);
+const articleUrl = computed(() =>
+  new URL(route.path, articleOrigin.value).toString(),
+);
+const publishedDate = computed(() => {
+  if (!blog.value?.date) return undefined;
+  const parsedDate = new Date(blog.value.date);
+  return Number.isNaN(parsedDate.getTime()) ? undefined : parsedDate.toISOString();
+});
+const articleSchema = computed(() => {
+  if (!blog.value) return null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${articleUrl.value}#article`,
+    mainEntityOfPage: articleUrl.value,
+    url: articleUrl.value,
+    headline: blog.value.title,
+    description: blog.value.description || blog.value.subtitle || undefined,
+    image: articleImage.value?.src ? [articleImage.value.src] : undefined,
+    datePublished: publishedDate.value,
+    dateModified: publishedDate.value,
+    inLanguage: "ar",
+    articleSection: category.value,
+    author: {
+      "@type": "Organization",
+      name: site.value.brandName || "المنصة التعليمية",
+      url: `${articleOrigin.value}/`,
+    },
+    publisher: {
+      "@type": "Organization",
+      "@id": `${articleOrigin.value}/#organization`,
+      name: site.value.brandName || "المنصة التعليمية",
+      ...(site.value.logo?.src
+        ? { logo: { "@type": "ImageObject", url: site.value.logo.src } }
+        : {}),
+    },
+  };
+});
+
 useSeoMeta({
   title: () =>
     blog.value
@@ -145,9 +189,22 @@ useSeoMeta({
   description: () => blog.value?.description || site.value.description || "",
   ogTitle: () => blog.value?.title || "",
   ogDescription: () => blog.value?.description || "",
+  ogImage: () => articleImage.value?.src || undefined,
+  ogType: "article",
+  twitterCard: "summary_large_image",
+  twitterImage: () => articleImage.value?.src || undefined,
 });
 
-useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
+useHead(() => ({
+  htmlAttrs: { lang: "ar", dir: "rtl" },
+  script: articleSchema.value
+    ? [{
+        key: "blog-posting-schema",
+        type: "application/ld+json",
+        innerHTML: JSON.stringify(articleSchema.value).replace(/</gu, "\\u003c"),
+      }]
+    : [],
+}));
 </script>
 
 <template>

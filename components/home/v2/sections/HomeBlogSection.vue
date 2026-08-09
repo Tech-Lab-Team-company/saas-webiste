@@ -243,7 +243,7 @@ onBeforeUnmount(() => {
           @pointermove="trackBlogPointer"
           @pointerleave="resetBlogCard"
         >
-          <NuxtLink :to="blog.route" :aria-label="blog.title">
+          <NuxtLink :to="blog.route">
             <header>
               <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
               <b>{{ blogNumber(index) }}</b>

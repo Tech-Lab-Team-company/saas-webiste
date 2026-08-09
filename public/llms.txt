@@ -1,0 +1,13 @@
+# Educational Platform
+
+This website provides Arabic educational courses, books, articles, and student resources.
+
+## Main public sections
+
+- /course — course catalog
+- /books — educational book catalog
+- /blogs — educational articles
+- /about-teacher — platform and teacher information
+- /fqs — frequently asked questions
+
+Student accounts, profiles, exams, payments, and course-player content are private and should not be indexed.

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import "~/assets/css/home-v2.css";
-import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
 import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 
@@ -21,7 +20,10 @@ const site = computed(() => mapHomeSite(settingsStore.setting));
     <div class="home-v2-layout__content">
       <slot />
     </div>
-    <HomeFooterSection :site="site" />
+    <LazyHomeV2SectionsHomeFooterSection
+      :site="site"
+      :hydrate-on-visible="{ rootMargin: '300px' }"
+    />
   </div>
 </template>
 

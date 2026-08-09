@@ -2,6 +2,7 @@
 
 import type HomeSection from "~/types/home_section_interface";
 import Panel from 'primevue/panel';
+import { Autoplay, EffectCreative } from "swiper/modules";
 
 const containerRef = ref(null)
 const props = defineProps<{
@@ -12,6 +13,7 @@ const homesection = ref(props.HomeSections)
 const UserSetting = useSettingStore();
 
 const swiper = useSwiper(containerRef, {
+  modules: [Autoplay, EffectCreative],
   effect: 'creative',
   // loop: true,
   autoplay: {

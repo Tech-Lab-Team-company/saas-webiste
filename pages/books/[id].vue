@@ -27,6 +27,7 @@ definePageMeta({
 });
 
 const route = useRoute();
+const requestUrl = useRequestURL();
 const webDomain = getWebDomain();
 
 const settingsStore = useSettingStore();
@@ -241,6 +242,61 @@ const purchaseOptions = computed(() => {
   }];
 });
 
+const bookOrigin = computed(() =>
+  webDomain ? `https://${webDomain}` : requestUrl.origin,
+);
+const bookUrl = computed(() => new URL(route.path, bookOrigin.value).toString());
+const bookSchema = computed(() => {
+  const currentBook = book.value;
+  if (!currentBook) return null;
+
+  const numericPrices = purchaseOptions.value
+    .map((option) => Number(option.price))
+    .filter((price) => Number.isFinite(price) && price >= 0);
+  const price = currentBook.isFree
+    ? 0
+    : numericPrices.length
+      ? Math.min(...numericPrices)
+      : Number(currentBook.totalAfterDiscount || currentBook.price);
+  const normalizedCurrency = currentBook.currency.trim().toUpperCase();
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    "@id": `${bookUrl.value}#book`,
+    url: bookUrl.value,
+    name: currentBook.title,
+    description: currentBook.description
+      || websiteSectionBook.value?.description
+      || undefined,
+    image: coverImage.value ? [coverImage.value] : undefined,
+    inLanguage: "ar",
+    numberOfPages: currentBook.numberOfPages || undefined,
+    isAccessibleForFree: currentBook.isFree,
+    publisher: {
+      "@type": "Organization",
+      "@id": `${bookOrigin.value}/#organization`,
+      name: site.value.brandName || "المنصة التعليمية",
+    },
+    ...(Number.isFinite(price) && price >= 0
+      ? {
+          offers: {
+            "@type": "Offer",
+            url: bookUrl.value,
+            price,
+            priceCurrency: /^[A-Z]{3}$/u.test(normalizedCurrency)
+              ? normalizedCurrency
+              : "EGP",
+            availability: "https://schema.org/InStock",
+            ...(currentBook.endDate
+              ? { priceValidUntil: currentBook.endDate }
+              : {}),
+          },
+        }
+      : {}),
+  };
+});
+
 useSeoMeta({
   title: () => book.value
     ? `${book.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
@@ -253,14 +309,24 @@ useSeoMeta({
     || websiteSectionBook.value?.description
     || undefined,
   ogImage: () => coverImage.value || undefined,
+  ogType: "book",
+  twitterCard: "summary_large_image",
+  twitterImage: () => coverImage.value || undefined,
 });
 
-useHead({
+useHead(() => ({
   htmlAttrs: {
     lang: "ar",
     dir: "rtl",
   },
-});
+  script: bookSchema.value
+    ? [{
+        key: "book-schema",
+        type: "application/ld+json",
+        innerHTML: JSON.stringify(bookSchema.value).replace(/</gu, "\\u003c"),
+      }]
+    : [],
+}));
 </script>
 
 <template>

@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import { gsap } from "gsap";
-import {
-  animate,
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useReducedMotion,
-} from "motion-v";
 import type {
   HomeHeroViewModel,
   HomeSiteViewModel,
@@ -31,6 +23,16 @@ const mobileHeroImage = computed(() =>
   imageIsAvailable(heroData.value?.mobileImage?.src)
     ? heroData.value?.mobileImage
     : null,
+);
+const imageService = useImage();
+const optimizedMobileHeroSource = computed(() =>
+  mobileHeroImage.value?.src
+    ? imageService(mobileHeroImage.value.src, {
+        width: 640,
+        format: "webp",
+        quality: 78,
+      })
+    : undefined,
 );
 const settingsLogo = computed(() =>
   imageIsAvailable(props.site.logo?.src) ? props.site.logo : null,
@@ -159,275 +161,19 @@ const emptyStateDescription = computed(() =>
     : "أضف العنوان والوصف والصورة من لوحة التحكم ليظهر القسم الرئيسي هنا.",
 );
 
-const heroSection = ref<HTMLElement | null>(null);
-const heroVisual = ref<HTMLElement | null>(null);
-let heroAnimationContext: ReturnType<typeof gsap.context> | null = null;
-let removeHeroPointerEffects: (() => void) | null = null;
-
-const typewriterPhrases = computed(() =>
-  Array.from(
-    new Set(
-      [heroContent.value.subtitle].filter(Boolean),
-    ),
-  ),
-);
-const typewriterPhraseGraphemes = computed(() =>
-  typewriterPhrases.value.map(splitGraphemes),
-);
-const prefersReducedMotion = useReducedMotion();
-const typedText = ref(heroContent.value.subtitle);
-const phraseIndex = ref(0);
-const visibleCharacters = useMotionValue(
-  splitGraphemes(heroContent.value.subtitle).length,
-);
-let typewriterAnimation: ReturnType<typeof animate> | null = null;
-let typewriterTimer: ReturnType<typeof setTimeout> | null = null;
-
-const stopTypewriter = () => {
-  typewriterAnimation?.stop();
-  typewriterAnimation = null;
-
-  if (typewriterTimer) {
-    clearTimeout(typewriterTimer);
-    typewriterTimer = null;
-  }
-};
-
-useMotionValueEvent(visibleCharacters, "change", (latest) => {
-  const graphemes = typewriterPhraseGraphemes.value[phraseIndex.value] || [];
-  typedText.value = graphemes.slice(0, Math.round(latest)).join("");
-});
-
-const typeCurrentPhrase = () => {
-  stopTypewriter();
-
-  const phrase = typewriterPhrases.value[phraseIndex.value] || "";
-  const phraseLength =
-    typewriterPhraseGraphemes.value[phraseIndex.value]?.length || 0;
-  if (!phrase) return;
-
-  if (prefersReducedMotion.value || typewriterPhrases.value.length === 1) {
-    visibleCharacters.set(phraseLength);
-    typedText.value = phrase;
-    return;
-  }
-
-  typewriterAnimation = animate(visibleCharacters, phraseLength, {
-    duration: Math.min(3.2, Math.max(0.75, phraseLength * 0.075)),
-    ease: "linear",
-    onComplete: () => {
-      typewriterTimer = setTimeout(() => {
-        typewriterAnimation = animate(visibleCharacters, 0, {
-          duration: Math.min(1.4, Math.max(0.35, phraseLength * 0.035)),
-          ease: "linear",
-          onComplete: () => {
-            phraseIndex.value =
-              (phraseIndex.value + 1) % typewriterPhrases.value.length;
-            typeCurrentPhrase();
-          },
-        });
-      }, 1500);
-    },
-  });
-};
-
-const restartTypewriter = () => {
-  stopTypewriter();
-  phraseIndex.value = 0;
-  visibleCharacters.set(0);
-  typedText.value = "";
-  typeCurrentPhrase();
-};
-
-const setupHeroAnimation = () => {
-  const section = heroSection.value;
-  const visual = heroVisual.value;
-  if (!section || !visual) return;
-
-  const reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-  if (reducedMotion) return;
-
-  heroAnimationContext = gsap.context(() => {
-    const intro = gsap.timeline({
-      defaults: { ease: "power3.out" },
-    });
-
-    intro
-      .from(".home-v2-hero__ambient", {
-        autoAlpha: 0,
-        duration: 1,
-      })
-      .from(
-        ".home-v2-hero__kicker",
-        { autoAlpha: 0, x: 36, duration: 0.58 },
-        0.08,
-      )
-      .from(
-        ".home-v2-hero__title-line",
-        {
-          autoAlpha: 0,
-          yPercent: 115,
-          rotate: 2,
-          duration: 0.88,
-          stagger: 0.1,
-          ease: "expo.out",
-        },
-        0.18,
-      )
-      .fromTo(
-        ".home-v2-hero__typewriter-underline",
-        { scaleX: 0, autoAlpha: 0 },
-        {
-          scaleX: 1,
-          autoAlpha: 1,
-          duration: 0.72,
-          ease: "expo.out",
-        },
-        0.72,
-      )
-      .from(
-        ".home-v2-hero__copy > p:not(.home-v2-hero__kicker)",
-        { autoAlpha: 0, y: 24, duration: 0.58 },
-        0.58,
-      )
-      .from(
-        ".home-v2-hero__actions > *",
-        { autoAlpha: 0, y: 18, duration: 0.48, stagger: 0.08 },
-        0.72,
-      )
-      .from(
-        visual,
-        {
-          autoAlpha: 0,
-          clipPath: "inset(48% 12% 48% 12% round 80px)",
-          scale: 0.86,
-          rotate: -3,
-          duration: 1.08,
-          ease: "power3.out",
-        },
-        0.08,
-      )
-      .from(
-        ".home-v2-hero__brand-logo",
-        {
-          autoAlpha: 0,
-          scale: 0.35,
-          rotate: -25,
-          duration: 0.6,
-          ease: "back.out(1.35)",
-        },
-        0.88,
-      )
-      .fromTo(
-        ".home-v2-hero__visual-shine",
-        { xPercent: 170, autoAlpha: 0 },
-        {
-          xPercent: -240,
-          autoAlpha: 1,
-          duration: 0.95,
-          ease: "power2.inOut",
-          onComplete: () => {
-            gsap.set(".home-v2-hero__visual-shine", {
-              autoAlpha: 0,
-              display: "none",
-            });
-          },
-        },
-        0.76,
-      );
-
-    gsap.to(".home-v2-hero__ambient-orb--one", {
-      x: 34,
-      y: -26,
-      scale: 1.08,
-      duration: 8.5,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-    gsap.to(".home-v2-hero__ambient-orb--two", {
-      x: -28,
-      y: 34,
-      scale: 0.92,
-      duration: 10.5,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-    gsap.to(visual, {
-      y: -9,
-      duration: 2.4,
-      delay: 1.6,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-
-    if (window.matchMedia("(pointer: fine)").matches) {
-      const moveX = gsap.quickTo(visual, "x", {
-        duration: 0.58,
-        ease: "power3.out",
-      });
-      const rotateX = gsap.quickTo(visual, "rotationX", {
-        duration: 0.58,
-        ease: "power3.out",
-      });
-      const rotateY = gsap.quickTo(visual, "rotationY", {
-        duration: 0.58,
-        ease: "power3.out",
-      });
-
-      const handlePointerMove = (event: PointerEvent) => {
-        const bounds = section.getBoundingClientRect();
-        const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
-        const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
-
-        moveX(horizontal * 18);
-        rotateX(vertical * -3.5);
-        rotateY(horizontal * 4.5);
-      };
-      const resetPointerEffect = () => {
-        moveX(0);
-        rotateX(0);
-        rotateY(0);
-      };
-
-      section.addEventListener("pointermove", handlePointerMove);
-      section.addEventListener("pointerleave", resetPointerEffect);
-      removeHeroPointerEffects = () => {
-        section.removeEventListener("pointermove", handlePointerMove);
-        section.removeEventListener("pointerleave", resetPointerEffect);
-      };
-    }
-  }, section);
-};
+const prefersReducedMotion = ref(false);
+const typedText = computed(() => heroContent.value.subtitle);
 
 onMounted(() => {
-  restartTypewriter();
-  setupHeroAnimation();
-});
-
-watch(
-  () => typewriterPhrases.value.join("\u0000"),
-  () => {
-    if (import.meta.client) restartTypewriter();
-  },
-);
-
-watch(prefersReducedMotion, restartTypewriter);
-onBeforeUnmount(() => {
-  stopTypewriter();
-  removeHeroPointerEffects?.();
-  heroAnimationContext?.revert();
+  prefersReducedMotion.value = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 });
 </script>
 
 <template>
   <section
     id="top"
-    ref="heroSection"
     class="home-v2-hero"
     :aria-labelledby="hasHeroContent && heroContent.title ? 'home-v2-hero-title' : undefined"
   >
@@ -467,15 +213,12 @@ onBeforeUnmount(() => {
                   hasOversizedSubtitle || prefersReducedMotion,
               },
             ]"
-            :aria-label="heroContent.subtitle"
           >
-            <span aria-hidden="true">{{ typedText }}</span>
-            <motion.span
-              v-if="!prefersReducedMotion && !hasOversizedSubtitle"
+            <span>{{ typedText }}</span>
+            <span
+              v-if="!hasOversizedSubtitle"
               aria-hidden="true"
               class="home-v2-hero__typewriter-cursor"
-              :animate="{ opacity: [1, 0, 1] }"
-              :transition="{ duration: 0.85, repeat: Infinity, ease: 'linear' }"
             />
             <span
               class="home-v2-hero__typewriter-underline"
@@ -488,30 +231,41 @@ onBeforeUnmount(() => {
           <a class="button" :href="heroContent.link"
             >استكشف الكورسات <span aria-hidden="true">←</span></a
           >
-          <NuxtLink class="home-v2-hero__secondary" to="/aboutus"
+          <NuxtLink
+            class="home-v2-hero__secondary"
+            to="/about-teacher"
+            prefetch-on="interaction"
             >تعرّف على المنصة <span aria-hidden="true">↗</span></NuxtLink
           >
         </div>
       </div>
 
       <figure
-        ref="heroVisual"
         class="home-v2-hero__visual"
         :aria-label="heroImage?.alt || 'صورة المنصة'"
       >
         <picture v-if="heroImage">
           <source
-            v-if="mobileHeroImage && !heroUsesSettingsLogo"
+            v-if="optimizedMobileHeroSource && !heroUsesSettingsLogo"
             media="(max-width: 780px)"
-            :srcset="mobileHeroImage.src"
+            :srcset="optimizedMobileHeroSource"
           />
-          <img
+          <NuxtImg
             :class="[
               'home-v2-hero__image',
               { 'home-v2-hero__image--logo': heroUsesSettingsLogo },
             ]"
             :src="heroImage.src"
             :alt="heroImage.alt"
+            width="1086"
+            height="1448"
+            sizes="321px sm:562px"
+            format="webp"
+            quality="78"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            preload
             @error="handleHeroImageError"
           />
         </picture>
@@ -522,11 +276,17 @@ onBeforeUnmount(() => {
           title="أضف صورة الواجهة"
           description="أضف الصورة من لوحة التحكم لتظهر هنا."
         />
-        <span class="home-v2-hero__visual-note">مورد مؤقت</span>
+        <span v-if="!heroImage" class="home-v2-hero__visual-note">مورد مؤقت</span>
         <span v-if="settingsLogo" class="home-v2-hero__brand-logo">
-          <img
+          <NuxtImg
             :src="settingsLogo.src"
             :alt="settingsLogo.alt || site.brandName || 'شعار المنصة'"
+            width="160"
+            height="160"
+            format="webp"
+            quality="78"
+            loading="lazy"
+            decoding="async"
             @error="handleHeroImageError"
           />
         </span>
@@ -709,6 +469,15 @@ onBeforeUnmount(() => {
   margin-inline-start: 0.1em;
   border-radius: 999px;
   background: currentcolor;
+  animation: hero-cursor-blink 0.85s steps(1, end) infinite;
+}
+
+@keyframes hero-cursor-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-v2-hero__typewriter-cursor { animation: none; }
 }
 
 .home-v2-hero__copy > p:not(.home-v2-hero__kicker) {
@@ -778,8 +547,6 @@ onBeforeUnmount(() => {
   background: #cfe0ff;
   box-shadow: 24px 28px 0
     color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
-  transform-style: preserve-3d;
-  will-change: transform, clip-path;
 }
 
 .home-v2-hero .button {

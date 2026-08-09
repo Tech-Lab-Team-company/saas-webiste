@@ -106,6 +106,7 @@ onBeforeUnmount(() => {
     <div class="container home-v2-header__content">
       <NuxtLink
         to="/"
+        prefetch-on="interaction"
         class="home-v2-header__brand"
         :aria-label="`العودة إلى صفحة ${site.brandName || 'المنصة'}`"
       >
@@ -116,6 +117,8 @@ onBeforeUnmount(() => {
             :alt="site.logo?.alt || site.brandName || ''"
             width="163"
             height="52"
+            format="webp"
+            quality="80"
             loading="eager"
           />
           <span v-else aria-hidden="true">+</span>
@@ -135,16 +138,21 @@ onBeforeUnmount(() => {
         class="home-v2-header__nav"
         aria-label="التنقل الرئيسي"
       >
-        <NuxtLink v-for="item in navItems" :key="item.to" :to="item.to">
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          prefetch-on="interaction"
+        >
           {{ item.label }}
         </NuxtLink>
       </nav>
 
       <div v-if="!userStore.user" class="home-v2-header__actions">
-        <NuxtLink to="/login" class="home-v2-header__login"
+        <NuxtLink to="/login" prefetch-on="interaction" class="home-v2-header__login"
           >دخول الطالب</NuxtLink
         >
-        <NuxtLink to="/Auth/register" class="button"
+        <NuxtLink to="/Auth/register" prefetch-on="interaction" class="button"
           >إنشاء حساب <span aria-hidden="true">←</span></NuxtLink
         >
       </div>
@@ -155,6 +163,7 @@ onBeforeUnmount(() => {
       >
         <NuxtLink
           to="/profile"
+          prefetch-on="interaction"
           class="home-v2-header__student"
           aria-label="الذهاب إلى الملف الشخصي"
         >
@@ -185,6 +194,7 @@ onBeforeUnmount(() => {
         v-for="item in navItems"
         :key="`mobile-${item.to}`"
         :to="item.to"
+        prefetch-on="interaction"
       >
         {{ item.label }}
       </NuxtLink>

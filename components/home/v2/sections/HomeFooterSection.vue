@@ -171,6 +171,8 @@ onBeforeUnmount(() => {
               :alt="site.logo?.alt || site.brandName || ''"
               width="46"
               height="46"
+              format="webp"
+              quality="75"
               loading="lazy"
             />
             <span v-else aria-hidden="true">+</span>

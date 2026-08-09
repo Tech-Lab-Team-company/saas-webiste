@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css/skyblue"; // Using skyblue theme for better visibility
+import { Autoplay, EffectCreative } from "swiper/modules";
 import { ref, onMounted } from 'vue';
 import { baseUrl } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
@@ -10,6 +11,7 @@ import { getWebDomain } from "~/constant/webDomain";
 const containerRef = ref(null)
 
 const swiper = useSwiper(containerRef, {
+  modules: [Autoplay, EffectCreative],
   effect: 'creative',
   // loop: true,
   autoplay: {

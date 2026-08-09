@@ -1,6 +1,5 @@
-import axios from "axios";
+import { $fetch, FetchError } from "ofetch";
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
-import NetworkService from "~/base/core/networkStructure/networking/network_service";
 import { HeroSectionTypeEnum } from "../types/homePage.types";
 import type {
   HomeApiSourceResult,
@@ -9,10 +8,10 @@ import type {
 } from "../types/homePage.types";
 
 const normalizeHomeDataError = (error: unknown): HomeDataError => {
-  if (axios.isAxiosError(error)) {
+  if (error instanceof FetchError) {
     const statusCode = error.response?.status;
 
-    if (error.code === "ECONNABORTED") {
+    if (error.cause instanceof Error && error.cause.name === "AbortError") {
       return {
         type: "timeout",
         message: "تعذر تحميل هذا القسم في الوقت الحالي.",
@@ -193,20 +192,20 @@ export class HomePageApi {
     data: Record<string, number | string | null>,
     queryParams?: Record<string, number>,
   ): Promise<unknown> {
-    const response = await NetworkService.instance.post({
-      url,
-      data,
+    const response = await $fetch<unknown>(url, {
+      baseURL: ApiNames.Instance.baseUrl,
+      method: "POST",
+      body: data,
       headers: {
         Accept: "application/json",
         "Accept-Language": "ar",
         "Content-Type": "application/json",
         "web-domain": this.webDomain,
       },
-      queryParams,
-      isAuth: false,
+      query: queryParams,
     });
 
-    return readEnvelopeData(response.data);
+    return readEnvelopeData(response);
   }
 }
 

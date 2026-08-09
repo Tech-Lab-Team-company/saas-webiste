@@ -1,25 +1,135 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
-import { resolve } from 'node:path';
 
 export default defineNuxtConfig({
-  // app:{
-  //   head:{
-  //     link:[
-  //       { rel: 'icon', type: 'image/x-icon', href: `${useSettingStore().setting?.image?.img}` },
-  //     ]
-  //   }
-  // },
-  
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
-  ssr: false,
+  experimental: {
+    defaults: {
+      nuxtLink: {
+        // Route code is fetched when a visitor shows intent instead of downloading
+        // every visible destination during the homepage's critical loading window.
+        prefetchOn: {
+          visibility: false,
+          interaction: true,
+        },
+      },
+    },
+  },
+  hooks: {
+    'build:manifest': (manifest) => {
+      // Lazy sections and non-critical layouts stay discoverable by the runtime,
+      // but do not compete with the hero through browser-level prefetch hints.
+      for (const chunk of Object.values(manifest)) chunk.prefetch = false
+    },
+  },
+  // Public pages are rendered as HTML for fast first paint and reliable indexing.
+  // Account-only screens remain client-rendered through the route rules below.
+  ssr: true,
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      htmlAttrs: {
+        lang: 'ar',
+        dir: 'rtl',
+      },
+    },
+  },
   runtimeConfig: {
     public: {
       webLink: process.env.WEB_LINK || '',
     },
   },
   routeRules: {
+    '/': { swr: 300 },
+    '/about-teacher': { swr: 3600 },
+    '/books': { swr: 300 },
+    '/books/**': { swr: 600 },
+    '/blogs': { swr: 300 },
+    '/blogs/**': { swr: 600 },
+    '/blog-v2/**': { swr: 600 },
+    '/app': { swr: 3600 },
+    '/fqs': { swr: 3600 },
+    '/privacy': { swr: 3600 },
+    '/terms': { swr: 3600 },
+    '/_nuxt/**': {
+      headers: {
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    },
+    '/_ipx/**': {
+      headers: {
+        'Cache-Control': 'public, max-age=2592000, stale-while-revalidate=86400',
+      },
+    },
+    '/images/**': {
+      headers: {
+        'Cache-Control': 'public, max-age=2592000, stale-while-revalidate=86400',
+      },
+    },
+    '/lottie/**': {
+      headers: {
+        'Cache-Control': 'public, max-age=2592000, stale-while-revalidate=86400',
+      },
+    },
+    '/home-v2': {
+      redirect: { to: '/', statusCode: 301 },
+    },
+    '/old-home': {
+      redirect: { to: '/', statusCode: 301 },
+    },
+    '/aboutus': {
+      redirect: { to: '/about-teacher', statusCode: 301 },
+    },
+    '/Auth/**': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/login/**': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profile': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profile/**': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profilecourse': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profileexams': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profilesubjectinfo': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/student-dashboard': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/questions': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/exams': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/passwordupdate': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/paymentverify/**': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
     '/course/**': {
       headers: {
         'Cache-Control': 'private, no-store, max-age=0',
@@ -31,7 +141,12 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ['@nuxt/image', 'nuxt-swiper', '@primevue/nuxt-module', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt' ,'@twicpics/components/nuxt3' ,'@nuxtjs/i18n' ],
+  modules: ['@nuxt/image', 'nuxt-swiper', '@primevue/nuxt-module', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@nuxtjs/i18n'],
+  swiper: {
+    // Register only Swiper core globally; feature modules stay with the
+    // legacy carousel components that actually use them.
+    bundled: false,
+  },
   // , '@pinia/nuxt',
   primevue: {
     // useToastService: true,
@@ -52,6 +167,9 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
     strategy: 'no_prefix',
     locales: [
       {
@@ -73,16 +191,13 @@ export default defineNuxtConfig({
     },
   },
   css: [
-    'primeicons/primeicons.css',
-    "@/assets/style/main.min.css",
     "@/assets/css/app-theme.css",
-    '@twicpics/components/style.css',
-    'swiper/swiper-bundle.css'
   ],
-  twicpics: {
-    domain: 'https://your-subdomain.twic.pics',
-    anticipation: 0.5,
-    step: 100,
+  image: {
+    domains: [
+      'dev.saas.techlabeg.com',
+      'strategyeducation.techlabeg.com',
+    ],
   }
 
 })

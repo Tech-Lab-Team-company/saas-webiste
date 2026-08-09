@@ -20,10 +20,11 @@ const webDomain = getWebDomain();
 const api = new HomePageApi(webDomain);
 const { data: blogHero } = await useAsyncData<HomeHeroViewModel | null>(
   `blogs-hero:${webDomain}:${HeroSectionTypeEnum.BLOGS_API_WEBSITE}`,
-  async () => mapHeroSection(
-    await api.fetchHeroSections(HeroSectionTypeEnum.BLOGS_API_WEBSITE),
-    HeroSectionTypeEnum.BLOGS_API_WEBSITE,
-  ),
+  async () =>
+    mapHeroSection(
+      await api.fetchHeroSections(HeroSectionTypeEnum.BLOGS_API_WEBSITE),
+      HeroSectionTypeEnum.BLOGS_API_WEBSITE,
+    ),
   {
     default: () => null,
     dedupe: "defer",
@@ -39,17 +40,15 @@ const {
   async () => mapBlogsPage(await api.fetchBlogs()),
   { default: () => [] },
 );
-const heroTitle = computed(
-  () => blogHero.value?.title?.trim() || "",
-);
-const heroEyebrow = computed(
-  () => blogHero.value?.subtitle?.trim() || "",
-);
+const heroTitle = computed(() => blogHero.value?.title?.trim() || "");
+const heroEyebrow = computed(() => blogHero.value?.subtitle?.trim() || "");
 const heroDescription = computed(
   () => blogHero.value?.description?.trim() || "",
 );
 const heroDesktopImage = computed(() => blogHero.value?.image?.src || null);
-const heroMobileImage = computed(() => blogHero.value?.mobileImage?.src || null);
+const heroMobileImage = computed(
+  () => blogHero.value?.mobileImage?.src || null,
+);
 const heroImageAlt = computed(
   () => blogHero.value?.image?.alt || blogHero.value?.mobileImage?.alt || "",
 );
@@ -260,9 +259,12 @@ onBeforeUnmount(() => {
 });
 
 useSeoMeta({
-  title: () => blogHero.value?.title
-    ? `${blogHero.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
-    : `المدونة${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
+  title: () =>
+    blogHero.value?.title
+      ? `${blogHero.value.title}${
+          site.value.brandName ? ` | ${site.value.brandName}` : ""
+        }`
+      : `المدونة${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
   description: () => blogHero.value?.description || undefined,
   ogImage: () => heroDesktopImage.value || heroMobileImage.value || undefined,
 });
@@ -296,11 +298,15 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
         <div v-else class="container blog-listing__hero-grid">
           <div class="blog-listing__hero-copy">
-            <span v-if="heroEyebrow" class="blog-listing__eyebrow">{{ heroEyebrow }}</span>
+            <span v-if="heroEyebrow" class="blog-listing__eyebrow">{{
+              heroEyebrow
+            }}</span>
             <h1 v-if="heroTitle">{{ heroTitle }}</h1>
             <p v-if="heroDescription">{{ heroDescription }}</p>
             <div class="blog-listing__hero-meta" aria-label="معلومات المدونة">
-              <span><b>{{ blogs.length }}</b> مقالات عملية</span>
+              <span
+                ><b>{{ blogs.length }}</b> مقالات عملية</span
+              >
               <span><b>100%</b> قراءة مجانية</span>
             </div>
           </div>
@@ -555,7 +561,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(145deg, transparent 52%, color-mix(in srgb, var(--home-v2-deep) 42%, transparent));
+  background: linear-gradient(
+    145deg,
+    transparent 52%,
+    color-mix(in srgb, var(--home-v2-deep) 42%, transparent)
+  );
   content: "";
   pointer-events: none;
 }
@@ -775,7 +785,8 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 @media (max-width: 720px) {
   .blog-listing__hero-visual {
     min-height: 320px;
-    box-shadow: 12px 12px color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
+    box-shadow: 12px 12px
+      color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
   }
 
   .blog-listing__grid {

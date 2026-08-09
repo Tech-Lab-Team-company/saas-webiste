@@ -7,8 +7,6 @@ export const useSettingStore = defineStore("setting", () => {
 
     function setSetting(data: WebStatus) {
         setting.value = data;
-        console.log(data , "data");
-        console.log(setting.value , "setting.value");
     }
     return {
         setting,

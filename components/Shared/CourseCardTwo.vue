@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import "@splidejs/vue-splide/css";
+import { Autoplay, EffectCreative } from "swiper/modules";
 import type HomeSection from "~/types/home_section_interface";
 
 const containerRef = ref(null)
 
 const swiper = useSwiper(containerRef, {
+  modules: [Autoplay, EffectCreative],
   effect: 'creative',
   // loop: true,
   autoplay: {

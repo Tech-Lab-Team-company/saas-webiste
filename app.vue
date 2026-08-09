@@ -2,17 +2,17 @@
 import { baseUrl } from "~/constant/baseUrl";
 import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
-import MainDialog from "./base/persention/Dialogs/MainDialogs/MainDialog.vue";
-import FetchPaymentMethodsParams from "./features/fetch_payment_methods/Core/Params/fetch_payment_methods_params";
-import FetchPaymentMethodController from "./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
-// import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 import { getWebDomain } from "~/constant/webDomain";
-import Error from "./error.vue";
-import LoaderDialog from "./base/persention/Dialogs/LoaderDialogs/LoaderDialog.vue";
 import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 
-const router = useRouter();
 const route = useRoute();
+const runtimeConfig = useRuntimeConfig();
+const requestUrl = useRequestURL();
+const ErrorPage = defineAsyncComponent(() => import("./error.vue"));
+const LazyMainDialog = defineAsyncComponent(
+  () => import("./base/persention/Dialogs/MainDialogs/MainDialog.vue"),
+);
+
 const isCourseDetailsPage = computed(() =>
   /^\/course\/[^/]+\/?$/u.test(route.path),
 );
@@ -20,14 +20,24 @@ const isCourseExamPage = computed(() =>
   /^\/course\/[^/]+\/(?!timer(?:\/|$))[^/]+\/?$/u.test(route.path),
 );
 const isHomeV2 = computed(() =>
-  ["/", "/aboutus", "/about-teacher", "/books", "/blogs", "/course", "/app"].includes(route.path) ||
+  [
+    "/",
+    "/aboutus",
+    "/about-teacher",
+    "/books",
+    "/blogs",
+    "/course",
+    "/app",
+    "/fqs",
+    "/privacy",
+    "/terms",
+  ].includes(route.path) ||
   route.path.startsWith("/books/") ||
   route.path.startsWith("/blogs/") ||
   route.path.startsWith("/blog-v2/") ||
   isCourseDetailsPage.value ||
   isCourseExamPage.value,
 );
-const UserStore = useUserStore();
 const { theme, isDark, toggleTheme } = useAppTheme();
 const {
   data: webStatus,
@@ -44,11 +54,9 @@ const {
       "web-domain": getWebDomain(),
     },
   });
-  // console.log(error.value, "error");
-
-  // console.log("WebStatus:", getWebDomain());
-
   return response.data;
+}, {
+  dedupe: "defer",
 });
 
 const normalizeThemeColor = (value: string | null | undefined, fallback: string) =>
@@ -103,13 +111,6 @@ const themeInlineStyle = computed(() =>
     .join(";"),
 );
 
-useHead(() => ({
-  htmlAttrs: {
-    "data-theme": theme.value,
-    style: themeInlineStyle.value,
-  },
-}));
-
 watchEffect(() => {
   const activeTheme = theme.value;
   const activeVariables = themeVariables.value;
@@ -123,26 +124,162 @@ watchEffect(() => {
   });
 });
 
-
 const SettingStore = useSettingStore();
-const changeFavicon = (iconPath) => {
-  useHead({
-    link: [{ rel: "icon", type: "image/x-icon", href: iconPath }],
-  });
-};
-changeFavicon(`${webStatus.value?.image?.img || ''}`);
+watch(webStatus, (value) => {
+  if (value) SettingStore.setSetting(value);
+}, {
+  immediate: true,
+});
+
+const siteOrigin = computed(() => {
+  const configuredUrl = String(runtimeConfig.public.webLink || "").trim();
+
+  if (configuredUrl) {
+    try {
+      return new URL(
+        configuredUrl.includes("://") ? configuredUrl : `https://${configuredUrl}`,
+      ).origin;
+    } catch {
+      // Fall back to the active request host for multi-tenant deployments.
+    }
+  }
+
+  return requestUrl.origin;
+});
+
+const canonicalUrl = computed(() => {
+  const normalizedPath = route.path === "/"
+    ? "/"
+    : route.path.replace(/\/+$/u, "");
+  return new URL(normalizedPath, siteOrigin.value).toString();
+});
+
+const privateRoutePrefixes = [
+  "/auth",
+  "/login",
+  "/profile",
+  "/student-dashboard",
+  "/questions",
+  "/exams",
+  "/passwordupdate",
+  "/paymentverify",
+];
+const isPrivateRoute = computed(() => {
+  const path = route.path.toLowerCase();
+  return privateRoutePrefixes.some((prefix) => path.startsWith(prefix));
+});
+
+const siteTitle = computed(() =>
+  webStatus.value?.meta_title || webStatus.value?.name || "منصة تعليمية",
+);
+const siteDescription = computed(() =>
+  webStatus.value?.meta_description ||
+  webStatus.value?.description ||
+  "منصة تعليمية للكورسات والكتب والمحتوى الدراسي.",
+);
+const siteImage = computed(() =>
+  webStatus.value?.cover?.img || webStatus.value?.image?.img || undefined,
+);
+const socialProfiles = computed(() => [
+  webStatus.value?.facebook,
+  webStatus.value?.instagram,
+  webStatus.value?.twitter,
+  webStatus.value?.linkedin,
+  webStatus.value?.youtube,
+  webStatus.value?.tikTok,
+].filter((url): url is string => Boolean(url && /^https?:\/\//iu.test(url))));
+const siteSchema = computed(() => ({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteOrigin.value}/#organization`,
+      name: webStatus.value?.name || siteTitle.value,
+      url: `${siteOrigin.value}/`,
+      ...(webStatus.value?.image?.img
+        ? { logo: webStatus.value.image.img }
+        : {}),
+      ...(siteDescription.value ? { description: siteDescription.value } : {}),
+      ...(socialProfiles.value.length ? { sameAs: socialProfiles.value } : {}),
+      ...(webStatus.value?.phone || webStatus.value?.email
+        ? {
+            contactPoint: {
+              "@type": "ContactPoint",
+              ...(webStatus.value?.phone
+                ? { telephone: webStatus.value.phone }
+                : {}),
+              ...(webStatus.value?.email
+                ? { email: webStatus.value.email }
+                : {}),
+              contactType: "customer support",
+              availableLanguage: ["Arabic"],
+            },
+          }
+        : {}),
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteOrigin.value}/#website`,
+      url: `${siteOrigin.value}/`,
+      name: siteTitle.value,
+      description: siteDescription.value,
+      inLanguage: "ar",
+      publisher: { "@id": `${siteOrigin.value}/#organization` },
+    },
+  ],
+}));
+
+useHead(() => ({
+  htmlAttrs: {
+    lang: "ar",
+    dir: "rtl",
+    "data-theme": theme.value,
+    style: themeInlineStyle.value,
+  },
+  link: [
+    { rel: "canonical", href: canonicalUrl.value },
+    { rel: "preconnect", href: "https://dev.saas.techlabeg.com", crossorigin: "anonymous" },
+    { rel: "dns-prefetch", href: "https://dev.saas.techlabeg.com" },
+    ...(webStatus.value?.image?.img
+      ? [{ rel: "icon", href: webStatus.value.image.img }]
+      : []),
+  ],
+  script: [
+    {
+      key: "site-schema",
+      type: "application/ld+json",
+      innerHTML: JSON.stringify(siteSchema.value).replace(/</gu, "\\u003c"),
+    },
+  ],
+}));
 
 useSeoMeta({
-  title: webStatus.value?.meta_title || webStatus.value?.name,
-  description: webStatus.value?.meta_description || webStatus.value?.description,
-  keywords: webStatus.value?.meta_keywords || undefined,
-  ogTitle: webStatus.value?.meta_title || webStatus.value?.name,
-  ogDescription: webStatus.value?.meta_description || webStatus.value?.description,
-  ogImage: webStatus.value?.cover?.img || webStatus.value?.image?.img,
+  title: () => siteTitle.value,
+  description: () => siteDescription.value,
+  keywords: () => webStatus.value?.meta_keywords || undefined,
+  robots: () => isPrivateRoute.value
+    ? "noindex, nofollow, noarchive"
+    : "index, follow, max-image-preview:large",
+  ogTitle: () => siteTitle.value,
+  ogDescription: () => siteDescription.value,
+  ogImage: () => siteImage.value,
+  ogUrl: () => canonicalUrl.value,
+  ogType: "website",
+  ogLocale: "ar_EG",
+  twitterCard: "summary_large_image",
+  twitterTitle: () => siteTitle.value,
+  twitterDescription: () => siteDescription.value,
+  twitterImage: () => siteImage.value,
 });
 
 const PaymentStore = usePaymentStore();
-const FetchPaymentMethod = async () => {
+const fetchPaymentMethod = async () => {
+  const [paramsModule, controllerModule] = await Promise.all([
+    import("./features/fetch_payment_methods/Core/Params/fetch_payment_methods_params"),
+    import("./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller"),
+  ]);
+  const FetchPaymentMethodsParams = paramsModule.default;
+  const FetchPaymentMethodController = controllerModule.default;
   const paymentMethod = new FetchPaymentMethodsParams(1);
   const fetchPaymentMethodController =
     FetchPaymentMethodController.getInstance();
@@ -155,53 +292,20 @@ const FetchPaymentMethod = async () => {
 };
 
 onMounted(() => {
-  // if (UserStore?.user) {
-
-  FetchPaymentMethod();
-  // }
+  if (!isHomeV2.value) void fetchPaymentMethod();
 });
-
-const UserSettingStore = useSettingStore();
-UserSettingStore.setSetting(webStatus.value!);
 </script>
 
 <template>
-  <div class="coming-soon" v-if="isEduhubDomain">
-    <!-- Animated background -->
-    <div class="bg-circles">
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <!-- Main content -->
-    <div class="container">
-      <img
-        src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/logo.png"
-        alt="EduHUB Logo"
-        class="logo"
-      />
-      <h1>Coming Soon</h1>
-      <p>The Future of E-Learning is Here</p>
-    </div>
-    <a href="tel:+201119342223" class="whatsapp">
-      <img
-        src="https://strategyeducation.techlabeg.com/storage/uploads/eduhub/whatsapp.png"
-        alt="whatsapp"
-      />
-    </a>
-  </div>
-
-  <div v-else>
+  <div>
     <NuxtLayout>
-      <MobileNav v-if="!isHomeV2" />
-      <ChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
-      <SpeedDialToast v-if="!isHomeV2" class="social-icons" />
-      <Toast />
+      <LazyMobileNav v-if="!isHomeV2" />
+      <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
+      <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" />
+      <LazyToast v-if="!isHomeV2" />
       <NuxtPage v-if="!error" />
-      <Error v-if="error" />
-      <MainDialog v-if="!pending && !isHomeV2" />
-      <!-- <LoaderDialog v-if="!pending" /> -->
+      <ErrorPage v-else />
+      <LazyMainDialog v-if="!pending && !isHomeV2" />
     </NuxtLayout>
   </div>
   <AppThemeToggle :is-dark="isDark" @toggle="toggleTheme" />

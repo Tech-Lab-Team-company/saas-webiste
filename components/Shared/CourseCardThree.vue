@@ -2,6 +2,7 @@
 import microphone from "@/public/icons/microphone.vue";
 import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
+import { Autoplay, EffectCreative } from "swiper/modules";
 import type HomeSection from "~/types/home_section_interface";
 
 const props = defineProps<{
@@ -20,6 +21,7 @@ watch(
 const containerRef = ref(null)
 
 const swiper = useSwiper(containerRef, {
+  modules: [Autoplay, EffectCreative],
   effect: 'creative',
   // loop: true,
   autoplay: {

@@ -3,9 +3,30 @@ import "~/assets/css/home-v2.css";
 import HomeCoursesSection from "~/components/home/v2/sections/HomeCoursesSection.vue";
 import { useHomePage } from "~/features/HomePageFeature/composables/useHomePage";
 
-const { home, pending, loadCoursesByYear } = useHomePage();
+const { home, pending, loadCoursesByYear } = await useHomePage();
 
 definePageMeta({ layout: "home-v2" });
+
+const seoTitle = computed(() =>
+  home.value.site.brandName
+    ? `الكورسات | ${home.value.site.brandName}`
+    : "الكورسات التعليمية",
+);
+const seoDescription = computed(() =>
+  `اختر مرحلتك وسنتك الدراسية واكتشف الكورسات المناسبة لك على ${home.value.site.brandName || "المنصة"}.`,
+);
+
+useSeoMeta({
+  title: () => seoTitle.value,
+  description: () => seoDescription.value,
+  robots: "index, follow, max-image-preview:large",
+  ogTitle: () => seoTitle.value,
+  ogDescription: () => seoDescription.value,
+  ogType: "website",
+  twitterCard: "summary_large_image",
+  twitterTitle: () => seoTitle.value,
+  twitterDescription: () => seoDescription.value,
+});
 
 useHead({
   htmlAttrs: {

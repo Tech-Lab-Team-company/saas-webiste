@@ -17,13 +17,13 @@ import type {
 } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
 
-export const useHomePage = () => {
+export const useHomePage = async () => {
   const settingsStore = useSettingStore()
   const { setting } = storeToRefs(settingsStore)
   const webDomain = getWebDomain()
   const api = new HomePageApi(webDomain)
 
-  const { data, pending: homePending, error, refresh } = useAsyncData<HomePageViewModel>(
+  const homeRequest = useAsyncData<HomePageViewModel>(
     `home-v2-data:dynamic-v4:${webDomain}`,
     async () => mapHomePage(await api.load(), setting.value),
     {
@@ -32,11 +32,7 @@ export const useHomePage = () => {
     },
   )
 
-  const {
-    data: courseTaxonomy,
-    pending: courseTaxonomyPending,
-    error: courseTaxonomyError,
-  } = useAsyncData<{
+  const taxonomyRequest = useAsyncData<{
     stages: HomeCourseStageViewModel[]
     tabs: HomeCourseTabViewModel[]
   }>(
@@ -69,6 +65,22 @@ export const useHomePage = () => {
       dedupe: 'defer',
     },
   )
+
+  const [homeResult, taxonomyResult] = await Promise.all([
+    homeRequest,
+    taxonomyRequest,
+  ])
+  const {
+    data,
+    pending: homePending,
+    error,
+    refresh,
+  } = homeResult
+  const {
+    data: courseTaxonomy,
+    pending: courseTaxonomyPending,
+    error: courseTaxonomyError,
+  } = taxonomyResult
 
   const home = computed<HomePageViewModel>(() => {
     const currentHome = data.value ?? createEmptyHomePageViewModel()

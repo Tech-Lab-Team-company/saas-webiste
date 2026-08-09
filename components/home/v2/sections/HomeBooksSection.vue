@@ -412,7 +412,7 @@ onBeforeUnmount(() => {
 .home-v2-books__heading > span::before {
   width: 28px;
   height: 2px;
-  background: var(--home-v2-coral);
+  background: color-mix(in srgb, var(--home-v2-coral) 58%, #5f160e);
   content: "";
 }
 

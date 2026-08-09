@@ -6,15 +6,7 @@ import type {
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
 
-import HomeAppSection from "./sections/HomeAppSection.vue";
-import HomeBlogSection from "./sections/HomeBlogSection.vue";
-import HomeCoursesSection from "./sections/HomeCoursesSection.vue";
-import HomeCtaSection from "./sections/HomeCtaSection.vue";
-import HomeFaqSection from "./sections/HomeFaqSection.vue";
 import HomeHeroSection from "./sections/HomeHeroSection.vue";
-import HomeBooksSection from "./sections/HomeBooksSection.vue";
-import HomeLearningJourneySection from "~/components/Home/v2/sections/HomeLearningJourneySection.vue";
-import HomeAboutTeacherSection from "~/components/Home/v2/sections/HomeAboutTeacherSection.vue";
 
 const props = defineProps<{
   home: HomePageViewModel;
@@ -47,17 +39,38 @@ const themeStyles = computed(() => {
   >
     <main>
       <HomeHeroSection :hero="props.home.hero" :site="props.home.site" />
-      <HomeCoursesSection
+      <LazyHomeV2SectionsHomeCoursesSection
         :courses="props.home.courses"
         :load-courses-by-year="props.loadCoursesByYear"
+        :hydrate-on-visible="{ rootMargin: '50px' }"
       />
-      <HomeBooksSection :books="props.home.books" />
-      <HomeBlogSection :blogs="props.home.blogs" />
-      <HomeLearningJourneySection :journey="props.home.learningJourney" />
-      <HomeAboutTeacherSection :about="props.home.aboutTeacher" />
-      <HomeAppSection :site="props.home.site" />
-      <HomeFaqSection />
-      <HomeCtaSection :cta="props.home.cta" />
+      <LazyHomeV2SectionsHomeBooksSection
+        :books="props.home.books"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
+      <LazyHomeV2SectionsHomeBlogSection
+        :blogs="props.home.blogs"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
+      <LazyHomeV2SectionsHomeLearningJourneySection
+        :journey="props.home.learningJourney"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
+      <LazyHomeV2SectionsHomeAboutTeacherSection
+        :about="props.home.aboutTeacher"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
+      <LazyHomeV2SectionsHomeAppSection
+        :site="props.home.site"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
+      <LazyHomeV2SectionsHomeFaqSection
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
+      <LazyHomeV2SectionsHomeCtaSection
+        :cta="props.home.cta"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
     </main>
   </div>
 </template>
