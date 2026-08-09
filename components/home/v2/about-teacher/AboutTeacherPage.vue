@@ -23,10 +23,11 @@ const webDomain = getWebDomain();
 const api = new HomePageApi(webDomain);
 const { data: aboutHero } = await useAsyncData<HomeHeroViewModel | null>(
   `about-v2-hero:${webDomain}:${HeroSectionTypeEnum.ABOUT_API_WEBSITE}`,
-  async () => mapHeroSection(
-    await api.fetchHeroSections(HeroSectionTypeEnum.ABOUT_API_WEBSITE),
-    HeroSectionTypeEnum.ABOUT_API_WEBSITE,
-  ),
+  async () =>
+    mapHeroSection(
+      await api.fetchHeroSections(HeroSectionTypeEnum.ABOUT_API_WEBSITE),
+      HeroSectionTypeEnum.ABOUT_API_WEBSITE,
+    ),
   {
     default: () => null,
     dedupe: "defer",
@@ -377,7 +378,9 @@ const animateMethod = (section: HTMLElement) => {
 const animateExperience = (section: HTMLElement) => {
   const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
   const card = section.querySelector(".about-teacher-stage-card");
-  const chips = section.querySelectorAll(".about-teacher-stage-card__chips span");
+  const chips = section.querySelectorAll(
+    ".about-teacher-stage-card__chips span",
+  );
   const content = section.querySelectorAll(
     ".about-teacher-stage-card__content > *",
   );
@@ -530,10 +533,14 @@ const revealMotionSection = (section: HTMLElement) => {
 
   motionContext?.add(() => {
     if (section.classList.contains("about-teacher-hero")) animateHero(section);
-    else if (section.classList.contains("about-teacher-method")) animateMethod(section);
-    else if (section.classList.contains("about-teacher-experience")) animateExperience(section);
-    else if (section.classList.contains("about-teacher-contact")) animateContact(section);
-    else if (section.classList.contains("about-teacher-cta")) animateCta(section);
+    else if (section.classList.contains("about-teacher-method"))
+      animateMethod(section);
+    else if (section.classList.contains("about-teacher-experience"))
+      animateExperience(section);
+    else if (section.classList.contains("about-teacher-contact"))
+      animateContact(section);
+    else if (section.classList.contains("about-teacher-cta"))
+      animateCta(section);
   });
 };
 
@@ -654,7 +661,9 @@ onBeforeUnmount(() => {
     :style="{
       '--home-v2-blue': site.colors.primary || '#28366c',
       '--home-v2-deep': site.colors.secondary || '#3a3e7e',
-      '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
+      '--home-v2-blue-light': `color-mix(in srgb, ${
+        site.colors.primary || '#28366c'
+      } 14%, white)`,
     }"
   >
     <main class="about-teacher-main">
@@ -674,6 +683,5 @@ onBeforeUnmount(() => {
       />
       <AboutTeacherCtaSection />
     </main>
-
   </div>
 </template>

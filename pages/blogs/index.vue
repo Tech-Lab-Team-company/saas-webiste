@@ -4,8 +4,11 @@ import "~/assets/css/home-v2.css";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   mapBlogsPage,
+  mapHeroSection,
   mapHomeSite,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
+import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { HeroSectionTypeEnum } from "~/features/HomePageFeature/types/homePage.types";
 
 definePageMeta({ layout: "home-v2" });
 
@@ -18,6 +21,17 @@ const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
   ? "mr-eslamsalama.com"
   : requestUrl.hostname;
 const api = new HomePageApi(webDomain);
+const { data: blogHero } = await useAsyncData<HomeHeroViewModel | null>(
+  `blogs-hero:${webDomain}:${HeroSectionTypeEnum.BLOGS_API_WEBSITE}`,
+  async () => mapHeroSection(
+    await api.fetchHeroSections(HeroSectionTypeEnum.BLOGS_API_WEBSITE),
+    HeroSectionTypeEnum.BLOGS_API_WEBSITE,
+  ),
+  {
+    default: () => null,
+    dedupe: "defer",
+  },
+);
 const {
   data: blogs,
   pending,
@@ -27,6 +41,21 @@ const {
   `blogs-page:${webDomain}`,
   async () => mapBlogsPage(await api.fetchBlogs()),
   { default: () => [] },
+);
+const heroTitle = computed(
+  () => blogHero.value?.title || "فكّر في الفيزياء، مش تحفظها.",
+);
+const heroEyebrow = computed(
+  () => blogHero.value?.subtitle || `مدونة ${site.value.brandName || "EduHub"}`,
+);
+const heroDescription = computed(
+  () => blogHero.value?.description
+    || "أفكار عملية للمذاكرة وحل المسائل والمراجعة، مكتوبة بخطوات تقدر تبدأ تطبقها من جلستك الجاية.",
+);
+const heroDesktopImage = computed(() => blogHero.value?.image?.src || null);
+const heroMobileImage = computed(() => blogHero.value?.mobileImage?.src || null);
+const heroImageAlt = computed(
+  () => blogHero.value?.image?.alt || blogHero.value?.mobileImage?.alt || heroTitle.value,
 );
 const tones = ["navy", "blue", "coral"] as const;
 const markers = ["فهم", "05", "7D", "قوة", "وقت", "دقة"] as const;
@@ -110,9 +139,11 @@ onMounted(() => {
     const heroCopy = root.querySelectorAll<HTMLElement>(
       ".blog-listing__eyebrow, .blog-listing__hero-copy h1, .blog-listing__hero-copy > p, .blog-listing__hero-meta > span",
     );
-    const method = root.querySelector<HTMLElement>(".blog-listing__method");
+    const method = root.querySelector<HTMLElement>(
+      ".blog-listing__method, .blog-listing__hero-visual",
+    );
     const methodContent = root.querySelectorAll<HTMLElement>(
-      ".blog-listing__method > span, .blog-listing__method > strong, .blog-listing__method li",
+      ".blog-listing__method > span, .blog-listing__method > strong, .blog-listing__method li, .blog-listing__hero-visual img",
     );
     const articleHeadingItems = root.querySelectorAll<HTMLElement>(
       ".blog-listing__section-heading > *",
@@ -225,9 +256,12 @@ onBeforeUnmount(() => {
 });
 
 useSeoMeta({
-  title: () => `المدونة | ${site.value.brandName || "EduHub"}`,
-  description:
-    "مقالات عملية للمذاكرة وحل المسائل والمراجعة بخطوات قابلة للتطبيق.",
+  title: () => blogHero.value?.title
+    ? `${blogHero.value.title} | ${site.value.brandName || "EduHub"}`
+    : `المدونة | ${site.value.brandName || "EduHub"}`,
+  description: () => blogHero.value?.description
+    || "مقالات عملية للمذاكرة وحل المسائل والمراجعة بخطوات قابلة للتطبيق.",
+  ogImage: () => heroDesktopImage.value || heroMobileImage.value || undefined,
 });
 
 useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
@@ -250,23 +284,38 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
       <header class="blog-listing__hero">
         <div class="container blog-listing__hero-grid">
           <div class="blog-listing__hero-copy">
-            <span class="blog-listing__eyebrow"
-              >مدونة {{ site.brandName || "EduHub" }}</span
-            >
-            <h1>فكّر في الفيزياء.<br /><em>مش تحفظها.</em></h1>
-            <p>
-              أفكار عملية للمذاكرة وحل المسائل والمراجعة، مكتوبة بخطوات تقدر
-              تبدأ تطبقها من جلستك الجاية.
-            </p>
+            <span class="blog-listing__eyebrow">{{ heroEyebrow }}</span>
+            <h1>{{ heroTitle }}</h1>
+            <p>{{ heroDescription }}</p>
             <div class="blog-listing__hero-meta" aria-label="معلومات المدونة">
-              <span
-                ><b>{{ blogs.length }}</b> مقالات عملية</span
-              >
+              <span><b>{{ blogs.length }}</b> مقالات عملية</span>
               <span><b>100%</b> قراءة مجانية</span>
             </div>
           </div>
 
+          <figure
+            v-if="heroDesktopImage || heroMobileImage"
+            class="blog-listing__hero-visual"
+          >
+            <picture>
+              <source
+                v-if="heroMobileImage"
+                media="(max-width: 700px)"
+                :srcset="heroMobileImage"
+              />
+              <NuxtImg
+                :src="heroDesktopImage || heroMobileImage || ''"
+                :alt="heroImageAlt"
+                width="760"
+                height="760"
+                sizes="(max-width: 940px) 100vw, 38vw"
+                loading="eager"
+              />
+            </picture>
+          </figure>
+
           <div
+            v-else
             class="blog-listing__method"
             aria-label="طريقة التعلم في المدونة"
           >
@@ -486,6 +535,38 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   border: 1px solid #ffffff2e;
   background: #ffffff12;
   box-shadow: 24px 24px color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
+}
+
+.blog-listing__hero-visual {
+  position: relative;
+  min-height: 390px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #ffffff2e;
+  background: #ffffff12;
+  box-shadow: 24px 24px color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
+}
+
+.blog-listing__hero-visual::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(145deg, transparent 52%, color-mix(in srgb, var(--home-v2-deep) 42%, transparent));
+  content: "";
+  pointer-events: none;
+}
+
+.blog-listing__hero-visual picture,
+.blog-listing__hero-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.blog-listing__hero-visual img {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
 }
 
 .blog-listing__method::after {
@@ -737,6 +818,10 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
     width: min(560px, 100%);
   }
 
+  .blog-listing__hero-visual {
+    width: min(620px, 100%);
+  }
+
   .blog-listing__section-heading {
     grid-template-columns: 1fr;
     gap: 13px;
@@ -744,6 +829,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 }
 
 @media (max-width: 720px) {
+  .blog-listing__hero-visual {
+    min-height: 320px;
+    box-shadow: 12px 12px color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
+  }
+
   .blog-listing__grid {
     grid-template-columns: 1fr;
   }

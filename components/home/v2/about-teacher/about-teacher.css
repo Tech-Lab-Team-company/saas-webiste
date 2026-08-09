@@ -120,8 +120,7 @@
   color: #fff;
   font: 800 14px var(--home-v2-heading);
   transition: color 0.3s ease, background-color 0.3s ease,
-    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.38s ease;
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.38s ease;
 }
 
 .about-teacher-hero__actions > a:last-child {
@@ -269,7 +268,7 @@
   position: absolute;
   top: 0;
   inset-inline: 0;
-  height: 3px;
+  height: 5px;
   background: linear-gradient(90deg, var(--home-v2-blue), var(--about-accent));
   content: "";
   transform: scaleX(0);

@@ -1,112 +1,135 @@
 <script setup lang="ts">
-import type { HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
+import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
 const props = defineProps<{
-  site: HomeSiteViewModel
-}>()
+  site: HomeSiteViewModel;
+}>();
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
 
-const userImage = computed(() =>
-  userStore.image || userStore.user?.image || '/images/user.png',
-)
+const userImage = computed(
+  () => userStore.image || userStore.user?.image || "/images/user.png",
+);
 
 const handleUserImageError = (event: Event) => {
-  const image = event.currentTarget as HTMLImageElement
-  if (!image.src.endsWith('/images/user.png')) {
-    image.src = '/images/user.png'
+  const image = event.currentTarget as HTMLImageElement;
+  if (!image.src.endsWith("/images/user.png")) {
+    image.src = "/images/user.png";
   }
-}
+};
 
 const handleLogout = async () => {
   if (import.meta.client) {
-    localStorage.removeItem('auth')
-    localStorage.removeItem('user')
+    localStorage.removeItem("auth");
+    localStorage.removeItem("user");
   }
 
-  userStore.logout()
-  await router.push('/home-v2')
-}
+  userStore.logout();
+  await router.push("/home-v2");
+};
 
 const headerDescription = computed(() => {
-  const description = (props.site.description || 'منصة تعليمية منظمة').replace(/\s+/g, ' ').trim()
-  const limit = 64
+  const description = (props.site.description || "منصة تعليمية منظمة")
+    .replace(/\s+/g, " ")
+    .trim();
+  const limit = 64;
 
   return description.length > limit
     ? `${description.slice(0, limit).trimEnd()}…`
-    : description
-})
+    : description;
+});
 
 const navItems = computed(() => [
-  ...(route.path === '/home-v2'
-    ? []
-    : [{ label: 'الرئيسية', to: '/home-v2' }]),
-  { label: 'الكورسات', to: '/course' },
-  { label: 'الكتب', to: '/books' },
-  { label: 'المدونة', to: '/blogs' },
-  { label: 'التطبيق', to: '/app' },
+  ...(route.path === "/home-v2" ? [] : [{ label: "الرئيسية", to: "/home-v2" }]),
+  { label: "الكورسات", to: "/course" },
+  { label: "الكتب", to: "/books" },
+  { label: "المدونة", to: "/blogs" },
+  { label: "التطبيق", to: "/app" },
   {
-    label: props.site.brandName ? `عن ${props.site.brandName}` : 'عن المنصة',
-    to: '/about-teacher',
+    label: props.site.brandName ? `عن ${props.site.brandName}` : "عن المنصة",
+    to: "/about-teacher",
   },
-])
+]);
 
-const scrollProgress = ref(0)
-const isScrolled = ref(false)
-let progressFrame: number | null = null
-let pageResizeObserver: ResizeObserver | null = null
+const scrollProgress = ref(0);
+const isScrolled = ref(false);
+let progressFrame: number | null = null;
+let pageResizeObserver: ResizeObserver | null = null;
 
 const updateScrollProgress = () => {
-  const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight
-  const nextProgress = scrollableHeight > 0
-    ? (window.scrollY / scrollableHeight) * 100
-    : 0
+  const scrollableHeight =
+    document.documentElement.scrollHeight - window.innerHeight;
+  const nextProgress =
+    scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
 
-  scrollProgress.value = Math.min(100, Math.max(0, nextProgress))
-  isScrolled.value = window.scrollY > 18
-}
+  scrollProgress.value = Math.min(100, Math.max(0, nextProgress));
+  isScrolled.value = window.scrollY > 18;
+};
 
 const queueScrollProgressUpdate = () => {
-  if (progressFrame !== null) return
+  if (progressFrame !== null) return;
 
   progressFrame = window.requestAnimationFrame(() => {
-    updateScrollProgress()
-    progressFrame = null
-  })
-}
+    updateScrollProgress();
+    progressFrame = null;
+  });
+};
 
 onMounted(() => {
-  updateScrollProgress()
-  window.addEventListener('scroll', queueScrollProgressUpdate, { passive: true })
-  window.addEventListener('resize', queueScrollProgressUpdate, { passive: true })
+  updateScrollProgress();
+  window.addEventListener("scroll", queueScrollProgressUpdate, {
+    passive: true,
+  });
+  window.addEventListener("resize", queueScrollProgressUpdate, {
+    passive: true,
+  });
 
-  pageResizeObserver = new ResizeObserver(queueScrollProgressUpdate)
-  pageResizeObserver.observe(document.body)
-})
+  pageResizeObserver = new ResizeObserver(queueScrollProgressUpdate);
+  pageResizeObserver.observe(document.body);
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', queueScrollProgressUpdate)
-  window.removeEventListener('resize', queueScrollProgressUpdate)
-  pageResizeObserver?.disconnect()
+  window.removeEventListener("scroll", queueScrollProgressUpdate);
+  window.removeEventListener("resize", queueScrollProgressUpdate);
+  pageResizeObserver?.disconnect();
 
   if (progressFrame !== null) {
-    window.cancelAnimationFrame(progressFrame)
+    window.cancelAnimationFrame(progressFrame);
   }
-})
+});
 </script>
 
 <template>
-  <header :class="['home-v2-header', { 'home-v2-header--scrolled': isScrolled }]">
+  <header
+    :class="['home-v2-header', { 'home-v2-header--scrolled': isScrolled }]"
+  >
     <div class="container home-v2-header__content">
-      <NuxtLink to="/" class="home-v2-header__brand" :aria-label="`العودة إلى صفحة ${site.brandName || 'المنصة'}`">
-        <span :class="['home-v2-header__logo', { 'home-v2-temporary-asset': !site.logo }]">
-          <NuxtImg :src="site.logo?.src || '/images/logo.png'" :alt="site.logo?.alt || site.brandName || ''" width="163" height="52" loading="eager" />
+      <NuxtLink
+        to="/"
+        class="home-v2-header__brand"
+        :aria-label="`العودة إلى صفحة ${site.brandName || 'المنصة'}`"
+      >
+        <span
+          :class="[
+            'home-v2-header__logo',
+            { 'home-v2-temporary-asset': !site.logo },
+          ]"
+        >
+          <NuxtImg
+            :src="site.logo?.src || '/images/logo.png'"
+            :alt="site.logo?.alt || site.brandName || ''"
+            width="163"
+            height="52"
+            loading="eager"
+          />
         </span>
         <span>
-          <b>{{ site.brandName || 'EduHub' }}</b>
-          <small :title="site.description || undefined">{{ headerDescription }}</small>
+          <b>{{ site.brandName || "EduHub" }}</b>
+          <small :title="site.description || undefined">{{
+            headerDescription
+          }}</small>
         </span>
       </NuxtLink>
 
@@ -121,25 +144,51 @@ onBeforeUnmount(() => {
       </nav>
 
       <div v-if="!userStore.user" class="home-v2-header__actions">
-        <NuxtLink to="/login" class="home-v2-header__login">دخول الطالب</NuxtLink>
-        <NuxtLink to="/Auth/register" class="button">إنشاء حساب <span aria-hidden="true">←</span></NuxtLink>
+        <NuxtLink to="/login" class="home-v2-header__login"
+          >دخول الطالب</NuxtLink
+        >
+        <NuxtLink to="/Auth/register" class="button"
+          >إنشاء حساب <span aria-hidden="true">←</span></NuxtLink
+        >
       </div>
 
-      <div v-else class="home-v2-header__actions home-v2-header__actions--student">
-        <NuxtLink to="/profile" class="home-v2-header__student" aria-label="الذهاب إلى الملف الشخصي">
-          <img :src="userImage" :alt="userStore.user.name" @error="handleUserImageError" />
+      <div
+        v-else
+        class="home-v2-header__actions home-v2-header__actions--student"
+      >
+        <NuxtLink
+          to="/profile"
+          class="home-v2-header__student"
+          aria-label="الذهاب إلى الملف الشخصي"
+        >
+          <img
+            :src="userImage"
+            :alt="userStore.user.name"
+            @error="handleUserImageError"
+          />
           <span>
             <small>مساحة الطالب</small>
             <b>{{ userStore.user.name }}</b>
           </span>
         </NuxtLink>
-        <button type="button" class="home-v2-header__logout" @click="handleLogout">
+        <button
+          type="button"
+          class="home-v2-header__logout"
+          @click="handleLogout"
+        >
           تسجيل الخروج
         </button>
       </div>
     </div>
-    <nav class="home-v2-header__mobile-nav" aria-label="التنقل الرئيسي للموبايل">
-      <NuxtLink v-for="item in navItems" :key="`mobile-${item.to}`" :to="item.to">
+    <nav
+      class="home-v2-header__mobile-nav"
+      aria-label="التنقل الرئيسي للموبايل"
+    >
+      <NuxtLink
+        v-for="item in navItems"
+        :key="`mobile-${item.to}`"
+        :to="item.to"
+      >
         {{ item.label }}
       </NuxtLink>
     </nav>
@@ -186,8 +235,6 @@ onBeforeUnmount(() => {
   align-items: center;
 }
 
-
-
 .home-v2-header__actions--student {
   gap: 10px;
 }
@@ -199,7 +246,7 @@ onBeforeUnmount(() => {
   gap: 9px;
   padding: 4px 7px;
   border-radius: 10px;
-  transition: background-color .2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .home-v2-header__student:hover {
@@ -248,7 +295,7 @@ onBeforeUnmount(() => {
   font-family: inherit;
   font-size: 11px;
   font-weight: 900;
-  transition: background-color .2s ease, color .2s ease, transform .2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .home-v2-header__logout:hover {
@@ -359,9 +406,9 @@ onBeforeUnmount(() => {
   gap: 3px;
   margin-inline: auto;
   padding: 5px;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 9%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--home-v2-blue) 4%, white);
+  /* border: 1px solid color-mix(in srgb, var(--home-v2-blue) 9%, transparent); */
+  /* border-radius: 999px; */
+  /* background: color-mix(in srgb, var(--home-v2-blue) 4%, white); */
   font-size: 14px;
   font-weight: 700;
 }
@@ -407,7 +454,7 @@ onBeforeUnmount(() => {
   height: 2px;
   border-radius: 99px;
   background: var(--home-v2-blue);
-  content: '';
+  content: "";
   transform: scaleX(0);
   transition: transform 0.2s ease;
 }
@@ -421,7 +468,8 @@ onBeforeUnmount(() => {
   padding-inline: 20px;
   border: 1px solid color-mix(in srgb, var(--home-v2-blue) 78%, white);
   border-radius: 12px;
-  box-shadow: 0 9px 22px color-mix(in srgb, var(--home-v2-blue) 22%, transparent);
+  box-shadow: 0 9px 22px
+    color-mix(in srgb, var(--home-v2-blue) 22%, transparent);
 }
 
 .home-v2-header .button span {
@@ -470,7 +518,11 @@ onBeforeUnmount(() => {
 
   .home-v2-header__mobile-nav a:hover,
   .home-v2-header__mobile-nav a.router-link-active {
-    background: color-mix(in srgb, var(--home-v2-blue) 16%, var(--home-v2-surface));
+    background: color-mix(
+      in srgb,
+      var(--home-v2-blue) 16%,
+      var(--home-v2-surface)
+    );
     color: var(--home-v2-ink);
   }
 }

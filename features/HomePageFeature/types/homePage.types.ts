@@ -14,6 +14,7 @@ export enum HeroSectionTypeEnum {
   HOME_API_WEBSITE = 2,
   COURSES_API_APP = 3,
   ABOUT_API_WEBSITE = 4,
+  BLOGS_API_WEBSITE = 6,
 }
 
 export interface HomeSectionState<T> {

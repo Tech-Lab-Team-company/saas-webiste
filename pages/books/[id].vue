@@ -7,7 +7,10 @@ import {
   mapBookDetailsResource,
   mapHomeSite,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
-import type { HomeBookDetailsResourceViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import {
+  BookTypeEnum,
+  type HomeBookDetailsResourceViewModel,
+} from "~/features/HomePageFeature/models/HomePageViewModel";
 
 interface BookMediaItem {
   key: string;
@@ -214,14 +217,24 @@ const purchaseOptions = computed(() => {
       label: type.label,
       price: currentBook.isFree ? 0 : type.price,
       isDigital: /إلكتروني|رقمي/u.test(type.label),
+      requiresDelivery: currentBook.bookType === BookTypeEnum.PAPER
+        || currentBook.bookType === BookTypeEnum.BOTH,
     }));
   }
 
   return [{
     id: currentBook.bookType ?? currentBook.id,
-    label: currentBook.bookType === 1 ? "كتاب إلكتروني" : currentBook.bookType === 2 ? "نسخة مطبوعة" : "نسخة الكتاب",
+    label: currentBook.bookType === 1
+      ? "كتاب إلكتروني"
+      : currentBook.bookType === 2
+        ? "نسخة مطبوعة"
+        : currentBook.bookType === 3
+          ? "إلكتروني ومطبوع"
+          : "نسخة الكتاب",
     price: currentBook.isFree ? 0 : Number(currentBook.price),
     isDigital: currentBook.bookType === 1,
+    requiresDelivery: currentBook.bookType === BookTypeEnum.PAPER
+      || currentBook.bookType === BookTypeEnum.BOTH,
   }];
 });
 
@@ -462,6 +475,7 @@ useHead({
                   :price="option.price"
                   :currency="book.currency"
                   :option-label="option.label"
+                  :requires-delivery="option.requiresDelivery"
                   @purchased="refresh"
                 />
                 <span v-else class="book-details-page__format-unavailable">غير متاح حاليًا</span>
