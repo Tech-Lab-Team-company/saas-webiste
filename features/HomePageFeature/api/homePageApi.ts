@@ -103,20 +103,30 @@ export class HomePageApi {
     };
   }
 
-  async fetchCoursesByYear(stageId: number, yearId: number): Promise<unknown> {
-    return this.post(ApiNames.Instance.filter_courses, {
-      category_id: 1,
-      type: 1,
-      education_type_id: null,
-      stage_id: stageId,
-      year_id: yearId,
-      subject_id: null,
-      university_id: null,
-      college_id: null,
-      department_id: null,
-      division_id: null,
-      university_subject_id: null,
-    });
+  async fetchCoursesByYear(
+    stageId: number,
+    yearId: number,
+    page = 1,
+    perPage = 9,
+  ): Promise<unknown> {
+    return this.post(
+      ApiNames.Instance.filter_courses,
+      {
+        category_id: 1,
+        type: 1,
+        education_type_id: null,
+        stage_id: stageId,
+        year_id: yearId,
+        subject_id: null,
+        university_id: null,
+        college_id: null,
+        department_id: null,
+        division_id: null,
+        university_subject_id: null,
+        page,
+        per_page: perPage,
+      },
+    );
   }
 
   async fetchStages(): Promise<unknown> {

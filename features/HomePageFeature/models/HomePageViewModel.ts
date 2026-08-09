@@ -39,6 +39,19 @@ export interface HomeCourseViewModel {
   recordingsCount: number | null
 }
 
+export interface HomeCoursePaginationViewModel {
+  currentPage: number
+  lastPage: number
+  perPage: number
+  total: number
+  serverDriven: boolean
+}
+
+export interface HomeCoursePageViewModel {
+  courses: HomeCourseViewModel[]
+  pagination: HomeCoursePaginationViewModel
+}
+
 export type HomeCourseTabKey = string
 
 export interface HomeCourseStageViewModel {

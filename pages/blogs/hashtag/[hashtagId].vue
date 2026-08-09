@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import "~/assets/css/home-v2.css";
+import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   mapBlogsPage,
@@ -24,12 +25,7 @@ const hashtagId = computed(() => {
   return Number.isInteger(value) && value > 0 ? value : null;
 });
 
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 const api = new HomePageApi(webDomain);
 
 const normalizeHashtags = (value: unknown): BlogHashtag[] => {
@@ -70,10 +66,9 @@ const activeHashtag = computed(
 );
 const pageTitle = computed(() => activeHashtag.value?.title || "نتائج الوسم");
 const tones = ["navy", "blue", "coral"] as const;
-const markers = ["فهم", "اقرأ", "فكرة", "وقت", "خطوة", "دقة"] as const;
 
 const formatDate = (date: string | null) => {
-  if (!date) return "قراءة عملية";
+  if (!date) return "";
   const parsedDate = new Date(date);
   if (Number.isNaN(parsedDate.getTime())) return date;
   return new Intl.DateTimeFormat("ar-EG", {
@@ -87,7 +82,7 @@ const plainText = (value: string | null) =>
   (value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
 useSeoMeta({
-  title: () => `${pageTitle.value} | مدونة ${site.value.brandName || "EduHub"}`,
+  title: () => `${pageTitle.value} | المدونة${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
   description: () => `مقالات مرتبطة بوسم ${pageTitle.value}.`,
 });
 
@@ -159,7 +154,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
                       :alt="blog.image.alt || ''"
                     />
                     <span>{{ blog.subtitle || pageTitle }}</span>
-                    <strong>{{ markers[index % markers.length] }}</strong>
+                    <strong>{{ String(index + 1).padStart(2, "0") }}</strong>
                     <small>{{ String(index + 1).padStart(2, "0") }}</small>
                   </div>
                   <div class="hashtag-card__body">

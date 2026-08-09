@@ -31,9 +31,7 @@ const handleLogout = async () => {
 };
 
 const headerDescription = computed(() => {
-  const description = (props.site.description || "منصة تعليمية منظمة")
-    .replace(/\s+/g, " ")
-    .trim();
+  const description = (props.site.description || "").replace(/\s+/g, " ").trim();
   const limit = 64;
 
   return description.length > limit
@@ -111,23 +109,22 @@ onBeforeUnmount(() => {
         class="home-v2-header__brand"
         :aria-label="`العودة إلى صفحة ${site.brandName || 'المنصة'}`"
       >
-        <span
-          :class="[
-            'home-v2-header__logo',
-            { 'home-v2-temporary-asset': !site.logo },
-          ]"
-        >
+        <span :class="['home-v2-header__logo', { 'home-v2-header__logo--empty': !site.logo }]">
           <NuxtImg
-            :src="site.logo?.src || '/images/logo.png'"
+            v-if="site.logo"
+            :src="site.logo.src"
             :alt="site.logo?.alt || site.brandName || ''"
             width="163"
             height="52"
             loading="eager"
           />
+          <span v-else aria-hidden="true">+</span>
         </span>
         <span>
-          <b>{{ site.brandName || "EduHub" }}</b>
-          <small :title="site.description || undefined">{{
+          <b :class="{ 'home-v2-header__brand-empty': !site.brandName }">
+            {{ site.brandName || "أضف اسم المنصة" }}
+          </b>
+          <small v-if="headerDescription" :title="site.description || undefined">{{
             headerDescription
           }}</small>
         </span>
@@ -354,6 +351,14 @@ onBeforeUnmount(() => {
   object-position: center;
 }
 
+.home-v2-header__logo--empty {
+  border: 1px dashed color-mix(in srgb, var(--home-v2-blue) 48%, transparent);
+  background: var(--home-v2-blue-light);
+  box-shadow: none;
+  color: var(--home-v2-blue);
+  font: 300 27px/1 var(--home-v2-heading);
+}
+
 .home-v2-header__progress-track {
   position: absolute;
   right: 0;
@@ -390,6 +395,11 @@ onBeforeUnmount(() => {
   letter-spacing: -0.015em;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.home-v2-header__brand-empty {
+  color: var(--home-v2-blue) !important;
+  font-size: 13px !important;
 }
 
 .home-v2-header__brand small {

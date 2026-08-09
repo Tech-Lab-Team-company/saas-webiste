@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import { storeToRefs } from "pinia";
 import "~/assets/css/home-v2.css";
+import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   createEmptyBooks,
@@ -9,16 +10,12 @@ import {
   mapHomeSite,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeBookViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 definePageMeta({ layout: "home-v2" });
 
 const route = useRoute();
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
@@ -150,7 +147,7 @@ onBeforeUnmount(() => {
 });
 
 useSeoMeta({
-  title: () => `الكتب | ${site.value.brandName || "EduHub"}`,
+  title: () => `الكتب${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
   description: "تصفح جميع الكتب والمراجع التعليمية المتاحة على المنصة.",
 });
 
@@ -244,12 +241,18 @@ useHead({
           <div v-if="pending" class="books-page__state" role="status">
             جاري تحميل الكتب...
           </div>
-          <div v-else-if="error" class="books-page__state books-page__state--error" role="alert">
-            تعذر تحميل الكتب في الوقت الحالي.
-          </div>
-          <div v-else-if="books.items.length === 0" class="books-page__state" role="status">
-            لا توجد كتب متاحة حاليًا.
-          </div>
+          <HomeSectionEmptyState
+            v-else-if="error"
+            label="قسم الكتب"
+            title="تعذر تحميل الكتب"
+            description="تعذر جلب الكتب في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
+          />
+          <HomeSectionEmptyState
+            v-else-if="books.items.length === 0"
+            label="قسم الكتب"
+            title="أضف كتب المنصة"
+            description="أضف أول كتاب من لوحة التحكم ليظهر في المكتبة هنا."
+          />
 
           <div v-else-if="filteredBooks.length === 0" class="books-page__state" role="status">
             لا توجد كتب مطابقة للاختيارات الحالية.
@@ -272,21 +275,21 @@ useHead({
                   decoding="async"
                 />
                 <template v-else>
-                  <span>EDUCATIONAL BOOK</span>
+                  <span>كتاب رقم {{ book.bookId }}</span>
                   <b>{{ book.title }}</b>
-                  <small>{{ site.brandName || "منصة التعليم" }}</small>
+                  <small v-if="site.brandName">{{ site.brandName }}</small>
                 </template>
                 <em>{{ book.isFree ? "مجاني" : "متاح الآن" }}</em>
               </div>
 
               <div class="books-page__card-body">
-                <span>{{ book.subtitle || "كتاب من مكتبة المنصة" }}</span>
+                <span v-if="book.subtitle">{{ book.subtitle }}</span>
                 <h3>{{ book.title }}</h3>
-                <p>{{ book.description || "اطّلع على محتوى الكتاب وتفاصيله الكاملة قبل البدء." }}</p>
+                <p v-if="book.description">{{ book.description }}</p>
                 <div class="books-page__formats">
-                  <div>
+                  <div v-if="book.numberOfPages">
                     <small>عدد الصفحات</small>
-                    <b>{{ book.numberOfPages ? `${book.numberOfPages} صفحة` : "غير محدد" }}</b>
+                    <b>{{ book.numberOfPages }} صفحة</b>
                   </div>
                   <div>
                     <small>السعر</small>

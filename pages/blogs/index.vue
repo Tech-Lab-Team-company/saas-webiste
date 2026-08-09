@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { gsap } from "gsap";
 import "~/assets/css/home-v2.css";
+import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   mapBlogsPage,
@@ -9,17 +10,13 @@ import {
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { HeroSectionTypeEnum } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 definePageMeta({ layout: "home-v2" });
 
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 const api = new HomePageApi(webDomain);
 const { data: blogHero } = await useAsyncData<HomeHeroViewModel | null>(
   `blogs-hero:${webDomain}:${HeroSectionTypeEnum.BLOGS_API_WEBSITE}`,
@@ -43,25 +40,32 @@ const {
   { default: () => [] },
 );
 const heroTitle = computed(
-  () => blogHero.value?.title || "فكّر في الفيزياء، مش تحفظها.",
+  () => blogHero.value?.title?.trim() || "",
 );
 const heroEyebrow = computed(
-  () => blogHero.value?.subtitle || `مدونة ${site.value.brandName || "EduHub"}`,
+  () => blogHero.value?.subtitle?.trim() || "",
 );
 const heroDescription = computed(
-  () => blogHero.value?.description
-    || "أفكار عملية للمذاكرة وحل المسائل والمراجعة، مكتوبة بخطوات تقدر تبدأ تطبقها من جلستك الجاية.",
+  () => blogHero.value?.description?.trim() || "",
 );
 const heroDesktopImage = computed(() => blogHero.value?.image?.src || null);
 const heroMobileImage = computed(() => blogHero.value?.mobileImage?.src || null);
 const heroImageAlt = computed(
-  () => blogHero.value?.image?.alt || blogHero.value?.mobileImage?.alt || heroTitle.value,
+  () => blogHero.value?.image?.alt || blogHero.value?.mobileImage?.alt || "",
+);
+const hasHeroContent = computed(() =>
+  Boolean(
+    heroTitle.value ||
+      heroEyebrow.value ||
+      heroDescription.value ||
+      heroDesktopImage.value ||
+      heroMobileImage.value,
+  ),
 );
 const tones = ["navy", "blue", "coral"] as const;
-const markers = ["فهم", "05", "7D", "قوة", "وقت", "دقة"] as const;
 
 const formatDate = (date: string | null) => {
-  if (!date) return "قراءة عملية";
+  if (!date) return "";
   const parsedDate = new Date(date);
   if (Number.isNaN(parsedDate.getTime())) return date;
 
@@ -140,10 +144,10 @@ onMounted(() => {
       ".blog-listing__eyebrow, .blog-listing__hero-copy h1, .blog-listing__hero-copy > p, .blog-listing__hero-meta > span",
     );
     const method = root.querySelector<HTMLElement>(
-      ".blog-listing__method, .blog-listing__hero-visual",
+      ".blog-listing__hero-empty, .blog-listing__hero-visual",
     );
     const methodContent = root.querySelectorAll<HTMLElement>(
-      ".blog-listing__method > span, .blog-listing__method > strong, .blog-listing__method li, .blog-listing__hero-visual img",
+      ".blog-listing__hero-visual img",
     );
     const articleHeadingItems = root.querySelectorAll<HTMLElement>(
       ".blog-listing__section-heading > *",
@@ -257,10 +261,9 @@ onBeforeUnmount(() => {
 
 useSeoMeta({
   title: () => blogHero.value?.title
-    ? `${blogHero.value.title} | ${site.value.brandName || "EduHub"}`
-    : `المدونة | ${site.value.brandName || "EduHub"}`,
-  description: () => blogHero.value?.description
-    || "مقالات عملية للمذاكرة وحل المسائل والمراجعة بخطوات قابلة للتطبيق.",
+    ? `${blogHero.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
+    : `المدونة${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
+  description: () => blogHero.value?.description || undefined,
   ogImage: () => heroDesktopImage.value || heroMobileImage.value || undefined,
 });
 
@@ -282,11 +285,20 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   >
     <main class="blog-listing__page">
       <header class="blog-listing__hero">
-        <div class="container blog-listing__hero-grid">
+        <div v-if="!hasHeroContent" class="container blog-listing__hero-empty">
+          <HomeSectionEmptyState
+            tone="dark"
+            label="واجهة المدونة"
+            title="أضف محتوى واجهة المدونة"
+            description="أضف العنوان والوصف والصورة من لوحة التحكم ليظهر قسم المدونة هنا."
+          />
+        </div>
+
+        <div v-else class="container blog-listing__hero-grid">
           <div class="blog-listing__hero-copy">
-            <span class="blog-listing__eyebrow">{{ heroEyebrow }}</span>
-            <h1>{{ heroTitle }}</h1>
-            <p>{{ heroDescription }}</p>
+            <span v-if="heroEyebrow" class="blog-listing__eyebrow">{{ heroEyebrow }}</span>
+            <h1 v-if="heroTitle">{{ heroTitle }}</h1>
+            <p v-if="heroDescription">{{ heroDescription }}</p>
             <div class="blog-listing__hero-meta" aria-label="معلومات المدونة">
               <span><b>{{ blogs.length }}</b> مقالات عملية</span>
               <span><b>100%</b> قراءة مجانية</span>
@@ -314,21 +326,14 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             </picture>
           </figure>
 
-          <div
+          <HomeSectionEmptyState
             v-else
-            class="blog-listing__method"
-            aria-label="طريقة التعلم في المدونة"
-          >
-            <span>قاعدة بسيطة</span>
-            <strong
-              >افهم الفكرة،<br />حل بإيدك،<br /><em>راجع خطأك.</em></strong
-            >
-            <ol>
-              <li><b>01</b><span>فهم</span></li>
-              <li><b>02</b><span>تطبيق</span></li>
-              <li><b>03</b><span>مراجعة</span></li>
-            </ol>
-          </div>
+            compact
+            tone="dark"
+            label="صورة المدونة"
+            title="أضف صورة الواجهة"
+            description="أضف صورة قسم المدونة من لوحة التحكم."
+          />
         </div>
       </header>
 
@@ -356,19 +361,19 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             >
               <NuxtLink :to="blog.route" class="blog-listing__card-link">
                 <div class="blog-listing__visual" aria-hidden="true">
-                  <span>{{ blog.subtitle || "نصائح الفيزياء" }}</span>
-                  <strong>{{ markers[index] }}</strong>
+                  <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
+                  <strong>{{ String(index + 1).padStart(2, "0") }}</strong>
                   <small>{{ String(index + 1).padStart(2, "0") }}</small>
                 </div>
                 <div class="blog-listing__card-body">
                   <div class="blog-listing__card-meta">
-                    <span>{{ blog.subtitle || "مدونة الفيزياء" }}</span>
+                    <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
                     <time v-if="blog.date" :datetime="blog.date">{{
                       formatDate(blog.date)
                     }}</time>
                   </div>
                   <h2>{{ blog.title }}</h2>
-                  <p>{{ blog.description }}</p>
+                  <p v-if="blog.description">{{ blog.description }}</p>
                   <span class="blog-listing__read"
                     >اقرأ المقال <i aria-hidden="true">←</i></span
                   >
@@ -432,6 +437,15 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   color: #fff;
 }
 
+.blog-listing__hero-empty {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 540px;
+  align-items: center;
+  padding-block: 54px;
+}
+
 .blog-listing__hero::before,
 .blog-listing__hero::after {
   position: absolute;
@@ -493,8 +507,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   letter-spacing: -0.04em;
 }
 
-.blog-listing__hero-copy h1 em,
-.blog-listing__method strong em {
+.blog-listing__hero-copy h1 em {
   color: var(--home-v2-coral);
   font-style: normal;
 }
@@ -528,15 +541,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   font: 900 19px var(--home-v2-heading);
 }
 
-.blog-listing__method {
-  position: relative;
-  min-height: 330px;
-  padding: 34px;
-  border: 1px solid #ffffff2e;
-  background: #ffffff12;
-  box-shadow: 24px 24px color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
-}
-
 .blog-listing__hero-visual {
   position: relative;
   min-height: 390px;
@@ -567,62 +571,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   position: absolute;
   inset: 0;
   object-fit: cover;
-}
-
-.blog-listing__method::after {
-  position: absolute;
-  top: 24px;
-  left: 25px;
-  width: 110px;
-  height: 110px;
-  border: 1px solid #ffffff24;
-  border-radius: 50%;
-  content: "";
-}
-
-.blog-listing__method > span {
-  color: var(--home-v2-coral);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.blog-listing__method > strong {
-  position: relative;
-  z-index: 1;
-  display: block;
-  margin-top: 12px;
-  font: 900 31px/1.45 var(--home-v2-heading);
-}
-
-.blog-listing__method ol {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 28px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.blog-listing__method li {
-  display: flex;
-  min-height: 66px;
-  flex-direction: column;
-  justify-content: center;
-  padding: 11px;
-  border-top: 2px solid var(--home-v2-blue);
-  background: #ffffff0f;
-}
-
-.blog-listing__method li b {
-  color: var(--home-v2-coral);
-  font: 900 11px var(--home-v2-heading);
-}
-
-.blog-listing__method li span {
-  margin-top: 3px;
-  color: #ffffffd1;
-  font-size: 12px;
-  font-weight: 800;
 }
 
 .blog-listing__main {
@@ -814,10 +762,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
     padding-block: 64px;
   }
 
-  .blog-listing__method {
-    width: min(560px, 100%);
-  }
-
   .blog-listing__hero-visual {
     width: min(620px, 100%);
   }
@@ -864,17 +808,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
   .blog-listing__hero-copy > p {
     font-size: 15px;
-  }
-
-  .blog-listing__method {
-    min-height: 300px;
-    padding: 26px;
-    box-shadow: 12px 12px
-      color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
-  }
-
-  .blog-listing__method > strong {
-    font-size: 27px;
   }
 
   .blog-listing__main {

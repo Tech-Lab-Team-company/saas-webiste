@@ -1,38 +1,31 @@
-<script setup>
-const cards = [
-  {
-    id: 1,
-    btn: "تعليم",
-  },
-  {
-    id: 2,
-    btn: "تصميم",
-  },
-  {
-    id: 3,
-    btn: "برمجه",
-  },
-  {
-    id: 4,
-    btn: "تصميم",
-  },
-  {
-    id: 5,
-    btn: "تعليم",
-  },
-  {
-    id: 6,
-    btn: "تصميم",
-  },
-  {
-    id: 7,
-    btn: "برمجه",
-  },
-  {
-    id: 8,
-    btn: "تصميم",
-  },
-];
+<script setup lang="ts">
+import { getWebDomain } from "~/constant/webDomain";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
+
+interface HashtagLink {
+  id: number;
+  title: string;
+}
+
+const normalizeHashtags = (value: unknown): HashtagLink[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const source = item as Record<string, unknown>;
+    const id = Number(source.id);
+    const title = typeof source.title === "string" ? source.title.trim() : "";
+    return Number.isInteger(id) && id > 0 && title ? [{ id, title }] : [];
+  });
+};
+
+const webDomain = getWebDomain();
+const api = new HomePageApi(webDomain);
+const { data: hashtags } = await useAsyncData(
+  `legacy-sidebar-hashtags:${webDomain}`,
+  async () => normalizeHashtags(await api.fetchHashtags()),
+  { default: () => [] },
+);
 </script>
 
 <template>
@@ -40,14 +33,15 @@ const cards = [
   <div class="sidebar-buttons" dir="rtl">
     <div class="sidebar-page-articles-buttons pt-lg">
       <h2 class="sidebar-title">{{ $t('encyclopedia') }}</h2>
-      <div class="grid grid-cols-3 gap-md pt-md">
-        <button
-          v-for="(item, index) in cards"
-          :key="'btn-' + index"
+      <div v-if="hashtags.length" class="grid grid-cols-3 gap-md pt-md">
+        <NuxtLink
+          v-for="item in hashtags"
+          :key="item.id"
+          :to="`/blogs/hashtag/${item.id}`"
           class="sidebar-button"
         >
-          {{ item.btn }}
-        </button>
+          {{ item.title }}
+        </NuxtLink>
       </div>
     </div>
   </div>

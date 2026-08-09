@@ -38,16 +38,16 @@ const { locale } = useI18n();
       v-for="(article, index) in latestarticles.slice(0, 4)"
       :key="index"
     >
-      <div class="sidebar-page-articles-card-img">
+      <div v-if="article.attachments?.[0]?.file" class="sidebar-page-articles-card-img">
         <img
-            :src="article.attachments?.[0]?.file || ''"
-            :alt="article.attachments?.[0]?.alt || 'Default alt'"
+            :src="article.attachments[0].file"
+            :alt="article.attachments[0].alt || article.title"
             class="course-image"
           />
       </div>
       <div class="sidebar-page-articles-card-info">
-        <p class="sidebar-date">{{ article.date }}</p>
-        <h3 class="sidebar-text">{{ article.description }}</h3>
+        <p v-if="article.date" class="sidebar-date">{{ article.date }}</p>
+        <h3 class="sidebar-text">{{ article.title }}</h3>
       </div>
     </NuxtLink>
   </div>

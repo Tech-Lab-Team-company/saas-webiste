@@ -12,6 +12,7 @@ import type {
   HomeSiteViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 const props = defineProps<{
   hero: HomeSectionState<HomeHeroViewModel | null>;
@@ -93,7 +94,19 @@ const truncateText = (value: string, limit: number) => {
 };
 
 const rawHeroSubtitle = computed(() =>
-  normalizeText(heroData.value?.subtitle || "وكمّل بثقة."),
+  normalizeText(heroData.value?.subtitle || ""),
+);
+const heroTitleUsesSiteFallback = computed(
+  () =>
+    props.hero.status !== "error" &&
+    !normalizeText(heroData.value?.title || "") &&
+    Boolean(normalizeText(props.site.brandName || "")),
+);
+const heroDescriptionUsesSiteFallback = computed(
+  () =>
+    props.hero.status !== "error" &&
+    !normalizeText(heroData.value?.description || "") &&
+    Boolean(normalizeText(props.site.description || "")),
 );
 const hasOversizedSubtitle = computed(
   () => splitGraphemes(rawHeroSubtitle.value).length > TYPEWRITER_PHRASE_LIMIT,
@@ -101,20 +114,49 @@ const hasOversizedSubtitle = computed(
 
 const heroContent = computed(() => ({
   title: truncateText(
-    heroData.value?.title || "تعلّم بخطوات مرتبة،",
+    heroData.value?.title ||
+      (heroTitleUsesSiteFallback.value ? props.site.brandName || "" : ""),
     HERO_TITLE_LIMIT,
   ),
   subtitle: truncateText(rawHeroSubtitle.value, TYPEWRITER_PHRASE_LIMIT),
   text: truncateText(
     heroData.value?.description ||
-      "تعلّم من محتوى منظم ومصمم لمساعدتك على التقدم بثقة.",
+      (heroDescriptionUsesSiteFallback.value
+        ? props.site.description || ""
+        : ""),
     HERO_DESCRIPTION_LIMIT,
   ),
-  link: heroData.value?.link || "#courses",
+  link: heroData.value?.link || "",
 }));
 
 const heroKicker = computed(() =>
-  truncateText(props.site.brandName || "EduHub", 42),
+  heroTitleUsesSiteFallback.value
+    ? ""
+    : truncateText(props.site.brandName || "", 42),
+);
+
+const hasHeroContent = computed(() =>
+  Boolean(
+    props.hero.status !== "error" &&
+      (heroContent.value.title ||
+        heroContent.value.subtitle ||
+        heroContent.value.text ||
+        heroContent.value.link ||
+        heroData.value?.image ||
+        heroData.value?.mobileImage),
+  ),
+);
+
+const emptyStateTitle = computed(() =>
+  props.hero.status === "error"
+    ? "تعذر تحميل الواجهة الرئيسية"
+    : "أضف محتوى الواجهة الرئيسية",
+);
+
+const emptyStateDescription = computed(() =>
+  props.hero.status === "error"
+    ? "تعذر جلب بيانات القسم في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
+    : "أضف العنوان والوصف والصورة من لوحة التحكم ليظهر القسم الرئيسي هنا.",
 );
 
 const heroSection = ref<HTMLElement | null>(null);
@@ -125,10 +167,7 @@ let removeHeroPointerEffects: (() => void) | null = null;
 const typewriterPhrases = computed(() =>
   Array.from(
     new Set(
-      (hasOversizedSubtitle.value
-        ? [heroContent.value.subtitle]
-        : [heroContent.value.subtitle, "افهم أسرع.", "واتقدّم بثقة."]
-      ).filter(Boolean),
+      [heroContent.value.subtitle].filter(Boolean),
     ),
   ),
 );
@@ -390,21 +429,37 @@ onBeforeUnmount(() => {
     id="top"
     ref="heroSection"
     class="home-v2-hero"
-    aria-labelledby="home-v2-hero-title"
+    :aria-labelledby="hasHeroContent && heroContent.title ? 'home-v2-hero-title' : undefined"
   >
     <div class="home-v2-hero__ambient" aria-hidden="true">
       <span class="home-v2-hero__ambient-grid" />
       <span class="home-v2-hero__ambient-orb home-v2-hero__ambient-orb--one" />
       <span class="home-v2-hero__ambient-orb home-v2-hero__ambient-orb--two" />
     </div>
-    <div class="container home-v2-hero__layout">
+    <div v-if="!hasHeroContent" class="container home-v2-hero__empty">
+      <HomeSectionEmptyState
+        tone="dark"
+        label="قسم الواجهة الرئيسية"
+        :title="emptyStateTitle"
+        :description="emptyStateDescription"
+      />
+    </div>
+
+    <div v-else class="container home-v2-hero__layout">
       <div class="home-v2-hero__copy">
-        <p class="home-v2-hero__kicker" :title="site.brandName || undefined">
+        <p
+          v-if="heroKicker"
+          class="home-v2-hero__kicker"
+          :title="site.brandName || undefined"
+        >
           {{ heroKicker }}
         </p>
-        <h1 id="home-v2-hero-title">
-          <span class="home-v2-hero__title-line">{{ heroContent.title }}</span>
+        <h1 v-if="heroContent.title || heroContent.subtitle" id="home-v2-hero-title">
+          <span v-if="heroContent.title" class="home-v2-hero__title-line">
+            {{ heroContent.title }}
+          </span>
           <em
+            v-if="heroContent.subtitle"
             :class="[
               'home-v2-hero__title-line home-v2-hero__typewriter',
               {
@@ -428,8 +483,8 @@ onBeforeUnmount(() => {
             />
           </em>
         </h1>
-        <p>{{ heroContent.text }}</p>
-        <div class="home-v2-hero__actions">
+        <p v-if="heroContent.text">{{ heroContent.text }}</p>
+        <div v-if="heroContent.link" class="home-v2-hero__actions">
           <a class="button" :href="heroContent.link"
             >استكشف الكورسات <span aria-hidden="true">←</span></a
           >
@@ -441,10 +496,7 @@ onBeforeUnmount(() => {
 
       <figure
         ref="heroVisual"
-        :class="[
-          'home-v2-hero__visual',
-          { 'home-v2-temporary-asset': !heroImage },
-        ]"
+        class="home-v2-hero__visual"
         :aria-label="heroImage?.alt || 'صورة المنصة'"
       >
         <picture v-if="heroImage">
@@ -463,11 +515,14 @@ onBeforeUnmount(() => {
             @error="handleHeroImageError"
           />
         </picture>
-        <div v-else class="home-v2-hero__placeholder">
-          <span aria-hidden="true">EDU</span>
-          <strong>صورة المدرّس</strong>
-          <small>سيتم استبدالها بالأصل المعتمد</small>
-        </div>
+        <HomeSectionEmptyState
+          v-else
+          compact
+          label="صورة القسم"
+          title="أضف صورة الواجهة"
+          description="أضف الصورة من لوحة التحكم لتظهر هنا."
+        />
+        <span class="home-v2-hero__visual-note">مورد مؤقت</span>
         <span v-if="settingsLogo" class="home-v2-hero__brand-logo">
           <img
             :src="settingsLogo.src"
@@ -563,6 +618,15 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   align-items: center;
   gap: clamp(36px, 4vw, 64px);
+}
+
+.home-v2-hero__empty {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: max(650px, calc(92svh - 86px));
+  align-items: center;
+  padding-block: 72px;
 }
 
 .home-v2-hero__copy {
@@ -783,6 +847,26 @@ onBeforeUnmount(() => {
   box-shadow: 0 10px 28px #06114738;
 }
 
+.home-v2-hero__visual-note {
+  position: absolute;
+  z-index: 6;
+  inset-inline-end: 18px;
+  bottom: 20px;
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding-inline: 15px;
+  border: 1px solid rgb(255 255 255 / 58%);
+  border-radius: 999px;
+  background: rgb(6 17 71 / 74%);
+  box-shadow: 0 12px 30px rgb(6 17 71 / 24%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(10px);
+}
+
 .home-v2-hero__visual-shine {
   position: absolute;
   z-index: 4;
@@ -808,33 +892,6 @@ onBeforeUnmount(() => {
   object-fit: contain;
 }
 
-.home-v2-hero__placeholder {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-content: center;
-  gap: 8px;
-  padding: 32px;
-  text-align: center;
-  background: radial-gradient(circle at 50% 30%, #fff 0 12%, transparent 12.5%),
-    linear-gradient(155deg, #ddebff, #7fb6f7);
-  color: var(--home-v2-deep);
-}
-
-.home-v2-hero__placeholder span {
-  font: 900 clamp(65px, 11vw, 120px) / 0.8 var(--home-v2-heading);
-  letter-spacing: -0.1em;
-  opacity: 0.18;
-}
-
-.home-v2-hero__placeholder strong {
-  font: 900 22px var(--home-v2-heading);
-}
-
-.home-v2-hero__placeholder small {
-  font-size: 13px;
-}
-
 @media (max-width: 780px) {
   .home-v2-hero h1 {
     font-size: clamp(34px, 10.5vw, 46px);
@@ -853,6 +910,11 @@ onBeforeUnmount(() => {
     padding-top: 25px;
   }
 
+  .home-v2-hero__empty {
+    min-height: 560px;
+    padding-block: 52px;
+  }
+
   .home-v2-hero__copy {
     padding-bottom: 20px;
   }
@@ -860,6 +922,14 @@ onBeforeUnmount(() => {
   .home-v2-hero__visual {
     width: min(84%, 350px);
     margin-bottom: 48px;
+  }
+
+  .home-v2-hero__visual-note {
+    inset-inline-end: 14px;
+    bottom: 14px;
+    min-height: 34px;
+    padding-inline: 13px;
+    font-size: 11px;
   }
 
   .home-v2-hero__actions {

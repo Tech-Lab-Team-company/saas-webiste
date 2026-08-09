@@ -17,6 +17,7 @@ import type {
   HomeBooksViewModel,
   HomeAboutTeacherViewModel,
   HomeCtaViewModel,
+  HomeCoursePageViewModel,
   HomeCourseTabViewModel,
   HomeCourseStageViewModel,
   HomeCourseViewModel,
@@ -30,9 +31,6 @@ import type {
   HomeWebsiteSectionBookViewModel,
 } from '../models/HomePageViewModel'
 import { BookPriceTypeEnum, BookTypeEnum } from '../models/HomePageViewModel'
-import { createHomeLearningJourneyMock } from '../mocks/homeLearningJourney.mock'
-import { createHomeAboutTeacherMock } from '../mocks/homeAboutTeacher.mock'
-import { createHomeHeroSectionMock } from '../mocks/homeHeroSection.mock'
 
 const DEFAULT_HOME_ERROR_MESSAGE = 'تعذر تحميل هذا القسم في الوقت الحالي.'
 
@@ -204,8 +202,16 @@ const mapBlogApiDto = (value: unknown): HomeBlogApiDto | null => {
     subtitle: toNullableString(value.subtitle),
     description: toNullableString(value.description),
     date: toNullableString(value.date),
+    mailImage: mapFlexibleImageApiDto(value.mail_image, value.title),
     attachments: toArray(value.attachments)
-      .map(mapImageApiDto)
+      .map((attachment) => {
+        if (!isRecord(attachment)) return null
+
+        return mapFlexibleImageApiDto(
+          attachment.file ?? attachment.img,
+          attachment.alt ?? value.title,
+        )
+      })
       .filter((attachment): attachment is HomeImageApiDto => attachment !== null),
   }
 }
@@ -281,6 +287,67 @@ export const mapHomeCourseList = (value: unknown): HomeCourseViewModel[] => {
   })
 
   return [...courses.values()]
+}
+
+export const mapHomeCoursePage = (
+  value: unknown,
+  requestedPage = 1,
+  requestedPerPage = 9,
+): HomeCoursePageViewModel => {
+  const record = isRecord(value) ? value : null
+  const nestedData = record && isRecord(record.data) ? record.data : null
+  const courseSource = Array.isArray(value)
+    ? value
+    : Array.isArray(record?.data)
+      ? record.data
+      : Array.isArray(nestedData?.data)
+        ? nestedData.data
+        : []
+  const metadataSource = nestedData ?? record
+  const metadata = metadataSource && isRecord(metadataSource.meta)
+    ? metadataSource.meta
+    : metadataSource
+  const hasServerPagination = Boolean(
+    metadata &&
+      (metadata.current_page !== undefined ||
+        metadata.last_page !== undefined ||
+        metadata.total !== undefined),
+  )
+  const allCourses = mapHomeCourseList(courseSource)
+  const safePerPage = Math.max(
+    1,
+    toNullableNumber(metadata?.per_page) ?? requestedPerPage,
+  )
+  const total = Math.max(
+    0,
+    toNullableNumber(metadata?.total) ?? allCourses.length,
+  )
+  const computedLastPage = Math.max(1, Math.ceil(total / safePerPage))
+  const lastPage = Math.max(
+    1,
+    toNullableNumber(metadata?.last_page) ?? computedLastPage,
+  )
+  const currentPage = Math.min(
+    lastPage,
+    Math.max(1, toNullableNumber(metadata?.current_page) ?? requestedPage),
+  )
+  const courses = hasServerPagination
+    ? allCourses
+    : allCourses.slice(
+        (currentPage - 1) * safePerPage,
+        currentPage * safePerPage,
+      )
+
+  return {
+    courses,
+    pagination: {
+      currentPage,
+      lastPage,
+      perPage: safePerPage,
+      total,
+      serverDriven: hasServerPagination,
+    },
+  }
 }
 
 export const mapHomeCourseStages = (value: unknown): HomeCourseStageViewModel[] => {
@@ -370,16 +437,23 @@ const mapBlog = (blog: HomeBlogApiDto): HomeBlogViewModel | null => {
     description: blog.description,
     date: blog.date,
     route: blog.slug ? `/blogs/${encodeURIComponent(blog.slug)}` : '/blogs',
-    image: mapImage(blog.attachments[0] ?? null),
+    image: mapImage(blog.attachments[0] ?? blog.mailImage),
   }
 }
 
-export const mapBlogsPage = (value: unknown): HomeBlogViewModel[] =>
-  toArray(value)
+export const mapBlogsPage = (value: unknown): HomeBlogViewModel[] => {
+  const blogItems = Array.isArray(value)
+    ? value
+    : isRecord(value)
+      ? toArray(value.data ?? value.items ?? value.blogs)
+      : []
+
+  return blogItems
     .map(mapBlogApiDto)
     .filter((blog): blog is HomeBlogApiDto => blog !== null)
     .map(mapBlog)
     .filter((blog): blog is HomeBlogViewModel => blog !== null)
+}
 
 const createEmptyBooksPagination = (): HomeBooksViewModel['pagination'] => ({
   currentPage: 1,
@@ -506,7 +580,7 @@ const mapBook = (value: unknown): HomeBookViewModel | null => {
       ? priceType === BookPriceTypeEnum.FREE || availablePrice === 0
       : toNullableBoolean(value.isFree ?? value.is_free) ?? false,
     price: nestedBook ? String(availablePrice) : toNullableString(value.price) ?? '0',
-    currency: nestedBook ? 'ج.م' : toNullableString(value.currency) ?? '',
+    currency: toNullableString(value.currency ?? (nestedBook ? nestedBook.currency : null)) ?? '',
     bookTypes,
     bookType: nestedBookType ?? toNullableNumber(value.book_type),
     invoiceLink: toSafeUrl(value.invoice_link),
@@ -698,33 +772,26 @@ const mapLearningJourneyItem = (
 
 const mapLearningJourney = (
   value: unknown,
-  site: HomeSiteViewModel,
 ): HomeLearningJourneyViewModel => {
-  const fallbackSection = createHomeLearningJourneyMock(site)[0]
   const rootItems = toArray(value)
   const lastRootItem = rootItems[rootItems.length - 1]
-  const section = isRecord(lastRootItem)
+  const section: Record<string, unknown> = isRecord(lastRootItem)
     ? lastRootItem
     : isRecord(value)
       ? value
-      : fallbackSection
+      : {}
 
   const nestedItems = section.children
-  const itemsSource = Array.isArray(nestedItems)
-    ? nestedItems
-    : fallbackSection.children
+  const itemsSource = Array.isArray(nestedItems) ? nestedItems : []
   const items = itemsSource
     .map(mapLearningJourneyItem)
     .filter((item): item is HomeLearningJourneyItemViewModel => item !== null)
 
   return {
-    eyebrow: toNullableString(section.subtitle) ?? fallbackSection.subtitle,
-    title: toNullableString(section.title) ?? fallbackSection.title,
-    description: toNullableString(section.description) ?? fallbackSection.description,
-    textBackground:
-      toNullableString(section.text_background ?? section.textBackground) ??
-      fallbackSection.text_background ??
-      'PHYSICS',
+    eyebrow: toNullableString(section.subtitle) ?? '',
+    title: toNullableString(section.title) ?? '',
+    description: toNullableString(section.description) ?? '',
+    textBackground: toNullableString(section.text_background ?? section.textBackground) ?? '',
     icon: mapImage(mapFlexibleImageApiDto(section.icon, section.title)),
     link: '/course',
     linkLabel: 'شاهد نموذج الطالب',
@@ -736,66 +803,62 @@ const mapAboutTeacher = (
   value: unknown,
   site: HomeSiteViewModel,
 ): HomeAboutTeacherViewModel => {
-  const fallbackSection = createHomeAboutTeacherMock()
   const rootItems = toArray(value)
   const lastRootItem = rootItems[rootItems.length - 1]
-  const section = isRecord(lastRootItem)
+  const section: Record<string, unknown> = isRecord(lastRootItem)
     ? lastRootItem
     : isRecord(value)
       ? value
-      : fallbackSection
+      : {}
 
-  const fallbackExperience = fallbackSection.experience
-  const experience = isRecord(section.experience) ? section.experience : fallbackExperience
-  const rawBenefits = Array.isArray(section.benefits) && section.benefits.length > 0
-    ? section.benefits
-    : fallbackSection.benefits
+  const experience: Record<string, unknown> = isRecord(section.experience)
+    ? section.experience
+    : {}
+  const rawBenefits = Array.isArray(section.benefits) ? section.benefits : []
   const benefits = rawBenefits.flatMap((item, index) => {
     if (!isRecord(item)) {
       return []
     }
 
-    const fallbackBenefit = fallbackSection.benefits[index]
-    const title = toNullableString(item.title) ?? fallbackBenefit?.title
-    const description = toNullableString(item.description) ?? fallbackBenefit?.description
+    const title = toNullableString(item.title)
+    const description = toNullableString(item.description)
 
     if (!title || !description) {
       return []
     }
 
     return [{
-      id: toNullableNumber(item.id) ?? fallbackBenefit?.id ?? index + 1,
+      id: toNullableNumber(item.id) ?? index + 1,
       title,
       description,
     }]
   })
 
-  const teacherName = site.brandName || 'مدرسك'
+  const teacherName = site.brandName
 
   return {
-    id: toNullableNumber(section.id) ?? fallbackSection.id,
-    title: toNullableString(section.title) ?? fallbackSection.title,
-    subTitle: toNullableString(section.sub_title ?? section.subtitle) ?? fallbackSection.sub_title,
-    description: toNullableString(section.description) ?? fallbackSection.description,
+    id: toNullableNumber(section.id) ?? 0,
+    title: toNullableString(section.title) ?? '',
+    subTitle: toNullableString(section.sub_title ?? section.subtitle) ?? '',
+    description: toNullableString(section.description) ?? '',
     icon: mapImage(mapFlexibleImageApiDto(section.icon, section.title)),
     experience: {
-      value: toNullableString(experience.value) ?? fallbackExperience.value,
-      prefix: toNullableString(experience.prefix) ?? fallbackExperience.prefix,
+      value: toNullableString(experience.value) ?? '',
+      prefix: toNullableString(experience.prefix) ?? '',
     },
     benefits,
     link: '/about-teacher',
-    linkLabel: `اعرف أكثر عن ${teacherName}`,
+    linkLabel: teacherName ? `اعرف أكثر عن ${teacherName}` : 'اعرف أكثر عن المدرس',
   }
 }
 
-const createHomeCtaFallback = (): HomeCtaViewModel => ({
-  eyebrow: 'جاهز تبدأ؟',
-  title: 'اختار مسارك، وابدأ بخطوة واضحة.',
-  description: 'الصفحة الجديدة ما زالت في وضع المعاينة، بينما يظل مسار التسجيل والكورسات الحالي متاحًا.',
+const createEmptyHomeCta = (): HomeCtaViewModel => ({
+  eyebrow: '',
+  title: '',
+  description: '',
 })
 
 const mapReadySection = (value: unknown): HomeCtaViewModel => {
-  const fallback = createHomeCtaFallback()
   const rootItems = toArray(value)
   const lastRootItem = rootItems[rootItems.length - 1]
   const section: Record<string, unknown> = isRecord(lastRootItem)
@@ -805,17 +868,17 @@ const mapReadySection = (value: unknown): HomeCtaViewModel => {
       : {}
 
   return {
-    eyebrow: toNullableString(section.subtitle) ?? fallback.eyebrow,
-    title: toNullableString(section.title) ?? fallback.title,
-    description: toNullableString(section.description) ?? fallback.description,
+    eyebrow: toNullableString(section.subtitle) ?? '',
+    title: toNullableString(section.title) ?? '',
+    description: toNullableString(section.description) ?? '',
   }
 }
 
-export const mapHomeLearningJourneyMock = (site: HomeSiteViewModel) =>
-  mapLearningJourney(createHomeLearningJourneyMock(site), site)
+const createEmptyLearningJourney = (): HomeLearningJourneyViewModel =>
+  mapLearningJourney(null)
 
-export const mapHomeAboutTeacherMock = (site: HomeSiteViewModel) =>
-  mapAboutTeacher(createHomeAboutTeacherMock(), site)
+const createEmptyAboutTeacher = (site: HomeSiteViewModel): HomeAboutTeacherViewModel =>
+  mapAboutTeacher(null, site)
 
 const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeSectionState<T> => ({
   data,
@@ -900,15 +963,15 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
     status: 'empty',
   },
   learningJourney: {
-    data: mapHomeLearningJourneyMock(createEmptySite()),
+    data: createEmptyLearningJourney(),
     status: 'empty',
   },
   aboutTeacher: {
-    data: mapHomeAboutTeacherMock(createEmptySite()),
+    data: createEmptyAboutTeacher(createEmptySite()),
     status: 'empty',
   },
   cta: {
-    data: createHomeCtaFallback(),
+    data: createEmptyHomeCta(),
     status: 'empty',
   },
 })
@@ -927,14 +990,11 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
       }
     }
 
-    const mockHero = mapHeroSectionApiDto(createHomeHeroSectionMock(site)[0])
-    const mockHeroViewModel = mockHero ? mapCustomHero(mockHero) : null
-
     if (sources.heroSections.kind === 'error') {
-      return mapSectionError<HomeHeroViewModel | null>(mockHeroViewModel, sources.heroSections.error)
+      return mapSectionError<HomeHeroViewModel | null>(null, sources.heroSections.error)
     }
 
-    return { data: mockHeroViewModel, status: 'empty' as const }
+    return { data: null, status: 'empty' as const }
   })()
 
   const courses = (() => {
@@ -981,54 +1041,65 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
 
   const learningJourney = (() => {
     if (sources.learningJourney.kind === 'error') {
-      return {
-        data: mapHomeLearningJourneyMock(site),
-        status: 'empty' as const,
-      }
+      return mapSectionError<HomeLearningJourneyViewModel>(
+        createEmptyLearningJourney(),
+        sources.learningJourney.error,
+      )
     }
 
-    const hasApiData =
-      (Array.isArray(sources.learningJourney.data) &&
-        sources.learningJourney.data.length > 0) ||
-      (isRecord(sources.learningJourney.data) &&
-        Object.keys(sources.learningJourney.data).length > 0)
+    const data = mapLearningJourney(sources.learningJourney.data)
+    const hasApiData = Boolean(
+      data.eyebrow ||
+      data.title ||
+      data.description ||
+      data.icon ||
+      data.items.length > 0,
+    )
 
     return {
-      data: mapLearningJourney(sources.learningJourney.data, site),
+      data,
       status: hasApiData ? ('success' as const) : ('empty' as const),
     }
   })()
 
   const aboutTeacher = (() => {
     if (sources.aboutTeacher.kind === 'error') {
-      return {
-        data: mapHomeAboutTeacherMock(site),
-        status: 'empty' as const,
-      }
+      return mapSectionError<HomeAboutTeacherViewModel>(
+        createEmptyAboutTeacher(site),
+        sources.aboutTeacher.error,
+      )
     }
 
-    const hasApiData =
-      (Array.isArray(sources.aboutTeacher.data) &&
-        sources.aboutTeacher.data.length > 0) ||
-      (isRecord(sources.aboutTeacher.data) &&
-        Object.keys(sources.aboutTeacher.data).length > 0)
+    const data = mapAboutTeacher(sources.aboutTeacher.data, site)
+    const hasApiData = Boolean(
+      data.title ||
+      data.subTitle ||
+      data.description ||
+      data.icon ||
+      data.experience.value ||
+      data.experience.prefix ||
+      data.benefits.length > 0,
+    )
 
     return {
-      data: mapAboutTeacher(sources.aboutTeacher.data, site),
+      data,
       status: hasApiData ? ('success' as const) : ('empty' as const),
     }
   })()
 
   const cta = (() => {
-    const hasApiData =
-      sources.readySection.kind === 'success' &&
-      ((Array.isArray(sources.readySection.data) && sources.readySection.data.length > 0) ||
-        (isRecord(sources.readySection.data) && Object.keys(sources.readySection.data).length > 0))
+    if (sources.readySection.kind === 'error') {
+      return mapSectionError<HomeCtaViewModel>(
+        createEmptyHomeCta(),
+        sources.readySection.error,
+      )
+    }
+
+    const data = mapReadySection(sources.readySection.data)
+    const hasApiData = Boolean(data.eyebrow || data.title || data.description)
 
     return {
-      data: mapReadySection(
-        sources.readySection.kind === 'success' ? sources.readySection.data : null,
-      ),
+      data,
       status: hasApiData ? ('success' as const) : ('empty' as const),
     }
   })()

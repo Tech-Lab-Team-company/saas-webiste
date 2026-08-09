@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import type { HomeAboutTeacherViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 const props = defineProps<{
   about: HomeSectionState<HomeAboutTeacherViewModel>;
@@ -11,6 +12,18 @@ const aboutSection = ref<HTMLElement | null>(null);
 const aboutContent = ref<HTMLElement | null>(null);
 const aboutHasEntered = ref(false);
 let aboutAnimationContext: ReturnType<typeof gsap.context> | null = null;
+
+const hasAboutContent = computed(() => props.about.status === "success");
+const emptyStateTitle = computed(() =>
+  props.about.status === "error"
+    ? "تعذر تحميل قسم المدرس"
+    : "أضف محتوى قسم المدرس",
+);
+const emptyStateDescription = computed(() =>
+  props.about.status === "error"
+    ? "تعذر جلب بيانات القسم في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
+    : "أضف نبذة المدرس والخبرة والمميزات من لوحة التحكم ليظهر القسم هنا.",
+);
 
 const titleParts = computed(() => {
   const title = props.about.data.title;
@@ -157,32 +170,56 @@ onBeforeUnmount(() => {
     class="section home-v2-about-teacher"
     aria-labelledby="home-v2-about-teacher-title"
   >
-    <div class="container home-v2-about-teacher__grid">
-      <div class="home-v2-about-teacher__quote">
+    <div v-if="!hasAboutContent" class="container home-v2-about-teacher__empty">
+      <HomeSectionEmptyState
+        label="قسم عن المدرس"
+        :title="emptyStateTitle"
+        :description="emptyStateDescription"
+      />
+    </div>
+
+    <div v-else class="container home-v2-about-teacher__grid">
+      <div
+        v-if="about.data.description || about.data.experience.value || about.data.experience.prefix"
+        class="home-v2-about-teacher__quote"
+      >
         <span class="home-v2-about-teacher__quote-mark" aria-hidden="true">“</span>
-        <p>{{ about.data.description }}</p>
-        <!-- <pre>
-          {{ about.data }}
-        </pre> -->
-        <div class="home-v2-about-teacher__experience">
-          <strong dir="ltr">+{{ about.data.experience.value }}</strong>
-          <small>{{ about.data.experience.prefix }}</small>
+        <p v-if="about.data.description">{{ about.data.description }}</p>
+        <div
+          v-if="about.data.experience.value || about.data.experience.prefix"
+          class="home-v2-about-teacher__experience"
+        >
+          <strong v-if="about.data.experience.value" dir="ltr">
+            +{{ about.data.experience.value }}
+          </strong>
+          <small v-if="about.data.experience.prefix">
+            {{ about.data.experience.prefix }}
+          </small>
         </div>
         <span class="home-v2-about-teacher__corner" aria-hidden="true"></span>
       </div>
+      <HomeSectionEmptyState
+        v-else
+        compact
+        label="نبذة المدرس"
+        title="أضف النبذة والخبرة"
+        description="أضف وصف المدرس وسنوات الخبرة من لوحة التحكم."
+      />
 
       <div ref="aboutContent" class="home-v2-about-teacher__content">
-        <span class="section-tag">{{ about.data.linkLabel }}</span>
-        <h2 id="home-v2-about-teacher-title">
+        <span v-if="about.data.linkLabel" class="section-tag">
+          {{ about.data.linkLabel }}
+        </span>
+        <h2 v-if="about.data.title" id="home-v2-about-teacher-title">
           {{ titleParts.before }}<em v-if="titleParts.value">{{ titleParts.value }}</em>{{ titleParts.after }}
         </h2>
-        <p>{{ about.data.subTitle }}</p>
-        <ul>
+        <p v-if="about.data.subTitle">{{ about.data.subTitle }}</p>
+        <ul v-if="about.data.benefits.length">
           <li v-for="benefit in about.data.benefits" :key="benefit.id">
             {{ benefit.title }}
           </li>
         </ul>
-        <NuxtLink :to="about.data.link">
+        <NuxtLink v-if="about.data.link" :to="about.data.link">
           {{ about.data.linkLabel }}
           <span aria-hidden="true">←</span>
         </NuxtLink>
@@ -203,6 +240,12 @@ onBeforeUnmount(() => {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
   gap: clamp(72px, 6.15vw, 100px);
+}
+
+.home-v2-about-teacher__empty {
+  display: grid;
+  min-height: 540px;
+  align-items: center;
 }
 
 .home-v2-about-teacher__quote {

@@ -1,14 +1,19 @@
 export function getWebDomain(): string {
-  const url = window.location.href;
+  const configuredWebLink = String(
+    useRuntimeConfig().public.webLink || "",
+  ).trim();
+  if (!configuredWebLink) return "";
+
   try {
-    const hostname = new URL(url).hostname;
-    if (hostname === "localhost" || hostname === "almaherinenglish.com")
-      return "mr-eslamsalama.com";
-    // const parts = hostname.split('.');
-    // return parts.slice(-2).join('.');
-    return hostname;
+    const url = configuredWebLink.includes("://")
+      ? configuredWebLink
+      : `https://${configuredWebLink}`;
+    return new URL(url).hostname;
   } catch {
-    return "mr-eslamsalama.com";
+    return configuredWebLink
+      .replace(/^https?:\/\//i, "")
+      .split("/")[0]
+      .trim();
   }
 }
 

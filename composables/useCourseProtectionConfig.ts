@@ -1,0 +1,26 @@
+export function useCourseProtectionConfig() {
+  return {
+    enabled: true,
+    blockInspectShortcuts: true,
+    blockContextMenu: true,
+    blockDocumentShortcuts: true,
+    blockMediaDrag: true,
+    blockPrint: true,
+    captureShield: true,
+    shieldOnWindowBlur: true,
+    watermarkEnabled: true,
+    watermarkCopies: 15,
+    watermarkOpacity: 0.3,
+    watermarkShowStudentName: true,
+    watermarkShowStudentId: true,
+    watermarkShowCourseId: true,
+    watermarkFallbackText: "محتوى تعليمي محمي",
+    disableVideoDownload: true,
+    disablePictureInPicture: true,
+    disableRemotePlayback: true,
+    hidePdfToolbar: true,
+    pdfNoReferrer: true,
+    noticeDurationMs: 2600,
+    focusRestoreDelayMs: 300,
+  } as const;
+}

@@ -2,15 +2,13 @@
 import { gsap } from 'gsap'
 import type Fqs from '~/types/fqs'
 import { baseUrl } from '~/constant/baseUrl'
+import { getWebDomain } from '~/constant/webDomain'
 
 type FaqResponse = {
   data: Fqs[]
 }
 
-const hostname = useRequestURL().hostname
-const webDomain = hostname === 'localhost' || hostname === 'mr-eslamsalama.com'
-  ? 'mr-eslamsalama.com'
-  : hostname
+const webDomain = getWebDomain()
 
 const { data: faqs, pending, error } = await useAsyncData(
   `home-v2-faqs:${webDomain}`,
@@ -182,35 +180,6 @@ onBeforeUnmount(() => {
   }
 })
 
-/* Static FAQ mock retained for reference.
-const faqMock = [
-  {
-    id: 1,
-    question: 'كيف أبدأ استخدام المنصة؟',
-    answer: 'أنشئ حسابًا جديدًا، ثم اختر مرحلتك الدراسية لتظهر لك الكورسات والمحتوى المناسب.',
-  },
-  {
-    id: 2,
-    question: 'هل يمكنني مشاهدة الدروس من الهاتف؟',
-    answer: 'نعم، يمكنك استخدام المنصة من الهاتف أو الجهاز اللوحي أو الكمبيوتر بسهولة.',
-  },
-  {
-    id: 3,
-    question: 'كيف أشترك في أحد الكورسات؟',
-    answer: 'افتح صفحة الكورس المطلوب، ثم اختر طريقة الاشتراك المناسبة وأكمل خطوات الدفع.',
-  },
-  {
-    id: 4,
-    question: 'هل أستطيع متابعة تقدمي داخل الكورس؟',
-    answer: 'نعم، تعرض مساحة الطالب الدروس المكتملة وتساعدك على متابعة تقدمك بشكل منظم.',
-  },
-  {
-    id: 5,
-    question: 'ماذا أفعل إذا واجهت مشكلة؟',
-    answer: 'يمكنك التواصل معنا من خلال بيانات الاتصال أو واتساب، وسيساعدك فريق الدعم في أقرب وقت.',
-  },
-] as const
-*/
 </script>
 
 <template>

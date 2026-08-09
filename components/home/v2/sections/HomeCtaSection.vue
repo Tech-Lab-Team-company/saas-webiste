@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import type { HomeCtaViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 const props = defineProps<{
   cta: HomeSectionState<HomeCtaViewModel>;
@@ -10,6 +11,18 @@ const props = defineProps<{
 const ctaSection = ref<HTMLElement | null>(null);
 let ctaAnimationContext: ReturnType<typeof gsap.context> | null = null;
 let ctaHasEntered = false;
+
+const hasCtaContent = computed(() => props.cta.status === "success");
+const emptyStateTitle = computed(() =>
+  props.cta.status === "error"
+    ? "تعذر تحميل قسم الدعوة"
+    : "أضف محتوى قسم الدعوة",
+);
+const emptyStateDescription = computed(() =>
+  props.cta.status === "error"
+    ? "تعذر جلب بيانات القسم في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
+    : "أضف العنوان والوصف من لوحة التحكم ليظهر القسم هنا.",
+);
 
 const revealCtaSection = () => {
   const section = ctaSection.value;
@@ -83,11 +96,20 @@ onBeforeUnmount(() => {
     aria-labelledby="home-v2-cta-title"
   >
     <div class="container">
-      <div class="home-v2-cta__panel">
+      <HomeSectionEmptyState
+        v-if="!hasCtaContent"
+        label="قسم الدعوة لاتخاذ إجراء"
+        :title="emptyStateTitle"
+        :description="emptyStateDescription"
+      />
+
+      <div v-else class="home-v2-cta__panel">
         <span class="home-v2-cta__pulse" aria-hidden="true" />
-        <span>{{ props.cta.data.eyebrow }}</span>
-        <h2 id="home-v2-cta-title">{{ props.cta.data.title }}</h2>
-        <p>{{ props.cta.data.description }}</p>
+        <span v-if="props.cta.data.eyebrow">{{ props.cta.data.eyebrow }}</span>
+        <h2 v-if="props.cta.data.title" id="home-v2-cta-title">
+          {{ props.cta.data.title }}
+        </h2>
+        <p v-if="props.cta.data.description">{{ props.cta.data.description }}</p>
         <div class="home-v2-cta__actions">
           <a class="button" href="#courses">استكشف المسارات <span aria-hidden="true">←</span></a>
           <NuxtLink to="/Auth/register">أنشئ حسابك</NuxtLink>

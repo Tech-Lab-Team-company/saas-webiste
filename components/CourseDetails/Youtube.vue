@@ -21,6 +21,7 @@ import { useSettingStore } from "~/stores/setting";
 const props = defineProps<{
   video: string;
   sessionId?: number | null;
+  courseId?: number | null;
 }>();
 
 // State
@@ -74,7 +75,7 @@ watch(() => props.video, (newVal) => {
 
 <template>
   <br>
-  <div :class="isPiP ? 'video-player-pip' : 'video-player'">
+  <div :class="isPiP ? 'video-player-pip' : 'video-player'" @contextmenu.prevent>
     <Player theme="dark" id="myVideo" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
       @click="VideoBlurScreen = !VideoBlurScreen"
       @vmPlay="VideoBlurScreen = false"
@@ -90,6 +91,7 @@ watch(() => props.video, (newVal) => {
       </div>
 
       <Youtube :showFullscreenControl="false"  :key="videoId" :videoId="videoId!"  @vmReady="onPlayerReady" />
+      <CourseDetailsMediaWatermark :course-id="courseId" />
       <Ui>
         <DefaultSettings />
         <Controls>

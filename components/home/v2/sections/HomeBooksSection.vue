@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import type { HomeBooksViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 const props = defineProps<{
   books: HomeSectionState<HomeBooksViewModel>;
@@ -81,22 +82,19 @@ const bookFeatures = computed(() => {
   }
 
   return [
-    { id: "01", title: "مستقل عن الكورسات", description: null },
-    {
-      id: "02",
-      title:
-        book.bookTypes.map((type) => type.label).join(" · ") ||
-        "نسخة تعليمية مستقلة",
-      description: null,
-    },
-    {
-      id: "03",
-      title: book.numberOfPages
-        ? `${book.numberOfPages} صفحة`
-        : priceLabel.value,
-      description: null,
-    },
-  ];
+    ...(book.bookTypes.length
+      ? [{ title: book.bookTypes.map((type) => type.label).join(" · "), description: null }]
+      : []),
+    ...(book.numberOfPages
+      ? [{ title: `${book.numberOfPages} صفحة`, description: null }]
+      : []),
+    ...(priceLabel.value
+      ? [{ title: priceLabel.value, description: null }]
+      : []),
+  ].map((feature, index) => ({
+    ...feature,
+    id: String(index + 1).padStart(2, "0"),
+  }));
 });
 
 const revealBooksSection = () => {
@@ -215,7 +213,7 @@ const revealBooksSection = () => {
         );
     } else {
       timeline.from(
-        ".home-v2-books__empty",
+        ".home-section-empty",
         {
           autoAlpha: 0,
           y: 28,
@@ -319,8 +317,7 @@ onBeforeUnmount(() => {
           <div class="home-v2-books__cover-overlay">
             <span class="home-v2-books__sheen" aria-hidden="true" />
             <span class="home-v2-books__edition">
-              GAMMA NOTES
-              {{ String(featuredBook.bookType || 1).padStart(2, "0") }}
+              كتاب رقم {{ featuredBook.bookId }}
             </span>
             <div class="home-v2-books__cover-title">
               <strong>{{ featuredBook.bookTitle }}</strong>
@@ -330,8 +327,13 @@ onBeforeUnmount(() => {
             </div>
             <span class="home-v2-books__pages">
               <b>{{ featuredBook.isFree ? "مجاني" : featuredBook.price }}</b>
-              <small v-if="!featuredBook.isFree">
-                {{ featuredBook.currency || "ج.م" }}
+              <small
+                v-if="
+                  !featuredBook.isFree &&
+                  (featuredBook.currency || featuredBook.priceTypeLabel)
+                "
+              >
+                {{ featuredBook.currency }}
                 <template v-if="featuredBook.priceTypeLabel">
                   {{ featuredBook.priceTypeLabel }}</template
                 >
@@ -342,11 +344,11 @@ onBeforeUnmount(() => {
 
         <div class="home-v2-books__copy">
           <span>
-            {{ featuredBook.subtitle || `كتاب مستقل · ${priceLabel}` }}
+            {{ featuredBook.subtitle || priceLabel }}
           </span>
           <h3>{{ featuredBook.title }}</h3>
           <p v-if="featuredBook.description">{{ featuredBook.description }}</p>
-          <ul class="home-v2-books__features">
+          <ul v-if="bookFeatures.length" class="home-v2-books__features">
             <li v-for="feature in bookFeatures" :key="feature.id">
               <small>{{ feature.id }}</small>
               <span>
@@ -370,14 +372,16 @@ onBeforeUnmount(() => {
         </div>
       </article>
 
-      <div v-else class="home-v2-books__empty" role="status">
-        <strong v-if="books.status === 'error'"
-          >تعذر تحميل الكتب في الوقت الحالي.</strong
-        >
-        <strong v-else>لا توجد كتب متاحة حاليًا.</strong>
-        <p>يمكنك زيارة المكتبة لاحقًا للاطلاع على أحدث الكتب.</p>
-        <NuxtLink to="/books">فتح مكتبة الكتب</NuxtLink>
-      </div>
+      <HomeSectionEmptyState
+        v-else
+        label="قسم الكتب"
+        :title="books.status === 'error' ? 'تعذر تحميل الكتب' : 'أضف كتب المنصة'"
+        :description="
+          books.status === 'error'
+            ? 'تعذر جلب الكتب في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة.'
+            : 'أضف أول كتاب من لوحة التحكم ليظهر هذا القسم هنا.'
+        "
+      />
     </div>
   </section>
 </template>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
+import { getWebDomain } from "~/constant/webDomain";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 interface StudyProcessStep {
   id: number | string;
@@ -80,12 +82,7 @@ const mapStudyProcess = (value: unknown): StudyProcessSection => {
   };
 };
 
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 
 const { data: studyProcess, pending, error } = await useAsyncData(
   `about-teacher-study-process:${webDomain}`,
@@ -127,10 +124,17 @@ const { data: studyProcess, pending, error } = await useAsyncData(
 
     <div
       v-else-if="error || !studyProcess.title || studyProcess.steps.length === 0"
-      class="container about-teacher-method__state about-teacher-method__state--error"
-      role="alert"
+      class="container"
     >
-      تعذّر تحميل خطوات نظام الدراسة في الوقت الحالي.
+      <HomeSectionEmptyState
+        label="قسم نظام الدراسة"
+        :title="error ? 'تعذّر تحميل نظام الدراسة' : 'أضف نظام الدراسة'"
+        :description="
+          error
+            ? 'تعذر جلب خطوات نظام الدراسة في الوقت الحالي.'
+            : 'أضف عنوان القسم وخطوات الدراسة من لوحة التحكم لتظهر هنا.'
+        "
+      />
     </div>
 
     <div v-else class="container">

@@ -2,6 +2,8 @@
 import { storeToRefs } from "pinia";
 import "~/assets/css/home-v2.css";
 import BuyBookDialog from "~/components/Books/BuyBookDialog.vue";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
+import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   mapBookDetailsResource,
@@ -25,12 +27,7 @@ definePageMeta({
 });
 
 const route = useRoute();
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
@@ -163,7 +160,7 @@ const openMedia = (item: BookMediaItem) => {
 };
 
 const formatBookDate = (date: string | null): string => {
-  if (!date) return "غير محدد";
+  if (!date) return "";
 
   const parsedDate = new Date(`${date}T00:00:00`);
   if (Number.isNaN(parsedDate.getTime())) return date;
@@ -180,14 +177,16 @@ const bookFeatures = computed(() => {
   if (!currentBook) return [];
 
   return [
-    "محتوى تعليمي منظم وسهل الرجوع إليه",
-    currentBook.numberOfPages
-      ? `${currentBook.numberOfPages} صفحة للمذاكرة والمراجعة`
-      : "مناسب للمذاكرة والمراجعة المستقلة",
-    currentBook.bookTypes.length
-      ? `متاح بصيغة ${currentBook.bookTypes.map((type) => type.label).join(" و")}`
-      : "كتاب مستقل عن الكورسات",
-    currentBook.isFree ? "متاح مجانًا" : "شراء مستقل بدون الاشتراك في كورس",
+    ...(currentBook.numberOfPages
+      ? [`${currentBook.numberOfPages} صفحة`]
+      : []),
+    ...(currentBook.bookTypes.length
+      ? [`متاح بصيغة ${currentBook.bookTypes.map((type) => type.label).join(" و")}`]
+      : []),
+    currentBook.isFree ? "متاح مجانًا" : "متاح للشراء",
+    ...(currentBook.attachments.length
+      ? [`${currentBook.attachments.length} مرفق`]
+      : []),
   ];
 });
 
@@ -196,11 +195,15 @@ const bookFacts = computed(() => {
   if (!currentBook) return [];
 
   return [
-    { label: "عدد الصفحات", value: currentBook.numberOfPages ? `${currentBook.numberOfPages} صفحة` : "غير محدد" },
-    { label: "نوع النسخة", value: currentBook.bookTypes.map((type) => type.label).join(" · ") || "كتاب مستقل" },
-    { label: "السعر", value: displayPrice.value || "غير محدد" },
-    { label: "متاح من", value: formatBookDate(currentBook.startDate) },
-    { label: "متاح حتى", value: formatBookDate(currentBook.endDate) },
+    ...(currentBook.numberOfPages
+      ? [{ label: "عدد الصفحات", value: `${currentBook.numberOfPages} صفحة` }]
+      : []),
+    ...(currentBook.bookTypes.length
+      ? [{ label: "نوع النسخة", value: currentBook.bookTypes.map((type) => type.label).join(" · ") }]
+      : []),
+    ...(displayPrice.value ? [{ label: "السعر", value: displayPrice.value }] : []),
+    ...(currentBook.startDate ? [{ label: "متاح من", value: formatBookDate(currentBook.startDate) }] : []),
+    ...(currentBook.endDate ? [{ label: "متاح حتى", value: formatBookDate(currentBook.endDate) }] : []),
     { label: "المرفقات", value: String(currentBook.attachments.length) },
     { label: "مقاطع الفيديو", value: String(currentBook.videoLinksCount) },
     { label: "المحتوى الإضافي", value: String(currentBook.multimediaCount) },
@@ -240,8 +243,8 @@ const purchaseOptions = computed(() => {
 
 useSeoMeta({
   title: () => book.value
-    ? `${book.value.title} | ${site.value.brandName || "EduHub"}`
-    : `تفاصيل الكتاب | ${site.value.brandName || "EduHub"}`,
+    ? `${book.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
+    : `تفاصيل الكتاب${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
   description: () => book.value?.description
     || websiteSectionBook.value?.description
     || "تفاصيل الكتاب ومحتواه وسعره.",
@@ -290,10 +293,10 @@ useHead({
                 :alt="book.title"
                 loading="eager"
               />
-              <span>EDUHUB BOOK {{ book.bookId }}</span>
+              <span>كتاب رقم {{ book.bookId }}</span>
               <strong>{{ book.title }}</strong>
-              <small>
-                {{ book.numberOfPages ? `${book.numberOfPages} صفحة` : "كتاب من مكتبة المنصة" }}
+              <small v-if="book.numberOfPages">
+                {{ book.numberOfPages }} صفحة
               </small>
             </figure>
 
@@ -310,23 +313,28 @@ useHead({
                 {{ websiteSectionBook?.title || (book.isFree ? "كتاب مجاني" : "كتاب مستقل") }}
               </span>
               <h1>{{ book.title }}</h1>
-              <h2>
-                {{ book.subtitle || websiteSectionBook?.subtitle || "محتوى مرتب للمذاكرة والمراجعة" }}
+              <h2 v-if="book.subtitle || websiteSectionBook?.subtitle">
+                {{ book.subtitle || websiteSectionBook?.subtitle }}
               </h2>
-              <p>
-                {{ book.description || websiteSectionBook?.description || "اطّلع على تفاصيل الكتاب واختر النسخة المناسبة لك." }}
+              <p v-if="book.description || websiteSectionBook?.description">
+                {{ book.description || websiteSectionBook?.description }}
               </p>
 
-              <div class="book-details-page__author">
-                <span aria-hidden="true">{{ (site.brandName || "E").slice(0, 1) }}</span>
-                <div>
+              <div
+                v-if="site.brandName || book.numberOfPages"
+                class="book-details-page__author"
+              >
+                <span v-if="site.brandName" aria-hidden="true">
+                  {{ site.brandName.slice(0, 1) }}
+                </span>
+                <div v-if="site.brandName">
                   <small>إعداد ومراجعة</small>
-                  <b>{{ site.brandName || "EduHub" }}</b>
+                  <b>{{ site.brandName }}</b>
                 </div>
-                <i aria-hidden="true"></i>
-                <div>
+                <i v-if="site.brandName && book.numberOfPages" aria-hidden="true"></i>
+                <div v-if="book.numberOfPages">
                   <small>عدد الصفحات</small>
-                  <b>{{ book.numberOfPages ? `${book.numberOfPages} صفحة` : "غير محدد" }}</b>
+                  <b>{{ book.numberOfPages }} صفحة</b>
                 </div>
               </div>
             </div>
@@ -336,12 +344,10 @@ useHead({
         <section class="book-details-page__information">
           <div class="container book-details-page__information-grid">
             <div class="book-details-page__content">
-              <article>
+              <article v-if="book.description || bookFeatures.length">
                 <span class="book-details-page__section-tag">عن الكتاب</span>
-                <h2>مرجع واضح للمذاكرة والمراجعة</h2>
-                <p>
-                  {{ book.description || "كتاب مستقل يساعدك على تنظيم المذاكرة والرجوع إلى المحتوى بسهولة." }}
-                </p>
+                <h2>{{ book.title }}</h2>
+                <p v-if="book.description">{{ book.description }}</p>
                 <div class="book-details-page__feature-grid">
                   <div v-for="(feature, index) in bookFeatures" :key="feature">
                     <span>{{ String(index + 1).padStart(2, "0") }}</span>
@@ -349,6 +355,13 @@ useHead({
                   </div>
                 </div>
               </article>
+
+              <HomeSectionEmptyState
+                v-else
+                label="تفاصيل الكتاب"
+                title="أضف تفاصيل الكتاب"
+                description="أضف وصف الكتاب ومعلوماته من لوحة التحكم لتظهر هنا."
+              />
 
               <article v-if="bookSteps.length" class="book-details-page__steps-section">
                 <div class="book-details-page__steps-heading">

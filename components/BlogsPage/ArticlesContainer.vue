@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { BlogsPageBlogsImage } from "#components";
-import pic from "@/assets/images/pic.png";
 import type  SidebarHashtag  from "~/types/sidebarhashtag";
 
 import { baseUrl } from "~/constant/baseUrl";

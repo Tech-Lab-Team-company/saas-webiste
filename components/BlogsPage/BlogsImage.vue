@@ -1,29 +1,26 @@
 <script setup lang="ts">
 import type BlogsImage from "~/types/blogsimage";
-// import { baseUrl } from "~/constant/baseUrl";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 
-const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
-  try {
-    const response = await $fetch<{
-      data: BlogsImage;
-      message: string;
-      status: number;
-    }>("https://saas.crazyidea.online/api/website/fetch_blogs", {
-      method: "POST",
-      headers: {
-        "Accept-Language": "ar",
-        "web-domain": getWebDomain(),
-      },
-      body: { slug: useRoute().params.slug },
-    });
-
-    // console.log(response , "blogs cardss");
-    return response.data;
-  } catch (err) {
-    console.error("فشل في جلب التدوينة:", err);
-    return null;
+const route = useRoute();
+const slug = computed(() => String(route.params.slug || ""));
+const webDomain = getWebDomain();
+const api = new HomePageApi(webDomain);
+const { data: blogdetails } = await useAsyncData<BlogsImage | null>(
+  `legacy-blog-image:${webDomain}:${slug.value}`,
+  async () => (await api.fetchBlog(slug.value)) as BlogsImage,
+  { default: () => null, watch: [slug] },
+);
+const articleImage = computed(() => {
+  const attachment = blogdetails.value?.attachments?.find((item) => item.file);
+  if (attachment?.file) {
+    return { src: attachment.file, alt: attachment.alt || "" };
   }
+
+  return blogdetails.value?.mail_image
+    ? { src: blogdetails.value.mail_image, alt: blogdetails.value.title }
+    : null;
 });
 
 </script>
@@ -34,32 +31,28 @@ const { data: blogdetails } = await useAsyncData("blogsimage", async () => {
     <div class="image">
       <div class="blogs-page-image-cards">
         <div
+        v-if="articleImage"
         class="blogs-page-image-card"
-        v-for="(card, index) in blogdetails.attachments"
-        :key="index"
         >
-        <!-- {{ console.log(card , "blogs cards") }} -->
         <img
-            :src="blogdetails.attachments?.[0]?.file || ''"
-            :alt="blogdetails.attachments?.[0]?.alt || 'Default alt'"
+            :src="articleImage.src"
+            :alt="articleImage.alt"
             class="course-image"
           />
         </div>
         <div class="des">
           <div class="blogs-page-des">
             <p
+              v-if="blogdetails.subtitle"
               class="blogs-page-descc"
-              v-for="(card, index) in blogdetails.attachments"
-              :key="index"
             >
-              {{ blogdetails.subtitle|| "No Description" }}
+              {{ blogdetails.subtitle }}
             </p>
             <p
+              v-if="blogdetails.description"
               class="blogs-page-desc"
-              v-for="(card, index) in blogdetails.attachments"
-              :key="index"
             >
-              {{ blogdetails.description || "No Description" }}
+              {{ blogdetails.description }}
             </p>
           </div>
         </div>

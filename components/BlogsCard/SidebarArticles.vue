@@ -1,32 +1,26 @@
 <script setup lang="ts">
-import pic from "@/assets/images/pic.png";
+import { getWebDomain } from "~/constant/webDomain";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
+import { mapBlogsPage } from "~/features/HomePageFeature/mappers/homePageMapper";
 
-const cards = [
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
+const webDomain = getWebDomain();
+const api = new HomePageApi(webDomain);
+const { data: cards } = await useAsyncData(
+  `legacy-sidebar-blogs:${webDomain}`,
+  async () => mapBlogsPage(await api.fetchBlogs()).slice(0, 4),
+  { default: () => [] },
+);
 
-  },
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
- 
-  },
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
-
-  },
-  {
-    date: "2023-10-01",
-    text: "تعلّم بذكاء – دليل شامل لاكتساب المعرفة وتطوير المهارات لتحقيق التفوق الأكاديمي والمهني",
-    img: pic,
-
-  },
-];
+const formatDate = (date: string | null) => {
+  if (!date) return "";
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return date;
+  return new Intl.DateTimeFormat("ar-EG", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(parsedDate);
+};
 </script>
 
 <template>
@@ -34,20 +28,20 @@ const cards = [
      <div class="sidebar-articles" dir="rtl">
       
           <h2 class="sidebar-title">{{ $t('آخر المقالات') }}</h2>
-          <div
+          <NuxtLink
             class="sidebar-page-articles-card"
-            v-for="(card, index) in cards"
-            :key="index"
+            v-for="card in cards"
+            :key="card.id"
+            :to="card.route"
           >
-          <!-- {{ console.log(card, "Sidebarcard") }} -->
-            <div class="sidebar-page-articles-card-img">
-              <img :src="card.img" :alt="card.text" />
+            <div v-if="card.image" class="sidebar-page-articles-card-img">
+              <img :src="card.image.src" :alt="card.image.alt" />
             </div>
             <div class="sidebar-page-articles-card-info">
-              <p class="sidebar-date">{{ card.date }}</p>
-              <h3 class="sidebar-text">{{ card.text }}</h3>
+              <p v-if="card.date" class="sidebar-date">{{ formatDate(card.date) }}</p>
+              <h3 class="sidebar-text">{{ card.title }}</h3>
             </div>
-          </div>
+          </NuxtLink>
 
         </div>
         <!-- end sidebar -->

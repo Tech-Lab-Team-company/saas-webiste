@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { baseUrl } from "~/constant/baseUrl";
+import { getWebDomain } from "~/constant/webDomain";
 import type Fqs from "~/types/fqs";
 
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 
 const { data: fqs, pending, error, refresh } = await useAsyncData(
   `fqs:${webDomain}`,

@@ -2,8 +2,8 @@
 import { gsap } from "gsap";
 import HomeCourseCard from "~/components/home/v2/HomeCourseCard.vue";
 import type {
+  HomeCoursePageViewModel,
   HomeCourseTabKey,
-  HomeCourseViewModel,
   HomeCoursesViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
@@ -14,7 +14,9 @@ const props = defineProps<{
   loadCoursesByYear: (
     stageId: number,
     yearId: number,
-  ) => Promise<HomeSectionState<HomeCourseViewModel[]>>;
+    page?: number,
+    perPage?: number,
+  ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
 const route = useRoute();
@@ -23,7 +25,7 @@ const router = useRouter();
 const selectedStageId = ref<number | null>(null);
 const selectedTabKey = ref<HomeCourseTabKey | null>(null);
 const coursesByTab = ref<
-  Partial<Record<HomeCourseTabKey, HomeSectionState<HomeCourseViewModel[]>>>
+  Partial<Record<HomeCourseTabKey, HomeSectionState<HomeCoursePageViewModel>>>
 >({});
 const loadingTabKey = ref<HomeCourseTabKey | null>(null);
 const requestIds = ref<Partial<Record<HomeCourseTabKey, number>>>({});
@@ -32,6 +34,7 @@ const courseResults = ref<HTMLElement | null>(null);
 const sectionHasEntered = ref(false);
 let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
 const MAX_PREVIEW_COURSES = 6;
+const CATALOG_COURSES_PER_PAGE = 9;
 
 const shouldReduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -98,9 +101,7 @@ const availableYearTabs = computed(() =>
   ),
 );
 
-const selectedCourses = computed<HomeSectionState<
-  HomeCourseViewModel[]
-> | null>(() => {
+const selectedCourses = computed<HomeSectionState<HomeCoursePageViewModel> | null>(() => {
   if (!selectedTab.value) {
     return null;
   }
@@ -110,9 +111,34 @@ const selectedCourses = computed<HomeSectionState<
 
 const visibleCourses = computed(() =>
   props.catalog
-    ? selectedCourses.value?.data ?? []
-    : selectedCourses.value?.data.slice(0, MAX_PREVIEW_COURSES) ?? [],
+    ? selectedCourses.value?.data.courses ?? []
+    : selectedCourses.value?.data.courses.slice(0, MAX_PREVIEW_COURSES) ?? [],
 );
+
+const coursePagination = computed(
+  () => selectedCourses.value?.data.pagination ?? null,
+);
+
+const paginationPages = computed(() => {
+  const pagination = coursePagination.value;
+  if (!pagination || pagination.lastPage <= 1) return [];
+
+  const visibleCount = Math.min(5, pagination.lastPage);
+  const firstPage = Math.max(
+    1,
+    Math.min(
+      pagination.currentPage - Math.floor(visibleCount / 2),
+      pagination.lastPage - visibleCount + 1,
+    ),
+  );
+
+  return Array.from({ length: visibleCount }, (_, index) => firstPage + index);
+});
+
+const normalizePage = (value: unknown) => {
+  const page = Number(value);
+  return Number.isInteger(page) && page > 0 ? page : 1;
+};
 
 const selectStage = async (stageId: number) => {
   if (selectedStageId.value === stageId) return;
@@ -126,9 +152,9 @@ const selectStage = async (stageId: number) => {
     );
 
     if (firstYear) {
-      await selectTab(firstYear.key);
+      await selectTab(firstYear.key, undefined, 1);
     } else {
-      const { year_id: _yearId, ...query } = route.query;
+      const { year_id: _yearId, page: _page, ...query } = route.query;
       await router.replace({
         query: { ...query, stage_id: String(stageId) },
       });
@@ -136,14 +162,23 @@ const selectStage = async (stageId: number) => {
   }
 };
 
-const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
+const selectTab = async (
+  tabKey: HomeCourseTabKey,
+  event?: Event,
+  requestedPage = 1,
+) => {
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
+  const page = normalizePage(requestedPage);
 
   if (!tab || loadingTabKey.value === tab.key) {
     return;
   }
 
-  if (selectedTabKey.value === tab.key && coursesByTab.value[tab.key]) {
+  if (
+    selectedTabKey.value === tab.key &&
+    coursesByTab.value[tab.key]?.status !== "error" &&
+    coursesByTab.value[tab.key]?.data.pagination.currentPage === page
+  ) {
     return;
   }
 
@@ -159,30 +194,50 @@ const selectTab = async (tabKey: HomeCourseTabKey, event?: Event) => {
 
   selectedStageId.value = tab.stageId;
   selectedTabKey.value = tab.key;
+  loadingTabKey.value = tab.key;
+  const requestId = (requestIds.value[tab.key] ?? 0) + 1;
+  requestIds.value[tab.key] = requestId;
+
   if (
     props.catalog &&
     (String(route.query.stage_id ?? "") !== String(tab.stageId) ||
-      String(route.query.year_id ?? "") !== String(tab.yearId))
+      String(route.query.year_id ?? "") !== String(tab.yearId) ||
+      normalizePage(route.query.page) !== page)
   ) {
     await router.replace({
       query: {
         ...route.query,
         stage_id: String(tab.stageId),
         year_id: String(tab.yearId),
+        page: String(page),
       },
     });
   }
-  loadingTabKey.value = tab.key;
-  const requestId = (requestIds.value[tab.key] ?? 0) + 1;
-  requestIds.value[tab.key] = requestId;
 
-  const result = await props.loadCoursesByYear(tab.stageId, tab.yearId);
+  const result = await props.loadCoursesByYear(
+    tab.stageId,
+    tab.yearId,
+    page,
+    CATALOG_COURSES_PER_PAGE,
+  );
 
   if (requestIds.value[tab.key] !== requestId) {
     return;
   }
 
   coursesByTab.value[tab.key] = result;
+
+  const resolvedPage = result.data.pagination.currentPage;
+  if (props.catalog && resolvedPage !== page) {
+    await router.replace({
+      query: {
+        ...route.query,
+        stage_id: String(tab.stageId),
+        year_id: String(tab.yearId),
+        page: String(resolvedPage),
+      },
+    });
+  }
 
   if (loadingTabKey.value === tab.key) {
     loadingTabKey.value = null;
@@ -200,7 +255,7 @@ const selectCatalogYearFromRoute = () => {
     (item) => item.stageId === requestedStageId,
   ) ?? props.courses.data.tabs[0];
 
-  if (tab) void selectTab(tab.key);
+  if (tab) void selectTab(tab.key, undefined, normalizePage(route.query.page));
 };
 
 onMounted(selectCatalogYearFromRoute);
@@ -209,21 +264,54 @@ watch(
   () => [
     route.query.stage_id,
     route.query.year_id,
+    route.query.page,
     props.courses.data.tabs.map((tab) => tab.key).join(","),
   ],
   () => {
     if (!props.catalog) return;
     const requestedYearId = Number(route.query.year_id);
     const requestedStageId = Number(route.query.stage_id);
+    const requestedPage = normalizePage(route.query.page);
     const tab = props.courses.data.tabs.find(
       (item) => item.yearId === requestedYearId,
     ) ?? props.courses.data.tabs.find(
       (item) => item.stageId === requestedStageId,
     );
-    if (tab && tab.key !== selectedTabKey.value) void selectTab(tab.key);
+    const loadedPage = tab
+      ? coursesByTab.value[tab.key]?.data.pagination.currentPage
+      : null;
+    if (
+      tab &&
+      (tab.key !== selectedTabKey.value || loadedPage !== requestedPage)
+    ) {
+      void selectTab(tab.key, undefined, requestedPage);
+    }
     else if (!selectedTabKey.value) selectCatalogYearFromRoute();
   },
 );
+
+const changePage = async (page: number) => {
+  const tab = selectedTab.value;
+  const pagination = coursePagination.value;
+  if (
+    !props.catalog ||
+    !tab ||
+    !pagination ||
+    loadingTabKey.value === tab.key
+  ) {
+    return;
+  }
+
+  const nextPage = Math.min(pagination.lastPage, Math.max(1, page));
+  if (nextPage === pagination.currentPage) return;
+
+  await selectTab(tab.key, undefined, nextPage);
+  await nextTick();
+  courseResults.value?.scrollIntoView({
+    behavior: shouldReduceMotion() ? "auto" : "smooth",
+    block: "start",
+  });
+};
 
 const animateCourseResults = async () => {
   await nextTick();
@@ -388,6 +476,7 @@ watch(
     selectedTabKey.value,
     loadingTabKey.value,
     selectedCourses.value?.status,
+    coursePagination.value?.currentPage,
     visibleCourses.value.map((course) => course.id).join(","),
   ],
   animateCourseResults,
@@ -548,7 +637,7 @@ onBeforeUnmount(() => {
               <span>المسار المختار</span>
               <h3>كورسات {{ selectedTab.label }}</h3>
             </div>
-            <b v-if="selectedCourses">{{ selectedCourses.data.length }} كورس</b>
+            <b v-if="coursePagination">{{ coursePagination.total }} كورس</b>
           </div>
 
           <div
@@ -569,7 +658,10 @@ onBeforeUnmount(() => {
             <span>تعذر التحميل</span>
             <h3>لم نتمكن من عرض الكورسات الآن</h3>
             <p>{{ selectedCourses.error?.message }}</p>
-            <button type="button" @click="selectTab(selectedTab.key)">
+            <button
+              type="button"
+              @click="selectTab(selectedTab.key, undefined, coursePagination?.currentPage ?? 1)"
+            >
               حاول مرة أخرى
             </button>
           </div>
@@ -584,19 +676,68 @@ onBeforeUnmount(() => {
             <p>ستظهر الكورسات والمراجعات هنا فور إتاحتها.</p>
           </div>
 
-          <div v-else-if="selectedCourses" class="course-grid">
-            <HomeCourseCard
-              v-for="(course, index) in visibleCourses"
-              :key="course.id"
-              :course="course"
-              :level-label="selectedTab.label"
-              :index="index"
-              :animate="false"
-              :interactive="false"
-              @pointermove="tiltCourseCard"
-              @pointerleave="resetCourseCard"
-            />
-          </div>
+          <template v-else-if="selectedCourses">
+            <div class="course-grid">
+              <HomeCourseCard
+                v-for="(course, index) in visibleCourses"
+                :key="course.id"
+                :course="course"
+                :level-label="selectedTab.label"
+                :index="index"
+                :animate="false"
+                :interactive="false"
+                @pointermove="tiltCourseCard"
+                @pointerleave="resetCourseCard"
+              />
+            </div>
+
+            <nav
+              v-if="catalog && coursePagination && coursePagination.lastPage > 1"
+              class="home-course-pagination"
+              aria-label="صفحات الكورسات"
+            >
+              <button
+                type="button"
+                class="home-course-pagination__arrow"
+                :disabled="coursePagination.currentPage === 1 || loadingTabKey === selectedTab.key"
+                aria-label="الصفحة السابقة"
+                @click="changePage(coursePagination.currentPage - 1)"
+              >
+                <span aria-hidden="true">→</span>
+              </button>
+
+              <button
+                v-for="page in paginationPages"
+                :key="page"
+                type="button"
+                :class="{ active: page === coursePagination.currentPage }"
+                :aria-current="page === coursePagination.currentPage ? 'page' : undefined"
+                :aria-label="`الصفحة ${page}`"
+                :disabled="loadingTabKey === selectedTab.key"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
+
+              <button
+                type="button"
+                class="home-course-pagination__arrow"
+                :disabled="coursePagination.currentPage === coursePagination.lastPage || loadingTabKey === selectedTab.key"
+                aria-label="الصفحة التالية"
+                @click="changePage(coursePagination.currentPage + 1)"
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+            </nav>
+
+            <p
+              v-if="catalog && coursePagination"
+              class="home-course-pagination__summary"
+            >
+              صفحة {{ coursePagination.currentPage }} من {{ coursePagination.lastPage }}
+              · إجمالي {{ coursePagination.total }} كورس
+            </p>
+          </template>
         </template>
       </div>
 
@@ -965,6 +1106,67 @@ onBeforeUnmount(() => {
   gap: 22px;
 }
 
+.home-course-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 34px;
+}
+
+.home-course-pagination button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--home-v2-surface);
+  color: var(--ink);
+  cursor: pointer;
+  font: 900 13px var(--heading);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.home-course-pagination button:hover:not(:disabled) {
+  border-color: var(--teal);
+  color: var(--teal);
+  transform: translateY(-2px);
+}
+
+.home-course-pagination button.active {
+  border-color: var(--deep);
+  background: var(--deep);
+  color: #fff;
+  box-shadow: inset 0 -3px var(--coral);
+}
+
+.home-course-pagination button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--coral) 55%, transparent);
+  outline-offset: 3px;
+}
+
+.home-course-pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.home-course-pagination__arrow span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.home-course-pagination__summary {
+  margin: 12px 0 0;
+  color: var(--home-v2-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
 .course-card {
   display: flex;
   min-width: 0;
@@ -1266,6 +1468,15 @@ onBeforeUnmount(() => {
 @media (max-width: 430px) {
   .home-course-audiences {
     grid-template-columns: 1fr;
+  }
+
+  .home-course-pagination {
+    gap: 5px;
+  }
+
+  .home-course-pagination button {
+    width: 38px;
+    height: 38px;
   }
 }
 

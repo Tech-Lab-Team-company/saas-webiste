@@ -67,9 +67,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
 
     <!-- الكومنتات مضافة هنا كما طلبت -->
     <BlogsPageBlogsImage />
-    <!-- <BlogsPageBlogsButton /> -->
     <BlogsPageBlogsButtonOne />
-    <!-- <BlogsPageBlogsIcon /> -->
   </div>
 </template>
 

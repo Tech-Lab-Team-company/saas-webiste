@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import type { HomeBlogViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 const props = defineProps<{
   blogs: HomeSectionState<HomeBlogViewModel[]>;
@@ -17,7 +18,17 @@ const blogHasEntered = ref(false);
 let blogAnimationContext: ReturnType<typeof gsap.context> | null = null;
 let blogHeadingHasRevealed = false;
 const cardVariants = ["navy", "blue", "coral"] as const;
-const cardMarkers = ["فهم", "05", "7D", "قوة", "وقت", "دقة"] as const;
+
+const emptyStateTitle = computed(() =>
+  props.blogs.status === "error"
+    ? "تعذر تحميل مقالات المدونة"
+    : "أضف مقالات المدونة",
+);
+const emptyStateDescription = computed(() =>
+  props.blogs.status === "error"
+    ? "تعذر جلب المقالات في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
+    : "أضف أول مقال من لوحة التحكم ليظهر محتوى المدونة هنا.",
+);
 
 const blogNumber = (index: number): string =>
   String(index + 1).padStart(2, "0");
@@ -121,7 +132,7 @@ const revealBlogSection = () => {
         0.24,
       );
 
-    const placeholder = section.querySelector(".home-v2-blog__placeholder");
+    const placeholder = section.querySelector(".home-section-empty");
     if (placeholder) {
       timeline.from(
         placeholder,
@@ -210,13 +221,10 @@ onBeforeUnmount(() => {
       <div class="home-v2-blog__heading">
         <div>
           <span class="section-tag">من المدونة</span>
-          <h2 id="home-v2-blog-title">ذاكر بذكاء.<br />وحل <em>بهدوء.</em></h2>
+          <h2 id="home-v2-blog-title">أحدث المقالات.<br />محتوى <em>متجدد.</em></h2>
         </div>
         <div>
-          <p>
-            مقالات ونصائح تساعدك تفهم الفيزياء، تنظم مذاكرتك، وتدخل الامتحان
-            بثقة.
-          </p>
+          <p>تصفّح أحدث المقالات المنشورة على المنصة واختر ما يناسبك.</p>
           <NuxtLink to="/blogs"
             >كل مقالات المدونة <span aria-hidden="true">←</span></NuxtLink
           >
@@ -237,16 +245,16 @@ onBeforeUnmount(() => {
         >
           <NuxtLink :to="blog.route" :aria-label="blog.title">
             <header>
-              <span>{{ blog.subtitle || "مدونة الفيزياء" }}</span>
+              <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
               <b>{{ blogNumber(index) }}</b>
             </header>
-            <strong aria-hidden="true">{{
-              cardMarkers[index] || blogNumber(index)
-            }}</strong>
+            <strong aria-hidden="true">{{ blogNumber(index) }}</strong>
             <div>
               <small v-if="blog.date">{{ formatBlogDate(blog.date) }}</small>
               <h3>{{ blog.title }}</h3>
-              <p>{{ blog.description || blog.subtitle }}</p>
+              <p v-if="blog.description || blog.subtitle">
+                {{ blog.description || blog.subtitle }}
+              </p>
               <span class="home-v2-blog__read"
                 >اقرأ المقال <i aria-hidden="true">←</i></span
               >
@@ -255,9 +263,12 @@ onBeforeUnmount(() => {
         </article>
       </div>
 
-      <div v-else class="home-v2-blog__placeholder" role="status">
-        <strong>لا توجد مقالات متاحة حاليًا.</strong>
-      </div>
+      <HomeSectionEmptyState
+        v-else
+        label="قسم المدونة"
+        :title="emptyStateTitle"
+        :description="emptyStateDescription"
+      />
     </div>
   </section>
 </template>
@@ -485,32 +496,6 @@ onBeforeUnmount(() => {
 
 .home-v2-blog__card:active {
   transform: translateY(-2px);
-}
-
-.home-v2-blog__placeholder {
-  display: grid;
-  min-height: 260px;
-  align-content: center;
-  gap: 10px;
-  padding: 34px;
-  border: 1px dashed color-mix(in srgb, var(--home-v2-blue) 40%, transparent);
-  border-radius: 14px;
-  background: linear-gradient(135deg, #eef5ff, #fbfcff);
-}
-
-.home-v2-blog__placeholder span {
-  color: var(--home-v2-blue);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.home-v2-blog__placeholder strong {
-  font: 900 clamp(24px, 3vw, 36px) / 1.35 var(--home-v2-heading);
-}
-
-.home-v2-blog__placeholder p {
-  margin: 0;
-  color: var(--home-v2-muted);
 }
 
 @media (max-width: 760px) {

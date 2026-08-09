@@ -14,10 +14,15 @@ const props = defineProps({
   CourseVideoLink: {
     type: Object as () => CourseVideoSelection | null,
     default: null,
-  }
+  },
+  courseId: {
+    type: Number,
+    default: null,
+  },
 });
 
 const CourseVideoLink = computed(() => props.CourseVideoLink);
+const protectionConfig = useCourseProtectionConfig();
 
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
@@ -40,16 +45,29 @@ const embedVideoLink = computed(() => {
 });
 
 const pdfIframe = ref<HTMLIFrameElement | null>(null);
+const pdfContainer = ref<HTMLElement | null>(null);
+
+const protectedPdfLink = computed(() => {
+  if (
+    fileType.value !== 'pdf' ||
+    !protectionConfig.enabled ||
+    !protectionConfig.hidePdfToolbar
+  ) {
+    return embedVideoLink.value;
+  }
+  const separator = embedVideoLink.value.includes('#') ? '&' : '#';
+  return `${embedVideoLink.value}${separator}toolbar=0&navpanes=0`;
+});
 
 function openFullscreen() {
-  const iframe = pdfIframe.value;
-  if (iframe) {
-    if (iframe.requestFullscreen) {
-      iframe.requestFullscreen();
-    } else if ((iframe as any).webkitRequestFullscreen) {
-      (iframe as any).webkitRequestFullscreen();
-    } else if ((iframe as any).msRequestFullscreen) {
-      (iframe as any).msRequestFullscreen();
+  const container = pdfContainer.value;
+  if (container) {
+    if (container.requestFullscreen) {
+      container.requestFullscreen();
+    } else if ((container as any).webkitRequestFullscreen) {
+      (container as any).webkitRequestFullscreen();
+    } else if ((container as any).msRequestFullscreen) {
+      (container as any).msRequestFullscreen();
     }
   }
 }
@@ -64,15 +82,27 @@ function openFullscreen() {
       :key="`youtube-${CourseVideoLink?.sessionId}`"
       :video="embedVideoLink"
       :session-id="CourseVideoLink?.sessionId"
+      :course-id="courseId"
     />
     <NormalVedio
       v-else-if="fileType === 'video'"
       :key="`video-${CourseVideoLink?.sessionId}`"
       :video="embedVideoLink"
       :session-id="CourseVideoLink?.sessionId"
+      :course-id="courseId"
     />
-    <div class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
-      <iframe ref="pdfIframe" width="100%" height="600" :src="embedVideoLink" frameborder="0" allowfullscreen></iframe>
+    <div ref="pdfContainer" class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
+      <iframe
+        ref="pdfIframe"
+        width="100%"
+        height="600"
+        :src="protectedPdfLink"
+        frameborder="0"
+        :referrerpolicy="protectionConfig.enabled && protectionConfig.pdfNoReferrer ? 'no-referrer' : undefined"
+        allowfullscreen
+        @contextmenu.prevent
+      ></iframe>
+      <CourseDetailsMediaWatermark :course-id="courseId" />
       <div class="flex justify-end">
         <button class="btn-primary" @click="openFullscreen">
           تكبير الشاشة

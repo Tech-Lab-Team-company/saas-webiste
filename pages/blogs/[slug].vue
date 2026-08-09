@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import "~/assets/css/home-v2.css";
+import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 import { mapBlogsPage } from "~/features/HomePageFeature/mappers/homePageMapper";
@@ -8,10 +9,22 @@ import type { HomeBlogViewModel } from "~/features/HomePageFeature/models/HomePa
 interface ApiBlogDetails {
   id: number;
   slug: string | null;
+  read_time: number | string | null;
   title: string;
   subtitle: string | null;
   description: string | null;
+  quote: string | null;
+  content_point: string[] | null;
+  read_remember: string[] | null;
+  summary:
+    | string
+    | {
+        title?: string | null;
+        subtitle?: string | null;
+      }
+    | null;
   date: string | null;
+  mail_image: string | null;
   attachments?: Array<{ id?: number; file?: string; alt?: string }>;
   hashtags?: Array<{ id?: number; title?: string }>;
 }
@@ -22,12 +35,7 @@ const route = useRoute();
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));
 const slug = computed(() => String(route.params.slug || ""));
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 const api = new HomePageApi(webDomain);
 const { data: blog, pending, error, refresh } = await useAsyncData(
   `blog-details:${webDomain}:${slug.value}`,
@@ -58,11 +66,63 @@ const relatedBlogs = computed(() =>
   allBlogs.value.filter((item) => routeSlug(item) !== slug.value).slice(0, 2),
 );
 const category = computed(() => blog.value?.hashtags?.[0]?.title || "المدونة");
-const marker = computed(() => blog.value?.title?.trim().slice(0, 3) || "اقرأ");
+const marker = computed(() => blog.value?.title?.trim().slice(0, 3) || "");
+const contentPoints = computed(() =>
+  (blog.value?.content_point || []).filter(
+    (item): item is string => typeof item === "string" && Boolean(item.trim()),
+  ),
+);
+const readRemember = computed(() =>
+  (blog.value?.read_remember || []).filter(
+    (item): item is string => typeof item === "string" && Boolean(item.trim()),
+  ),
+);
+const articleImage = computed(() => {
+  const attachment = blog.value?.attachments?.find((item) => item.file);
+
+  if (attachment?.file) {
+    return {
+      src: attachment.file,
+      alt: attachment.alt || blog.value?.title || "صورة المقال",
+    };
+  }
+
+  if (blog.value?.mail_image) {
+    return {
+      src: blog.value.mail_image,
+      alt: blog.value.title || "صورة المقال",
+    };
+  }
+
+  return null;
+});
+const summaryContent = computed(() => {
+  const summary = blog.value?.summary;
+
+  if (typeof summary === "string") {
+    const text = summary.trim();
+    return text ? { title: "ملخص المقال", subtitle: text } : null;
+  }
+
+  if (!summary || typeof summary !== "object") return null;
+
+  const title = summary.title?.trim() || "";
+  const subtitle = summary.subtitle?.trim() || "";
+
+  return title || subtitle ? { title, subtitle } : null;
+});
 const readTime = computed(() => {
+  if (blog.value?.read_time !== null && blog.value?.read_time !== undefined) {
+    const value = String(blog.value.read_time).trim();
+    if (value) {
+      return /^\d+(?:[.,]\d+)?$/.test(value) ? `${value} دقيقة قراءة` : value;
+    }
+  }
+
   const content = `${blog.value?.subtitle || ""} ${blog.value?.description || ""}`
     .replace(/<[^>]*>/g, " ")
     .trim();
+  if (!content) return "";
   return `${Math.max(1, Math.ceil(content.split(/\s+/).filter(Boolean).length / 180))} دقائق قراءة`;
 });
 
@@ -80,7 +140,7 @@ const formattedDate = computed(() => {
 useSeoMeta({
   title: () =>
     blog.value
-      ? `${blog.value.title} | ${site.value.brandName || "المدونة"}`
+      ? `${blog.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
       : "المقال غير موجود",
   description: () => blog.value?.description || site.value.description || "",
   ogTitle: () => blog.value?.title || "",
@@ -126,18 +186,18 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             </nav>
             <span class="blog-v2__category">{{ category }}</span>
             <h1>
-              {{ blog.title }}<br /><em>{{ blog.subtitle }}</em>
+              {{ blog.title }}<template v-if="blog.subtitle"><br /><em>{{ blog.subtitle }}</em></template>
             </h1>
-            <p>{{ blog.description }}</p>
+            <p v-if="blog.description">{{ blog.description }}</p>
             <div class="blog-v2__meta">
-              <span>{{ readTime }}</span>
-              <time :datetime="blog.date">{{ formattedDate }}</time>
+              <span v-if="readTime">{{ readTime }}</span>
+              <time v-if="formattedDate" :datetime="blog.date">{{ formattedDate }}</time>
             </div>
           </div>
           <div class="blog-v2__mark" aria-hidden="true">
             <small>{{ String(blogIndex + 1).padStart(2, "0") }}</small>
-            <strong>{{ marker }}</strong>
-            <span>{{ site.brandName || "Physics" }}</span>
+            <strong v-if="marker">{{ marker }}</strong>
+            <span v-if="site.brandName">{{ site.brandName }}</span>
           </div>
         </div>
       </header>
@@ -145,41 +205,75 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
       <main class="blog-v2__main">
         <div class="blog-v2__shell blog-v2__layout">
           <article class="blog-v2__article">
+            <blockquote
+              v-if="blog.quote"
+              class="blog-v2__lead blog-v2__quote"
+            >
+              <p>{{ blog.quote }}</p>
+            </blockquote>
+
+            <section
+              class="blog-v2__content-section"
+              aria-labelledby="blog-article-content-title"
+            >
+              <span aria-hidden="true">01</span>
+              <h2 id="blog-article-content-title">{{ blog.title }}</h2>
+              <div
+                v-if="blog.description"
+                class="blog-v2__content-copy blog-v2__html-content"
+                v-html="blog.description"
+              />
+            </section>
+
             <div
-              v-if="blog.attachments?.[0]?.file"
-              class="blog-v2__article-image"
+              v-if="articleImage"
+              class="blog-v2__article-image blog-v2__article-image--content"
             >
               <img
-                :src="blog.attachments[0].file"
-                :alt="blog.attachments[0].alt || blog.title"
+                :src="articleImage.src"
+                :alt="articleImage.alt"
               />
             </div>
 
-            <div
-              v-if="blog.subtitle"
-              class="blog-v2__lead blog-v2__html-content"
-              v-html="blog.subtitle"
-            />
-
-            <section
-              v-if="blog.description"
-              class="blog-v2__content-section blog-v2__html-content"
-              v-html="blog.description"
-            />
-
-            <section class="blog-v2__conclusion">
+            <section v-if="summaryContent" class="blog-v2__conclusion">
               <span>الخلاصة</span>
-              <h2>خطوة صغيرة تتكرر، أفضل من خطة كبيرة تتوقف.</h2>
-              <p>
-                اختار نقطة واحدة من المقال وطبّقها في مذاكرتك اليوم، وبعدها قيّم
-                الفرق وعدّل طريقتك بهدوء.
-              </p>
-              <NuxtLink to="/course">شوف كورسات صفك <span>←</span></NuxtLink>
+              <h2 v-if="summaryContent.title">{{ summaryContent.title }}</h2>
+              <p v-if="summaryContent.subtitle">{{ summaryContent.subtitle }}</p>
             </section>
+
           </article>
 
           <aside class="blog-v2__aside">
-            <div class="blog-v2__takeaways" v-if="blog.hashtags?.length">
+            <section
+              v-if="contentPoints.length"
+              class="blog-v2__toc"
+              aria-labelledby="blog-content-points-title"
+            >
+              <h2 id="blog-content-points-title">في هذا المقال</h2>
+              <ol>
+                <li v-for="(item, index) in contentPoints" :key="`${index}-${item}`">
+                  <b aria-hidden="true">{{ String(index + 1).padStart(2, "0") }}</b>
+                  <span>{{ item }}</span>
+                </li>
+              </ol>
+            </section>
+
+            <section
+              v-if="readRemember.length"
+              class="blog-v2__takeaways"
+              aria-labelledby="blog-read-remember-title"
+            >
+              <h2 id="blog-read-remember-title">
+                افتكر {{ readRemember.length }} حاجات
+              </h2>
+              <ul>
+                <li v-for="(item, index) in readRemember" :key="`${index}-${item}`">
+                  {{ item }}
+                </li>
+              </ul>
+            </section>
+
+            <div class="blog-v2__topics" v-if="blog.hashtags?.length">
               <span>موضوعات المقال</span>
               <ul>
                 <li v-for="item in blog.hashtags" :key="item.id || item.title">
@@ -199,9 +293,9 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             <div class="blog-v2__related-grid">
               <article v-for="item in relatedBlogs" :key="item.id">
                 <NuxtLink :to="item.route">
-                  <span>{{ item.subtitle || "المدونة" }}</span>
+                  <span v-if="item.subtitle">{{ item.subtitle }}</span>
                   <h3>{{ item.title }}</h3>
-                  <p>{{ item.description }}</p>
+                  <p v-if="item.description">{{ item.description }}</p>
                   <b>اقرأ المقال ←</b>
                 </NuxtLink>
               </article>
@@ -264,6 +358,9 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   width: 100%;
   max-height: 520px;
   object-fit: cover;
+}
+.blog-v2__article-image--content {
+  margin: 48px 0 0;
 }
 .blog-v2__html-content :deep(*) {
   max-width: 100%;
@@ -456,6 +553,9 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   line-height: 1.95;
   box-shadow: 0 12px 32px -30px color-mix(in srgb, var(--coral) 65%, transparent);
 }
+.blog-v2__quote p {
+  margin: 0;
+}
 .blog-v2__content-section {
   position: relative;
   padding-inline-start: 58px;
@@ -480,7 +580,8 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   margin: 0 0 18px;
   font: 900 clamp(26px, 3vw, 36px) / 1.45 "bold";
 }
-.blog-v2__content-section > p {
+.blog-v2__content-copy,
+.blog-v2__content-copy :deep(p) {
   margin: 0 0 14px;
   color: var(--muted);
   font-size: 17px;
@@ -508,21 +609,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   border-radius: 50%;
   background: var(--accent);
   content: "";
-}
-.blog-v2__tip {
-  margin-top: 25px;
-  padding: 22px 25px;
-  border: 1px solid color-mix(in srgb, var(--coral) 35%, var(--line));
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--coral) 9%, var(--surface-raised));
-}
-.blog-v2__tip b {
-  color: color-mix(in srgb, var(--coral) 78%, var(--ink));
-}
-.blog-v2__tip p {
-  margin: 5px 0 0;
-  color: var(--muted);
-  line-height: 1.8;
 }
 .blog-v2__conclusion {
   margin-top: 65px;
@@ -562,51 +648,96 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   gap: 18px;
 }
 .blog-v2__toc,
-.blog-v2__takeaways {
+.blog-v2__takeaways,
+.blog-v2__topics {
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
 }
-.blog-v2__toc > span,
-.blog-v2__takeaways > span {
+.blog-v2__toc h2,
+.blog-v2__takeaways h2 {
+  margin: 0;
+  font: 900 15px/1.5 "bold", Tahoma, sans-serif;
+}
+.blog-v2__toc h2 {
+  color: var(--accent);
+}
+.blog-v2__toc ol {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.blog-v2__toc li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.blog-v2__toc li b {
+  padding-top: 2px;
+  color: var(--coral);
+  font-size: 10px;
+}
+.blog-v2__topics > span {
   display: block;
   margin-bottom: 15px;
   color: var(--accent);
   font-size: 12px;
   font-weight: 900;
 }
-.blog-v2__toc a {
-  display: grid;
-  grid-template-columns: 30px 1fr;
-  gap: 8px;
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-.blog-v2__toc a:hover {
-  color: var(--accent);
-}
-.blog-v2__toc b {
-  color: var(--accent);
-}
 .blog-v2__takeaways {
   color: #fff;
-  background: var(--home-v2-blue);
+  background: var(--home-v2-deep);
   border-color: transparent;
 }
-.blog-v2__takeaways > span {
-  color: #fff;
+.blog-v2__takeaways h2 {
+  color: var(--coral);
 }
 .blog-v2__takeaways ul {
   display: grid;
-  gap: 11px;
-  margin: 0;
-  padding-inline-start: 18px;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 0;
   color: #ffffffdc;
+  list-style: none;
   line-height: 1.7;
+}
+.blog-v2__takeaways li {
+  position: relative;
+  padding-inline-start: 18px;
+  font-size: 13px;
+}
+.blog-v2__takeaways li::before {
+  position: absolute;
+  top: 0.72em;
+  inset-inline-start: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--coral);
+  content: "";
+}
+.blog-v2__topics ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.blog-v2__topics li {
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-raised));
+  font-size: 12px;
+  font-weight: 800;
 }
 .blog-v2__related {
   margin-top: 80px;
@@ -704,8 +835,8 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
     position: static;
     grid-template-columns: 1fr 1fr;
   }
-  .blog-v2__toc {
-    display: none;
+  .blog-v2__topics {
+    grid-column: 1 / -1;
   }
 }
 @media (max-width: 700px) {

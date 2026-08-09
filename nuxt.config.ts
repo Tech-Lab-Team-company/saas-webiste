@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
 import { resolve } from 'node:path';
+
 export default defineNuxtConfig({
   // app:{
   //   head:{
@@ -11,8 +12,25 @@ export default defineNuxtConfig({
   // },
   
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   ssr: false,
+  runtimeConfig: {
+    public: {
+      webLink: process.env.WEB_LINK || '',
+    },
+  },
+  routeRules: {
+    '/course/**': {
+      headers: {
+        'Cache-Control': 'private, no-store, max-age=0',
+        'Content-Security-Policy': "frame-ancestors 'none'",
+        'Permissions-Policy': 'display-capture=(), picture-in-picture=()',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+      },
+    },
+  },
   modules: ['@nuxt/image', 'nuxt-swiper', '@primevue/nuxt-module', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt' ,'@twicpics/components/nuxt3' ,'@nuxtjs/i18n' ],
   // , '@pinia/nuxt',
   primevue: {
@@ -68,4 +86,3 @@ export default defineNuxtConfig({
   }
 
 })
-

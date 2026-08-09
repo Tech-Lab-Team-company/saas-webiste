@@ -44,8 +44,9 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
           class="card"
         >
         <img
-            :src="card.attachments?.[0]?.file || ''"
-            :alt="card.attachments?.[0]?.alt || 'Default alt'"
+            v-if="card.attachments?.[0]?.file"
+            :src="card.attachments[0].file"
+            :alt="card.attachments[0].alt || card.title"
             class="course-image"
           />
           <div class="card-body">
@@ -58,7 +59,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
                 </div>
               </div>
             </div>
-            <p class="card-text" v-html="card.description"></p>
+            <p v-if="card.description" class="card-text" v-html="card.description"></p>
 <!--            <div class="card-footer">-->
 <!--              <p v-html="card.subtitle"></p>-->
 <!--            </div>-->
@@ -277,21 +278,3 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
   /* border: 1px solid #ccc; */
 }
 </style>
-<!-- // const cards = [
-//   {
-//     title: "رحلة نحو المعرفة والتفوق",
-//   },
-// ];
-
-// const cards_one = [
-//   {
-//     add: " اضيف بواسطه",
-//     name: "احمد حوام",
-//     icon: frame,
-//   },
-//   {
-//     add_one: "التاريخ",
-//     date: "2025-12-1",
-//     icon1: clock,
-//   },
-// ]; -->

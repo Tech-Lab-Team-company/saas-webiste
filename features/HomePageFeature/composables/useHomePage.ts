@@ -3,8 +3,7 @@ import { getWebDomain } from '~/constant/webDomain'
 import { HomePageApi, normalizeHomeDataError } from '../api/homePageApi'
 import {
   createEmptyHomePageViewModel,
-  mapHomeAboutTeacherMock,
-  mapHomeCourseList,
+  mapHomeCoursePage,
   mapHomeCourseStages,
   mapHomeCourseYears,
   mapHomePage,
@@ -12,8 +11,8 @@ import {
 } from '../mappers/homePageMapper'
 import type {
   HomeCourseStageViewModel,
+  HomeCoursePageViewModel,
   HomeCourseTabViewModel,
-  HomeCourseViewModel,
   HomePageViewModel,
 } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
@@ -99,13 +98,6 @@ export const useHomePage = () => {
             : null,
         },
       },
-      aboutTeacher:
-        currentHome.aboutTeacher.status === 'empty'
-          ? {
-              data: mapHomeAboutTeacherMock(site),
-              status: 'empty',
-            }
-          : currentHome.aboutTeacher,
     }
   })
 
@@ -116,17 +108,32 @@ export const useHomePage = () => {
   const loadCoursesByYear = async (
     stageId: number,
     yearId: number,
-  ): Promise<HomeSectionState<HomeCourseViewModel[]>> => {
+    page = 1,
+    perPage = 9,
+  ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
-      const courses = mapHomeCourseList(await api.fetchCoursesByYear(stageId, yearId))
+      const coursePage = mapHomeCoursePage(
+        await api.fetchCoursesByYear(stageId, yearId, page, perPage),
+        page,
+        perPage,
+      )
 
       return {
-        data: courses,
-        status: courses.length > 0 ? 'success' : 'empty',
+        data: coursePage,
+        status: coursePage.courses.length > 0 ? 'success' : 'empty',
       }
     } catch (requestError) {
       return {
-        data: [],
+        data: {
+          courses: [],
+          pagination: {
+            currentPage: page,
+            lastPage: 1,
+            perPage,
+            total: 0,
+            serverDriven: false,
+          },
+        },
         status: 'error',
         error: normalizeHomeDataError(requestError),
       }

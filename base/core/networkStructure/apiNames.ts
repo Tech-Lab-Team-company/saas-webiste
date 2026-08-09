@@ -147,7 +147,7 @@ class ApiNames {
   public fetch_home_website_section = "fetch_home_website_section";
   public filter_courses = "filter_courses";
 
-  public show_blog = "show_blog";
+//  public show_blog = "show_blog";
 
   public CoursesFilter = this.baseUrl + "filter_courses";
   public CoursesPayment = this.baseUrl + "join_course";

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { BlogsCardBlogsHashtag, BlogsPageBlogsImage } from "#components";
-import pic from "@/assets/images/pic.png";
+import { BlogsCardBlogsHashtag } from "#components";
 
 
 

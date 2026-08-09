@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getWebDomain } from '~/constant/webDomain'
+
 type Stage = {
   id: 'first' | 'second' | 'third'
   index: string
@@ -42,14 +44,6 @@ const selectedStage = computed(() => stages.find((stage) => stage.id === selecte
 const coursesByStage = ref<Partial<Record<Stage['id'], ApiCourse[]>>>({})
 const loadingStageId = ref<Stage['id'] | null>(null)
 const errorByStage = ref<Partial<Record<Stage['id'], string>>>({})
-
-const getWebDomain = () => {
-  const hostname = useRequestURL().hostname
-
-  return hostname === 'localhost' || hostname === 'mr-eslamsalama.com'
-    ? 'mr-eslamsalama.com'
-    : hostname
-}
 
 const fetchCourses = async (stage: Stage) => {
   if (coursesByStage.value[stage.id] || loadingStageId.value === stage.id) {

@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import ProfileSidebar from "~/components/Profile/ProfileSidebar.vue";
+import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 
 definePageMeta({ middleware: ["verified-student"] });
 
+const settingsStore = useSettingStore();
+const site = computed(() => mapHomeSite(settingsStore.setting));
+
 useSeoMeta({
-  title: "بنك الأسئلة | EduHub",
+  title: () => `بنك الأسئلة${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
   description: "تدرّب على أسئلة المواد، تابع تقدمك وراجع إجاباتك من مكان واحد.",
 });
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { baseUrl } from "~/constant/baseUrl";
+import { getWebDomain } from "~/constant/webDomain";
 
 interface LegalDocument {
   id: number;
@@ -13,12 +14,7 @@ const props = defineProps<{
   fallbackTitle: string;
 }>();
 
-const requestUrl = useRequestURL();
-const webDomain = ["localhost", "127.0.0.1", "mr-eslamsalama.com"].includes(
-  requestUrl.hostname,
-)
-  ? "mr-eslamsalama.com"
-  : requestUrl.hostname;
+const webDomain = getWebDomain();
 
 const { data: document, pending, error, refresh } = await useAsyncData(
   `${props.cacheKey}:${webDomain}`,

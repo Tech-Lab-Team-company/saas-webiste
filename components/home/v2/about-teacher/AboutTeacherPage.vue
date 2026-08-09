@@ -21,33 +21,42 @@ const { setting } = storeToRefs(settingsStore);
 
 const webDomain = getWebDomain();
 const api = new HomePageApi(webDomain);
-const { data: aboutHero } = await useAsyncData<HomeHeroViewModel | null>(
+
+const createEmptyAboutHero = (): HomeHeroViewModel => ({
+  title: null,
+  subtitle: null,
+  description: null,
+  link: null,
+  image: null,
+  mobileImage: null,
+});
+
+const { data: aboutHero } = await useAsyncData<HomeHeroViewModel>(
   `about-v2-hero:${webDomain}:${HeroSectionTypeEnum.ABOUT_API_WEBSITE}`,
-  async () =>
-    mapHeroSection(
+  async () => {
+    const hero = mapHeroSection(
       await api.fetchHeroSections(HeroSectionTypeEnum.ABOUT_API_WEBSITE),
       HeroSectionTypeEnum.ABOUT_API_WEBSITE,
-    ),
+    );
+
+    return hero ?? createEmptyAboutHero();
+  },
   {
-    default: () => null,
+    default: createEmptyAboutHero,
     dedupe: "defer",
   },
 );
 
 const site = computed(() => mapHomeSite(setting.value));
-const teacherName = computed(() => site.value.brandName || "مدرسك");
-const teacherRole = computed(
-  () =>
-    site.value.description ||
-    "مدرس متخصص يساعد طلاب المرحلة الثانوية على الفهم والتطبيق بثقة",
-);
+const teacherName = computed(() => site.value.brandName || "");
+const teacherRole = computed(() => site.value.description || "");
 const teacherImage = computed(
   () =>
     aboutHero.value?.image?.src ||
     aboutHero.value?.mobileImage?.src ||
     site.value.cover?.src ||
     site.value.logo?.src ||
-    "/images/logo.png",
+    "",
 );
 
 const whatsappUrl = computed(() => {
@@ -58,18 +67,14 @@ const whatsappUrl = computed(() => {
   return phone ? `https://wa.me/${phone}` : null;
 });
 
-const contactDescription = computed(
-  () =>
-    site.value.address ||
-    "تقدر تتواصل مع المنصة للاستفسار عن الكورسات والاشتراك.",
-);
+const contactDescription = computed(() => site.value.address || "");
 
 useSeoMeta({
-  title: () => aboutHero.value?.title || `عن ${teacherName.value}`,
+  title: () => aboutHero.value?.title || (teacherName.value ? `عن ${teacherName.value}` : "عن المدرس"),
   description: () => aboutHero.value?.description || teacherRole.value,
-  ogTitle: () => aboutHero.value?.title || `عن ${teacherName.value}`,
+  ogTitle: () => aboutHero.value?.title || (teacherName.value ? `عن ${teacherName.value}` : "عن المدرس"),
   ogDescription: () => aboutHero.value?.description || teacherRole.value,
-  ogImage: () => teacherImage.value,
+  ogImage: () => teacherImage.value || undefined,
 });
 
 useHead({
@@ -377,19 +382,28 @@ const animateMethod = (section: HTMLElement) => {
 
 const animateExperience = (section: HTMLElement) => {
   const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
-  const card = section.querySelector(".about-teacher-stage-card");
-  const chips = section.querySelectorAll(
+  const legacyCard = section.querySelector(".about-teacher-stage-card");
+  const legacyChips = section.querySelectorAll(
     ".about-teacher-stage-card__chips span",
   );
-  const content = section.querySelectorAll(
+  const legacyContent = section.querySelectorAll(
     ".about-teacher-stage-card__content > *",
+  );
+  const map = section.querySelector(
+    ".about-teacher-experience-map, .about-teacher-experience-state, .home-section-empty",
+  );
+  const stageTabs = section.querySelectorAll(
+    ".about-teacher-experience-nav__item",
+  );
+  const panelContent = section.querySelectorAll(
+    ".about-teacher-experience-panel > header > *, .about-teacher-experience-year",
   );
 
   animateSectionHeading(section, timeline);
 
-  if (card) {
+  if (legacyCard) {
     timeline.fromTo(
-      card,
+      legacyCard,
       { autoAlpha: 0, y: 36, scale: 0.985 },
       {
         autoAlpha: 1,
@@ -402,9 +416,9 @@ const animateExperience = (section: HTMLElement) => {
     );
   }
 
-  if (chips.length) {
+  if (legacyChips.length) {
     timeline.fromTo(
-      chips,
+      legacyChips,
       { autoAlpha: 0, y: 16, scale: 0.9 },
       {
         autoAlpha: 1,
@@ -418,9 +432,9 @@ const animateExperience = (section: HTMLElement) => {
     );
   }
 
-  if (content.length) {
+  if (legacyContent.length) {
     timeline.fromTo(
-      content,
+      legacyContent,
       { autoAlpha: 0, y: 20 },
       {
         autoAlpha: 1,
@@ -430,6 +444,53 @@ const animateExperience = (section: HTMLElement) => {
         clearProps: "opacity,visibility,transform",
       },
       0.78,
+    );
+  }
+
+  if (map) {
+    timeline.fromTo(
+      map,
+      { autoAlpha: 0, y: 42, scale: 0.975 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.96,
+        ease: "back.out(1.15)",
+        clearProps: "opacity,visibility,transform",
+      },
+      0.46,
+    );
+  }
+
+  if (stageTabs.length) {
+    timeline.fromTo(
+      stageTabs,
+      { autoAlpha: 0, x: 24, scale: 0.94 },
+      {
+        autoAlpha: 1,
+        x: 0,
+        scale: 1,
+        duration: 0.62,
+        stagger: cappedStagger(stageTabs.length, 0.09, 0.42),
+        clearProps: "opacity,visibility,transform",
+      },
+      0.66,
+    );
+  }
+
+  if (panelContent.length) {
+    timeline.fromTo(
+      panelContent,
+      { autoAlpha: 0, y: 24 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.64,
+        stagger: cappedStagger(panelContent.length, 0.07, 0.5),
+        clearProps: "opacity,visibility,transform",
+      },
+      0.76,
     );
   }
 };
@@ -671,7 +732,6 @@ onBeforeUnmount(() => {
         :hero="aboutHero"
         :teacher-name="teacherName"
         :teacher-role="teacherRole"
-        :teacher-image="teacherImage"
       />
       <AboutTeacherMethodSection />
       <AboutTeacherExperienceSection :teacher-role="teacherRole" />

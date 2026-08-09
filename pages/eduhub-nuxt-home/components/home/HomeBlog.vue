@@ -1,50 +1,30 @@
 <script setup lang="ts">
-type BlogPost = {
-  to: string
-  category: string
-  index: string
-  mark: string
-  readingTime: string
-  title: string
-  description: string
-  tone: 'navy' | 'blue' | 'coral'
-}
+import { getWebDomain } from '~/constant/webDomain'
+import { HomePageApi } from '~/features/HomePageFeature/api/homePageApi'
+import { mapBlogsPage } from '~/features/HomePageFeature/mappers/homePageMapper'
 
-const posts: BlogPost[] = [
-  {
-    to: '/blog/study-physics-with-understanding',
-    category: 'أسلوب المذاكرة',
-    index: '01',
-    mark: 'فهم',
-    readingTime: '6 دقائق قراءة',
-    title: 'تذاكر الفيزياء بفهم، مش بحفظ القوانين',
-    description:
-      'طريقة عملية تخليك تربط القانون بمعناه، وتعرف إمتى تستخدمه قبل ما تبدأ في حل عدد كبير من المسائل.',
-    tone: 'navy',
-  },
-  {
-    to: '/blog/analyze-physics-problem-in-five-steps',
-    category: 'حل المسائل',
-    index: '02',
-    mark: '05',
-    readingTime: '7 دقائق قراءة',
-    title: 'حلّل مسألة الفيزياء في 5 خطوات قبل ما تبدأ الحل',
-    description:
-      'روتين ثابت لقراءة المسألة، ترتيب المعطيات، اختيار القانون ومراجعة الناتج من غير تسرّع أو عشوائية.',
-    tone: 'blue',
-  },
-  {
-    to: '/blog/physics-revision-plan-before-exam',
-    category: 'المراجعة والامتحان',
-    index: '03',
-    mark: '7D',
-    readingTime: '6 دقائق قراءة',
-    title: 'خطة مراجعة الفيزياء قبل الامتحان من غير توتر',
-    description:
-      'خطة مرنة ترتب المنهج والأسئلة والأخطاء في الأيام الأخيرة، وتترك لك وقتًا للنوم والمراجعة الهادئة.',
-    tone: 'coral',
-  },
-]
+const webDomain = getWebDomain()
+const api = new HomePageApi(webDomain)
+const { data: blogs, pending, error, refresh } = await useAsyncData(
+  `legacy-home-blogs:${webDomain}`,
+  async () => mapBlogsPage(await api.fetchBlogs()),
+  { default: () => [] },
+)
+const posts = computed(() => blogs.value.slice(0, 3))
+const tones = ['navy', 'blue', 'coral'] as const
+
+const blogNumber = (index: number) => String(index + 1).padStart(2, '0')
+const formatDate = (date: string | null) => {
+  if (!date) return ''
+  const parsedDate = new Date(date)
+  if (Number.isNaN(parsedDate.getTime())) return date
+
+  return new Intl.DateTimeFormat('ar-EG', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(parsedDate)
+}
 </script>
 
 <template>
@@ -52,40 +32,50 @@ const posts: BlogPost[] = [
     <div class="container">
       <div class="home-editorial-heading home-blog-heading" data-motion-reveal="up">
         <div>
-          <span>من مدونة Gamma</span>
+          <span>من المدونة</span>
           <h2>
-            ذاكر بذكاء.<br />
-            وحل <em>بهدوء.</em>
+            أحدث المقالات.<br />
+            محتوى <em>متجدد.</em>
           </h2>
         </div>
 
         <div class="home-blog-intro">
-          <p>مقالات عملية عن فهم الفيزياء، تحليل المسائل، وتنظيم المراجعة قبل الامتحان.</p>
-          <NuxtLink to="/blog">كل مقالات المدونة ←</NuxtLink>
+          <p>تصفّح أحدث المقالات المنشورة على المنصة.</p>
+          <NuxtLink to="/blogs">كل مقالات المدونة ←</NuxtLink>
         </div>
       </div>
 
-      <div class="home-blog-grid">
+      <div v-if="pending" class="home-blog-state" role="status">
+        جاري تحميل المقالات…
+      </div>
+      <div v-else-if="error" class="home-blog-state" role="alert">
+        <strong>تعذر تحميل المقالات.</strong>
+        <button type="button" @click="refresh">إعادة المحاولة</button>
+      </div>
+      <div v-else-if="!posts.length" class="home-blog-state">
+        لا توجد مقالات منشورة حاليًا.
+      </div>
+      <div v-else class="home-blog-grid">
         <article
           v-for="(post, index) in posts"
-          :key="post.to"
+          :key="post.id"
           class="home-blog-card"
-          :class="`home-blog-${post.tone}`"
+          :class="`home-blog-${tones[index % tones.length]}`"
           data-motion-reveal="up"
           :data-motion-order="index"
         >
-          <NuxtLink :to="post.to">
+          <NuxtLink :to="post.route">
             <header>
-              <span>{{ post.category }}</span>
-              <b>{{ post.index }}</b>
+              <span v-if="post.subtitle">{{ post.subtitle }}</span>
+              <b>{{ blogNumber(index) }}</b>
             </header>
 
-            <strong>{{ post.mark }}</strong>
+            <strong>{{ blogNumber(index) }}</strong>
 
             <div>
-              <small>{{ post.readingTime }}</small>
+              <small v-if="post.date">{{ formatDate(post.date) }}</small>
               <h3>{{ post.title }}</h3>
-              <p>{{ post.description }}</p>
+              <p v-if="post.description">{{ post.description }}</p>
               <span class="home-blog-read">
                 اقرأ المقال <i aria-hidden="true">←</i>
               </span>
@@ -162,6 +152,31 @@ const posts: BlogPost[] = [
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
+}
+
+.home-blog-state {
+  display: grid;
+  min-height: 190px;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 30px;
+  border: 1px solid #dfe7f3;
+  border-radius: 10px;
+  color: #4f617c;
+  background: #fff;
+  text-align: center;
+}
+
+.home-blog-state button {
+  padding: 9px 15px;
+  border: 1px solid #0867d4;
+  border-radius: 6px;
+  color: #0867d4;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
 }
 
 .home-blog-card {

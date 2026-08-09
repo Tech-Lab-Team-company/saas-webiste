@@ -125,6 +125,7 @@ export interface HomeBlogApiDto {
   subtitle: string | null
   description: string | null
   date: string | null
+  mailImage: HomeImageApiDto | null
   attachments: HomeImageApiDto[]
 }
 

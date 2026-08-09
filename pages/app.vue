@@ -14,9 +14,24 @@ const cleanLink = (value: string | null) => {
 
 const androidUrl = computed(() => cleanLink(site.value.app.androidUrl));
 const iosUrl = computed(() => cleanLink(site.value.app.iosUrl));
+const appImageFailed = ref(false);
+const appImageSrc = computed(() => site.value.app.image?.src || "");
+const appImageAlt = computed(
+  () =>
+    site.value.app.image?.alt ||
+    `واجهة تطبيق ${site.value.brandName || "المنصة"}`,
+);
+
+watch(appImageSrc, () => {
+  appImageFailed.value = false;
+});
+
+const handleAppImageError = () => {
+  appImageFailed.value = true;
+};
 
 useSeoMeta({
-  title: () => `التطبيق | ${site.value.brandName || "EduHub"}`,
+  title: () => `التطبيق${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
   description: () =>
     `حمّل تطبيق ${site.value.brandName || "المنصة"} على Android أو iPhone وتابع المحتوى من موبايلك.`,
 });
@@ -37,7 +52,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
     <main class="app-page__main">
       <div class="app-page__wrap">
         <header class="app-page__intro">
-          <span>{{ site.brandName || "EduHub" }} على الموبايل</span>
+          <span v-if="site.brandName">{{ site.brandName }} على الموبايل</span>
           <h1>التطبيق على Android وiPhone</h1>
           <p>
             حمّل تطبيق {{ site.brandName || "المنصة" }} على موبايلك، أو تابع
@@ -48,12 +63,22 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
         <section class="app-page__card" aria-labelledby="app-options-title">
           <div class="app-page__phone">
             <NuxtImg
-              :src="site.app.image?.src || '/images/eslam-salama-app-screen.webp'"
-              :alt="site.app.image?.alt || `واجهة تطبيق ${site.brandName || 'المنصة'}`"
+              v-if="appImageSrc && !appImageFailed"
+              :src="appImageSrc"
+              :alt="appImageAlt"
               width="380"
               height="675"
               loading="eager"
+              @error="handleAppImageError"
             />
+            <span
+              v-else
+              class="app-page__image-alt"
+              role="img"
+              :aria-label="appImageAlt"
+            >
+              {{ appImageAlt }}
+            </span>
           </div>
 
           <div class="app-page__content">
@@ -77,12 +102,10 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             <span class="app-page__store-icon" aria-hidden="true">▶</span>
             <span><small>حمّل الآن من</small><b>Google Play</b></span>
           </a>
-          <span v-else class="app-page__link-disabled">رابط Android غير متاح</span>
           <a v-if="iosUrl" class="app-page__store-button" :href="iosUrl" target="_blank" rel="noreferrer">
             <span class="app-page__store-icon app-page__store-icon--apple" aria-hidden="true">●</span>
             <span><small>حمّل الآن من</small><b>App Store</b></span>
           </a>
-          <span v-else class="app-page__link-disabled">رابط iPhone غير متاح</span>
           <NuxtLink to="/course">تصفّح الكورسات</NuxtLink>
           <NuxtLink to="/books">افتح المذكرات</NuxtLink>
           <NuxtLink to="/profile">افتح مساحة الطالب</NuxtLink>
@@ -118,6 +141,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .app-page__phone::before { top: -82px; right: -25px; }
 .app-page__phone::after { bottom: -85px; left: -48px; }
 .app-page__phone :deep(img) { width: 100%; height: 100%; object-fit: cover; }
+.app-page__image-alt { position: relative; z-index: 1; max-width: 155px; padding: 20px; color: #ffffffcf; font: 800 14px/1.7 var(--home-v2-heading); text-align: center; }
 .app-page__content { padding: 36px 40px; }
 .app-page__kind { display: inline-flex; padding: 6px 9px; color: var(--home-v2-blue); background: var(--home-v2-blue-light); font-size: 13px; font-weight: 900; }
 .app-page__content h2 { margin: 12px 0 8px; color: var(--home-v2-ink); font: 900 25px/1.45 var(--home-v2-heading); }

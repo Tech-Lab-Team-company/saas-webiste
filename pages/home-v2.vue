@@ -9,7 +9,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'معاينة الصفحة الرئيسية الجديدة | EduHub',
+  title: () => `الصفحة الرئيسية${home.value.site.brandName ? ` | ${home.value.site.brandName}` : ''}`,
   robots: 'noindex, nofollow',
 })
 

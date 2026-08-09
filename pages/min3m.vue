@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import { getWebDomain } from "~/constant/webDomain";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
+import { mapBlogsPage } from "~/features/HomePageFeature/mappers/homePageMapper";
+
+const min3mWebDomain = getWebDomain();
+const min3mApi = new HomePageApi(min3mWebDomain);
+const {
+  data: min3mBlogs,
+  pending: min3mBlogsPending,
+  error: min3mBlogsError,
+  refresh: refreshMin3mBlogs,
+} = await useAsyncData(
+  `min3m-blogs:${min3mWebDomain}`,
+  async () => mapBlogsPage(await min3mApi.fetchBlogs()),
+  { default: () => [] },
+);
+const visibleMin3mBlogs = computed(() => min3mBlogs.value.slice(0, 3));
+const min3mBlogTones = ["navy", "blue", "coral"] as const;
+const min3mBlogNumber = (index: number) =>
+  String(index + 1).padStart(2, "0");
+const formatMin3mBlogDate = (date: string | null) => {
+  if (!date) return "";
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return date;
+
+  return new Intl.DateTimeFormat("ar-EG", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(parsedDate);
+};
+</script>
+
 <template>
   <button
     class="theme-toggle"
@@ -265,86 +299,49 @@
           data-motion-reveal="up"
         >
           <div>
-            <span>من مدونة Gamma</span>
+            <span>من المدونة</span>
             <h2>
-              ذاكر بذكاء.<br />
-              وحل <em>بهدوء.</em>
+              أحدث المقالات.<br />
+              محتوى <em>متجدد.</em>
             </h2>
           </div>
           <div class="home-blog-intro">
-            <p>
-              مقالات عملية عن فهم الفيزياء، تحليل المسائل، وتنظيم المراجعة قبل
-              الامتحان.
-            </p>
-            <a href="/blog">كل مقالات المدونة ←</a>
+            <p>تصفّح أحدث المقالات المنشورة على المنصة.</p>
+            <a href="/blogs">كل مقالات المدونة ←</a>
           </div>
         </div>
-        <div class="home-blog-grid">
+        <div v-if="min3mBlogsPending" class="home-blog-state" role="status">
+          جاري تحميل المقالات…
+        </div>
+        <div v-else-if="min3mBlogsError" class="home-blog-state" role="alert">
+          <strong>تعذر تحميل المقالات.</strong>
+          <button type="button" @click="refreshMin3mBlogs">إعادة المحاولة</button>
+        </div>
+        <div v-else-if="!visibleMin3mBlogs.length" class="home-blog-state">
+          لا توجد مقالات منشورة حاليًا.
+        </div>
+        <div v-else class="home-blog-grid">
           <article
-            class="home-blog-card home-blog-navy"
+            v-for="(blog, index) in visibleMin3mBlogs"
+            :key="blog.id"
+            class="home-blog-card"
+            :class="`home-blog-${min3mBlogTones[index % min3mBlogTones.length]}`"
             data-motion-reveal="up"
-            data-motion-order="0"
+            :data-motion-order="index"
           >
-            <a href="/blog/study-physics-with-understanding">
+            <NuxtLink :to="blog.route">
               <header>
-                <span>أسلوب المذاكرة</span>
-                <b>01</b>
+                <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
+                <b>{{ min3mBlogNumber(index) }}</b>
               </header>
-              <strong>فهم</strong>
+              <strong>{{ min3mBlogNumber(index) }}</strong>
               <div>
-                <small>6 دقائق قراءة</small>
-                <h3>تذاكر الفيزياء بفهم، مش بحفظ القوانين</h3>
-                <p>
-                  طريقة عملية تخليك تربط القانون بمعناه، وتعرف إمتى تستخدمه قبل
-                  ما تبدأ في حل عدد كبير من المسائل.
-                </p>
+                <small v-if="blog.date">{{ formatMin3mBlogDate(blog.date) }}</small>
+                <h3>{{ blog.title }}</h3>
+                <p v-if="blog.description">{{ blog.description }}</p>
                 <span class="home-blog-read"> اقرأ المقال <i>←</i> </span>
               </div>
-            </a>
-          </article>
-          <article
-            class="home-blog-card home-blog-blue"
-            data-motion-reveal="up"
-            data-motion-order="1"
-          >
-            <a href="/blog/analyze-physics-problem-in-five-steps">
-              <header>
-                <span>حل المسائل</span>
-                <b>02</b>
-              </header>
-              <strong>05</strong>
-              <div>
-                <small>7 دقائق قراءة</small>
-                <h3>حلّل مسألة الفيزياء في 5 خطوات قبل ما تبدأ الحل</h3>
-                <p>
-                  روتين ثابت لقراءة المسألة، ترتيب المعطيات، اختيار القانون
-                  ومراجعة الناتج من غير تسرّع أو عشوائية.
-                </p>
-                <span class="home-blog-read"> اقرأ المقال <i>←</i> </span>
-              </div>
-            </a>
-          </article>
-          <article
-            class="home-blog-card home-blog-coral"
-            data-motion-reveal="up"
-            data-motion-order="2"
-          >
-            <a href="/blog/physics-revision-plan-before-exam">
-              <header>
-                <span>المراجعة والامتحان</span>
-                <b>03</b>
-              </header>
-              <strong>7D</strong>
-              <div>
-                <small>6 دقائق قراءة</small>
-                <h3>خطة مراجعة الفيزياء قبل الامتحان من غير توتر</h3>
-                <p>
-                  خطة مرنة ترتب المنهج والأسئلة والأخطاء في الأيام الأخيرة،
-                  وتترك لك وقتًا للنوم والمراجعة الهادئة.
-                </p>
-                <span class="home-blog-read"> اقرأ المقال <i>←</i> </span>
-              </div>
-            </a>
+            </NuxtLink>
           </article>
         </div>
       </div>
@@ -9893,6 +9890,31 @@ html[data-theme="dark"] .home-stage-empty h3 {
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   display: grid;
+}
+
+.home-blog-state {
+  color: #4f617c;
+  background: #fff;
+  border: 1px solid #dfe7f3;
+  border-radius: 10px;
+  min-height: 190px;
+  padding: 30px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.home-blog-state button {
+  color: #0867d4;
+  background: transparent;
+  border: 1px solid #0867d4;
+  border-radius: 6px;
+  padding: 9px 15px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .home-blog-card {

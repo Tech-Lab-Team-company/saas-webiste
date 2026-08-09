@@ -38,23 +38,23 @@ const { locale } = useI18n();
           :to="`/blogs/${card.slug}`"
           class="card"
         >
-        <!-- {{ console.log(blogscard , "blogs cards") }} -->
         <img
-            :src="card.attachments?.[0]?.file || ''"
-            :alt="card.attachments?.[0]?.alt || 'Default alt'"
+            v-if="card.attachments?.[0]?.file"
+            :src="card.attachments[0].file"
+            :alt="card.attachments[0].alt || card.title"
             class="course-image"
           />
           <div class="card-body">
             <div class="card-header">
               <hr />
-              <h5 class="card-title">{{ card.title || 'No Title' }}</h5>
+              <h5 class="card-title">{{ card.title }}</h5>
               <div class="card-date">
                 <p>{{ card.date }}</p>
               </div>
             </div>
-            <p class="card-text">{{ card.description || 'No Description' }}</p>
-            <div class="card-footer">
-              <p>{{ card.subtitle || 'No Subtitle'  }}</p>
+            <p v-if="card.description" class="card-text">{{ card.description }}</p>
+            <div v-if="card.subtitle" class="card-footer">
+              <p>{{ card.subtitle }}</p>
             </div>
           </div>
         </NuxtLink>
@@ -191,21 +191,3 @@ const { locale } = useI18n();
   /* border: 1px solid #ccc; */
 }
 </style>
-<!-- // const cards = [
-//   {
-//     title: "رحلة نحو المعرفة والتفوق",
-//   },
-// ];
-
-// const cards_one = [
-//   {
-//     add: " اضيف بواسطه",
-//     name: "احمد حوام",
-//     icon: frame,
-//   },
-//   {
-//     add_one: "التاريخ",
-//     date: "2025-12-1",
-//     icon1: clock,
-//   },
-// ]; -->

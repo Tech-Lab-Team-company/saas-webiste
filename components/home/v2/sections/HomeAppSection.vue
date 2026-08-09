@@ -2,9 +2,32 @@
 import { gsap } from "gsap";
 import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
-defineProps<{
+const props = defineProps<{
   site: HomeSiteViewModel;
 }>();
+
+const cleanLink = (value: string | null) => {
+  const link = value?.trim();
+  return link && link !== "-" ? link : null;
+};
+
+const androidUrl = computed(() => cleanLink(props.site.app.androidUrl));
+const iosUrl = computed(() => cleanLink(props.site.app.iosUrl));
+const appImageFailed = ref(false);
+const appImageSrc = computed(() => props.site.app.image?.src || "");
+const appImageAlt = computed(
+  () =>
+    props.site.app.image?.alt ||
+    `واجهة تطبيق ${props.site.brandName || "المنصة"}`,
+);
+
+watch(appImageSrc, () => {
+  appImageFailed.value = false;
+});
+
+const handleAppImageError = () => {
+  appImageFailed.value = true;
+};
 
 const appSection = ref<HTMLElement | null>(null);
 let appAnimationContext: ReturnType<typeof gsap.context> | null = null;
@@ -104,29 +127,26 @@ onBeforeUnmount(() => {
           حمّل تطبيق {{ site.brandName || "المنصة" }} وتابع محتواك من هاتفك
           في أي وقت.
         </p>
-        <div class="home-v2-app__actions">
+        <div
+          v-if="androidUrl || iosUrl"
+          class="home-v2-app__actions"
+        >
           <a
-            v-if="site.app.androidUrl"
-            :href="site.app.androidUrl"
+            v-if="androidUrl"
+            :href="androidUrl"
             target="_blank"
             rel="noopener"
           >
             تحميل Android
           </a>
-          <span v-else class="home-v2-disabled-action" aria-disabled="true">
-            تطبيق Android غير متاح
-          </span>
           <a
-            v-if="site.app.iosUrl"
-            :href="site.app.iosUrl"
+            v-if="iosUrl"
+            :href="iosUrl"
             target="_blank"
             rel="noopener"
           >
             تحميل iPhone
           </a>
-          <span v-else class="home-v2-disabled-action" aria-disabled="true">
-            تطبيق iPhone غير متاح
-          </span>
         </div>
       </div>
 
@@ -136,14 +156,24 @@ onBeforeUnmount(() => {
       >
         <div class="home-v2-app__screen">
           <NuxtImg
-            :src="site.app.image?.src || '/images/eslam-salama-app-screen.webp'"
-            :alt="site.app.image?.alt || `واجهة تطبيق ${site.brandName || 'المنصة'}`"
+            v-if="appImageSrc && !appImageFailed"
+            :src="appImageSrc"
+            :alt="appImageAlt"
             width="380"
             height="675"
             loading="lazy"
+            @error="handleAppImageError"
           />
+          <span
+            v-else
+            class="home-v2-app__image-alt"
+            role="img"
+            :aria-label="appImageAlt"
+          >
+            {{ appImageAlt }}
+          </span>
         </div>
-        <figcaption>لقطة حقيقية من التطبيق</figcaption>
+        <figcaption v-if="appImageSrc && !appImageFailed">لقطة من التطبيق</figcaption>
       </figure>
     </div>
   </section>
@@ -287,8 +317,22 @@ onBeforeUnmount(() => {
 .home-v2-app__screen {
   position: relative;
   overflow: hidden;
+  aspect-ratio: 380 / 675;
   border-radius: 33px 33px 10px 10px;
   background: #020b2a;
+}
+
+.home-v2-app__image-alt {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  padding: 28px;
+  color: #ffffffc7;
+  font: 800 14px/1.7 var(--home-v2-heading);
+  text-align: center;
 }
 
 .home-v2-app__screen::after {

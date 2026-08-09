@@ -1,6 +1,7 @@
 export default interface BlogsImage {
   id: number;
   slug: string | null;
+  title: string;
   mail_image: string | null;  
   subtitle: string;
   description: string;

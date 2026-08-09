@@ -14,21 +14,13 @@ const whatsappUrl = computed(() => {
 })
 
 const footerDescription = computed(() =>
-  (props.site.description || 'شرح منظم يساعد الطلاب على الفهم والتطبيق بخطوات واضحة.')
+  (props.site.description || '')
     .replace(/\s+/g, ' ')
     .trim(),
 )
 
-const brandSubtitle = computed(() => {
-  if (props.site.brandName?.toLowerCase().includes('gamma')) {
-    return 'إسلام سلامة · مدرس الفيزياء للمرحلة الثانوية'
-  }
-
-  return 'منصة تعليمية منظمة للمرحلة الثانوية'
-})
-
 const followLabel = computed(() =>
-  props.site.brandName?.toLowerCase().includes('gamma') ? 'تابع مستر إسلام' : 'تابع المنصة',
+  props.site.brandName ? `تابع ${props.site.brandName}` : 'تابع المنصة',
 )
 
 const footerSection = ref<HTMLElement | null>(null)
@@ -171,23 +163,26 @@ onBeforeUnmount(() => {
   <footer ref="footerSection" class="home-v2-footer">
     <div class="container home-v2-footer__grid">
       <div class="home-v2-footer__brand-column">
-        <NuxtLink to="/" class="home-v2-footer__brand" :aria-label="`${site.brandName || 'EduHub'} — الرئيسية`">
-          <span :class="['home-v2-footer__logo', { 'home-v2-temporary-asset': !site.logo }]">
+        <NuxtLink to="/" class="home-v2-footer__brand" :aria-label="`${site.brandName || 'المنصة'} — الرئيسية`">
+          <span :class="['home-v2-footer__logo', { 'home-v2-footer__logo--empty': !site.logo }]">
             <NuxtImg
-              :src="site.logo?.src || '/images/logo.png'"
+              v-if="site.logo"
+              :src="site.logo.src"
               :alt="site.logo?.alt || site.brandName || ''"
               width="46"
               height="46"
               loading="lazy"
             />
+            <span v-else aria-hidden="true">+</span>
           </span>
           <span class="home-v2-footer__brand-copy">
-            <b lang="en">{{ site.brandName || 'EduHub' }}</b>
-            <small>{{ brandSubtitle }}</small>
+            <b>{{ site.brandName || 'أضف اسم المنصة' }}</b>
           </span>
         </NuxtLink>
 
-        <p class="home-v2-footer__description">{{ footerDescription }}</p>
+        <p v-if="footerDescription" class="home-v2-footer__description">
+          {{ footerDescription }}
+        </p>
 
         <address class="home-v2-footer__contacts" aria-label="بيانات التواصل">
           <a v-if="site.phone" :href="`tel:${site.phone}`" dir="ltr">{{ site.phone }}</a>
@@ -275,7 +270,10 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="container home-v2-footer__bottom">
-      <span>© {{ new Date().getFullYear() }} {{ site.brandName || 'EduHub' }}. جميع الحقوق محفوظة.</span>
+      <span>
+        © {{ new Date().getFullYear() }}<template v-if="site.brandName"> {{ site.brandName }}</template>.
+        جميع الحقوق محفوظة.
+      </span>
       <nav class="home-v2-footer__legal" aria-label="السياسات القانونية">
         <NuxtLink to="/privacy">سياسة الخصوصية</NuxtLink>
         <NuxtLink to="/terms">الشروط والأحكام</NuxtLink>
@@ -335,6 +333,13 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.home-v2-footer__logo--empty {
+  border-style: dashed;
+  background: rgb(255 255 255 / 7%);
+  color: #f0cb81;
+  font: 300 28px/1 var(--home-v2-heading);
 }
 
 .home-v2-footer__brand-copy {

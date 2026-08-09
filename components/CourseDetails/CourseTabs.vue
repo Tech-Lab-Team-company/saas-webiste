@@ -14,13 +14,17 @@ import Loder from "../Loader/Loder.vue";
 const value = ref("0");
 const route = useRoute();
 const tab_value = ref("content");
-const activetab = ref({});
+const activetab = ref<number | null>(null);
 const videoLink = ref({
   sessionId: null as number | null,
   videoLink: "",
   title: "",
   description: "",
 });
+const isViewingCourseContent = computed(() => activetab.value === 0);
+const { isCaptureShielded, protectionNotice } = useCourseContentProtection(
+  isViewingCourseContent,
+);
 
 // const id = ref<string>(<string>route.params.id)
 
@@ -105,6 +109,13 @@ onUnmounted(() => {
     :class="{ 'is-viewing-course-content': activetab == 0 }"
     dir="auto"
   >
+    <Transition name="course-protection-notice">
+      <div v-if="protectionNotice" class="course-protection-notice" role="status">
+        <i class="pi pi-shield" aria-hidden="true"></i>
+        {{ protectionNotice }}
+      </div>
+    </Transition>
+
     <div class="page-loader" v-if="!CardData">
       <Loder />
     </div>
@@ -117,11 +128,21 @@ onUnmounted(() => {
       @Changestatus="FetchCourseDetails"
     >
       <template #main="{ platformTeacher }">
-        <div class="course-viewer" v-if="activetab == 0">
+        <div
+          class="course-viewer"
+          :class="{ 'is-capture-shielded': isCaptureShielded }"
+          v-if="activetab == 0"
+        >
           <CourseDetailsCourseVideo
             :CourseData="CardData"
             :CourseVideoLink="videoLink"
+            :course-id="CardData?.id"
           />
+          <div v-if="isCaptureShielded" class="course-capture-shield">
+            <i class="pi pi-lock" aria-hidden="true"></i>
+            <strong>المحتوى محمي</strong>
+            <span>ارجع إلى نافذة الكورس لمتابعة الدرس</span>
+          </div>
         </div>
 
         <section class="course-tabs">

@@ -2,51 +2,79 @@
 import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 
 const props = defineProps<{
-  hero: HomeHeroViewModel | null;
+  hero: HomeHeroViewModel;
   teacherName: string;
   teacherRole: string;
-  teacherImage: string;
 }>();
 
-const eyebrow = computed(() => props.hero?.subtitle || "عن المدرس");
-const title = computed(
-  () => props.hero?.title || "الفيزياء أوضح لما تفهم معنى القانون.",
+const eyebrow = computed(() => props.hero.subtitle?.trim() || "");
+const title = computed(() => props.hero.title?.trim() || "");
+const description = computed(() => props.hero.description?.trim() || "");
+const heroLink = computed(() => props.hero.link?.trim() || "");
+const desktopImage = computed(
+  () => props.hero.image?.src || props.hero.mobileImage?.src || "",
 );
-const description = computed(
-  () =>
-    props.hero?.description ||
-    `${props.teacherName} — ${props.teacherRole}. نقدّم محتوى تعليميًا منظمًا يبدأ من فهم الفكرة وينتهي بإتقان تطبيقها في المسألة.`,
-);
-const desktopImage = computed(() => props.hero?.image?.src || props.teacherImage);
-const mobileImage = computed(() => props.hero?.mobileImage?.src || null);
-const imageAlt = computed(
-  () => props.hero?.image?.alt || `${props.teacherName} — ${props.teacherRole}`,
+const mobileImage = computed(() => props.hero.mobileImage?.src || "");
+const imageAlt = computed(() => props.hero.image?.alt?.trim() || "");
+const hasHeroContent = computed(() =>
+  Boolean(
+    eyebrow.value ||
+      title.value ||
+      description.value ||
+      heroLink.value ||
+      desktopImage.value,
+  ),
 );
 </script>
 
 <template>
-  <section class="about-teacher-hero" aria-labelledby="about-teacher-title">
+  <section
+    class="about-teacher-hero"
+    :aria-labelledby="
+      hasHeroContent && title
+        ? 'about-teacher-title'
+        : !hasHeroContent
+        ? 'about-teacher-empty-title'
+        : undefined
+    "
+  >
     <div class="about-teacher-hero__ambient" aria-hidden="true">
       <span class="about-teacher-hero__orb about-teacher-hero__orb--one" />
       <span class="about-teacher-hero__orb about-teacher-hero__orb--two" />
     </div>
-    <div class="container about-teacher-hero__grid">
+    <div
+      v-if="!hasHeroContent"
+      class="container about-teacher-hero__copy about-teacher-hero__empty"
+      data-about-reveal
+    >
+      <span class="about-teacher-hero__empty-mark" aria-hidden="true">+</span>
+      <span class="about-teacher-eyebrow">قسم عن المدرس</span>
+      <h1 id="about-teacher-empty-title">أضف محتوى القسم</h1>
+      <p>أضف العنوان والوصف والصورة من لوحة التحكم ليظهر قسم التعريف هنا.</p>
+    </div>
+
+    <div v-else class="container about-teacher-hero__grid">
       <div class="about-teacher-hero__copy" data-about-reveal>
-        <span class="about-teacher-eyebrow">{{ eyebrow }}</span>
-        <h1 id="about-teacher-title">{{ title }}</h1>
-        <p>{{ description }}</p>
-        <div class="about-teacher-hero__actions">
-          <a v-if="hero?.link" :href="hero.link">
-            اعرف أكثر <span aria-hidden="true">←</span>
-          </a>
-          <NuxtLink v-else to="/course">اختار صفك <span aria-hidden="true">←</span></NuxtLink>
+        <span v-if="eyebrow" class="about-teacher-eyebrow">{{ eyebrow }}</span>
+        <h1 v-if="title" id="about-teacher-title">{{ title }}</h1>
+        <p v-if="description">{{ description }}</p>
+        <div v-if="heroLink" class="about-teacher-hero__actions">
+          <a :href="heroLink"> اعرف أكثر <span aria-hidden="true">←</span> </a>
           <a href="#study-method">اعرف نظام الدراسة</a>
         </div>
       </div>
 
-      <figure class="about-teacher-portrait" data-about-reveal>
+      <figure
+        v-if="desktopImage"
+        class="about-teacher-portrait"
+        data-about-reveal
+      >
         <picture>
-          <source v-if="mobileImage" media="(max-width: 700px)" :srcset="mobileImage" />
+          <source
+            v-if="mobileImage"
+            media="(max-width: 700px)"
+            :srcset="mobileImage"
+          />
           <NuxtImg
             :src="desktopImage"
             :alt="imageAlt"
@@ -56,9 +84,9 @@ const imageAlt = computed(
             loading="eager"
           />
         </picture>
-        <figcaption>
-          <span>{{ teacherName }}</span>
-          <small>{{ teacherRole }}</small>
+        <figcaption v-if="teacherName || teacherRole">
+          <span v-if="teacherName">{{ teacherName }}</span>
+          <small v-if="teacherRole">{{ teacherRole }}</small>
         </figcaption>
       </figure>
     </div>

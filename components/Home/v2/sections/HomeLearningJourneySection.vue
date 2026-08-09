@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 import type { HomeLearningJourneyViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 const props = defineProps<{
   journey: HomeSectionState<HomeLearningJourneyViewModel>;
@@ -11,6 +12,18 @@ const journeySection = ref<HTMLElement | null>(null);
 const journeySteps = ref<HTMLElement | null>(null);
 const journeyHasEntered = ref(false);
 let journeyAnimationContext: ReturnType<typeof gsap.context> | null = null;
+
+const hasJourneyContent = computed(() => props.journey.status === "success");
+const emptyStateTitle = computed(() =>
+  props.journey.status === "error"
+    ? "تعذر تحميل رحلة التعلّم"
+    : "أضف محتوى رحلة التعلّم",
+);
+const emptyStateDescription = computed(() =>
+  props.journey.status === "error"
+    ? "تعذر جلب بيانات القسم في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
+    : "أضف عنوان الرحلة ووصفها وخطواتها من لوحة التحكم لتظهر هنا.",
+);
 
 const titleParts = computed(() => {
   const title = props.journey.data.title.trim();
@@ -164,7 +177,16 @@ onBeforeUnmount(() => {
     :data-background-text="journey.data.textBackground"
     aria-labelledby="home-v2-learning-journey-title"
   >
-    <div class="container home-v2-learning-journey__grid">  
+    <div v-if="!hasJourneyContent" class="container home-v2-learning-journey__empty">
+      <HomeSectionEmptyState
+        tone="dark"
+        label="قسم رحلة التعلّم"
+        :title="emptyStateTitle"
+        :description="emptyStateDescription"
+      />
+    </div>
+
+    <div v-else class="container home-v2-learning-journey__grid">
       <div class="home-v2-learning-journey__intro">
         <div class="home-v2-learning-journey__eyebrow">
           <!-- <img
@@ -175,9 +197,11 @@ onBeforeUnmount(() => {
             loading="lazy"
             decoding="async"
           /> -->
-          <span class="section-tag">{{ journey.data.eyebrow }}</span>
+          <span v-if="journey.data.eyebrow" class="section-tag">
+            {{ journey.data.eyebrow }}
+          </span>
         </div>
-        <h2 id="home-v2-learning-journey-title">
+        <h2 v-if="journey.data.title" id="home-v2-learning-journey-title">
           <span class="home-v2-learning-journey__title-line">
             {{ titleParts.main }}
           </span>
@@ -185,8 +209,9 @@ onBeforeUnmount(() => {
             {{ titleParts.accent }}
           </em>
         </h2>
-        <p>{{ journey.data.description }}</p>
+        <p v-if="journey.data.description">{{ journey.data.description }}</p>
         <NuxtLink
+          v-if="journey.data.link"
           :to="journey.data.link"
           class="home-v2-learning-journey__link"
         >
@@ -195,7 +220,11 @@ onBeforeUnmount(() => {
         </NuxtLink>
       </div>
 
-      <div ref="journeySteps" class="home-v2-learning-journey__steps">
+      <div
+        v-if="journey.data.items.length"
+        ref="journeySteps"
+        class="home-v2-learning-journey__steps"
+      >
         <span class="home-v2-learning-journey__rail" aria-hidden="true">
           <span class="home-v2-learning-journey__rail-value" />
         </span>
@@ -212,6 +241,14 @@ onBeforeUnmount(() => {
           >
         </article>
       </div>
+      <HomeSectionEmptyState
+        v-else
+        compact
+        tone="dark"
+        label="خطوات الرحلة"
+        title="أضف خطوات التعلّم"
+        description="أضف خطوة واحدة على الأقل من لوحة التحكم."
+      />
     </div>
   </section>
 </template>
@@ -248,6 +285,12 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: clamp(70px, 9vw, 150px);
   margin-bottom: 10px;
+}
+
+.home-v2-learning-journey__empty {
+  display: grid;
+  min-height: 650px;
+  align-items: center;
 }
 
 .home-v2-learning-journey .section-tag {
