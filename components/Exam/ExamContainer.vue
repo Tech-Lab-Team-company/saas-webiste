@@ -65,7 +65,7 @@ const progressPercentage = (bank: QuestionBankCard) => {
       <div class="container question-bank__hero-grid">
         <div class="question-bank__intro">
           <nav aria-label="مسار الصفحة">
-            <NuxtLink to="/home-v2">الرئيسية</NuxtLink>
+            <NuxtLink to="/">الرئيسية</NuxtLink>
             <span aria-hidden="true">/</span>
             <b>بنك الأسئلة</b>
           </nav>

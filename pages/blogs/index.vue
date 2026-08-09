@@ -530,7 +530,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .blog-listing__hero-meta span {
   display: inline-flex;
   min-height: 44px;
-  align-items: center;
+  align-items: baseline;
   gap: 7px;
   color: #ffffffb3;
   font-size: 13px;

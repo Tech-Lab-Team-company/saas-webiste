@@ -174,7 +174,7 @@ const uploadImage = async () => {
         <p>تغيير كلمة المرور</p>
       </NuxtLink>
       <NuxtLink
-        to="/home-v2"
+        to="/"
         class="profile-option profile-site-return"
         aria-label="الانتقال إلى الموقع الرئيسي"
       >

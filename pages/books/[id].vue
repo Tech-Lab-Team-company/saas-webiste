@@ -302,7 +302,7 @@ useHead({
 
             <div class="book-details-page__copy">
               <nav class="book-details-page__breadcrumb" aria-label="مسار التنقل">
-                <NuxtLink to="/home-v2">الرئيسية</NuxtLink>
+                <NuxtLink to="/">الرئيسية</NuxtLink>
                 <span aria-hidden="true">/</span>
                 <NuxtLink to="/books">المكتبة</NuxtLink>
                 <span aria-hidden="true">/</span>

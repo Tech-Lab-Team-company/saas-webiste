@@ -179,7 +179,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
         <div class="blog-v2__shell blog-v2__hero-grid">
           <div class="blog-v2__hero-copy">
             <nav class="blog-v2__breadcrumbs" aria-label="مسار الصفحة">
-              <NuxtLink to="/home-v2">الرئيسية</NuxtLink><span>/</span>
+              <NuxtLink to="/">الرئيسية</NuxtLink><span>/</span>
               <NuxtLink to="/blogs">المدونة</NuxtLink
               ><span>/</span>
               <b>{{ category }}</b>

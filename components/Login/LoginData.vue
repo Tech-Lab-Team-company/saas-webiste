@@ -161,7 +161,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
                         <span aria-hidden="true">←</span>
                     </button>
 
-                    <nuxt-link class="login-home-guest" to="/home-v2">
+                    <nuxt-link class="login-home-guest" to="/">
                         <span class="pi pi-globe" aria-hidden="true" />
                         <span>
                             <strong>{{ $t('المتابعة كزائر') }}</strong>

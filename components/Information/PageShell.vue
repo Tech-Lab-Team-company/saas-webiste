@@ -35,7 +35,7 @@ const navigation = [
       <header class="information-page__hero">
         <div class="container information-page__hero-content">
           <nav aria-label="مسار التنقل">
-            <NuxtLink to="/home-v2">الرئيسية</NuxtLink>
+            <NuxtLink to="/">الرئيسية</NuxtLink>
             <span aria-hidden="true">/</span>
             <b>{{ title }}</b>
           </nav>

@@ -27,7 +27,7 @@ const handleLogout = async () => {
   }
 
   userStore.logout();
-  await router.push("/home-v2");
+  await router.push("/");
 };
 
 const headerDescription = computed(() => {
@@ -40,7 +40,7 @@ const headerDescription = computed(() => {
 });
 
 const navItems = computed(() => [
-  ...(route.path === "/home-v2" ? [] : [{ label: "الرئيسية", to: "/home-v2" }]),
+  ...(route.path === "/" ? [] : [{ label: "الرئيسية", to: "/" }]),
   { label: "الكورسات", to: "/course" },
   { label: "الكتب", to: "/books" },
   { label: "المدونة", to: "/blogs" },

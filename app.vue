@@ -20,7 +20,7 @@ const isCourseExamPage = computed(() =>
   /^\/course\/[^/]+\/(?!timer(?:\/|$))[^/]+\/?$/u.test(route.path),
 );
 const isHomeV2 = computed(() =>
-  ["/home-v2", "/aboutus", "/about-teacher", "/books", "/blogs", "/course", "/app"].includes(route.path) ||
+  ["/", "/aboutus", "/about-teacher", "/books", "/blogs", "/course", "/app"].includes(route.path) ||
   route.path.startsWith("/books/") ||
   route.path.startsWith("/blogs/") ||
   route.path.startsWith("/blog-v2/") ||

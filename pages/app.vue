@@ -109,7 +109,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
           <NuxtLink to="/course">تصفّح الكورسات</NuxtLink>
           <NuxtLink to="/books">افتح المذكرات</NuxtLink>
           <NuxtLink to="/profile">افتح مساحة الطالب</NuxtLink>
-          <NuxtLink to="/home-v2">العودة للرئيسية</NuxtLink>
+          <NuxtLink to="/">العودة للرئيسية</NuxtLink>
         </nav>
         <p class="app-page__hint">اختار نظام موبايلك وابدأ من الرابط المناسب.</p>
       </div>

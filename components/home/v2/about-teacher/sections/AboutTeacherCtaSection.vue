@@ -5,7 +5,7 @@
         <span>ابدأ من مكانك الصحيح</span>
         <h2>اختار صفك، وشوف خطتك.</h2>
       </div>
-      <NuxtLink to="/home-v2#courses">
+      <NuxtLink to="/#courses">
         اختار المرحلة <span aria-hidden="true">←</span>
       </NuxtLink>
     </div>

@@ -95,7 +95,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
       <header class="hashtag-page__hero">
         <div class="container hashtag-page__hero-content">
           <nav aria-label="مسار الصفحة">
-            <NuxtLink to="/home-v2">الرئيسية</NuxtLink>
+            <NuxtLink to="/">الرئيسية</NuxtLink>
             <span>/</span>
             <NuxtLink to="/blogs">المدونة</NuxtLink>
             <span>/</span>
