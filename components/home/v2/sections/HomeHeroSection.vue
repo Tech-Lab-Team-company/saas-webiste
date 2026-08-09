@@ -53,10 +53,7 @@ const heroUsesSettingsLogo = computed(() =>
   ),
 );
 
-const handleHeroImageError = (event: Event) => {
-  const image = event.currentTarget as HTMLImageElement;
-  const failedSource = image.currentSrc || image.src;
-
+const handleHeroImageError = (failedSource?: string | null) => {
   if (failedSource && !failedImageSources.value.includes(failedSource)) {
     failedImageSources.value = [...failedImageSources.value, failedSource];
   }
@@ -266,7 +263,7 @@ onMounted(() => {
             fetchpriority="high"
             decoding="async"
             preload
-            @error="handleHeroImageError"
+            @error="handleHeroImageError(heroImage?.src)"
           />
         </picture>
         <HomeSectionEmptyState
@@ -287,7 +284,7 @@ onMounted(() => {
             quality="78"
             loading="lazy"
             decoding="async"
-            @error="handleHeroImageError"
+            @error="handleHeroImageError(settingsLogo?.src)"
           />
         </span>
         <span class="home-v2-hero__visual-shine" aria-hidden="true" />
