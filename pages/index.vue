@@ -54,7 +54,6 @@ const homeImage = computed(() =>
   home.value.site.logo?.src ||
   undefined,
 )
-
 useSeoMeta({
   title: () => homeTitle.value,
   description: () => homeDescription.value,

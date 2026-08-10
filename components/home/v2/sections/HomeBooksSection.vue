@@ -482,8 +482,11 @@ onBeforeUnmount(() => {
 .home-v2-books__cover > img {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
   object-fit: contain;
   object-position: center bottom;
   opacity: 0.8;

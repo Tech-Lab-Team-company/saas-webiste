@@ -44,16 +44,31 @@ export default defineEventHandler((event) => {
     }
   }
 
+  const forwardedProtocolHeader = getRequestHeader(event, "x-forwarded-proto");
   const forwardedProtocol = String(
-    getRequestHeader(event, "x-forwarded-proto") ||
-      requestUrl.protocol.replace(":", ""),
+    forwardedProtocolHeader || requestUrl.protocol.replace(":", ""),
   ).split(",")[0].trim();
   const currentOrigin = `${forwardedProtocol}://${forwardedHost}`;
   const normalizedPath = requestUrl.pathname === "/"
     ? "/"
     : requestUrl.pathname.replace(/\/+$/u, "");
+  // TLS commonly terminates at nginx/CDN, so Nitro can see an internal HTTP
+  // request even when the public request is already HTTPS. Comparing schemes
+  // in that setup creates a redirect back to the exact same public URL.
+  const preferredHost = preferredOrigin
+    ? new URL(preferredOrigin).host.toLowerCase()
+    : null;
+  const preferredProtocol = preferredOrigin
+    ? new URL(preferredOrigin).protocol.replace(":", "")
+    : null;
+  const protocolNeedsRedirect = Boolean(
+    preferredProtocol &&
+      forwardedProtocolHeader &&
+      forwardedProtocol !== preferredProtocol,
+  );
   const originNeedsRedirect = Boolean(
-    preferredOrigin && currentOrigin !== preferredOrigin,
+    (preferredHost && forwardedHost.toLowerCase() !== preferredHost) ||
+      protocolNeedsRedirect,
   );
   const pathNeedsRedirect = normalizedPath !== requestUrl.pathname;
 

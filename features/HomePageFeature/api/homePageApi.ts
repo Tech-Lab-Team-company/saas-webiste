@@ -143,7 +143,55 @@ export class HomePageApi {
   }
 
   private async fetchHomeBookSection(): Promise<unknown> {
-    return this.post(ApiNames.Instance.fetch_home_book_section, { for_home: 1 });
+    const [sectionsResult, booksResult] = await Promise.allSettled([
+      this.post(ApiNames.Instance.fetch_home_book_section, { for_home: 1 }),
+      this.fetchBooks(),
+    ]);
+
+    if (sectionsResult.status === "rejected") {
+      throw sectionsResult.reason;
+    }
+
+    if (booksResult.status === "rejected") {
+      return sectionsResult.value;
+    }
+
+    const sections = Array.isArray(sectionsResult.value)
+      ? sectionsResult.value
+      : [];
+    const booksRoot = isRecord(booksResult.value) ? booksResult.value : {};
+    const books = Array.isArray(booksRoot.data)
+      ? booksRoot.data
+      : Array.isArray(booksResult.value)
+        ? booksResult.value
+        : [];
+    const imageByBookId = new Map<number, string>();
+
+    for (const item of books) {
+      if (!isRecord(item)) continue;
+
+      const id = Number(item.book_id ?? item.id);
+      const image = typeof item.image === "string" ? item.image.trim() : "";
+      if (Number.isFinite(id) && image) imageByBookId.set(id, image);
+    }
+
+    return sections.map((item) => {
+      if (!isRecord(item)) return item;
+
+      const nestedBook = isRecord(item.book) ? item.book : {};
+      const bookId = Number(nestedBook.id ?? item.book_id);
+      const bookImage = imageByBookId.get(bookId);
+      if (!bookImage) return item;
+
+      return {
+        ...item,
+        image: bookImage,
+        book: {
+          ...nestedBook,
+          image: bookImage,
+        },
+      };
+    });
   }
 
   async fetchBookDetails(bookId: number): Promise<unknown> {

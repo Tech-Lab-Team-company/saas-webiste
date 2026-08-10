@@ -39,6 +39,56 @@ const isHomeV2 = computed(() =>
 );
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
+const SITE_IMAGE_KEYS = ["image", "cover"] as const;
+
+const imageRespondsSuccessfully = async (url: string): Promise<boolean> => {
+  if (!/^https?:\/\//iu.test(url)) return true;
+
+  try {
+    const response = await fetch(url, {
+      method: "HEAD",
+      signal: AbortSignal.timeout(2500),
+    });
+
+    return response.ok &&
+      /^image\//iu.test(response.headers.get("content-type") || "");
+  } catch {
+    return false;
+  }
+};
+
+const removeUnavailableSiteImages = async (
+  settings: WebStatus,
+): Promise<WebStatus> => {
+  const checkedImages = await Promise.all(
+    SITE_IMAGE_KEYS.map(async (key) => {
+      const image = settings[key] as unknown as {
+        img?: string;
+        alt?: string;
+      } | null;
+      const source = String(image?.img || "").trim();
+
+      return {
+        key,
+        available: !source || await imageRespondsSuccessfully(source),
+      };
+    }),
+  );
+  const unavailableKeys = checkedImages
+    .filter(({ available }) => !available)
+    .map(({ key }) => key);
+
+  if (unavailableKeys.length === 0) return settings;
+
+  return unavailableKeys.reduce<WebStatus>(
+    (sanitizedSettings, key) => ({
+      ...sanitizedSettings,
+      [key]: { img: "", alt: "" },
+    }),
+    settings,
+  );
+};
+
 const {
   data: webStatus,
   pending,
@@ -54,7 +104,9 @@ const {
         "web-domain": getWebDomain() || requestUrl.hostname,
       },
     });
-    return response.data ?? null;
+    return response.data
+      ? await removeUnavailableSiteImages(response.data)
+      : null;
   } catch (requestError) {
     // Site settings enhance branding, but a temporary API failure must never
     // replace an indexable page with the global noindex error document.
