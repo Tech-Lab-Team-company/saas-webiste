@@ -4,6 +4,11 @@ import Aura from '@primeuix/themes/aura';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
+  features: {
+    // The public SSR pages have only a few small critical stylesheets. Inlining
+    // them removes the document -> CSS request chain that otherwise delays FCP.
+    inlineStyles: true,
+  },
   experimental: {
     defaults: {
       nuxtLink: {
@@ -20,7 +25,14 @@ export default defineNuxtConfig({
     'build:manifest': (manifest) => {
       // Lazy sections and non-critical layouts stay discoverable by the runtime,
       // but do not compete with the hero through browser-level prefetch hints.
-      for (const chunk of Object.values(manifest)) chunk.prefetch = false
+      for (const chunk of Object.values(manifest)) {
+        chunk.prefetch = false
+
+        // Nuxt 3.16 emits stylesheet links even when the same SSR styles have
+        // already been inlined. Keep the CSS assets for client navigation, but
+        // omit those duplicate links from the server dependency manifest.
+        if (chunk.css?.length) chunk.css = []
+      }
     },
   },
   // Public pages are rendered as HTML for fast first paint and reliable indexing.

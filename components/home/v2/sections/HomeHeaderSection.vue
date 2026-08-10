@@ -52,50 +52,34 @@ const navItems = computed(() => [
   },
 ]);
 
-const scrollProgress = ref(0);
 const isScrolled = ref(false);
-let progressFrame: number | null = null;
-let pageResizeObserver: ResizeObserver | null = null;
+let headerFrame: number | null = null;
 
-const updateScrollProgress = () => {
-  const scrollableHeight =
-    document.documentElement.scrollHeight - window.innerHeight;
-  const nextProgress =
-    scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
-
-  scrollProgress.value = Math.min(100, Math.max(0, nextProgress));
+const updateHeaderState = () => {
   isScrolled.value = window.scrollY > 18;
 };
 
-const queueScrollProgressUpdate = () => {
-  if (progressFrame !== null) return;
+const queueHeaderStateUpdate = () => {
+  if (headerFrame !== null) return;
 
-  progressFrame = window.requestAnimationFrame(() => {
-    updateScrollProgress();
-    progressFrame = null;
+  headerFrame = window.requestAnimationFrame(() => {
+    updateHeaderState();
+    headerFrame = null;
   });
 };
 
 onMounted(() => {
-  updateScrollProgress();
-  window.addEventListener("scroll", queueScrollProgressUpdate, {
+  queueHeaderStateUpdate();
+  window.addEventListener("scroll", queueHeaderStateUpdate, {
     passive: true,
   });
-  window.addEventListener("resize", queueScrollProgressUpdate, {
-    passive: true,
-  });
-
-  pageResizeObserver = new ResizeObserver(queueScrollProgressUpdate);
-  pageResizeObserver.observe(document.body);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("scroll", queueScrollProgressUpdate);
-  window.removeEventListener("resize", queueScrollProgressUpdate);
-  pageResizeObserver?.disconnect();
+  window.removeEventListener("scroll", queueHeaderStateUpdate);
 
-  if (progressFrame !== null) {
-    window.cancelAnimationFrame(progressFrame);
+  if (headerFrame !== null) {
+    window.cancelAnimationFrame(headerFrame);
   }
 });
 </script>
@@ -202,16 +186,9 @@ onBeforeUnmount(() => {
     </nav>
     <span
       class="home-v2-header__progress-track"
-      role="progressbar"
-      aria-label="Home page reading progress"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      :aria-valuenow="Math.round(scrollProgress)"
+      aria-hidden="true"
     >
-      <span
-        class="home-v2-header__progress-value"
-        :style="{ transform: `scaleX(${scrollProgress / 100})` }"
-      />
+      <span class="home-v2-header__progress-value" />
     </span>
   </header>
 </template>
@@ -371,25 +348,44 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-header__progress-track {
-  position: absolute;
-  right: 0;
-  bottom: -1px;
-  left: 0;
-  height: 6px;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--home-v2-blue) 12%, transparent);
-  pointer-events: none;
+  display: none;
 }
 
-.home-v2-header__progress-value {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 999px 0 0 999px;
-  background: var(--home-v2-blue);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
-  transform-origin: right center;
-  will-change: transform;
+@supports (animation-timeline: scroll()) {
+  .home-v2-header__progress-track {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--home-v2-blue) 12%, transparent);
+    pointer-events: none;
+  }
+
+  .home-v2-header__progress-value {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px 0 0 999px;
+    animation: home-v2-header-reading-progress auto linear;
+    animation-timeline: scroll(root block);
+    background: var(--home-v2-blue);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
+    transform-origin: right center;
+    will-change: transform;
+  }
+}
+
+@keyframes home-v2-header-reading-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .home-v2-header__brand > span:last-child {
