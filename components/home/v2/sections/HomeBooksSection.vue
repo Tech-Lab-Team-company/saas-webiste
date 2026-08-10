@@ -671,9 +671,11 @@ onBeforeUnmount(() => {
 .home-v2-books__primary,
 .home-v2-books__secondary {
   display: inline-flex;
-  min-height: 52px;
+  min-width: 48px;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
+  line-height: 1.5;
   font-weight: 800;
   transition: background-color 0.2s ease, color 0.2s ease,
     border-color 0.2s ease;
@@ -691,8 +693,7 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-books__secondary {
-  min-width: auto;
-  padding: 0;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--home-v2-blue);
   color: var(--home-v2-blue);
 }

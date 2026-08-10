@@ -259,11 +259,14 @@ onBeforeUnmount(() => {
 
 .home-v2-app__actions a {
   display: inline-flex;
-  min-height: 38px;
+  min-width: 48px;
+  min-height: 48px;
   align-items: center;
-  padding: 0 2px 6px;
+  justify-content: center;
+  padding: 12px 16px;
   border-bottom: 1px solid #ffffff8c;
   color: #fff;
+  line-height: 1.5;
   font-weight: 800;
   transition: color 0.2s ease, border-color 0.2s ease,
     transform 0.2s ease;

@@ -262,7 +262,7 @@ onMounted(() => {
             loading="eager"
             fetchpriority="high"
             decoding="async"
-            preload
+            :preload="{ fetchPriority: 'high' }"
             @error="handleHeroImageError(heroImage?.src)"
           />
         </picture>
