@@ -32,7 +32,9 @@ const handleLogout = async () => {
 };
 
 const headerDescription = computed(() => {
-  const description = (props.site.description || "").replace(/\s+/g, " ").trim();
+  const description = (props.site.description || "")
+    .replace(/\s+/g, " ")
+    .trim();
   const limit = 64;
 
   return description.length > limit
@@ -95,11 +97,21 @@ onBeforeUnmount(() => {
         class="home-v2-header__brand"
         :aria-label="`العودة إلى صفحة ${site.brandName || 'المنصة'}`"
       >
-        <span :class="['home-v2-header__logo', { 'home-v2-header__logo--empty': !site.logo }]">
+        <span
+          :class="[
+            'home-v2-header__logo',
+            { 'home-v2-header__logo--empty': !site.logo },
+          ]"
+        >
           <NuxtImg
             v-if="site.logo"
             :src="site.logo.src"
-            :alt="getDescriptiveImageAlt(site.logo?.alt, `شعار ${site.brandName || 'المنصة التعليمية'}`)"
+            :alt="
+              getDescriptiveImageAlt(
+                site.logo?.alt,
+                `شعار ${site.brandName || 'المنصة التعليمية'}`,
+              )
+            "
             width="163"
             height="52"
             format="webp"
@@ -112,9 +124,11 @@ onBeforeUnmount(() => {
           <b :class="{ 'home-v2-header__brand-empty': !site.brandName }">
             {{ site.brandName || "أضف اسم المنصة" }}
           </b>
-          <small v-if="headerDescription" :title="site.description || undefined">{{
-            headerDescription
-          }}</small>
+          <small
+            v-if="headerDescription"
+            :title="site.description || undefined"
+            >{{ headerDescription }}</small
+          >
         </span>
       </NuxtLink>
 
@@ -134,7 +148,10 @@ onBeforeUnmount(() => {
       </nav>
 
       <div v-if="!userStore.user" class="home-v2-header__actions">
-        <NuxtLink to="/login" prefetch-on="interaction" class="home-v2-header__login"
+        <NuxtLink
+          to="/login"
+          prefetch-on="interaction"
+          class="home-v2-header__login"
           >دخول الطالب</NuxtLink
         >
         <NuxtLink to="/Auth/register" prefetch-on="interaction" class="button"
@@ -154,7 +171,11 @@ onBeforeUnmount(() => {
         >
           <img
             :src="userImage"
-            :alt="userStore.user.name ? `صورة الطالب ${userStore.user.name}` : 'صورة الملف الشخصي للطالب'"
+            :alt="
+              userStore.user.name
+                ? `صورة الطالب ${userStore.user.name}`
+                : 'صورة الملف الشخصي للطالب'
+            "
             @error="handleUserImageError"
           />
           <span>
@@ -184,10 +205,7 @@ onBeforeUnmount(() => {
         {{ item.label }}
       </NuxtLink>
     </nav>
-    <span
-      class="home-v2-header__progress-track"
-      aria-hidden="true"
-    >
+    <span class="home-v2-header__progress-track" aria-hidden="true">
       <span class="home-v2-header__progress-value" />
     </span>
   </header>
@@ -372,7 +390,8 @@ onBeforeUnmount(() => {
     animation: home-v2-header-reading-progress auto linear;
     animation-timeline: scroll(root block);
     background: var(--home-v2-blue);
-    box-shadow: 0 0 12px color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
+    box-shadow: 0 0 12px
+      color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
     transform-origin: right center;
     will-change: transform;
   }
