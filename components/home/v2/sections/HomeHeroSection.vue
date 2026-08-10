@@ -4,7 +4,10 @@ import type {
   HomeSiteViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
-import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
+
+const HomeSectionEmptyState = defineAsyncComponent(() =>
+  import("~/components/home/v2/ui/HomeSectionEmptyState.vue"),
+);
 
 const props = defineProps<{
   hero: HomeSectionState<HomeHeroViewModel | null>;
@@ -54,7 +57,9 @@ const heroUsesSettingsLogo = computed(() =>
 );
 
 const handleHeroImageError = (event: Event) => {
-  const image = event.currentTarget as HTMLImageElement;
+  const image = event.target;
+  if (!(image instanceof HTMLImageElement)) return;
+
   const failedSource = image.currentSrc || image.src;
 
   if (failedSource && !failedImageSources.value.includes(failedSource)) {

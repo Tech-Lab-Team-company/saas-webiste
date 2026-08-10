@@ -1,8 +1,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
-  nuxtApp.hook("vue:error", (err) => {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'page not found',
-    });
+  if (!import.meta.dev) return;
+
+  nuxtApp.hook("vue:error", (error, _instance, info) => {
+    console.error("[vue:error]", error, info);
   });
 });

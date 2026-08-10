@@ -50,7 +50,19 @@ const resetCard = (event: PointerEvent) => {
     @pointerleave="resetCard"
   >
     <div class="course-cover" :class="{ 'has-image': course.image && !imageFailed }">
-      <img v-if="course.image && !imageFailed" :src="course.image.src" :alt="course.image.alt || course.title" width="680" height="452" loading="lazy" @error="imageFailed = true" />
+      <NuxtImg
+        v-if="course.image && !imageFailed"
+        :src="course.image.src"
+        :alt="course.image.alt || course.title"
+        width="680"
+        height="452"
+        sizes="sm:100vw md:50vw lg:380px"
+        format="webp"
+        quality="76"
+        loading="lazy"
+        decoding="async"
+        @error="imageFailed = true"
+      />
       <template v-else>
         <span class="course-code">PHYSICS COURSE</span>
         <span class="course-index">{{ String(index + 1).padStart(2, "0") }}</span>

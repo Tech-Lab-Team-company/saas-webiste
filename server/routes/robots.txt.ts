@@ -1,6 +1,22 @@
 export default defineEventHandler((event) => {
   const requestUrl = getRequestURL(event);
-  const sitemapUrl = new URL("/sitemap.xml", requestUrl.origin).toString();
+  const runtimeConfig = useRuntimeConfig(event);
+  const configuredSiteUrl = String(runtimeConfig.public.siteUrl || "").trim();
+  let siteOrigin = requestUrl.origin;
+
+  if (configuredSiteUrl) {
+    try {
+      siteOrigin = new URL(
+        configuredSiteUrl.includes("://")
+          ? configuredSiteUrl
+          : `https://${configuredSiteUrl}`,
+      ).origin;
+    } catch {
+      siteOrigin = requestUrl.origin;
+    }
+  }
+
+  const sitemapUrl = new URL("/sitemap.xml", siteOrigin).toString();
 
   setResponseHeaders(event, {
     "Content-Type": "text/plain; charset=utf-8",
