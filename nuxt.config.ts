@@ -34,14 +34,26 @@ export default defineNuxtConfig({
         lang: 'ar',
         dir: 'rtl',
       },
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      ],
     },
   },
   runtimeConfig: {
     public: {
       webLink: process.env.WEB_LINK || '',
+      siteUrl: process.env.SITE_URL || '',
+      googleAnalyticsId: process.env.NUXT_PUBLIC_GOOGLE_ANALYTICS_ID || '',
     },
   },
   routeRules: {
+    '/**': {
+      headers: {
+        'Strict-Transport-Security': 'max-age=31536000',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    },
     '/': { swr: 300 },
     '/about-teacher': { swr: 3600 },
     '/books': { swr: 300 },

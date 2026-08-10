@@ -140,7 +140,7 @@ watch(webStatus, (value) => {
 });
 
 const siteOrigin = computed(() => {
-  const configuredUrl = String(runtimeConfig.public.webLink || "").trim();
+  const configuredUrl = String(runtimeConfig.public.siteUrl || "").trim();
 
   if (configuredUrl) {
     try {
@@ -153,6 +153,11 @@ const siteOrigin = computed(() => {
   }
 
   return requestUrl.origin;
+});
+
+const googleAnalyticsId = computed(() => {
+  const value = String(runtimeConfig.public.googleAnalyticsId || "").trim();
+  return /^G-[A-Z0-9]+$/u.test(value) ? value : "";
 });
 
 const canonicalUrl = computed(() => {
@@ -248,9 +253,6 @@ useHead(() => ({
     { rel: "canonical", href: canonicalUrl.value },
     { rel: "preconnect", href: "https://dev.saas.techlabeg.com", crossorigin: "anonymous" },
     { rel: "dns-prefetch", href: "https://dev.saas.techlabeg.com" },
-    ...(webStatus.value?.image?.img
-      ? [{ rel: "icon", href: webStatus.value.image.img }]
-      : []),
   ],
   script: [
     {
@@ -258,6 +260,26 @@ useHead(() => ({
       type: "application/ld+json",
       innerHTML: JSON.stringify(siteSchema.value).replace(/</gu, "\\u003c"),
     },
+    ...(googleAnalyticsId.value
+      ? [
+          {
+            key: "google-analytics-loader",
+            src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId.value}`,
+            async: true,
+            tagPosition: "bodyClose" as const,
+          },
+          {
+            key: "google-analytics-config",
+            innerHTML: [
+              "window.dataLayer=window.dataLayer||[];",
+              "function gtag(){dataLayer.push(arguments);}",
+              "gtag('js',new Date());",
+              `gtag('config','${googleAnalyticsId.value}',{anonymize_ip:true});`,
+            ].join(""),
+            tagPosition: "bodyClose" as const,
+          },
+        ]
+      : []),
   ],
 }));
 

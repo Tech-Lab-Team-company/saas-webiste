@@ -113,6 +113,16 @@ useSeoMeta({
           </button>
         </div>
 
+        <nav
+          v-if="statusCode === 404"
+          class="error-card__helpful-links"
+          aria-label="روابط مقترحة"
+        >
+          <NuxtLink to="/course">تصفّح الكورسات</NuxtLink>
+          <NuxtLink to="/books">مكتبة الكتب</NuxtLink>
+          <NuxtLink to="/blogs">المقالات التعليمية</NuxtLink>
+        </nav>
+
         <p class="error-card__note">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
@@ -448,6 +458,35 @@ useSeoMeta({
 }
 
 .error-card__button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--error-secondary) 30%, transparent);
+  outline-offset: 3px;
+}
+
+.error-card__helpful-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 20px;
+}
+
+.error-card__helpful-links a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--error-primary);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--error-secondary) 45%, transparent);
+  text-underline-offset: 5px;
+}
+
+.error-card__helpful-links a:hover {
+  color: var(--error-secondary);
+}
+
+.error-card__helpful-links a:focus-visible {
+  border-radius: 5px;
   outline: 3px solid color-mix(in srgb, var(--error-secondary) 30%, transparent);
   outline-offset: 3px;
 }

@@ -39,7 +39,7 @@ const normalizeLastModified = (value: string | null): string | undefined => {
 export default defineEventHandler(async (event) => {
   const requestUrl = getRequestURL(event);
   const runtimeConfig = useRuntimeConfig(event);
-  const configuredUrl = String(runtimeConfig.public.webLink || "").trim();
+  const configuredUrl = String(runtimeConfig.public.siteUrl || "").trim();
   let siteOrigin = requestUrl.origin;
 
   if (configuredUrl) {
@@ -52,7 +52,23 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const webDomain = new URL(siteOrigin).hostname;
+  const configuredWebLink = String(runtimeConfig.public.webLink || "").trim();
+  let webDomain = requestUrl.hostname;
+
+  if (configuredWebLink) {
+    try {
+      webDomain = new URL(
+        configuredWebLink.includes("://")
+          ? configuredWebLink
+          : `https://${configuredWebLink}`,
+      ).hostname;
+    } catch {
+      webDomain = configuredWebLink
+        .replace(/^https?:\/\//iu, "")
+        .split("/")[0]
+        .trim();
+    }
+  }
   const api = new HomePageApi(webDomain);
   const [blogsResult, booksResult] = await Promise.allSettled([
     api.fetchBlogs(),

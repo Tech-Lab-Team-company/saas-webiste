@@ -307,10 +307,15 @@ onBeforeUnmount(() => {
         @pointerleave="resetBookVisual"
       >
         <div class="home-v2-books__cover">
-          <img
+          <NuxtImg
             v-if="featuredBook.image"
             :src="featuredBook.image"
             :alt="featuredBook.title"
+            width="720"
+            height="960"
+            sizes="sm:100vw md:42vw lg:480px"
+            format="webp"
+            quality="78"
             loading="lazy"
             decoding="async"
           />
