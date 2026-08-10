@@ -237,6 +237,9 @@ export interface HomeCtaViewModel {
 export interface HomeSiteViewModel {
   brandName: string | null
   description: string | null
+  metaTitle: string | null
+  metaDescription: string | null
+  metaKeywords: string | null
   logo: HomeImageViewModel | null
   cover: HomeImageViewModel | null
   phone: string | null

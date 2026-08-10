@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import "~/assets/css/home-v2.css";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 definePageMeta({ layout: "home-v2" });
 
@@ -17,9 +17,10 @@ const iosUrl = computed(() => cleanLink(site.value.app.iosUrl));
 const appImageFailed = ref(false);
 const appImageSrc = computed(() => site.value.app.image?.src || "");
 const appImageAlt = computed(
-  () =>
-    site.value.app.image?.alt ||
-    `واجهة تطبيق ${site.value.brandName || "المنصة"}`,
+  () => getDescriptiveImageAlt(
+    site.value.app.image?.alt,
+    `واجهة تطبيق ${site.value.brandName || "المنصة"} تعرض الكورسات والمحتوى التعليمي`,
+  ),
 );
 
 watch(appImageSrc, () => {
@@ -55,8 +56,8 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
           <span v-if="site.brandName">{{ site.brandName }} على الموبايل</span>
           <h1>التطبيق على Android وiPhone</h1>
           <p>
-            حمّل تطبيق {{ site.brandName || "المنصة" }} على موبايلك، أو تابع
-            تجربة المنصة مباشرة من الويب.
+            التطبيق على Android وiPhone يتيح لك متابعة
+            {{ site.brandName || "المنصة" }} من موبايلك أو مباشرة من الويب.
           </p>
         </header>
 

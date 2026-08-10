@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { gsap } from 'gsap'
 import type { HomeSiteViewModel } from '~/features/HomePageFeature/models/HomePageViewModel'
+import { getDescriptiveImageAlt } from '~/utils/imageAlt'
 
 const props = defineProps<{
   site: HomeSiteViewModel
@@ -168,7 +169,7 @@ onBeforeUnmount(() => {
             <NuxtImg
               v-if="site.logo"
               :src="site.logo.src"
-              :alt="site.logo?.alt || site.brandName || ''"
+              :alt="getDescriptiveImageAlt(site.logo?.alt, `شعار ${site.brandName || 'المنصة التعليمية'}`)"
               width="46"
               height="46"
               format="webp"

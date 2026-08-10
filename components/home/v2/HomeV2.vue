@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import "~/assets/css/home-v2.css";
 import type {
   HomeCourseViewModel,
   HomePageViewModel,

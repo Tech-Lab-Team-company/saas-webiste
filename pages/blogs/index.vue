@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { gsap } from "gsap";
-import "~/assets/css/home-v2.css";
 import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
@@ -11,6 +10,7 @@ import {
 import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { HeroSectionTypeEnum } from "~/features/HomePageFeature/types/homePage.types";
 import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 definePageMeta({ layout: "home-v2" });
 
@@ -50,7 +50,10 @@ const heroMobileImage = computed(
   () => blogHero.value?.mobileImage?.src || null,
 );
 const heroImageAlt = computed(
-  () => blogHero.value?.image?.alt || blogHero.value?.mobileImage?.alt || "",
+  () => getDescriptiveImageAlt(
+    blogHero.value?.image?.alt || blogHero.value?.mobileImage?.alt,
+    `صورة واجهة مدونة ${site.value.brandName || "المنصة"}: ${heroTitle.value || "مقالات تعليمية"}`,
+  ),
 );
 const hasHeroContent = computed(() =>
   Boolean(

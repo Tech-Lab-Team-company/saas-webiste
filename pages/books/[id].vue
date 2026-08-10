@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import "~/assets/css/home-v2.css";
 import BuyBookDialog from "~/components/Books/BuyBookDialog.vue";
 import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 import { getWebDomain } from "~/constant/webDomain";
@@ -13,6 +12,7 @@ import {
   BookTypeEnum,
   type HomeBookDetailsResourceViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { buildSeoTitle } from "~/utils/seoText";
 
 interface BookMediaItem {
   key: string;
@@ -299,8 +299,8 @@ const bookSchema = computed(() => {
 
 useSeoMeta({
   title: () => book.value
-    ? `${book.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
-    : `تفاصيل الكتاب${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
+    ? buildSeoTitle(book.value.title, site.value.brandName)
+    : buildSeoTitle("تفاصيل الكتاب", site.value.brandName),
   description: () => book.value?.description
     || websiteSectionBook.value?.description
     || "تفاصيل الكتاب ومحتواه وسعره.",

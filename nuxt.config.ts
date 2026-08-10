@@ -34,9 +34,6 @@ export default defineNuxtConfig({
         lang: 'ar',
         dir: 'rtl',
       },
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      ],
     },
   },
   runtimeConfig: {
@@ -204,6 +201,7 @@ export default defineNuxtConfig({
   },
   css: [
     "@/assets/css/app-theme.css",
+    "@/assets/css/home-v2.css",
   ],
   image: {
     domains: [

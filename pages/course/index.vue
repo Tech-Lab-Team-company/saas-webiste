@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import "~/assets/css/home-v2.css";
 import HomeCoursesSection from "~/components/home/v2/sections/HomeCoursesSection.vue";
 import { useHomePage } from "~/features/HomePageFeature/composables/useHomePage";
 
@@ -8,12 +7,12 @@ const { home, pending, loadCoursesByYear } = await useHomePage();
 definePageMeta({ layout: "home-v2" });
 
 const seoTitle = computed(() =>
-  home.value.site.brandName
-    ? `الكورسات | ${home.value.site.brandName}`
-    : "الكورسات التعليمية",
+  `اختار مرحلتك وابدأ كورسك${
+    home.value.site.brandName ? ` | ${home.value.site.brandName}` : ""
+  }`,
 );
 const seoDescription = computed(() =>
-  `اختر مرحلتك وسنتك الدراسية واكتشف الكورسات المناسبة لك على ${home.value.site.brandName || "المنصة"}.`,
+  `اختار مرحلتك وابدأ كورسك. حدّد السنة الدراسية واكتشف الكورسات المناسبة لك على ${home.value.site.brandName || "المنصة"}.`,
 );
 
 useSeoMeta({
@@ -57,8 +56,8 @@ useHead({
             <h1>اختار مرحلتك.<br /><em>وابدأ كورسك.</em></h1>
           </div>
           <p>
-            اختار المرحلة والسنة الدراسية، واكتشف الكورسات المناسبة لمسارك من
-            المحتوى المتاح على {{ home.site.brandName || "المنصة" }}.
+            اختار مرحلتك وابدأ كورسك. حدّد السنة الدراسية، واكتشف الكورسات
+            المناسبة لمسارك على {{ home.site.brandName || "المنصة" }}.
           </p>
         </div>
       </header>

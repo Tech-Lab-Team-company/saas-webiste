@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const props = defineProps<{
   site: HomeSiteViewModel;
@@ -114,7 +115,7 @@ onBeforeUnmount(() => {
           <NuxtImg
             v-if="site.logo"
             :src="site.logo.src"
-            :alt="site.logo?.alt || site.brandName || ''"
+            :alt="getDescriptiveImageAlt(site.logo?.alt, `شعار ${site.brandName || 'المنصة التعليمية'}`)"
             width="163"
             height="52"
             format="webp"
@@ -169,7 +170,7 @@ onBeforeUnmount(() => {
         >
           <img
             :src="userImage"
-            :alt="userStore.user.name"
+            :alt="userStore.user.name ? `صورة الطالب ${userStore.user.name}` : 'صورة الملف الشخصي للطالب'"
             @error="handleUserImageError"
           />
           <span>

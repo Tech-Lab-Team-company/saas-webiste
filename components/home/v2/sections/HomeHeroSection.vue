@@ -4,6 +4,7 @@ import type {
   HomeSiteViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const HomeSectionEmptyState = defineAsyncComponent(() =>
   import("~/components/home/v2/ui/HomeSectionEmptyState.vue"),
@@ -56,12 +57,7 @@ const heroUsesSettingsLogo = computed(() =>
   ),
 );
 
-const handleHeroImageError = (event: Event) => {
-  const image = event.target;
-  if (!(image instanceof HTMLImageElement)) return;
-
-  const failedSource = image.currentSrc || image.src;
-
+const handleHeroImageError = (failedSource: string | undefined) => {
   if (failedSource && !failedImageSources.value.includes(failedSource)) {
     failedImageSources.value = [...failedImageSources.value, failedSource];
   }
@@ -135,6 +131,35 @@ const heroContent = computed(() => ({
   ),
   link: heroData.value?.link || "",
 }));
+
+const heroHeading = computed(() =>
+  [heroContent.value.title, heroContent.value.subtitle]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+([.!،؛؟])/gu, "$1"),
+);
+
+const heroLead = computed(() => {
+  const heading = heroHeading.value;
+  const body = heroContent.value.text;
+
+  if (!heading) return body;
+  if (!body) return heading;
+  if (normalizeText(body).includes(normalizeText(heading))) return body;
+
+  return `${heading} — ${body}`;
+});
+
+const heroImageAlt = computed(() => {
+  const brandName = normalizeText(props.site.brandName || "");
+  const fallback = heroUsesSettingsLogo.value
+    ? `شعار ${brandName || "المنصة التعليمية"}`
+    : heroHeading.value
+      ? `صورة توضيحية: ${heroHeading.value}`
+      : `صورة الواجهة الرئيسية لـ${brandName || "المنصة التعليمية"}`;
+
+  return getDescriptiveImageAlt(heroImage.value?.alt, fallback);
+});
 
 const heroKicker = computed(() =>
   heroTitleUsesSiteFallback.value
@@ -231,7 +256,7 @@ onMounted(() => {
             />
           </em>
         </h1>
-        <p v-if="heroContent.text">{{ heroContent.text }}</p>
+        <p v-if="heroLead">{{ heroLead }}</p>
         <div v-if="heroContent.link" class="home-v2-hero__actions">
           <a class="button" :href="heroContent.link"
             >استكشف الكورسات <span aria-hidden="true">←</span></a
@@ -247,7 +272,7 @@ onMounted(() => {
 
       <figure
         class="home-v2-hero__visual"
-        :aria-label="heroImage?.alt || 'صورة المنصة'"
+        :aria-label="heroImageAlt"
       >
         <picture v-if="heroImage">
           <source
@@ -261,7 +286,7 @@ onMounted(() => {
               { 'home-v2-hero__image--logo': heroUsesSettingsLogo },
             ]"
             :src="heroImage.src"
-            :alt="heroImage.alt"
+            :alt="heroImageAlt"
             width="1086"
             height="1448"
             sizes="321px sm:562px"
@@ -285,7 +310,7 @@ onMounted(() => {
         <span v-if="settingsLogo" class="home-v2-hero__brand-logo">
           <NuxtImg
             :src="settingsLogo.src"
-            :alt="settingsLogo.alt || site.brandName || 'شعار المنصة'"
+            :alt="getDescriptiveImageAlt(settingsLogo.alt, `شعار ${site.brandName || 'المنصة التعليمية'}`)"
             width="160"
             height="160"
             format="webp"

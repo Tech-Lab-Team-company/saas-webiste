@@ -39,7 +39,21 @@ const isHomeV2 = computed(() =>
 );
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
-const SITE_IMAGE_KEYS = ["image", "cover"] as const;
+const SITE_IMAGE_KEYS = ["favicon", "image", "cover", "app_image"] as const;
+
+const getSiteImageSource = (image: unknown): string => {
+  if (typeof image === "string") return image.trim();
+  if (!image || typeof image !== "object") return "";
+
+  const imageRecord = image as Record<string, unknown>;
+  return String(
+    imageRecord.img ||
+    imageRecord.image ||
+    imageRecord.src ||
+    imageRecord.url ||
+    "",
+  ).trim();
+};
 
 const imageRespondsSuccessfully = async (url: string): Promise<boolean> => {
   if (!/^https?:\/\//iu.test(url)) return true;
@@ -62,11 +76,7 @@ const removeUnavailableSiteImages = async (
 ): Promise<WebStatus> => {
   const checkedImages = await Promise.all(
     SITE_IMAGE_KEYS.map(async (key) => {
-      const image = settings[key] as unknown as {
-        img?: string;
-        alt?: string;
-      } | null;
-      const source = String(image?.img || "").trim();
+      const source = getSiteImageSource(settings[key]);
 
       return {
         key,
@@ -207,6 +217,26 @@ const siteOrigin = computed(() => {
   return requestUrl.origin;
 });
 
+const faviconHref = computed(() => {
+  const source = [
+    webStatus.value?.favicon,
+    webStatus.value?.image,
+    webStatus.value?.cover,
+    webStatus.value?.app_image,
+  ].map(getSiteImageSource).find(Boolean);
+
+  if (!source) return "/favicon.ico";
+
+  try {
+    const resolvedUrl = new URL(source, siteOrigin.value);
+    return ["http:", "https:"].includes(resolvedUrl.protocol)
+      ? resolvedUrl.toString()
+      : "/favicon.ico";
+  } catch {
+    return "/favicon.ico";
+  }
+});
+
 const googleAnalyticsId = computed(() => {
   const value = String(runtimeConfig.public.googleAnalyticsId || "").trim();
   return /^G-[A-Z0-9]+$/u.test(value) ? value : "";
@@ -234,12 +264,23 @@ const isPrivateRoute = computed(() => {
   return privateRoutePrefixes.some((prefix) => path.startsWith(prefix));
 });
 
-const siteTitle = computed(() =>
-  webStatus.value?.meta_title || webStatus.value?.name || "منصة تعليمية",
-);
+const normalizeSeoValue = (value: string | null | undefined) =>
+  String(value || "").replace(/\s+/gu, " ").trim();
+
+const siteTitle = computed(() => {
+  const dashboardTitle = normalizeSeoValue(webStatus.value?.meta_title);
+  if (dashboardTitle) return dashboardTitle;
+
+  const fallbackTitle = [
+    normalizeSeoValue(webStatus.value?.name),
+    normalizeSeoValue(webStatus.value?.description),
+  ].filter(Boolean).join(" | ");
+
+  return fallbackTitle || "منصة تعليمية";
+});
 const siteDescription = computed(() =>
-  webStatus.value?.meta_description ||
-  webStatus.value?.description ||
+  normalizeSeoValue(webStatus.value?.meta_description) ||
+  normalizeSeoValue(webStatus.value?.description) ||
   "منصة تعليمية للكورسات والكتب والمحتوى الدراسي.",
 );
 const siteImage = computed(() =>
@@ -302,6 +343,7 @@ useHead(() => ({
     style: themeInlineStyle.value,
   },
   link: [
+    { key: "site-favicon", rel: "icon", href: faviconHref.value },
     { rel: "canonical", href: canonicalUrl.value },
     { rel: "preconnect", href: "https://dev.saas.techlabeg.com", crossorigin: "anonymous" },
     { rel: "dns-prefetch", href: "https://dev.saas.techlabeg.com" },
@@ -338,7 +380,7 @@ useHead(() => ({
 useSeoMeta({
   title: () => siteTitle.value,
   description: () => siteDescription.value,
-  keywords: () => webStatus.value?.meta_keywords || undefined,
+  keywords: () => normalizeSeoValue(webStatus.value?.meta_keywords) || undefined,
   robots: () => isPrivateRoute.value
     ? "noindex, nofollow, noarchive"
     : "index, follow, max-image-preview:large",

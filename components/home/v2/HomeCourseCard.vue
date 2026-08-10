@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomeCourseViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const props = withDefaults(defineProps<{
   course: HomeCourseViewModel;
@@ -53,7 +54,7 @@ const resetCard = (event: PointerEvent) => {
       <NuxtImg
         v-if="course.image && !imageFailed"
         :src="course.image.src"
-        :alt="course.image.alt || course.title"
+        :alt="getDescriptiveImageAlt(course.image.alt, `غلاف كورس ${course.title}`)"
         width="680"
         height="452"
         sizes="sm:100vw md:50vw lg:380px"

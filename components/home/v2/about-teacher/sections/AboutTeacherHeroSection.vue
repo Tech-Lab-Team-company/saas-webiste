@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const props = defineProps<{
   hero: HomeHeroViewModel;
@@ -15,7 +16,12 @@ const desktopImage = computed(
   () => props.hero.image?.src || props.hero.mobileImage?.src || "",
 );
 const mobileImage = computed(() => props.hero.mobileImage?.src || "");
-const imageAlt = computed(() => props.hero.image?.alt?.trim() || "");
+const imageAlt = computed(() => getDescriptiveImageAlt(
+  props.hero.image?.alt,
+  props.teacherName
+    ? `صورة ${props.teacherName}${props.teacherRole ? `، ${props.teacherRole}` : ""}`
+    : `صورة توضيحية لقسم ${title.value || "عن المدرس"}`,
+));
 const hasHeroContent = computed(() =>
   Boolean(
     eyebrow.value ||

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import "~/assets/css/home-v2.css";
 import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 import { mapBlogsPage } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeBlogViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { buildSeoTitle } from "~/utils/seoText";
 
 interface ApiBlogDetails {
   id: number;
@@ -184,7 +184,7 @@ const articleSchema = computed(() => {
 useSeoMeta({
   title: () =>
     blog.value
-      ? `${blog.value.title}${site.value.brandName ? ` | ${site.value.brandName}` : ""}`
+      ? buildSeoTitle(blog.value.title, site.value.brandName)
       : "المقال غير موجود",
   description: () => blog.value?.description || site.value.description || "",
   ogTitle: () => blog.value?.title || "",

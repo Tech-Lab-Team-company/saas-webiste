@@ -889,6 +889,9 @@ const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeS
 const createEmptySite = (): HomeSiteViewModel => ({
   brandName: null,
   description: null,
+  metaTitle: null,
+  metaDescription: null,
+  metaKeywords: null,
   logo: null,
   cover: null,
   phone: null,
@@ -919,6 +922,9 @@ export const mapHomeSite = (settings: unknown): HomeSiteViewModel => {
   return {
     brandName: toNullableString(settings.name),
     description: toNullableString(settings.description),
+    metaTitle: toNullableString(settings.meta_title),
+    metaDescription: toNullableString(settings.meta_description),
+    metaKeywords: toNullableString(settings.meta_keywords),
     logo: mapImage(mapImageApiDto(settings.image) ?? mapImageApiDto(settings.img)),
     cover: mapImage(mapImageApiDto(settings.cover)),
     phone: toNullableString(settings.phone),

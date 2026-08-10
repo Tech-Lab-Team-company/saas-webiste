@@ -10,6 +10,7 @@ import {
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeHeroViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { HeroSectionTypeEnum } from "~/features/HomePageFeature/types/homePage.types";
+import { buildSeoTitle } from "~/utils/seoText";
 import AboutTeacherContactSection from "./sections/AboutTeacherContactSection.vue";
 import AboutTeacherCtaSection from "./sections/AboutTeacherCtaSection.vue";
 import AboutTeacherExperienceSection from "./sections/AboutTeacherExperienceSection.vue";
@@ -68,11 +69,15 @@ const whatsappUrl = computed(() => {
 });
 
 const contactDescription = computed(() => site.value.address || "");
+const aboutSeoTitle = computed(() => buildSeoTitle(
+  aboutHero.value?.title || (teacherName.value ? `عن ${teacherName.value}` : "عن المدرس"),
+  teacherName.value,
+));
 
 useSeoMeta({
-  title: () => aboutHero.value?.title || (teacherName.value ? `عن ${teacherName.value}` : "عن المدرس"),
+  title: () => aboutSeoTitle.value,
   description: () => aboutHero.value?.description || teacherRole.value,
-  ogTitle: () => aboutHero.value?.title || (teacherName.value ? `عن ${teacherName.value}` : "عن المدرس"),
+  ogTitle: () => aboutSeoTitle.value,
   ogDescription: () => aboutHero.value?.description || teacherRole.value,
   ogImage: () => teacherImage.value || undefined,
 });

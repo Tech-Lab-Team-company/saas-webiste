@@ -2,7 +2,6 @@
 import { storeToRefs } from "pinia";
 import "primeicons/primeicons.css";
 import "~/assets/style/main.min.css";
-import "~/assets/css/home-v2.css";
 import HomeFooterSection from "~/components/home/v2/sections/HomeFooterSection.vue";
 import HomeHeaderSection from "~/components/home/v2/sections/HomeHeaderSection.vue";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";

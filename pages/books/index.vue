@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { gsap } from "gsap";
 import { storeToRefs } from "pinia";
-import "~/assets/css/home-v2.css";
 import { getWebDomain } from "~/constant/webDomain";
 import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
@@ -147,8 +146,8 @@ onBeforeUnmount(() => {
 });
 
 useSeoMeta({
-  title: () => `الكتب${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
-  description: "تصفح جميع الكتب والمراجع التعليمية المتاحة على المنصة.",
+  title: () => `كل كتاب له هدف واضح${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
+  description: "كل كتاب له هدف واضح. تصفح الكتب والمراجع التعليمية واختر ما يناسب احتياجك.",
 });
 
 useHead({
@@ -175,7 +174,7 @@ useHead({
           <div class="books-page__hero-copy">
             <span>مكتبة {{ site.brandName || "المنصة" }}</span>
             <h1>كل كتاب.<br />له <em>هدف واضح.</em></h1>
-            <p>كتب ومذكرات تعليمية منظمة؛ اختار الكتاب المناسب واطّلع على تفاصيله وعدد صفحاته وسعره.</p>
+            <p>كل كتاب له هدف واضح؛ اختار الكتاب المناسب واطّلع على تفاصيله وعدد صفحاته وسعره.</p>
           </div>
 
           <div ref="heroBooksRef" class="books-page__hero-books" aria-hidden="true">

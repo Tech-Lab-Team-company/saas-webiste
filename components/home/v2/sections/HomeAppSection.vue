@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { gsap } from "gsap";
 import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const props = defineProps<{
   site: HomeSiteViewModel;
@@ -16,9 +17,10 @@ const iosUrl = computed(() => cleanLink(props.site.app.iosUrl));
 const appImageFailed = ref(false);
 const appImageSrc = computed(() => props.site.app.image?.src || "");
 const appImageAlt = computed(
-  () =>
-    props.site.app.image?.alt ||
-    `واجهة تطبيق ${props.site.brandName || "المنصة"}`,
+  () => getDescriptiveImageAlt(
+    props.site.app.image?.alt,
+    `واجهة تطبيق ${props.site.brandName || "المنصة"} تعرض الكورسات والمحتوى التعليمي`,
+  ),
 );
 
 watch(appImageSrc, () => {

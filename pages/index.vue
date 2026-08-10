@@ -23,30 +23,61 @@ const heroSeoText = computed(() => [
   home.value.hero.data?.subtitle,
 ].map(normalizeSeoText).filter(Boolean))
 
-const homeTitle = computed(() => truncateSeoText([
-  normalizeSeoText(home.value.site.brandName),
-  heroSeoText.value[0],
-  'كورسات وكتب تعليمية',
-].filter(Boolean).join(' | ') || 'منصة تعليمية للكورسات والكتب', 65))
+const homeHeading = computed(() => heroSeoText.value.join(' '))
 
-const homeDescription = computed(() => truncateSeoText([
-  ...heroSeoText.value,
-  normalizeSeoText(home.value.hero.data?.description),
-  ...(!home.value.hero.data?.description
-    ? [normalizeSeoText(home.value.site.description)]
-    : []),
-].filter((value, index, values) => value && values.indexOf(value) === index).join(' — ') ||
-  'اكتشف الكورسات والكتب والمحتوى التعليمي المناسب لمسارك الدراسي.', 155))
+const homeTitle = computed(() => {
+  const configuredTitle = normalizeSeoText(home.value.site.metaTitle) ||
+    normalizeSeoText(home.value.site.brandName)
+  const configuredDescription = normalizeSeoText(home.value.site.description) ||
+    normalizeSeoText(home.value.site.metaDescription)
+  const configuredTabTitle = [configuredTitle, configuredDescription]
+    .filter((value, index, values) =>
+      value && values.indexOf(value) === index,
+    )
+    .join(' | ')
+  const contentFallback = [
+    homeHeading.value,
+    normalizeSeoText(home.value.site.brandName),
+  ].filter(Boolean).join(' | ')
 
-const homeKeywords = computed(() => Array.from(new Set([
-  normalizeSeoText(home.value.site.brandName),
-  ...heroSeoText.value,
-  ...home.value.courses.data.tabs.flatMap((tab) =>
-    tab.courses.map((course) => normalizeSeoText(course.sourceSubject?.title)),
-  ),
-  'كورسات تعليمية',
-  'كتب تعليمية',
-].filter(Boolean))).slice(0, 8).join(', '))
+  return truncateSeoText(
+    configuredTabTitle || contentFallback ||
+      'منصة تعليمية للكورسات والكتب',
+    65,
+  )
+})
+
+const homeDescription = computed(() => {
+  const dashboardDescription =
+    normalizeSeoText(home.value.site.metaDescription) ||
+    normalizeSeoText(home.value.site.description)
+  const contentDescription = [
+    homeHeading.value,
+    normalizeSeoText(home.value.hero.data?.description),
+  ].filter((value, index, values) =>
+    value && values.indexOf(value) === index,
+  ).join(' — ')
+
+  return truncateSeoText(
+    contentDescription || dashboardDescription ||
+      'اكتشف الكورسات والكتب والمحتوى التعليمي المناسب لمسارك الدراسي.',
+    155,
+  )
+})
+
+const homeKeywords = computed(() =>
+  normalizeSeoText(home.value.site.metaKeywords) ||
+  Array.from(new Set([
+    normalizeSeoText(home.value.site.brandName),
+    normalizeSeoText(home.value.site.description),
+    ...heroSeoText.value,
+    ...home.value.courses.data.tabs.flatMap((tab) =>
+      tab.courses.map((course) => normalizeSeoText(course.sourceSubject?.title)),
+    ),
+    'كورسات تعليمية',
+    'كتب تعليمية',
+  ].filter(Boolean))).slice(0, 8).join(', '),
+)
 const homeImage = computed(() =>
   home.value.hero.data?.image?.src ||
   home.value.hero.data?.mobileImage?.src ||

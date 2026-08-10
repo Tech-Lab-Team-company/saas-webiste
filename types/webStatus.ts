@@ -22,6 +22,13 @@ export default interface WebStatus {
     allow_payment_gateway: boolean;
     expire_app: number;
     image: ImageModel;
+    favicon?: {
+        img?: string;
+        image?: string;
+        src?: string;
+        url?: string;
+        alt?: string;
+    } | string;
     app_image?: {
         img: string;
         alt: string;
