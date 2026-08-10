@@ -5,6 +5,7 @@ import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 import { mapBlogsPage } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeBlogViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { buildSeoTitle } from "~/utils/seoText";
+import { useSiteUrl } from "~/utils/siteUrl";
 
 interface ApiBlogDetails {
   id: number;
@@ -32,11 +33,11 @@ interface ApiBlogDetails {
 definePageMeta({ layout: "home-v2" });
 
 const route = useRoute();
-const requestUrl = useRequestURL();
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));
 const slug = computed(() => String(route.params.slug || ""));
 const webDomain = getWebDomain();
+const { siteOrigin, buildSiteUrl } = useSiteUrl();
 const api = new HomePageApi(webDomain);
 const { data: blog, pending, error, refresh } = await useAsyncData(
   `blog-details:${webDomain}:${slug.value}`,
@@ -138,12 +139,7 @@ const formattedDate = computed(() => {
   }).format(parsedDate);
 });
 
-const articleOrigin = computed(() =>
-  webDomain ? `https://${webDomain}` : requestUrl.origin,
-);
-const articleUrl = computed(() =>
-  new URL(route.path, articleOrigin.value).toString(),
-);
+const articleUrl = computed(() => buildSiteUrl(route.path));
 const publishedDate = computed(() => {
   if (!blog.value?.date) return undefined;
   const parsedDate = new Date(blog.value.date);
@@ -168,11 +164,11 @@ const articleSchema = computed(() => {
     author: {
       "@type": "Organization",
       name: site.value.brandName || "المنصة التعليمية",
-      url: `${articleOrigin.value}/`,
+      url: `${siteOrigin}/`,
     },
     publisher: {
       "@type": "Organization",
-      "@id": `${articleOrigin.value}/#organization`,
+      "@id": `${siteOrigin}/#organization`,
       name: site.value.brandName || "المنصة التعليمية",
       ...(site.value.logo?.src
         ? { logo: { "@type": "ImageObject", url: site.value.logo.src } }
@@ -189,9 +185,12 @@ useSeoMeta({
   description: () => blog.value?.description || site.value.description || "",
   ogTitle: () => blog.value?.title || "",
   ogDescription: () => blog.value?.description || "",
+  ogUrl: () => articleUrl.value,
   ogImage: () => articleImage.value?.src || undefined,
   ogType: "article",
   twitterCard: "summary_large_image",
+  twitterTitle: () => blog.value?.title || undefined,
+  twitterDescription: () => blog.value?.description || undefined,
   twitterImage: () => articleImage.value?.src || undefined,
 });
 

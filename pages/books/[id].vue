@@ -13,6 +13,7 @@ import {
   type HomeBookDetailsResourceViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { buildSeoTitle } from "~/utils/seoText";
+import { useSiteUrl } from "~/utils/siteUrl";
 
 interface BookMediaItem {
   key: string;
@@ -27,8 +28,8 @@ definePageMeta({
 });
 
 const route = useRoute();
-const requestUrl = useRequestURL();
 const webDomain = getWebDomain();
+const { siteOrigin, buildSiteUrl } = useSiteUrl();
 
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
@@ -242,10 +243,7 @@ const purchaseOptions = computed(() => {
   }];
 });
 
-const bookOrigin = computed(() =>
-  webDomain ? `https://${webDomain}` : requestUrl.origin,
-);
-const bookUrl = computed(() => new URL(route.path, bookOrigin.value).toString());
+const bookUrl = computed(() => buildSiteUrl(route.path));
 const bookSchema = computed(() => {
   const currentBook = book.value;
   if (!currentBook) return null;
@@ -275,7 +273,7 @@ const bookSchema = computed(() => {
     isAccessibleForFree: currentBook.isFree,
     publisher: {
       "@type": "Organization",
-      "@id": `${bookOrigin.value}/#organization`,
+      "@id": `${siteOrigin}/#organization`,
       name: site.value.brandName || "المنصة التعليمية",
     },
     ...(Number.isFinite(price) && price >= 0
@@ -308,9 +306,14 @@ useSeoMeta({
   ogDescription: () => book.value?.description
     || websiteSectionBook.value?.description
     || undefined,
+  ogUrl: () => bookUrl.value,
   ogImage: () => coverImage.value || undefined,
   ogType: "book",
   twitterCard: "summary_large_image",
+  twitterTitle: () => book.value?.title || undefined,
+  twitterDescription: () => book.value?.description
+    || websiteSectionBook.value?.description
+    || undefined,
   twitterImage: () => coverImage.value || undefined,
 });
 

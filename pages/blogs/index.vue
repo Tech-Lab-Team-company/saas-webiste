@@ -261,15 +261,29 @@ onBeforeUnmount(() => {
   blogAnimationContext = null;
 });
 
-useSeoMeta({
-  title: () =>
+const listingTitle = computed(() =>
     blogHero.value?.title
       ? `${blogHero.value.title}${
           site.value.brandName ? ` | ${site.value.brandName}` : ""
         }`
       : `المدونة${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
-  description: () => blogHero.value?.description || undefined,
+);
+const listingDescription = computed(() =>
+  blogHero.value?.description
+  || site.value.metaDescription
+  || site.value.description
+  || "مقالات تعليمية وخطوات عملية تساعد الطلاب على فهم الفيزياء.",
+);
+
+useSeoMeta({
+  title: () => listingTitle.value,
+  description: () => listingDescription.value,
+  ogTitle: () => listingTitle.value,
+  ogDescription: () => listingDescription.value,
   ogImage: () => heroDesktopImage.value || heroMobileImage.value || undefined,
+  twitterTitle: () => listingTitle.value,
+  twitterDescription: () => listingDescription.value,
+  twitterImage: () => heroDesktopImage.value || heroMobileImage.value || undefined,
 });
 
 useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });

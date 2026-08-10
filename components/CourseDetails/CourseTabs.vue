@@ -6,13 +6,21 @@ import examsicon from "~/public/icons/examsicon.vue";
 import exterinalurls from "~/public/icons/exterinalurls.vue";
 import wifiIcon from "~/public/icons/wifiIcon.vue";
 import homeworkicon from "~/public/icons/homeworkicon.vue";
-import CourseDetailsParams from "~/features/FetchCourseDetails/Core/Params/course_details_params";
-import CourseDetailsController from "~/features/FetchCourseDetails/presentation/controllers/course_details_controller";
 import type CourseDetailsModel from "~/features/FetchCourseDetails/Data/models/course_details_model";
 import Loder from "../Loader/Loder.vue";
 
+const props = withDefaults(defineProps<{
+  courseData?: CourseDetailsModel | null;
+  pending?: boolean;
+}>(), {
+  courseData: null,
+  pending: false,
+});
+const emit = defineEmits<{
+  refresh: [];
+}>();
+
 const value = ref("0");
-const route = useRoute();
 const tab_value = ref("content");
 const activetab = ref<number | null>(null);
 const videoLink = ref({
@@ -26,26 +34,8 @@ const { isCaptureShielded, protectionNotice } = useCourseContentProtection(
   isViewingCourseContent,
 );
 
-// const id = ref<string>(<string>route.params.id)
-
-const CardData = ref<CourseDetailsModel | null>(null);
-
-const FetchCourseDetails = async () => {
-  const courseDetailsParams = new CourseDetailsParams(
-    route.params.id as string,
-  );
-  const courseDetailsController = CourseDetailsController.getInstance();
-  const state = await courseDetailsController.FetchCourseDetails(
-    courseDetailsParams,
-  );
-  if (state.value.data) {
-    CardData.value = state.value.data;
-  }
-};
-
-onMounted(() => {
-  FetchCourseDetails();
-});
+const CardData = computed(() => props.courseData);
+const refreshCourseDetails = () => emit("refresh");
 
 const Data = (data: {
   activetabvalue: number;
@@ -116,7 +106,7 @@ onUnmounted(() => {
       </div>
     </Transition>
 
-    <div class="page-loader" v-if="!CardData">
+    <div class="page-loader" v-if="pending && !CardData">
       <Loder />
     </div>
 
@@ -125,7 +115,7 @@ onUnmounted(() => {
       :status="CardData?.allow_status"
       :isSubscribed="CardData?.is_subscribed"
       :isPaied="CardData?.is_paid"
-      @Changestatus="FetchCourseDetails"
+      @Changestatus="refreshCourseDetails"
     >
       <template #main="{ platformTeacher }">
         <div

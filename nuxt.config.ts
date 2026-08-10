@@ -50,8 +50,10 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      webLink: process.env.WEB_LINK || '',
-      siteUrl: process.env.SITE_URL || '',
+      // Tenant identity sent only as the backend `web-domain` header.
+      webLink: process.env.NUXT_PUBLIC_WEB_LINK || process.env.WEB_LINK || '',
+      // Preferred public frontend origin for canonical and absolute URLs.
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || '',
       googleAnalyticsId: process.env.NUXT_PUBLIC_GOOGLE_ANALYTICS_ID || '',
     },
   },
