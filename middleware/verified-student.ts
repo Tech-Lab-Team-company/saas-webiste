@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware((to) => {
 
   if (!user?.apiToken) {
     return navigateTo({
-      name: "login-loginhome",
+      path: "/loginhome",
       query: { redirect: to.fullPath },
       replace: true,
     });

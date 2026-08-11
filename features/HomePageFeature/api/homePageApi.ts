@@ -166,6 +166,13 @@ export class HomePageApi {
     });
   }
 
+  async fetchSubjectsByYear(yearId: number): Promise<unknown> {
+    return this.post(ApiNames.Instance.educationbasicsubjects, {
+      category_id: 1,
+      year_id: yearId,
+    });
+  }
+
   async fetchBooks(page = 1): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_books, {}, { page });
   }

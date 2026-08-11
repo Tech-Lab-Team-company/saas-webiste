@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
       </nav>
 
       <div v-if="!userStore.user" class="home-v2-header__actions">
-        <NuxtLink to="/login" prefetch-on="interaction" class="home-v2-header__login"
+        <NuxtLink to="/loginhome" prefetch-on="interaction" class="home-v2-header__login"
           >دخول الطالب</NuxtLink
         >
         <NuxtLink to="/Auth/register" prefetch-on="interaction" class="button"

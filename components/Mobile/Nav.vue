@@ -13,7 +13,7 @@ const menuItems = computed(() => {
 
   const authItem = signedIn.value != null
     ? { text: "تسجيل الخروج", icon: "pi-sign-out", isLogout: true }
-    : { text: "تسجيل الدخول", icon: "pi-sign-in", route: "/login/loginhome" };
+    : { text: "تسجيل الدخول", icon: "pi-sign-in", route: "/loginhome" };
 
   return [...baseItems, authItem];
 });

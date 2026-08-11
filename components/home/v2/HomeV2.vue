@@ -55,7 +55,7 @@ const themeStyles = computed(() => {
         :journey="props.home.learningJourney"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
-      <LazyHomeV2SectionsHomeAboutTeacherSection
+        <LazyHomeV2SectionsHomeAboutTeacherSection
         :about="props.home.aboutTeacher"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />

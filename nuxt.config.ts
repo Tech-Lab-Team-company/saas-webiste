@@ -105,6 +105,16 @@ export default defineNuxtConfig({
     '/aboutus': {
       redirect: { to: '/about-teacher', statusCode: 301 },
     },
+    '/login': {
+      redirect: { to: '/loginhome', statusCode: 302 },
+    },
+    '/login/loginhome': {
+      redirect: { to: '/loginhome', statusCode: 302 },
+    },
+    '/loginhome': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
     '/Auth/**': {
       ssr: false,
       headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
@@ -122,6 +132,10 @@ export default defineNuxtConfig({
       headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
     },
     '/profilecourse': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profileavailablecourses': {
       ssr: false,
       headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
     },

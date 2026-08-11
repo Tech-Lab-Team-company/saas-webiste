@@ -106,7 +106,7 @@ const toast = useToast();
 const FireToast = () => {
   console.log("ASdasd");
   toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
-  router.push({ path: "/login", query: { redirect: route.fullPath } });
+  router.push({ path: "/loginhome", query: { redirect: route.fullPath } });
 }
 </script>
 

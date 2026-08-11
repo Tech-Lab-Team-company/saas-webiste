@@ -12,6 +12,6 @@ import AuthUnifiedShell from "~/components/AuthLayout/AuthUnifiedShell.vue";
 
 const route = useRoute();
 const isRedesignedLoginHome = computed(
-  () => route.path.toLowerCase() === "/login/loginhome",
+  () => route.path.toLowerCase() === "/loginhome",
 );
 </script>

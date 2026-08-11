@@ -4,6 +4,7 @@ import { HomePageApi, normalizeHomeDataError } from '../api/homePageApi'
 import {
   createEmptyHomePageViewModel,
   mapHomeCoursePage,
+  mapHomeCourseSubjectIds,
   mapHomeCourseStages,
   mapHomeCourseYears,
   mapHomePage,
@@ -124,10 +125,16 @@ export const useHomePage = async () => {
     perPage = 9,
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
+      const [coursesResponse, subjectsResponse] = await Promise.all([
+        api.fetchCoursesByYear(stageId, yearId, page, perPage),
+        api.fetchSubjectsByYear(yearId),
+      ])
+      const allowedSubjectIds = mapHomeCourseSubjectIds(subjectsResponse)
       const coursePage = mapHomeCoursePage(
-        await api.fetchCoursesByYear(stageId, yearId, page, perPage),
+        coursesResponse,
         page,
         perPage,
+        allowedSubjectIds,
       )
 
       return {

@@ -17,14 +17,14 @@ const yearLabel = computed(() => {
                     <strong>مساحة الطالب</strong>
                     <span>إدارة بيانات حسابك ومعلوماتك الدراسية</span>
                 </div>
-                <div class="profile-topbar-status"><span></span>كورساتي</div>
+                <div class="profile-topbar-status"><span></span>مشترياتي</div>
             </header>
 
             <main class="profile-dashboard-main">
                 <header class="profile-page-heading">
                     <span>{{ yearLabel }}</span>
-                    <h1>محتوى {{ yearLabel }}</h1>
-                    <p>الكورسات المتاحة لصفك مع ملخص واضح لعدد الفيديوهات والملفات في كل كورس.</p>
+                    <h1>مشترياتي</h1>
+                    <p>الكورسات التي اشتريتها أو اشتركت بها، مع متابعة محتواها وتقدمك فيها.</p>
                 </header>
 
                 <section class="courses-container profile-courses-library">

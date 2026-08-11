@@ -64,7 +64,7 @@ const JoinCourse = async () => {
       life: 3000,
     });
     await router.push({
-      path: "/login",
+      path: "/loginhome",
       query: { redirect: router.currentRoute.value.fullPath },
     });
   }

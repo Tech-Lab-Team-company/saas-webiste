@@ -35,7 +35,7 @@ const navItems = [
       </nav>
 
       <div class="nav-actions">
-        <NuxtLink to="/login" class="login-link">دخول الطالب</NuxtLink>
+        <NuxtLink to="/loginhome" class="login-link">دخول الطالب</NuxtLink>
         <NuxtLink to="/register" class="button button-small">
           إنشاء حساب <span aria-hidden="true">←</span>
         </NuxtLink>
@@ -52,7 +52,7 @@ const navItems = [
           <NuxtLink v-for="item in navItems" :key="`mobile-${item.to}`" :to="item.to">
             {{ item.label }}
           </NuxtLink>
-          <NuxtLink to="/login">دخول الطالب</NuxtLink>
+          <NuxtLink to="/loginhome">دخول الطالب</NuxtLink>
           <NuxtLink to="/register">إنشاء حساب</NuxtLink>
         </nav>
       </details>

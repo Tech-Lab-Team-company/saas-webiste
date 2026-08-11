@@ -9,7 +9,7 @@ const UserSettingStore = useSettingStore();
 const route = useRoute();
 const redirectPath = computed(() => sanitizeAuthRedirect(route.query.redirect));
 const loginTarget = computed(() => ({
-  path: '/login/loginhome',
+  path: '/loginhome',
   ...(redirectPath.value ? { query: { redirect: redirectPath.value } } : {}),
 }));
 const registerTarget = computed(() => ({

@@ -267,7 +267,7 @@ onBeforeUnmount(() => {
       <nav class="home-v2-footer__links" aria-label="روابط الطالب">
         <b>مساحة الطالب</b>
         <NuxtLink to="/profile">مساحة الطالب</NuxtLink>
-        <NuxtLink to="/login">تسجيل الدخول</NuxtLink>
+        <NuxtLink to="/loginhome">تسجيل الدخول</NuxtLink>
         <NuxtLink to="/Auth/register">إنشاء حساب</NuxtLink>
       </nav>
     </div>

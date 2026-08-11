@@ -9,7 +9,7 @@ const exploreLinks = [
 
 const studentLinks = [
   { label: 'مساحة الطالب', to: '/learn' },
-  { label: 'تسجيل الدخول', to: '/login' },
+  { label: 'تسجيل الدخول', to: '/loginhome' },
   { label: 'إنشاء حساب', to: '/register' },
 ] as const
 
