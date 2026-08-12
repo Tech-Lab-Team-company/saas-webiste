@@ -4,11 +4,13 @@ import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
 import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
+import AppRouteTransition from "~/components/Global/AppRouteTransition.vue";
 import { resolveSiteOrigin } from "~/utils/siteUrl";
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();
 const requestUrl = useRequestURL();
+const { protectionNotice, protectionNoticeKey } = useAppContentProtection();
 const LazyMainDialog = defineAsyncComponent(
   () => import("./base/persention/Dialogs/MainDialogs/MainDialog.vue"),
 );
@@ -19,24 +21,25 @@ const isCourseDetailsPage = computed(() =>
 const isCourseExamPage = computed(() =>
   /^\/course\/[^/]+\/(?!timer(?:\/|$))[^/]+\/?$/u.test(route.path),
 );
-const isHomeV2 = computed(() =>
-  [
-    "/",
-    "/aboutus",
-    "/about-teacher",
-    "/books",
-    "/blogs",
-    "/course",
-    "/app",
-    "/fqs",
-    "/privacy",
-    "/terms",
-  ].includes(route.path) ||
-  route.path.startsWith("/books/") ||
-  route.path.startsWith("/blogs/") ||
-  route.path.startsWith("/blog-v2/") ||
-  isCourseDetailsPage.value ||
-  isCourseExamPage.value,
+const isHomeV2 = computed(
+  () =>
+    [
+      "/",
+      "/aboutus",
+      "/about-teacher",
+      "/books",
+      "/blogs",
+      "/course",
+      "/app",
+      "/fqs",
+      "/privacy",
+      "/terms",
+    ].includes(route.path) ||
+    route.path.startsWith("/books/") ||
+    route.path.startsWith("/blogs/") ||
+    route.path.startsWith("/blog-v2/") ||
+    isCourseDetailsPage.value ||
+    isCourseExamPage.value,
 );
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
@@ -49,10 +52,10 @@ const getSiteImageSource = (image: unknown): string => {
   const imageRecord = image as Record<string, unknown>;
   return String(
     imageRecord.img ||
-    imageRecord.image ||
-    imageRecord.src ||
-    imageRecord.url ||
-    "",
+      imageRecord.image ||
+      imageRecord.src ||
+      imageRecord.url ||
+      "",
   ).trim();
 };
 
@@ -65,8 +68,10 @@ const imageRespondsSuccessfully = async (url: string): Promise<boolean> => {
       signal: AbortSignal.timeout(2500),
     });
 
-    return response.ok &&
-      /^image\//iu.test(response.headers.get("content-type") || "");
+    return (
+      response.ok &&
+      /^image\//iu.test(response.headers.get("content-type") || "")
+    );
   } catch {
     return false;
   }
@@ -81,7 +86,7 @@ const removeUnavailableSiteImages = async (
 
       return {
         key,
-        available: !source || await imageRespondsSuccessfully(source),
+        available: !source || (await imageRespondsSuccessfully(source)),
       };
     }),
   );
@@ -100,38 +105,45 @@ const removeUnavailableSiteImages = async (
   );
 };
 
-const {
-  data: webStatus,
-  pending,
-} = await useAsyncData<WebStatus | null>("webStatus", async () => {
-  try {
-    const response = await $fetch<{
-      data: WebStatus;
-      message: string;
-      status: number;
-    }>(`${baseUrl}/fetch_web_status`, {
-      method: "GET",
-      headers: {
-        "web-domain": getWebDomain(),
-      },
-    });
-    return response.data
-      ? await removeUnavailableSiteImages(response.data)
-      : null;
-  } catch (requestError) {
-    // Site settings enhance branding, but a temporary API failure must never
-    // replace an indexable page with the global noindex error document.
-    if (import.meta.dev) {
-      console.warn("Unable to load web status; using SEO defaults.", requestError);
+const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
+  "webStatus",
+  async () => {
+    try {
+      const response = await $fetch<{
+        data: WebStatus;
+        message: string;
+        status: number;
+      }>(`${baseUrl}/fetch_web_status`, {
+        method: "GET",
+        headers: {
+          "web-domain": getWebDomain(),
+        },
+      });
+      return response.data
+        ? await removeUnavailableSiteImages(response.data)
+        : null;
+    } catch (requestError) {
+      // Site settings enhance branding, but a temporary API failure must never
+      // replace an indexable page with the global noindex error document.
+      if (import.meta.dev) {
+        console.warn(
+          "Unable to load web status; using SEO defaults.",
+          requestError,
+        );
+      }
+      return null;
     }
-    return null;
-  }
-}, {
-  default: () => null,
-  dedupe: "defer",
-});
+  },
+  {
+    default: () => null,
+    dedupe: "defer",
+  },
+);
 
-const normalizeThemeColor = (value: string | null | undefined, fallback: string) =>
+const normalizeThemeColor = (
+  value: string | null | undefined,
+  fallback: string,
+) =>
   value && /^#[0-9a-f]{3,8}$/iu.test(value.trim()) ? value.trim() : fallback;
 
 const primaryColor = computed(() =>
@@ -166,12 +178,8 @@ const themeVariables = computed<Record<string, string>>(() => ({
     : "#ffffff",
   "--app-text": isDark.value ? "#f3f6fc" : "#081b3a",
   "--app-muted": isDark.value ? "#aab6ca" : "#4f617c",
-  "--app-line": isDark.value
-    ? "rgb(205 220 245 / 16%)"
-    : "rgb(8 27 58 / 14%)",
-  "--app-shadow": isDark.value
-    ? "rgb(0 0 0 / 72%)"
-    : "rgb(6 17 71 / 40%)",
+  "--app-line": isDark.value ? "rgb(205 220 245 / 16%)" : "rgb(8 27 58 / 14%)",
+  "--app-shadow": isDark.value ? "rgb(0 0 0 / 72%)" : "rgb(6 17 71 / 40%)",
   "--app-footer-bg": isDark.value
     ? `color-mix(in srgb, ${secondaryColor.value} 24%, #070a11)`
     : `color-mix(in srgb, ${secondaryColor.value} 82%, #071020)`,
@@ -196,16 +204,22 @@ watchEffect(() => {
   });
 });
 
-watch(webStatus, (value) => {
-  if (value) SettingStore.setSetting(value);
-}, {
-  immediate: true,
-});
+watch(
+  webStatus,
+  (value) => {
+    if (value) SettingStore.setSetting(value);
+  },
+  {
+    immediate: true,
+  },
+);
 
-const siteOrigin = computed(() => resolveSiteOrigin(
-  String(runtimeConfig.public.siteUrl || ""),
-  requestUrl.origin,
-));
+const siteOrigin = computed(() =>
+  resolveSiteOrigin(
+    String(runtimeConfig.public.siteUrl || ""),
+    requestUrl.origin,
+  ),
+);
 
 const faviconHref = computed(() => {
   const source = [
@@ -213,7 +227,9 @@ const faviconHref = computed(() => {
     webStatus.value?.image,
     webStatus.value?.cover,
     webStatus.value?.app_image,
-  ].map(getSiteImageSource).find(Boolean);
+  ]
+    .map(getSiteImageSource)
+    .find(Boolean);
 
   if (!source) return "/favicon.ico";
 
@@ -233,9 +249,8 @@ const googleAnalyticsId = computed(() => {
 });
 
 const canonicalUrl = computed(() => {
-  const normalizedPath = route.path === "/"
-    ? "/"
-    : route.path.replace(/\/+$/u, "");
+  const normalizedPath =
+    route.path === "/" ? "/" : route.path.replace(/\/+$/u, "");
   return new URL(normalizedPath, siteOrigin.value).toString();
 });
 
@@ -255,7 +270,9 @@ const isPrivateRoute = computed(() => {
 });
 
 const normalizeSeoValue = (value: string | null | undefined) =>
-  String(value || "").replace(/\s+/gu, " ").trim();
+  String(value || "")
+    .replace(/\s+/gu, " ")
+    .trim();
 
 const siteTitle = computed(() => {
   const dashboardTitle = normalizeSeoValue(webStatus.value?.meta_title);
@@ -264,26 +281,31 @@ const siteTitle = computed(() => {
   const fallbackTitle = [
     normalizeSeoValue(webStatus.value?.name),
     normalizeSeoValue(webStatus.value?.description),
-  ].filter(Boolean).join(" | ");
+  ]
+    .filter(Boolean)
+    .join(" | ");
 
   return fallbackTitle || "منصة تعليمية";
 });
-const siteDescription = computed(() =>
-  normalizeSeoValue(webStatus.value?.meta_description) ||
-  normalizeSeoValue(webStatus.value?.description) ||
-  "منصة تعليمية للكورسات والكتب والمحتوى الدراسي.",
+const siteDescription = computed(
+  () =>
+    normalizeSeoValue(webStatus.value?.meta_description) ||
+    normalizeSeoValue(webStatus.value?.description) ||
+    "منصة تعليمية للكورسات والكتب والمحتوى الدراسي.",
 );
-const siteImage = computed(() =>
-  webStatus.value?.cover?.img || webStatus.value?.image?.img || undefined,
+const siteImage = computed(
+  () => webStatus.value?.cover?.img || webStatus.value?.image?.img || undefined,
 );
-const socialProfiles = computed(() => [
-  webStatus.value?.facebook,
-  webStatus.value?.instagram,
-  webStatus.value?.twitter,
-  webStatus.value?.linkedin,
-  webStatus.value?.youtube,
-  webStatus.value?.tikTok,
-].filter((url): url is string => Boolean(url && /^https?:\/\//iu.test(url))));
+const socialProfiles = computed(() =>
+  [
+    webStatus.value?.facebook,
+    webStatus.value?.instagram,
+    webStatus.value?.twitter,
+    webStatus.value?.linkedin,
+    webStatus.value?.youtube,
+    webStatus.value?.tikTok,
+  ].filter((url): url is string => Boolean(url && /^https?:\/\//iu.test(url))),
+);
 const siteSchema = computed(() => ({
   "@context": "https://schema.org",
   "@graph": [
@@ -335,7 +357,11 @@ useHead(() => ({
   link: [
     { key: "site-favicon", rel: "icon", href: faviconHref.value },
     { key: "canonical", rel: "canonical", href: canonicalUrl.value },
-    { rel: "preconnect", href: "https://dev.saas.techlabeg.com", crossorigin: "anonymous" },
+    {
+      rel: "preconnect",
+      href: "https://dev.saas.techlabeg.com",
+      crossorigin: "anonymous",
+    },
     { rel: "dns-prefetch", href: "https://dev.saas.techlabeg.com" },
   ],
   script: [
@@ -370,10 +396,12 @@ useHead(() => ({
 useSeoMeta({
   title: () => siteTitle.value,
   description: () => siteDescription.value,
-  keywords: () => normalizeSeoValue(webStatus.value?.meta_keywords) || undefined,
-  robots: () => isPrivateRoute.value
-    ? "noindex, nofollow, noarchive"
-    : "index, follow, max-image-preview:large",
+  keywords: () =>
+    normalizeSeoValue(webStatus.value?.meta_keywords) || undefined,
+  robots: () =>
+    isPrivateRoute.value
+      ? "noindex, nofollow, noarchive"
+      : "index, follow, max-image-preview:large",
   ogTitle: () => siteTitle.value,
   ogDescription: () => siteDescription.value,
   ogImage: () => siteImage.value,
@@ -389,8 +417,12 @@ useSeoMeta({
 const PaymentStore = usePaymentStore();
 const fetchPaymentMethod = async () => {
   const [paramsModule, controllerModule] = await Promise.all([
-    import("./features/fetch_payment_methods/Core/Params/fetch_payment_methods_params"),
-    import("./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller"),
+    import(
+      "./features/fetch_payment_methods/Core/Params/fetch_payment_methods_params"
+    ),
+    import(
+      "./features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller"
+    ),
   ]);
   const FetchPaymentMethodsParams = paramsModule.default;
   const FetchPaymentMethodController = controllerModule.default;
@@ -398,7 +430,7 @@ const fetchPaymentMethod = async () => {
   const fetchPaymentMethodController =
     FetchPaymentMethodController.getInstance();
   const state = await fetchPaymentMethodController.FetchPaymentMthod(
-    paymentMethod
+    paymentMethod,
   );
   if (state.value.data) {
     PaymentStore.setPayment(state.value.data);
@@ -412,12 +444,62 @@ onMounted(() => {
 
 <template>
   <div>
+    <Transition name="app-protection-notice">
+      <div
+        v-if="protectionNotice"
+        :key="protectionNoticeKey"
+        class="app-protection-notice"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="app-protection-notice__icon" aria-hidden="true">
+          <svg
+            class="app-protection-notice__shield"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M16 3.25 26 7v7.4c0 6.36-3.88 11.45-10 14.35C9.88 25.85 6 20.76 6 14.4V7l10-3.75Z"
+              fill="currentColor"
+              fill-opacity=".16"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+            <rect
+              x="11.25"
+              y="14.25"
+              width="9.5"
+              height="7.5"
+              rx="2.2"
+              fill="currentColor"
+            />
+            <path
+              d="M13.4 14.2v-1.45a2.6 2.6 0 1 1 5.2 0v1.45"
+              stroke="#12244f"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <circle cx="16" cy="18" r="1.15" fill="#12244f" />
+          </svg>
+          <span class="app-protection-notice__status-dot" />
+        </span>
+        <span class="app-protection-notice__content">
+          <strong>تنبيه الحماية</strong>
+          <span>{{ protectionNotice }}</span>
+        </span>
+      </div>
+    </Transition>
+    <AppRouteTransition />
     <NuxtLayout>
       <LazyMobileNav v-if="!isHomeV2" />
       <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
       <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" />
       <LazyToast v-if="!isHomeV2" />
-      <NuxtPage />
+      <div class="app-route-view">
+        <NuxtPage />
+      </div>
       <LazyMainDialog v-if="!pending && !isHomeV2" />
     </NuxtLayout>
   </div>
@@ -441,5 +523,177 @@ onMounted(() => {
   cursor: pointer;
 }
 
+.app-protection-notice {
+  position: fixed;
+  z-index: 10000;
+  top: 94px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  min-width: min(390px, calc(100vw - 32px));
+  max-width: min(520px, calc(100vw - 32px));
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+  padding: 15px 20px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 10% 20%, rgb(72 117 255 / 25%), transparent 34%),
+    rgb(9 15 29 / 96%);
+  box-shadow: 0 24px 65px rgb(0 0 0 / 34%), 0 0 0 1px rgb(7 17 38 / 20%);
+  color: #fff;
+  text-align: start;
+  backdrop-filter: blur(16px);
+  transform: translateX(-50%);
+}
 
+.app-protection-notice::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #55a7ff, #7c65ff);
+  content: "";
+  transform-origin: right center;
+  animation: app-protection-progress 2.6s linear forwards;
+}
+
+.app-protection-notice__icon {
+  position: relative;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgb(70 126 255 / 38%), rgb(111 79 255 / 18%));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%);
+  color: #a9ceff;
+  font-size: 21px;
+  animation: app-protection-shield 0.65s 0.15s ease-out;
+}
+
+.app-protection-notice__icon::before {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgb(156 207 255 / 38%);
+  border-radius: 10px;
+  content: "";
+  animation: app-protection-pulse 1.7s ease-out infinite;
+}
+
+.app-protection-notice__shield {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 5px 9px rgb(34 108 255 / 38%));
+}
+
+.app-protection-notice__status-dot {
+  position: absolute;
+  z-index: 2;
+  top: -3px;
+  right: -3px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #0d1830;
+  border-radius: 50%;
+  background: #69e6b1;
+  box-shadow: 0 0 12px rgb(105 230 177 / 72%);
+}
+
+.app-protection-notice__content {
+  display: grid;
+  gap: 3px;
+  line-height: 1.45;
+}
+
+.app-protection-notice__content strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.app-protection-notice__content > span {
+  color: rgb(255 255 255 / 72%);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.app-protection-notice-enter-active,
+.app-protection-notice-leave-active {
+  transition: opacity 0.24s ease,
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-protection-notice-enter-from,
+.app-protection-notice-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -20px) scale(0.94);
+}
+
+@keyframes app-protection-progress {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes app-protection-shield {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+
+  45% {
+    transform: scale(1.14) rotate(-7deg);
+  }
+
+  70% {
+    transform: scale(1.06) rotate(5deg);
+  }
+}
+
+@keyframes app-protection-pulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.78);
+  }
+
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(1.42);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-protection-notice {
+    top: 76px;
+    width: calc(100vw - 28px);
+    min-width: 0;
+    max-width: 430px;
+    gap: 12px;
+    padding: 13px 15px;
+  }
+
+  .app-protection-notice__icon {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-protection-notice,
+  .app-protection-notice::after,
+  .app-protection-notice__icon,
+  .app-protection-notice__icon::before {
+    animation: none;
+    transition: none;
+  }
+}
 </style>

@@ -5,15 +5,25 @@ This document explains the protection added to course pages such as
 
 ## What was implemented
 
-The protection applies to dynamic course pages under `/course/:id`.
+Inspect, source, save, print and context-menu protection applies across the
+entire application. Course media receives the additional protections described
+below on dynamic course pages under `/course/:id`.
 
-### Course-page protection
+### Application-wide protection
 
 - Disables Nuxt DevTools in the application build.
-- Blocks the context menu on course pages.
+- Blocks the context menu on every application page.
 - Blocks common browser shortcuts for Inspect, View Source, Save and Print.
 - Prevents dragging protected lesson media.
 - Displays a temporary protection notice when a blocked action is attempted.
+
+Application-wide controls and their shared notice are implemented by:
+
+- `composables/useAppContentProtection.ts`
+- `app.vue`
+
+### Course-page protection
+
 - Covers active lesson content when the browser tab loses focus, becomes hidden,
   or receives a supported screen-capture keyboard event.
 - Removes course media from printed pages.

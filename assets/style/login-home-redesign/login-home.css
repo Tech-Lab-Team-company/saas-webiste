@@ -196,6 +196,47 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color, #3a3e7e) 13%, transparent);
 }
 
+.login-home-password input {
+  padding-inline-end: 52px;
+}
+
+.login-home-password-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  inset-inline-end: 7px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  outline: 0;
+  background: transparent;
+  color: #718096;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.login-home-password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.login-home-password-toggle:hover,
+.login-home-password-toggle:focus-visible {
+  background: color-mix(in srgb, var(--secondary-color, #3a3e7e) 10%, transparent);
+  color: var(--secondary-color, #3a3e7e);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.login-home-password:focus-within .login-home-password-toggle {
+  color: var(--secondary-color, #3a3e7e);
+}
+
 .login-home-country {
   flex: 0 0 132px;
   min-width: 0;
@@ -712,6 +753,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .login-home-input input,
+  .login-home-password-toggle,
   .login-home-submit,
   .login-home-options a {
     transition: none;

@@ -296,16 +296,43 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .home-v2-footer {
-  padding-top: 70px;
-  background: var(
+  --footer-primary: var(--primary-color, #28366c);
+  --footer-secondary: var(--secondary-color, #3a3e7e);
+  --footer-background: var(
     --app-footer-bg,
-    color-mix(in srgb, var(--home-v2-deep) 82%, #071020)
+    color-mix(in srgb, var(--footer-secondary) 82%, #071020)
   );
+  --footer-accent: color-mix(in srgb, var(--footer-primary) 42%, white);
+  --footer-accent-strong: color-mix(in srgb, var(--footer-primary) 58%, white);
+  --footer-secondary-light: color-mix(in srgb, var(--footer-secondary) 42%, white);
+  --footer-soft-border: color-mix(in srgb, var(--footer-accent) 25%, transparent);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: 70px;
+  background:
+    radial-gradient(
+      circle at 10% 4%,
+      color-mix(in srgb, var(--footer-primary) 30%, transparent),
+      transparent 31%
+    ),
+    radial-gradient(
+      circle at 92% 92%,
+      color-mix(in srgb, var(--footer-secondary-light) 15%, transparent),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      var(--footer-background),
+      color-mix(in srgb, var(--footer-primary) 24%, var(--footer-background))
+    );
   color: #fff;
-  transition: background-color .3s ease;
+  transition: background-color .3s ease, color .3s ease;
 }
 
 .home-v2-footer__grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: clamp(52px, 6vw, 100px);
@@ -327,7 +354,7 @@ onBeforeUnmount(() => {
   flex: 0 0 46px;
   place-items: center;
   overflow: hidden;
-  border: 2px solid #ffffffb3;
+  border: 2px solid color-mix(in srgb, var(--footer-accent) 58%, white);
   border-radius: 10px;
   background: #fff;
 }
@@ -340,8 +367,8 @@ onBeforeUnmount(() => {
 
 .home-v2-footer__logo--empty {
   border-style: dashed;
-  background: rgb(255 255 255 / 7%);
-  color: #f0cb81;
+  background: color-mix(in srgb, var(--footer-primary) 13%, transparent);
+  color: var(--footer-accent);
   font: 300 28px/1 var(--home-v2-heading);
 }
 
@@ -365,7 +392,7 @@ onBeforeUnmount(() => {
 .home-v2-footer__description {
   max-width: 350px;
   margin: 22px 0 0;
-  color: #ef7a63;
+  color: var(--footer-accent);
   font-size: 15px;
   line-height: 1.8;
 }
@@ -399,7 +426,7 @@ onBeforeUnmount(() => {
 
 .home-v2-footer__social-block > b {
   display: block;
-  color: #f0cb81;
+  color: var(--footer-accent);
   font: 800 12px var(--home-v2-heading);
 }
 
@@ -416,17 +443,19 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   padding: 0 13px;
-  border: 1px solid #ffffff29;
+  border: 1px solid var(--footer-soft-border);
+  background: color-mix(in srgb, var(--footer-primary) 7%, transparent);
   color: #ffffffc7;
   font-size: 11px;
   font-weight: 800;
-  transition: border-color 0.3s ease, color 0.3s ease,
+  transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease,
     transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-v2-footer__socials > a:hover {
   transform: translateY(-2px);
-  border-color: #f0cb81;
+  border-color: var(--footer-accent);
+  background: color-mix(in srgb, var(--footer-primary) 18%, transparent);
   color: #fff;
 }
 
@@ -436,8 +465,8 @@ onBeforeUnmount(() => {
   height: 22px;
   place-items: center;
   border-radius: 50%;
-  background: #ffffff1a;
-  color: #f2ca7c;
+  background: color-mix(in srgb, var(--footer-primary) 20%, transparent);
+  color: var(--footer-accent);
 }
 
 .home-v2-footer__social-icon svg {
@@ -455,7 +484,7 @@ onBeforeUnmount(() => {
 
 .home-v2-footer__links > b {
   margin-bottom: 8px;
-  color: #f0cb81;
+  color: var(--footer-accent);
   font: 800 14px var(--home-v2-heading);
 }
 
@@ -468,16 +497,18 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__links > a:hover {
-  color: #fff;
+  color: var(--footer-accent-strong);
 }
 
 .home-v2-footer__bottom {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   padding: 22px 0;
-  border-top: 1px solid #ffffff1a;
+  border-top: 1px solid var(--footer-soft-border);
   color: #ffffffb3;
   font-size: 12px;
 }
@@ -500,21 +531,21 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__legal a:hover {
-  color: #fff;
+  color: var(--footer-accent-strong);
 }
 
 .home-v2-footer__powered-by {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
-  color: #e6ba62;
+  color: var(--footer-secondary-light);
   font-weight: 900;
   transition: color 0.28s ease;
 }
 
 .home-v2-footer__powered-by:hover,
 .home-v2-footer__powered-by:focus-visible {
-  color: #f4d590;
+  color: var(--footer-accent-strong);
 }
 
 @media (max-width: 900px) {

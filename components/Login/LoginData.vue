@@ -14,6 +14,7 @@ definePageMeta({
 const UserSettingStore = useSettingStore();
 const Credential = ref('');
 const LoginPassword = ref('');
+const showLoginPassword = ref(false);
 const selectedCountry = ref(UserSettingStore?.setting?.country_code);
 const redirectPath = computed(() => sanitizeAuthRedirect(route.query.redirect));
 const registerTarget = computed(() => ({
@@ -136,14 +137,29 @@ const handleKeyPress = (event: KeyboardEvent) => {
                     </div>
 
                     <label class="login-home-label" for="login-password">{{ $t('كلمة المرور') }}</label>
-                    <div class="login-home-input">
+                    <div class="login-home-input login-home-password">
                         <input
                             id="login-password"
                             v-model="LoginPassword"
-                            type="password"
+                            :type="showLoginPassword ? 'text' : 'password'"
                             autocomplete="current-password"
                             @keydown="handleKeyPress"
                         >
+                        <button
+                            type="button"
+                            class="login-home-password-toggle"
+                            :aria-label="showLoginPassword ? $t('إخفاء كلمة المرور') : $t('إظهار كلمة المرور')"
+                            :aria-pressed="showLoginPassword"
+                            @click="showLoginPassword = !showLoginPassword"
+                        >
+                            <svg v-if="showLoginPassword" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M3 3l18 18M10.6 10.7a2 2 0 0 0 2.7 2.7M9.9 5.2A10.8 10.8 0 0 1 12 5c5.3 0 8.6 4.8 9 5.5a1 1 0 0 1 0 1c-.5.8-1.6 2.3-3.2 3.5M6.2 6.2C4.5 7.3 3.4 8.8 3 9.5a1 1 0 0 0 0 1C3.4 11.3 6.7 16 12 16c.7 0 1.4-.1 2-.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <svg v-else viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <path d="M3 11.5C3.5 10.7 6.7 6 12 6s8.5 4.7 9 5.5c.1.3.1.7 0 1-.5.8-3.7 5.5-9 5.5s-8.5-4.7-9-5.5a1 1 0 0 1 0-1Z" stroke="currentColor" stroke-width="1.8" />
+                                <circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.8" />
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="login-home-options">

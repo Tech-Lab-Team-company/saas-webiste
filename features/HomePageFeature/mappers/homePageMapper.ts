@@ -842,14 +842,16 @@ const mapAboutTeacher = (
     const title = toNullableString(item.title)
     const description = toNullableString(item.description)
 
-    if (!title || !description) {
+    // The about-teacher endpoint may return concise benefits with a title only.
+    // Keep those items instead of dropping the entire benefits list.
+    if (!title) {
       return []
     }
 
     return [{
       id: toNullableNumber(item.id) ?? index + 1,
       title,
-      description,
+      description: description ?? '',
     }]
   })
 

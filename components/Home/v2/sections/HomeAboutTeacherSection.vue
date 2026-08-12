@@ -50,7 +50,10 @@ const animateHighlights = async (delay = 0) => {
   if (!content || !aboutHasEntered.value || shouldReduceMotion()) return;
 
   const items = Array.from(content.querySelectorAll("li"));
-  gsap.killTweensOf(items);
+  const icons = Array.from(
+    content.querySelectorAll(".home-v2-about-teacher__benefit-icon"),
+  );
+  gsap.killTweensOf([...items, ...icons]);
   gsap.fromTo(
     items,
     { autoAlpha: 0, x: 38, y: 8 },
@@ -62,6 +65,20 @@ const animateHighlights = async (delay = 0) => {
       delay,
       stagger: { amount: 0.38 },
       ease: "power3.out",
+      clearProps: "opacity,visibility,transform",
+    },
+  );
+  gsap.fromTo(
+    icons,
+    { autoAlpha: 0, scale: 0.2, rotation: -35 },
+    {
+      autoAlpha: 1,
+      scale: 1,
+      rotation: 0,
+      duration: 0.48,
+      delay: delay + 0.12,
+      stagger: { amount: 0.38 },
+      ease: "back.out(1.9)",
       clearProps: "opacity,visibility,transform",
     },
   );
@@ -214,9 +231,21 @@ onBeforeUnmount(() => {
           {{ titleParts.before }}<em v-if="titleParts.value">{{ titleParts.value }}</em>{{ titleParts.after }}
         </h2>
         <p v-if="about.data.subTitle">{{ about.data.subTitle }}</p>
-        <ul v-if="about.data.benefits.length">
+        <ul
+          v-if="about.data.benefits.length"
+          class="home-v2-about-teacher__benefits"
+          aria-label="مميزات الدراسة مع المدرس"
+        >
           <li v-for="benefit in about.data.benefits" :key="benefit.id">
-            {{ benefit.title }}
+            <span class="home-v2-about-teacher__benefit-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="m7 12.5 3.1 3L17.5 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span>
+              <strong>{{ benefit.title }}</strong>
+              <small v-if="benefit.description">{{ benefit.description }}</small>
+            </span>
           </li>
         </ul>
         <NuxtLink v-if="about.data.link" :to="about.data.link">
@@ -392,56 +421,96 @@ onBeforeUnmount(() => {
 .home-v2-about-teacher ul {
   position: relative;
   display: grid;
-  margin: 38px 0 34px;
+  margin: 34px 0 32px;
   padding: 0;
-  border-top: 1px solid color-mix(in srgb, var(--home-v2-muted) 22%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--home-v2-muted) 24%, transparent);
   list-style: none;
   perspective: 700px;
 }
 
 .home-v2-about-teacher li {
   position: relative;
-  padding: 17px 34px 17px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--home-v2-muted) 22%, transparent);
-  background-image: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--home-v2-blue) 11%, transparent),
-    color-mix(in srgb, var(--home-v2-blue) 4%, transparent)
-  );
-  background-repeat: no-repeat;
-  background-position: right center;
-  background-size: 0% 100%;
+  isolation: isolate;
+  display: flex;
+  min-height: 65px;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 7px;
+  border-bottom: 1px solid color-mix(in srgb, var(--home-v2-muted) 24%, transparent);
   color: var(--home-v2-deep);
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.65;
-  transition: color 0.3s ease, padding-inline-start 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-    background-size 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s ease;
+  transition: color 0.3s ease, border-color 0.3s ease,
+    padding 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-v2-about-teacher li::after {
+  position: absolute;
+  z-index: -1;
+  inset: 4px 0;
+  border-radius: 9px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--home-v2-blue) 2%, transparent),
+    color-mix(in srgb, var(--home-v2-blue) 10%, transparent)
+  );
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.25);
+  transform-origin: right center;
+  transition: opacity 0.3s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-v2-about-teacher li:hover {
-  padding-inline-start: 44px;
-  border-color: color-mix(in srgb, var(--home-v2-blue) 28%, transparent);
-  background-size: 100% 100%;
+  padding-inline-start: 14px;
+  border-color: color-mix(in srgb, var(--home-v2-blue) 35%, transparent);
   color: var(--home-v2-blue);
+  transform: translateX(-5px);
 }
 
-.home-v2-about-teacher li::before {
-  position: absolute;
-  top: 17px;
-  inset-inline-start: 4px;
-  color: var(--home-v2-blue);
-  content: "✓";
-  font-size: 20px;
-  font-weight: 900;
-  transform-origin: center;
-  transition: color 0.3s ease, transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+.home-v2-about-teacher li:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
-.home-v2-about-teacher li:hover::before {
-  color: var(--home-v2-deep);
-  transform: translateX(-5px) rotate(-8deg) scale(1.18);
+.home-v2-about-teacher__benefit-icon {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--home-v2-blue);
+  transition: color 0.3s ease, background-color 0.3s ease,
+    transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.home-v2-about-teacher__benefit-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.home-v2-about-teacher li:hover .home-v2-about-teacher__benefit-icon {
+  background: var(--home-v2-blue);
+  color: #fff;
+  transform: rotate(-9deg) scale(1.14);
+}
+
+.home-v2-about-teacher li > span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.home-v2-about-teacher li strong {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
+.home-v2-about-teacher li small {
+  color: var(--home-v2-muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .home-v2-about-teacher a {
@@ -496,6 +565,7 @@ onBeforeUnmount(() => {
     top: 28px;
     inset-inline-start: 28px;
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -507,7 +577,8 @@ onBeforeUnmount(() => {
   .home-v2-about-teacher__experience strong,
   .home-v2-about-teacher__experience small,
   .home-v2-about-teacher li,
-  .home-v2-about-teacher li::before {
+  .home-v2-about-teacher li::after,
+  .home-v2-about-teacher__benefit-icon {
     transition: none;
   }
 
