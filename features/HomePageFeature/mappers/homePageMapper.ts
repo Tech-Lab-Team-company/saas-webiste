@@ -293,6 +293,7 @@ export const mapHomeCoursePage = (
   value: unknown,
   requestedPage = 1,
   requestedPerPage = 9,
+  allowedSubjectIds?: ReadonlySet<number>,
 ): HomeCoursePageViewModel => {
   const record = isRecord(value) ? value : null
   const nestedData = record && isRecord(record.data) ? record.data : null
@@ -313,7 +314,12 @@ export const mapHomeCoursePage = (
         metadata.last_page !== undefined ||
         metadata.total !== undefined),
   )
-  const allCourses = mapHomeCourseList(courseSource)
+  const allCourses = mapHomeCourseList(courseSource).filter((course) =>
+    !allowedSubjectIds ||
+    (course.sourceSubject?.id !== null &&
+      course.sourceSubject?.id !== undefined &&
+      allowedSubjectIds.has(course.sourceSubject.id)),
+  )
   const safePerPage = Math.max(
     1,
     toNullableNumber(metadata?.per_page) ?? requestedPerPage,
@@ -348,6 +354,19 @@ export const mapHomeCoursePage = (
       serverDriven: hasServerPagination,
     },
   }
+}
+
+export const mapHomeCourseSubjectIds = (value: unknown): Set<number> => {
+  const subjectIds = new Set<number>()
+
+  toArray(value).forEach((item) => {
+    if (!isRecord(item)) return
+
+    const id = toNullableNumber(item.id)
+    if (id !== null) subjectIds.add(id)
+  })
+
+  return subjectIds
 }
 
 export const mapHomeCourseStages = (value: unknown): HomeCourseStageViewModel[] => {

@@ -155,7 +155,7 @@ const toggleSubCategory = (categoryId: number) => {
             </div>
             <div class="user" v-if="!user.isAuth">
               <div class="not-auth">
-                <NuxtLink to="/auth/login" class="login-link">
+                <NuxtLink to="/loginhome" class="login-link">
                   {{ $t("login") }}
                 </NuxtLink>
                 <span>/</span>
@@ -223,7 +223,7 @@ const toggleSubCategory = (categoryId: number) => {
         </div>
         <div class="user">
           <div class="not-auth" v-if="!user.isAuth">
-            <NuxtLink to="/auth/login" class="login-link">
+            <NuxtLink to="/loginhome" class="login-link">
               {{ $t("login") }}
             </NuxtLink>
             <span>/</span>

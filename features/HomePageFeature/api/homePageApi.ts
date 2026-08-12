@@ -128,6 +128,34 @@ export class HomePageApi {
     );
   }
 
+  async fetchPublicCourseCatalog(
+    page = 1,
+    perPage = 100,
+  ): Promise<unknown> {
+    // The anonymous filter endpoint is the source of truth for courses that
+    // are publicly listable for this tenant. Keep tenant identity in headers;
+    // pagination belongs to the API request, never to the public URL origin.
+    return this.post(
+      ApiNames.Instance.filter_courses,
+      {
+        category_id: null,
+        type: null,
+        education_type_id: null,
+        stage_id: null,
+        year_id: null,
+        subject_id: null,
+        university_id: null,
+        college_id: null,
+        department_id: null,
+        division_id: null,
+        university_subject_id: null,
+        page,
+        per_page: perPage,
+      },
+      { page, per_page: perPage },
+    );
+  }
+
   async fetchStages(): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_stages, {});
   }
@@ -135,6 +163,13 @@ export class HomePageApi {
   async fetchStageYears(stageId: number): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_stage_years, {
       stage_id: stageId,
+    });
+  }
+
+  async fetchSubjectsByYear(yearId: number): Promise<unknown> {
+    return this.post(ApiNames.Instance.educationbasicsubjects, {
+      category_id: 1,
+      year_id: yearId,
     });
   }
 

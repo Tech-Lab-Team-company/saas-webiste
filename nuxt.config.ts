@@ -50,8 +50,10 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      webLink: process.env.WEB_LINK || '',
-      siteUrl: process.env.SITE_URL || '',
+      // Tenant identity sent only as the backend `web-domain` header.
+      webLink: process.env.NUXT_PUBLIC_WEB_LINK || process.env.WEB_LINK || '',
+      // Preferred public frontend origin for canonical and absolute URLs.
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || '',
       googleAnalyticsId: process.env.NUXT_PUBLIC_GOOGLE_ANALYTICS_ID || '',
     },
   },
@@ -103,6 +105,16 @@ export default defineNuxtConfig({
     '/aboutus': {
       redirect: { to: '/about-teacher', statusCode: 301 },
     },
+    '/login': {
+      redirect: { to: '/loginhome', statusCode: 302 },
+    },
+    '/login/loginhome': {
+      redirect: { to: '/loginhome', statusCode: 302 },
+    },
+    '/loginhome': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
     '/Auth/**': {
       ssr: false,
       headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
@@ -120,6 +132,10 @@ export default defineNuxtConfig({
       headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
     },
     '/profilecourse': {
+      ssr: false,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
+    },
+    '/profileavailablecourses': {
       ssr: false,
       headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive' },
     },

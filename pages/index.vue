@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HomeV2 from '~/components/home/v2/HomeV2.vue'
 import { useHomePage } from '~/features/HomePageFeature/composables/useHomePage'
+import { normalizeSeoText, resolveHomepageSeo } from '~/utils/seoText'
 
 const { home, pending, loadCoursesByYear } = await useHomePage()
 
@@ -8,62 +9,23 @@ definePageMeta({
   layout: 'home-v2',
 })
 
-const normalizeSeoText = (value: string | null | undefined) =>
-  String(value || '').replace(/\s+/gu, ' ').trim()
-
-const truncateSeoText = (value: string, limit: number) => {
-  if (value.length <= limit) return value
-  const shortened = value.slice(0, limit + 1)
-  const lastSpace = shortened.lastIndexOf(' ')
-  return `${shortened.slice(0, lastSpace > limit * 0.7 ? lastSpace : limit).trim()}…`
-}
-
 const heroSeoText = computed(() => [
   home.value.hero.data?.title,
   home.value.hero.data?.subtitle,
 ].map(normalizeSeoText).filter(Boolean))
 
-const homeHeading = computed(() => heroSeoText.value.join(' '))
+const homepageSeo = computed(() => resolveHomepageSeo({
+  metaTitle: home.value.site.metaTitle,
+  metaDescription: home.value.site.metaDescription,
+  heroTitle: home.value.hero.data?.title,
+  heroSubtitle: home.value.hero.data?.subtitle,
+  heroDescription: home.value.hero.data?.description,
+  brandName: home.value.site.brandName,
+  siteDescription: home.value.site.description,
+}))
 
-const homeTitle = computed(() => {
-  const configuredTitle = normalizeSeoText(home.value.site.metaTitle) ||
-    normalizeSeoText(home.value.site.brandName)
-  const configuredDescription = normalizeSeoText(home.value.site.description) ||
-    normalizeSeoText(home.value.site.metaDescription)
-  const configuredTabTitle = [configuredTitle, configuredDescription]
-    .filter((value, index, values) =>
-      value && values.indexOf(value) === index,
-    )
-    .join(' | ')
-  const contentFallback = [
-    homeHeading.value,
-    normalizeSeoText(home.value.site.brandName),
-  ].filter(Boolean).join(' | ')
-
-  return truncateSeoText(
-    configuredTabTitle || contentFallback ||
-      'منصة تعليمية للكورسات والكتب',
-    65,
-  )
-})
-
-const homeDescription = computed(() => {
-  const dashboardDescription =
-    normalizeSeoText(home.value.site.metaDescription) ||
-    normalizeSeoText(home.value.site.description)
-  const contentDescription = [
-    homeHeading.value,
-    normalizeSeoText(home.value.hero.data?.description),
-  ].filter((value, index, values) =>
-    value && values.indexOf(value) === index,
-  ).join(' — ')
-
-  return truncateSeoText(
-    contentDescription || dashboardDescription ||
-      'اكتشف الكورسات والكتب والمحتوى التعليمي المناسب لمسارك الدراسي.',
-    155,
-  )
-})
+const homeTitle = computed(() => homepageSeo.value.title)
+const homeDescription = computed(() => homepageSeo.value.description)
 
 const homeKeywords = computed(() =>
   normalizeSeoText(home.value.site.metaKeywords) ||

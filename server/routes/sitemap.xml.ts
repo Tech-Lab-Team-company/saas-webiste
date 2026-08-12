@@ -2,7 +2,10 @@ import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   mapBlogsPage,
   mapBooksPage,
+  mapHomeCoursePage,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
+import { collectPublicCoursePages } from "~/utils/courseCatalog";
+import { resolveSiteOrigin } from "~/utils/siteUrl";
 
 type SitemapEntry = {
   path: string;
@@ -36,24 +39,30 @@ const normalizeLastModified = (value: string | null): string | undefined => {
   return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 };
 
+const COURSE_PAGE_SIZE = 100;
+
+const fetchAllPublicCourses = async (api: HomePageApi) =>
+  collectPublicCoursePages(async (page) => {
+    const coursePage = mapHomeCoursePage(
+      await api.fetchPublicCourseCatalog(page, COURSE_PAGE_SIZE),
+      page,
+      COURSE_PAGE_SIZE,
+    );
+
+    return {
+      courses: coursePage.courses,
+      lastPage: coursePage.pagination.lastPage,
+    };
+  });
+
 export default defineEventHandler(async (event) => {
   const requestUrl = getRequestURL(event);
   const runtimeConfig = useRuntimeConfig(event);
   const configuredUrl = String(runtimeConfig.public.siteUrl || "").trim();
-  let siteOrigin = requestUrl.origin;
-
-  if (configuredUrl) {
-    try {
-      siteOrigin = new URL(
-        configuredUrl.includes("://") ? configuredUrl : `https://${configuredUrl}`,
-      ).origin;
-    } catch {
-      siteOrigin = requestUrl.origin;
-    }
-  }
+  const siteOrigin = resolveSiteOrigin(configuredUrl, requestUrl.origin);
 
   const configuredWebLink = String(runtimeConfig.public.webLink || "").trim();
-  let webDomain = requestUrl.hostname;
+  let webDomain = "";
 
   if (configuredWebLink) {
     try {
@@ -69,10 +78,18 @@ export default defineEventHandler(async (event) => {
         .trim();
     }
   }
+
+  if (!webDomain) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Tenant WEB_LINK is not configured",
+    });
+  }
   const api = new HomePageApi(webDomain);
-  const [blogsResult, booksResult] = await Promise.allSettled([
+  const [blogsResult, booksResult, coursesResult] = await Promise.allSettled([
     api.fetchBlogs(),
     api.fetchBooks(1),
+    fetchAllPublicCourses(api),
   ]);
 
   const dynamicEntries: SitemapEntry[] = [];
@@ -101,6 +118,16 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  if (coursesResult.status === "fulfilled") {
+    for (const course of coursesResult.value) {
+      dynamicEntries.push({
+        path: `/course/${course.id}`,
+        changefreq: "weekly",
+        priority: 0.8,
+      });
+    }
+  }
+
   const uniqueEntries = [...staticEntries, ...dynamicEntries].filter(
     (entry, index, entries) =>
       entries.findIndex((candidate) => candidate.path === entry.path) === index,
@@ -120,6 +147,12 @@ export default defineEventHandler(async (event) => {
   setResponseHeaders(event, {
     "Content-Type": "application/xml; charset=utf-8",
     "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+    "X-Sitemap-Course-Count": String(
+      coursesResult.status === "fulfilled" ? coursesResult.value.length : 0,
+    ),
+    "X-Sitemap-Course-Status": coursesResult.status === "fulfilled"
+      ? "complete"
+      : "unavailable",
   });
 
   return [

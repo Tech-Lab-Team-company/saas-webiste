@@ -26,7 +26,7 @@ const handleLogout = () => {
   localStorage.removeItem("auth");
   localStorage.removeItem("user");
   userStore.logout();
-  router.push({ name: "login-loginhome" });
+  router.push("/loginhome");
 };
 
 const handleImageChange = async (event: Event) => {
@@ -131,7 +131,17 @@ const uploadImage = async () => {
         <span class="profile-icon profile-option-icon" aria-hidden="true">
           <i class="pi pi-book" />
         </span>
-        <p>كورساتي</p>
+        <p>مشترياتي</p>
+      </NuxtLink>
+      <NuxtLink
+        :to="{ name: 'profileavailablecourses' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-graduation-cap" />
+        </span>
+        <p>الكورسات</p>
       </NuxtLink>
       <NuxtLink
         :to="{ name: 'profileexams' }"

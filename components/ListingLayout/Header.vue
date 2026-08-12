@@ -164,7 +164,7 @@ const toggle = (event) => {
 
         <div class="user">
           <div class="not-auth" v-if="!user.isAuth">
-            <NuxtLink to="/auth/login" class="login-link">
+            <NuxtLink to="/loginhome" class="login-link">
               {{ $t("login") }}
             </NuxtLink>
             <span>/</span>

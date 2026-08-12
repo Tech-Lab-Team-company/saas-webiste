@@ -145,9 +145,20 @@ onBeforeUnmount(() => {
   heroBooksAnimationContext = null;
 });
 
+const listingTitle = computed(() =>
+  `كل كتاب له هدف واضح${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
+);
+const listingDescription = computed(() =>
+  "كل كتاب له هدف واضح. تصفح الكتب والمراجع التعليمية واختر ما يناسب احتياجك.",
+);
+
 useSeoMeta({
-  title: () => `كل كتاب له هدف واضح${site.value.brandName ? ` | ${site.value.brandName}` : ""}`,
-  description: "كل كتاب له هدف واضح. تصفح الكتب والمراجع التعليمية واختر ما يناسب احتياجك.",
+  title: () => listingTitle.value,
+  description: () => listingDescription.value,
+  ogTitle: () => listingTitle.value,
+  ogDescription: () => listingDescription.value,
+  twitterTitle: () => listingTitle.value,
+  twitterDescription: () => listingDescription.value,
 });
 
 useHead({

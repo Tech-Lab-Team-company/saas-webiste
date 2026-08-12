@@ -31,7 +31,10 @@ export default class NetworkService {
     isAuth = false,
   }: PostParams): Promise<AxiosResponse> {
     return this.axiosInstance.post(url, data, {
-      headers: headers ?? HeaderHandler.getInstance().getHeader(isAuth),
+      headers: {
+        ...HeaderHandler.getInstance().getHeader(isAuth),
+        ...headers,
+      },
       params: queryParams,
     });
   }
@@ -80,7 +83,10 @@ export default class NetworkService {
     isAuth = false,
   }: GetParams): Promise<AxiosResponse> {
     return this.axiosInstance.get(url, {
-      headers: headers ?? HeaderHandler.getInstance().getHeader(isAuth),
+      headers: {
+        ...HeaderHandler.getInstance().getHeader(isAuth),
+        ...headers,
+      },
       params: queryParams,
     });
   }

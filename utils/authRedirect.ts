@@ -21,7 +21,7 @@ export const sanitizeAuthRedirect = (value: unknown): string | null => {
   const pathname = candidate.split(/[?#]/u)[0].toLowerCase();
 
   // Do not redirect back into authentication pages and create a loop.
-  if (/^\/(?:login|auth)(?:\/|$)/u.test(pathname)) {
+  if (/^\/(?:login(?:home)?|auth)(?:\/|$)/u.test(pathname)) {
     return null;
   }
 

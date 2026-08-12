@@ -108,7 +108,7 @@ const fetchStudentCourses = async () => {
 
 onMounted(async () => {
   if (!user.value?.apiToken) {
-    await router.replace({ name: "login-loginhome" });
+    await router.replace("/loginhome");
     return;
   }
 

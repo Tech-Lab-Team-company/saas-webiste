@@ -1,22 +1,11 @@
+import { buildAbsoluteSiteUrl, resolveSiteOrigin } from "~/utils/siteUrl";
+
 export default defineEventHandler((event) => {
   const requestUrl = getRequestURL(event);
   const runtimeConfig = useRuntimeConfig(event);
   const configuredSiteUrl = String(runtimeConfig.public.siteUrl || "").trim();
-  let siteOrigin = requestUrl.origin;
-
-  if (configuredSiteUrl) {
-    try {
-      siteOrigin = new URL(
-        configuredSiteUrl.includes("://")
-          ? configuredSiteUrl
-          : `https://${configuredSiteUrl}`,
-      ).origin;
-    } catch {
-      siteOrigin = requestUrl.origin;
-    }
-  }
-
-  const sitemapUrl = new URL("/sitemap.xml", siteOrigin).toString();
+  const siteOrigin = resolveSiteOrigin(configuredSiteUrl, requestUrl.origin);
+  const sitemapUrl = buildAbsoluteSiteUrl(siteOrigin, "/sitemap.xml");
 
   setResponseHeaders(event, {
     "Content-Type": "text/plain; charset=utf-8",

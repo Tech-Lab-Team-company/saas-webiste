@@ -35,7 +35,7 @@ export default class SetNewPasswordController extends ControllerInterface<SetNew
           imageElement: successImage,
           messageContent: null,
         });
-        await router.replace("/login");
+        await router.replace("/loginhome");
         // if (this.state.value.data?.email) {
         //   ResetPasswordBuilder.Instance.setEmail(this.state.value.data?.email);
         // }

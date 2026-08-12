@@ -55,7 +55,7 @@ const droplist = ref(false);
         <NuxtLink to="/Auth/register">
           <button class="btn btn-primary btn-create">انشاء حساب</button>
         </NuxtLink>
-        <NuxtLink to="/login">
+        <NuxtLink to="/loginhome">
           <button class="btn btn-secondary btn-secondary-create" @click="handleLogin">
             تسجيل الدخول
           </button>

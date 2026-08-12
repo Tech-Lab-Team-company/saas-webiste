@@ -4,6 +4,7 @@ import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
 import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
+import { resolveSiteOrigin } from "~/utils/siteUrl";
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();
@@ -111,7 +112,7 @@ const {
     }>(`${baseUrl}/fetch_web_status`, {
       method: "GET",
       headers: {
-        "web-domain": getWebDomain() || requestUrl.hostname,
+        "web-domain": getWebDomain(),
       },
     });
     return response.data
@@ -201,21 +202,10 @@ watch(webStatus, (value) => {
   immediate: true,
 });
 
-const siteOrigin = computed(() => {
-  const configuredUrl = String(runtimeConfig.public.siteUrl || "").trim();
-
-  if (configuredUrl) {
-    try {
-      return new URL(
-        configuredUrl.includes("://") ? configuredUrl : `https://${configuredUrl}`,
-      ).origin;
-    } catch {
-      // Fall back to the active request host for multi-tenant deployments.
-    }
-  }
-
-  return requestUrl.origin;
-});
+const siteOrigin = computed(() => resolveSiteOrigin(
+  String(runtimeConfig.public.siteUrl || ""),
+  requestUrl.origin,
+));
 
 const faviconHref = computed(() => {
   const source = [
@@ -344,7 +334,7 @@ useHead(() => ({
   },
   link: [
     { key: "site-favicon", rel: "icon", href: faviconHref.value },
-    { rel: "canonical", href: canonicalUrl.value },
+    { key: "canonical", rel: "canonical", href: canonicalUrl.value },
     { rel: "preconnect", href: "https://dev.saas.techlabeg.com", crossorigin: "anonymous" },
     { rel: "dns-prefetch", href: "https://dev.saas.techlabeg.com" },
   ],

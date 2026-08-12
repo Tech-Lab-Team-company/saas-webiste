@@ -78,7 +78,7 @@ const open = async () => {
       detail: "يلزم تسجيل الدخول لإتمام شراء الكتاب.",
       life: 3500,
     });
-    await router.push({ path: "/login", query: { redirect: route.fullPath } });
+    await router.push({ path: "/loginhome", query: { redirect: route.fullPath } });
     return;
   }
 

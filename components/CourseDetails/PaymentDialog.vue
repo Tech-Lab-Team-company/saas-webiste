@@ -9,7 +9,7 @@ import CoursesPaymentController from "~/features/CoursePayment/presentation/cont
 import { PaymentTypes } from "./Enum/payment_types_enum";
 import OnlinePaymentController from "~/features/OnlinePayment/presentation/controllers/online_payment_controller";
 import OnlinePaymentParams from "~/features/OnlinePayment/Core/Params/online_payment_params";
-import { getWebDomain } from "~/constant/webDomain";
+import { useSiteUrl } from "~/utils/siteUrl";
 import Loder from "../Loader/Loder.vue";
 
 // 🔹 Props
@@ -30,6 +30,7 @@ const route = useRoute();
 const userStore = useUserStore();
 const settingStore = useSettingStore();
 const paymentStore = usePaymentStore();
+const { buildSiteUrl } = useSiteUrl();
 
 // 🔹 Watchers
 watch(
@@ -72,15 +73,18 @@ const Loader = ref(false);
 const OnlinePayment = async () => {
   visible.value = false;
   Loader.value = true;
+  const callbackUrl = buildSiteUrl(
+    `/paymentverify/${paymentMethod.value.id}`,
+  );
   const onlinePaymentParams = new OnlinePaymentParams(
     String(route.params.id),
     paymentMethod.value.id,
     null,
-    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
-    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
-    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
-    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`,
-    `https://${getWebDomain()}/paymentverify/${paymentMethod.value.id}`
+    callbackUrl,
+    callbackUrl,
+    callbackUrl,
+    callbackUrl,
+    callbackUrl,
   );
   const onlinePaymentController = OnlinePaymentController.getInstance();
   const state = await onlinePaymentController.CreateOnlinePayment(
@@ -102,7 +106,7 @@ const toast = useToast();
 const FireToast = () => {
   console.log("ASdasd");
   toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
-  router.push({ path: "/login", query: { redirect: route.fullPath } });
+  router.push({ path: "/loginhome", query: { redirect: route.fullPath } });
 }
 </script>
 

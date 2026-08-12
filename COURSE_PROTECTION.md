@@ -81,13 +81,19 @@ route rules require a compatible server or hosting adapter.
 
 ## `WEB_LINK` configuration
 
-Only one application environment variable is required:
+The tenant identifier is configured separately from the public frontend URL:
 
 ```dotenv
-WEB_LINK=https://your-domain.com
+NUXT_PUBLIC_WEB_LINK=your-tenant.example.com
+NUXT_PUBLIC_SITE_URL=https://web.your-tenant.example.com
 ```
 
-`nuxt.config.ts` exposes this value as `runtimeConfig.public.webLink`.
+`WEB_LINK` remains a backward-compatible deployment fallback for
+`NUXT_PUBLIC_WEB_LINK`; `SITE_URL` does the same for `NUXT_PUBLIC_SITE_URL`.
+The `webLink` value identifies the backend tenant and is never a public URL.
+The `siteUrl` value is the public frontend origin.
+
+`nuxt.config.ts` exposes the tenant value as `runtimeConfig.public.webLink`.
 `constant/webDomain.ts` only normalizes this configured value into a hostname
 for the `web-domain` API header. It no longer:
 
@@ -99,7 +105,7 @@ for the `web-domain` API header. It no longer:
 Books, blogs, FAQs, legal documents, teacher content, general API headers and
 the home-course request now all use the same configured `WEB_LINK` source.
 
-After changing `WEB_LINK`, restart the development server or rebuild the
+After changing either runtime value, restart the development server or rebuild the
 production application.
 
 ## Internal protection defaults

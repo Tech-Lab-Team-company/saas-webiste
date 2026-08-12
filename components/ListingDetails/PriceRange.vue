@@ -159,7 +159,7 @@ const addToBookmark = async () => {
           listingDate?.BasicInformation.status !== ProjectStatusEnum.Pending
         "
       />
-      <NuxtLink to="/auth/login" class="secondary-button" v-if="!user.isAuth">
+      <NuxtLink to="/loginhome" class="secondary-button" v-if="!user.isAuth">
         {{ $t("login") }}
       </NuxtLink>
     </div>

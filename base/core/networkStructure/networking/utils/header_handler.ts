@@ -20,7 +20,7 @@ class HeaderHandler {
     return this.instance;
   }
 
-  getHeader(isAuth = false, webDomain: string): { [key: string]: string } {
+  getHeader(isAuth = false): { [key: string]: string } {
     const headers: { [key: string]: string } = {};
     const userStore = this.userStore; // Initialize the store here
 

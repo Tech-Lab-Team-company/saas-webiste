@@ -169,7 +169,7 @@ watch(
                     {{ isExpanded(slide.id) ? "عرض أقل" : "عرض المزيد" }}
                   </button>
                   <div class="flex gap-sm">
-                    <NuxtLink to="/login" class="btn-link">
+                    <NuxtLink to="/loginhome" class="btn-link">
                       <button class="btn btn-secondary">تسجيل الدخول</button>
                     </NuxtLink>
                     <NuxtLink to="/Auth/register" class="btn-link">
