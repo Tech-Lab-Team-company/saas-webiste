@@ -146,6 +146,11 @@ export interface HomeBooksViewModel {
   }
 }
 
+export interface HomeSubjectViewModel {
+  id: number
+  label: string
+}
+
 export interface HomeBookDetailsViewModel extends HomeBookViewModel {
   attachments: Array<{
     id: number

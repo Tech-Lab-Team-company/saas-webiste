@@ -28,6 +28,7 @@ import type {
   HomeLearningJourneyViewModel,
   HomePageViewModel,
   HomeSiteViewModel,
+  HomeSubjectViewModel,
   HomeWebsiteSectionBookViewModel,
 } from '../models/HomePageViewModel'
 import { BookPriceTypeEnum, BookTypeEnum } from '../models/HomePageViewModel'
@@ -367,6 +368,22 @@ export const mapHomeCourseSubjectIds = (value: unknown): Set<number> => {
   })
 
   return subjectIds
+}
+
+export const mapHomeSubjects = (value: unknown): HomeSubjectViewModel[] => {
+  const subjects = new Map<number, HomeSubjectViewModel>()
+
+  toArray(value).forEach((item) => {
+    if (!isRecord(item)) return
+
+    const id = toNullableNumber(item.id)
+    const label = toNullableString(item.title ?? item.label ?? item.name)
+    if (id === null || !label || subjects.has(id)) return
+
+    subjects.set(id, { id, label })
+  })
+
+  return [...subjects.values()]
 }
 
 export const mapHomeCourseStages = (value: unknown): HomeCourseStageViewModel[] => {

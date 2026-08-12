@@ -6,14 +6,23 @@ import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
 import {
   createEmptyBooks,
   mapBooksPage,
+  mapHomeCourseStages,
+  mapHomeCourseYears,
   mapHomeSite,
+  mapHomeSubjects,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
-import type { HomeBookViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import type {
+  HomeBookViewModel,
+  HomeCourseStageViewModel,
+  HomeCourseTabViewModel,
+  HomeSubjectViewModel,
+} from "~/features/HomePageFeature/models/HomePageViewModel";
 import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 definePageMeta({ layout: "home-v2" });
 
 const route = useRoute();
+const router = useRouter();
 const webDomain = getWebDomain();
 
 const settingsStore = useSettingStore();
@@ -23,19 +32,80 @@ const currentPage = computed(() => {
   const value = Number(route.query.page);
   return Number.isInteger(value) && value > 0 ? value : 1;
 });
+const readPositiveQueryInteger = (value: unknown) => {
+  const number = Number(value);
+  return Number.isInteger(number) && number > 0 ? number : null;
+};
+const currentStageId = computed(() =>
+  readPositiveQueryInteger(route.query.stage_id),
+);
+const currentYearId = computed(() =>
+  readPositiveQueryInteger(route.query.year_id),
+);
+const currentSubjectId = computed(() => {
+  return readPositiveQueryInteger(route.query.subject_id);
+});
 
 const api = new HomePageApi(webDomain);
-const { data: books, pending, error, refresh } = await useAsyncData(
-  `books-page:${webDomain}`,
-  async () => mapBooksPage(await api.fetchBooks(currentPage.value)),
+const { data: stages, pending: stagesPending } = await useAsyncData<
+  HomeCourseStageViewModel[]
+>(
+  `books-stages:${webDomain}`,
+  async () => mapHomeCourseStages(await api.fetchStages()),
   {
-    default: createEmptyBooks,
+    default: () => [],
     dedupe: "defer",
   },
 );
+const selectedStage = computed(() =>
+  stages.value.find((stage) => stage.id === currentStageId.value) ?? null,
+);
+const yearsRequest = useAsyncData<HomeCourseTabViewModel[]>(
+  `books-stage-years:${webDomain}`,
+  async () => {
+    if (!selectedStage.value) return [];
+    return mapHomeCourseYears(
+      selectedStage.value,
+      await api.fetchStageYears(selectedStage.value.id),
+    );
+  },
+  {
+    default: () => [],
+    dedupe: "defer",
+    watch: [currentStageId],
+  },
+);
+const subjectsRequest = useAsyncData<HomeSubjectViewModel[]>(
+  `books-subjects:${webDomain}`,
+  async () => {
+    if (!currentYearId.value) return [];
+    return mapHomeSubjects(await api.fetchSubjectsByYear(currentYearId.value));
+  },
+  {
+    default: () => [],
+    dedupe: "defer",
+    watch: [currentYearId],
+  },
+);
+const booksRequest = useAsyncData(
+  `books-page:${webDomain}`,
+  async () =>
+    mapBooksPage(
+      await api.fetchBooks(currentPage.value, currentSubjectId.value),
+    ),
+  {
+    default: createEmptyBooks,
+    dedupe: "defer",
+    watch: [currentPage, currentSubjectId],
+  },
+);
+const [
+  { data: years, pending: yearsPending },
+  { data: subjects, pending: subjectsPending },
+  { data: books, pending, error },
+] = await Promise.all([yearsRequest, subjectsRequest, booksRequest]);
 
-watch(currentPage, async () => {
-  await refresh();
+watch([currentPage, currentSubjectId], () => {
   if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -57,38 +127,64 @@ const coverTones = ["mint", "coral", "sky", "gold", "deep", "violet"] as const;
 const coverTone = (book: HomeBookViewModel) =>
   coverTones[Math.abs(book.id) % coverTones.length];
 
-type GradeKey = "secondary-1" | "secondary-2" | "secondary-3";
 type FormatKey = "all" | "digital" | "printed";
 
-const grades: Array<{ key: GradeKey; label: string; patterns: RegExp }> = [
-  { key: "secondary-1", label: "أولى ثانوي", patterns: /أولى|الأول|اولى|الاول|1\s*ثانوي/u },
-  { key: "secondary-2", label: "ثانية ثانوي", patterns: /ثانية|الثاني|تانية|الثانى|2\s*ثانوي/u },
-  { key: "secondary-3", label: "ثالثة ثانوي", patterns: /ثالثة|الثالث|تالتة|الثانوية العامة|3\s*ثانوي/u },
-];
-
-const selectedGrade = ref<GradeKey | null>(null);
 const selectedFormat = ref<FormatKey>("all");
 
-const detectBookGrade = (book: HomeBookViewModel): GradeKey | null => {
-  const searchableText = `${book.title} ${book.subtitle || ""} ${book.description || ""}`;
-  return grades.find((grade) => grade.patterns.test(searchableText))?.key ?? null;
-};
-
 const filteredBooks = computed(() => books.value.items.filter((book) => {
-  const detectedGrade = detectBookGrade(book);
-  const matchesGrade = !selectedGrade.value || !detectedGrade || detectedGrade === selectedGrade.value;
   const matchesFormat = selectedFormat.value === "all"
     || book.bookType === null
     || book.bookType === 3
     || (selectedFormat.value === "digital" && book.bookType === 1)
     || (selectedFormat.value === "printed" && book.bookType === 2);
 
-  return matchesGrade && matchesFormat;
+  return matchesFormat;
 }));
 
-const selectedGradeLabel = computed(() =>
-  grades.find((grade) => grade.key === selectedGrade.value)?.label || "كل الصفوف",
+const selectedSubjectLabel = computed(() =>
+  subjects.value.find((subject) => subject.id === currentSubjectId.value)?.label
+    || "كل المواد",
 );
+const visibleBookCount = computed(() =>
+  selectedFormat.value === "all"
+    ? books.value.pagination.total || filteredBooks.value.length
+    : filteredBooks.value.length,
+);
+
+const booksQuery = (page = 1) => ({
+  ...(currentStageId.value ? { stage_id: currentStageId.value } : {}),
+  ...(currentYearId.value ? { year_id: currentYearId.value } : {}),
+  ...(currentSubjectId.value ? { subject_id: currentSubjectId.value } : {}),
+  ...(page > 1 ? { page } : {}),
+});
+
+const selectStage = async (stageId: number) => {
+  if (stageId === currentStageId.value) return;
+  await router.push({ path: "/books", query: { stage_id: stageId } });
+};
+
+const selectYear = async (yearId: number) => {
+  if (yearId === currentYearId.value) return;
+  await router.push({
+    path: "/books",
+    query: {
+      ...(currentStageId.value ? { stage_id: currentStageId.value } : {}),
+      year_id: yearId,
+    },
+  });
+};
+
+const selectSubject = async (subjectId: number | null) => {
+  if (subjectId === currentSubjectId.value) return;
+  await router.push({
+    path: "/books",
+    query: {
+      ...(currentStageId.value ? { stage_id: currentStageId.value } : {}),
+      ...(currentYearId.value ? { year_id: currentYearId.value } : {}),
+      ...(subjectId ? { subject_id: subjectId } : {}),
+    },
+  });
+};
 
 const heroBooksRef = ref<HTMLElement | null>(null);
 let heroBooksAnimationContext: ReturnType<typeof gsap.context> | null = null;
@@ -210,30 +306,84 @@ useHead({
             </div>
           </div>
 
-          <section class="books-page__filter-panel" aria-labelledby="books-grade-filter-title">
+          <section class="books-page__filter-panel" aria-labelledby="books-subject-filter-title">
             <div>
               <span>الخطوة الأولى</span>
-              <h3 id="books-grade-filter-title">أنت في أنهي صف؟</h3>
-              <p>بعد اختيارك هنعرض الكتب والمذكرات المناسبة لصفك فقط.</p>
+              <h3 id="books-subject-filter-title">اختار المادة</h3>
+              <p>اختار المرحلة والسنة، وبعدها المادة لعرض الكتب المناسبة.</p>
             </div>
-            <div class="books-page__grade-tabs" role="group" aria-label="اختيار الصف الدراسي">
-              <button
-                v-for="grade in grades"
-                :key="grade.key"
-                type="button"
-                :class="{ 'is-active': selectedGrade === grade.key }"
-                :aria-pressed="selectedGrade === grade.key"
-                @click="selectedGrade = selectedGrade === grade.key ? null : grade.key"
-              >
-                {{ grade.label }}
-              </button>
+            <div class="books-page__taxonomy">
+              <div class="books-page__taxonomy-group">
+                <b>المرحلة</b>
+                <div class="books-page__taxonomy-tabs" role="group" aria-label="اختيار المرحلة الدراسية">
+                  <button
+                    v-for="stage in stages"
+                    :key="stage.id"
+                    type="button"
+                    :class="{ 'is-active': currentStageId === stage.id }"
+                    :aria-pressed="currentStageId === stage.id"
+                    @click="selectStage(stage.id)"
+                  >
+                    {{ stage.label }}
+                  </button>
+                  <span v-if="stagesPending" class="books-page__subjects-loading">
+                    جاري تحميل المراحل...
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="currentStageId" class="books-page__taxonomy-group">
+                <b>السنة الدراسية</b>
+                <div class="books-page__taxonomy-tabs" role="group" aria-label="اختيار السنة الدراسية">
+                  <button
+                    v-for="year in years"
+                    :key="year.yearId"
+                    type="button"
+                    :class="{ 'is-active': currentYearId === year.yearId }"
+                    :aria-pressed="currentYearId === year.yearId"
+                    @click="selectYear(year.yearId)"
+                  >
+                    {{ year.label }}
+                  </button>
+                  <span v-if="yearsPending" class="books-page__subjects-loading">
+                    جاري تحميل السنوات...
+                  </span>
+                </div>
+              </div>
+
+              <div v-if="currentYearId" class="books-page__taxonomy-group">
+                <b>المادة</b>
+                <div class="books-page__taxonomy-tabs" role="group" aria-label="تصفية الكتب حسب المادة">
+                  <button
+                    type="button"
+                    :class="{ 'is-active': currentSubjectId === null }"
+                    :aria-pressed="currentSubjectId === null"
+                    @click="selectSubject(null)"
+                  >
+                    كل المواد
+                  </button>
+                  <button
+                    v-for="subject in subjects"
+                    :key="subject.id"
+                    type="button"
+                    :class="{ 'is-active': currentSubjectId === subject.id }"
+                    :aria-pressed="currentSubjectId === subject.id"
+                    @click="selectSubject(subject.id)"
+                  >
+                    {{ subject.label }}
+                  </button>
+                  <span v-if="subjectsPending" class="books-page__subjects-loading">
+                    جاري تحميل المواد...
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
 
           <div class="books-page__results-bar">
             <div>
-              <span>مكتبة {{ selectedGradeLabel }}</span>
-              <b>{{ filteredBooks.length }} كتاب متاح</b>
+              <span>مكتبة {{ selectedSubjectLabel }}</span>
+              <b>{{ visibleBookCount }} كتاب متاح</b>
             </div>
             <div class="books-page__format-tabs" role="group" aria-label="تصفية حسب نوع النسخة">
               <button type="button" :class="{ 'is-active': selectedFormat === 'all' }" @click="selectedFormat = 'all'">
@@ -321,7 +471,7 @@ useHead({
           >
             <NuxtLink
               v-if="books.pagination.hasPreviousPage"
-              :to="{ path: '/books', query: { page: currentPage - 1 } }"
+              :to="{ path: '/books', query: booksQuery(currentPage - 1) }"
               aria-label="الصفحة السابقة"
             >
               السابق
@@ -329,7 +479,7 @@ useHead({
             <NuxtLink
               v-for="pageNumber in visiblePages"
               :key="pageNumber"
-              :to="{ path: '/books', query: pageNumber === 1 ? {} : { page: pageNumber } }"
+              :to="{ path: '/books', query: booksQuery(pageNumber) }"
               :class="{ 'is-active': pageNumber === books.pagination.currentPage }"
               :aria-current="pageNumber === books.pagination.currentPage ? 'page' : undefined"
             >
@@ -337,7 +487,7 @@ useHead({
             </NuxtLink>
             <NuxtLink
               v-if="books.pagination.hasNextPage"
-              :to="{ path: '/books', query: { page: currentPage + 1 } }"
+              :to="{ path: '/books', query: booksQuery(currentPage + 1) }"
               aria-label="الصفحة التالية"
             >
               التالي
@@ -795,13 +945,35 @@ useHead({
   line-height: 1.8;
 }
 
-.books-page__grade-tabs {
+.books-page__taxonomy {
+  display: grid;
+  gap: 18px;
+}
+
+.books-page__taxonomy-group {
+  display: grid;
+  gap: 8px;
+}
+
+.books-page__taxonomy-group > b {
+  color: var(--home-v2-muted);
+  font-size: 12px;
+}
+
+.books-page__taxonomy-tabs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
 
-.books-page__grade-tabs button,
+.books-page__subjects-loading {
+  grid-column: 1 / -1;
+  color: var(--home-v2-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.books-page__taxonomy-tabs button,
 .books-page__format-tabs button {
   min-height: 48px;
   padding: 10px 14px;
@@ -813,16 +985,16 @@ useHead({
   transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
-.books-page__grade-tabs button:hover,
-.books-page__grade-tabs button:focus-visible,
-.books-page__grade-tabs button.is-active {
+.books-page__taxonomy-tabs button:hover,
+.books-page__taxonomy-tabs button:focus-visible,
+.books-page__taxonomy-tabs button.is-active {
   border-color: var(--home-v2-deep);
   outline: none;
   background: var(--home-v2-deep);
   color: #fff;
 }
 
-.books-page__grade-tabs button:active,
+.books-page__taxonomy-tabs button:active,
 .books-page__format-tabs button:active {
   transform: translateY(1px);
 }
@@ -1183,7 +1355,7 @@ useHead({
     padding: 20px 16px;
   }
 
-  .books-page__grade-tabs,
+  .books-page__taxonomy-tabs,
   .books-page__format-tabs {
     grid-template-columns: 1fr;
   }
