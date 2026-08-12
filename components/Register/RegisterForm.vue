@@ -2,14 +2,14 @@
 // import MapIcon from "../../public/icons/map.vue";
 // import city from "../../public/icons/city.vue";
 // import national from "../../public/icons/national.vue";
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import RegisterController from "~/features/RegisterFeature/presentation/controllers/register_controller";
 // import FetchCountriesParams from "~/features/FetchCountriesFeature/Core/Params/fetch_countries_params";
 // import FetchCountriesController from "~/features/FetchCountriesFeature/presentation/controllers/fetch_countries_controller";
 import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_model";
 import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
-import { StudentCategoryEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
+import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 import countries from "~/data/countries.json";
 
 const UserSetting = useSettingStore();
@@ -24,7 +24,6 @@ const passwordError = ref("");
 const confirmPasswordError = ref("");
 const selectedCountry = ref(UserSetting?.setting?.country_code);
 
-
 const router = useRouter();
 
 const validatePassword = () => {
@@ -33,7 +32,7 @@ const validatePassword = () => {
   if (!password.value) {
     passwordError.value = "كلمة المرور مطلوبة";
   } else if (!passwordRegex.test(password.value)) {
-    passwordError.value = ""
+    passwordError.value = "";
     // "كلمة المرور يجب أن تكون أكثر من 8 أحرف وتحتوي على رموز مثل (/*#@)";
   } else {
     passwordError.value = "";
@@ -52,7 +51,6 @@ const toggleTermsDialog = (event: Event) => {
   showTermsDialog.value = checkbox.checked; // الـ dialog يظهر فقط عند تحديد الـ checkbox
 };
 
-
 const FirstName = ref("");
 const SecondName = ref("");
 const Email = ref("");
@@ -61,14 +59,40 @@ const FirstphoneNumber = ref("");
 const SecondphoneNumber = ref("");
 const studentType = ref(0);
 const license_accept = ref(0);
-const Education_Type = ref(0)
+const Education_Type = ref(0);
+
+const educationTypeOptions = [
+  { value: CategoryIdEnum.BASIC, label: "اساسى" },
+  { value: CategoryIdEnum.UNIVERSITY, label: "جامعى" },
+  { value: CategoryIdEnum.GENERAL, label: "عام" },
+] as const;
+
+const availableEducationTypeOptions = computed(() => {
+  const enabledCategoryIds = new Set(
+    (UserSetting.setting?.categories ?? []).map(Number),
+  );
+
+  return educationTypeOptions.filter(({ value }) =>
+    enabledCategoryIds.has(value),
+  );
+});
+
+watch(
+  availableEducationTypeOptions,
+  (options) => {
+    if (!options.some(({ value }) => value === Education_Type.value)) {
+      Education_Type.value = options[0]?.value ?? 0;
+    }
+  },
+  { immediate: true },
+);
 
 const PhoneCode = ref(UserSetting?.setting?.country_code);
 
-
 const CheckData = async () => {
-console.log(selectedCountry?.value , "code")
-  const registerParams = new RegisterParams(FirstName.value,
+  console.log(selectedCountry?.value, "code");
+  const registerParams = new RegisterParams(
+    FirstName.value,
     SecondName.value || null,
     StudentAddress.value || null,
     Email.value || null,
@@ -78,14 +102,14 @@ console.log(selectedCountry?.value , "code")
     confirmPassword.value,
     Education_Type.value,
     selectedCountry?.value,
-    studentType.value)
+    studentType.value,
+  );
 
   const registerController = RegisterController.getInstance();
   const state = await registerController.Register(registerParams, router);
+};
 
-}
-
-const data = ref<CountryModel[]>([])
+const data = ref<CountryModel[]>([]);
 const cities = ref<CountryModel[]>([]);
 
 // const ftechData =async ()=>{
@@ -102,18 +126,12 @@ const cities = ref<CountryModel[]>([]);
 //   ftechData();
 // });
 
-
-
-
-
 watch(
   () => data.value,
   (newValue) => {
     data.value = newValue;
-  });
-
-  
-
+  },
+);
 
 // const validatePhoneNumber = (number: Event) => {
 //   if (number.target) {
@@ -129,7 +147,6 @@ watch(
 // }
 
 const settingStore = useSettingStore();
-
 </script>
 
 <template>
@@ -143,50 +160,86 @@ const settingStore = useSettingStore();
 
       <div class="inputs">
         <div class="auth-field-group">
-          <label class="auth-field-label" for="register-first-name">الاسم الأول *</label>
+          <label class="auth-field-label" for="register-first-name"
+            >الاسم الأول *</label
+          >
           <div class="login-input">
             <input id="register-first-name" type="text" v-model="FirstName" />
           </div>
         </div>
 
-        <div class="auth-field-group" v-if="settingStore?.setting?.allow_parent_name">
-          <label class="auth-field-label" for="register-parent-name">اسم ولي الأمر *</label>
+        <div
+          class="auth-field-group"
+          v-if="settingStore?.setting?.allow_parent_name"
+        >
+          <label class="auth-field-label" for="register-parent-name"
+            >اسم ولي الأمر *</label
+          >
           <div class="login-input">
             <input id="register-parent-name" type="text" v-model="SecondName" />
           </div>
         </div>
 
-        <div class="auth-field-group" v-if="settingStore?.setting?.address_required">
-          <label class="auth-field-label" for="register-address">العنوان *</label>
+        <div
+          class="auth-field-group"
+          v-if="settingStore?.setting?.address_required"
+        >
+          <label class="auth-field-label" for="register-address"
+            >العنوان *</label
+          >
           <div class="login-input">
             <input id="register-address" type="text" v-model="StudentAddress" />
           </div>
         </div>
 
-        <div class="auth-field-group" v-if="settingStore?.setting?.email_required">
-          <label class="auth-field-label" for="register-email">البريد الإلكتروني *</label>
+        <div
+          class="auth-field-group"
+          v-if="settingStore?.setting?.email_required"
+        >
+          <label class="auth-field-label" for="register-email"
+            >البريد الإلكتروني *</label
+          >
           <div class="login-input">
             <input id="register-email" type="email" v-model="Email" />
           </div>
         </div>
 
         <div class="auth-field-group">
-          <label class="auth-field-label" for="register-phone">رقم الهاتف</label>
+          <label class="auth-field-label" for="register-phone"
+            >رقم الهاتف</label
+          >
           <div class="login-input login-input-phone-code">
             <div class="phone-number">
-              <input id="register-phone" type="tel" v-model="FirstphoneNumber" />
+              <input
+                id="register-phone"
+                type="tel"
+                v-model="FirstphoneNumber"
+              />
             </div>
-            <div class="phone-code" v-if="settingStore?.setting?.country_code_required">
-              <Select :defaultValue="{ dial_code: `${UserSetting?.setting?.country_code}` }" v-model="selectedCountry" :options="countries" filter optionLabel="name"
-                class="w-full md:w-56">
+            <div
+              class="phone-code"
+              v-if="settingStore?.setting?.country_code_required"
+            >
+              <Select
+                :defaultValue="{
+                  dial_code: `${UserSetting?.setting?.country_code}`,
+                }"
+                v-model="selectedCountry"
+                :options="countries"
+                filter
+                optionLabel="name"
+                class="w-full md:w-56"
+              >
                 <template #value="slotProps">
                   <div v-if="slotProps.value" class="flex items-center">
-                    <div>{{ slotProps.value.dial_code }} {{ slotProps.value.flag }}</div>
+                    <div>
+                      {{ slotProps.value.dial_code }} {{ slotProps.value.flag }}
+                    </div>
                   </div>
                 </template>
 
                 <template #option="slotProps">
-                  <div class="flex items-center ">
+                  <div class="flex items-center">
                     <span>{{ slotProps.option.flag }}</span>
                     <span>{{ slotProps.option.name }}</span>
                     <div>({{ slotProps.option.dial_code }})</div>
@@ -197,17 +250,33 @@ const settingStore = useSettingStore();
           </div>
         </div>
 
-        <div class="auth-field-group" v-if="settingStore?.setting?.allow_parent_phone">
-          <label class="auth-field-label" for="register-parent-phone">رقم هاتف ولي الأمر</label>
+        <div
+          class="auth-field-group"
+          v-if="settingStore?.setting?.allow_parent_phone"
+        >
+          <label class="auth-field-label" for="register-parent-phone"
+            >رقم هاتف ولي الأمر</label
+          >
           <div class="login-input">
-            <input id="register-parent-phone" type="tel" v-model="SecondphoneNumber" />
+            <input
+              id="register-parent-phone"
+              type="tel"
+              v-model="SecondphoneNumber"
+            />
           </div>
         </div>
 
         <div class="auth-field-group">
-          <label class="auth-field-label" for="register-student-type">نوع الطالب</label>
+          <label class="auth-field-label" for="register-student-type"
+            >نوع الطالب</label
+          >
           <div class="login-input">
-            <select id="register-student-type" class="student-select" v-model="studentType" required>
+            <select
+              id="register-student-type"
+              class="student-select"
+              v-model="studentType"
+              required
+            >
               <option :value="GenderEnum?.male">ذكر</option>
               <option :value="GenderEnum?.female">انثى</option>
             </select>
@@ -215,23 +284,45 @@ const settingStore = useSettingStore();
         </div>
 
         <div class="auth-field-group">
-          <label class="auth-field-label" for="register-education-type">نوع التعليم</label>
+          <label class="auth-field-label" for="register-education-type"
+            >نوع التعليم</label
+          >
           <div class="login-input">
-            <select id="register-education-type" class="student-select" v-model="Education_Type" required>
-              <option v-if="settingStore?.setting?.categories.includes(1)" :value="StudentCategoryEnum.base">اساسى
+            <select
+              id="register-education-type"
+              class="student-select"
+              v-model="Education_Type"
+              required
+            >
+              <option
+                v-if="availableEducationTypeOptions.length === 0"
+                :value="0"
+                disabled
+              >
+                لا توجد أنواع تعليم متاحة
               </option>
-              <option v-if="settingStore?.setting?.categories.includes(2)" :value="StudentCategoryEnum.university">جامعى
+              <option
+                v-for="option in availableEducationTypeOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
               </option>
-              <option v-if="settingStore?.setting?.has_general" :value="StudentCategoryEnum.general">عام</option>
             </select>
           </div>
         </div>
 
         <div class="auth-field-group">
-          <label class="auth-field-label" for="register-password">كلمة المرور</label>
+          <label class="auth-field-label" for="register-password"
+            >كلمة المرور</label
+          >
           <div class="login-input password-container">
-            <input id="register-password" :type="showPassword ? 'text' : 'password'" v-model="password"
-              @input="validatePassword" />
+            <input
+              id="register-password"
+              :type="showPassword ? 'text' : 'password'"
+              v-model="password"
+              @input="validatePassword"
+            />
           </div>
           <div class="error-message" v-if="passwordError">
             {{ passwordError }}
@@ -239,10 +330,16 @@ const settingStore = useSettingStore();
         </div>
 
         <div class="auth-field-group">
-          <label class="auth-field-label" for="register-confirm-password">تأكيد كلمة المرور *</label>
+          <label class="auth-field-label" for="register-confirm-password"
+            >تأكيد كلمة المرور *</label
+          >
           <div class="login-input password-container">
-            <input id="register-confirm-password" :type="showConfirmPassword ? 'text' : 'password'"
-              v-model="confirmPassword" @input="validatePassword" />
+            <input
+              id="register-confirm-password"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              v-model="confirmPassword"
+              @input="validatePassword"
+            />
           </div>
           <div class="error-message" v-if="confirmPasswordError">
             {{ confirmPasswordError }}
@@ -270,11 +367,20 @@ const settingStore = useSettingStore();
 
         <div class="remember-mee">
           <label for="rememberr">موافق على الشروط و الاحكام </label>
-          <input id="rememberr" type="checkbox" @change="toggleTermsDialog" v-model="license_accept" />
+          <input
+            id="rememberr"
+            type="checkbox"
+            @change="toggleTermsDialog"
+            v-model="license_accept"
+          />
         </div>
         <!-- <NuxtLink to="/Auth/emailcode" @click="CheckData"> -->
-        <div class="btns btns-home" @click="CheckData">
-          <button class="login-btn">
+        <div class="btns btns-home">
+          <button
+            class="login-btn"
+            :disabled="availableEducationTypeOptions.length === 0"
+            @click="CheckData"
+          >
             التالى
           </button>
         </div>
@@ -293,7 +399,6 @@ const settingStore = useSettingStore();
       </div>
     </div>
 
-    <!--اDialog -->
     <div class="terms-dialog" v-if="showTermsDialog">
       <div class="dialog-content">
         <span class="close" @click="showTermsDialog = false">&times;</span>
@@ -329,7 +434,6 @@ const settingStore = useSettingStore();
 }
 
 /*  */
-
 
 .remember-mee {
   display: flex;
@@ -381,7 +485,6 @@ const settingStore = useSettingStore();
       }
     }
   }
-
 }
 
 .password-container {
@@ -436,13 +539,13 @@ const settingStore = useSettingStore();
   width: 320px;
 }
 
-@media(max-width: 767px) {
+@media (max-width: 767px) {
   .city-select {
     width: 200px;
   }
 }
 
-@media(max-width: 500px) {
+@media (max-width: 500px) {
   .city-select {
     width: 120px;
   }
@@ -521,7 +624,6 @@ input:focus {
   border-radius: 10px;
   cursor: pointer;
 }
-
 
 .close {
   position: absolute;

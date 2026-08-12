@@ -28,16 +28,6 @@ const mobileHeroImage = computed(() =>
     ? heroData.value?.mobileImage
     : null,
 );
-const imageService = useImage();
-const optimizedMobileHeroSource = computed(() =>
-  mobileHeroImage.value?.src
-    ? imageService(mobileHeroImage.value.src, {
-        width: 640,
-        format: "webp",
-        quality: 78,
-      })
-    : undefined,
-);
 const settingsLogo = computed(() =>
   imageIsAvailable(props.site.logo?.src) ? props.site.logo : null,
 );
@@ -276,11 +266,11 @@ onMounted(() => {
       >
         <picture v-if="heroImage">
           <source
-            v-if="optimizedMobileHeroSource && !heroUsesSettingsLogo"
+            v-if="mobileHeroImage?.src && !heroUsesSettingsLogo"
             media="(max-width: 780px)"
-            :srcset="optimizedMobileHeroSource"
+            :srcset="mobileHeroImage.src"
           />
-          <NuxtImg
+          <img
             :class="[
               'home-v2-hero__image',
               { 'home-v2-hero__image--logo': heroUsesSettingsLogo },
@@ -289,13 +279,9 @@ onMounted(() => {
             :alt="heroImageAlt"
             width="1086"
             height="1448"
-            sizes="321px sm:562px"
-            format="webp"
-            quality="78"
             loading="eager"
             fetchpriority="high"
             decoding="async"
-            :preload="{ fetchPriority: 'high' }"
             @error="handleHeroImageError(heroImage?.src)"
           />
         </picture>

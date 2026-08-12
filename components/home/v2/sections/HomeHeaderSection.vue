@@ -9,6 +9,7 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const isHydrated = ref(false);
 
 const userImage = computed(
   () => userStore.image || userStore.user?.image || "/images/user.png",
@@ -71,6 +72,7 @@ const queueHeaderStateUpdate = () => {
 };
 
 onMounted(() => {
+  isHydrated.value = true;
   queueHeaderStateUpdate();
   window.addEventListener("scroll", queueHeaderStateUpdate, {
     passive: true,
@@ -147,7 +149,10 @@ onBeforeUnmount(() => {
         </NuxtLink>
       </nav>
 
-      <div v-if="!userStore.user" class="home-v2-header__actions">
+      <div
+        v-if="!isHydrated || !userStore.user"
+        class="home-v2-header__actions"
+      >
         <NuxtLink
           to="/loginhome"
           prefetch-on="interaction"
@@ -172,6 +177,8 @@ onBeforeUnmount(() => {
         >
           <img
             :src="userImage"
+            width="38"
+            height="38"
             :alt="
               userStore.user.name
                 ? `صورة الطالب ${userStore.user.name}`

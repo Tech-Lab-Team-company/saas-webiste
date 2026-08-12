@@ -108,11 +108,11 @@ const mapHeroSectionApiDto = (value: unknown): HomeHeroSectionApiDto | null => {
     link: toNullableString(value.link ?? value.button_link ?? value.action_url),
     image: mapFlexibleImageApiDto(
       value.image ?? value.img ?? value.icon ?? media?.image ?? media?.img,
-      value.image_alt ?? value.alt,
+      value.image_alt ?? value.alt ?? media?.alt,
     ),
     mobileImage: mapFlexibleImageApiDto(
       value.mobile_image ?? value.mobile_img ?? media?.mobileImage ?? media?.mobile_img,
-      value.mobile_image_alt ?? value.mobile_alt,
+      value.mobile_image_alt ?? value.mobile_alt ?? media?.mobile_alt ?? media?.alt,
     ),
   }
 

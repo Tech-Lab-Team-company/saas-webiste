@@ -1,4 +1,5 @@
 import type ImageModel from "~/features/FetchCourseDetails/Data/models/image_model";
+import type { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 
 
 export default interface WebStatus {
@@ -56,4 +57,5 @@ export default interface WebStatus {
     buy_option_status:number;
     allow_coupon:boolean;
     allow_complete_data:boolean;
+    categories: CategoryIdEnum[];
 }

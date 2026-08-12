@@ -6,7 +6,6 @@ export interface SwiperHome {
   text: string;
   media: {
     img: string;
-    mobile_img: string;
     alt: string;
   };
   type: number;

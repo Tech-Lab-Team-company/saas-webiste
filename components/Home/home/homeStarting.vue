@@ -96,15 +96,6 @@ const expandedSlides = ref<Set<number>>(new Set());
 
 const setting = useSettingStore();
 
-const ScreenWidth = ref(window.innerWidth);
-
-watch(
-  () => window.innerWidth,
-  (newValue) => {
-    console.log(newValue);
-    ScreenWidth.value = newValue;
-  }
-);
 </script>
 
 <template>
@@ -185,11 +176,7 @@ watch(
             <div
               class="background-vid-container"
               :style="{
-                backgroundImage: `${
-                  ScreenWidth > 768
-                    ? `url(${slide.media.img})`
-                    : `url(${slide.media.mobile_img})`
-                }`,
+                backgroundImage: `url(${slide.media.img})`,
               }"
             ></div>
             <div class="video" v-if="isVideo(slide?.media?.img)">
@@ -201,7 +188,7 @@ watch(
 
             <div v-else>
               <img class="video web-image" :src="slide?.media?.img" />
-              <img class="video mobile-image" :src="slide?.media?.mobile_img" />
+              <img class="video mobile-image" :src="slide?.media?.img" />
             </div>
             <div class="vid-details">
               <div class="vid-title">
