@@ -16,6 +16,7 @@ const site = computed(() => mapHomeSite(settingsStore.setting));
     }"
   >
     <HomeHeaderSection :site="site" />
+    <LazySpeedDialToast class="social-icons" />
     <div class="home-v2-layout__content">
       <slot />
     </div>

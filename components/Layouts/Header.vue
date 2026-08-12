@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import { useUserStore } from "~/stores/user";
 import { useRouter } from "vue-router";
 import { useSettingStore } from "~/stores/setting";
+import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 
 const isLoggedIn = ref(false);
 const userStore = useUserStore()
@@ -38,6 +39,7 @@ const handleLogout = () => {
 };
 
 const settingStore = useSettingStore();
+const { isDark, toggleTheme } = useAppTheme();
 const droplist = ref(false);
 
 
@@ -50,6 +52,13 @@ const droplist = ref(false);
     </div>
 
     <nav class="header-container">
+      <AppThemeToggle
+        class="header-theme-toggle"
+        :is-dark="isDark"
+        inline
+        icon-only
+        @toggle="toggleTheme"
+      />
       
       <div class="buttons" v-if="!userStore.user">
         <NuxtLink to="/Auth/register">
@@ -125,6 +134,10 @@ const droplist = ref(false);
   gap: 0;
   padding: 0;
   margin: 0;
+}
+
+.header-theme-toggle {
+  flex: 0 0 42px;
 }
 
 li {

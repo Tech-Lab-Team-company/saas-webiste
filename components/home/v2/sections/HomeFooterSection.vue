@@ -281,15 +281,33 @@ onBeforeUnmount(() => {
         <NuxtLink to="/privacy">سياسة الخصوصية</NuxtLink>
         <NuxtLink to="/terms">الشروط والأحكام</NuxtLink>
       </nav>
-      <a
-        class="home-v2-footer__powered-by"
-        href="https://eduhubco.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        dir="ltr"
-      >
-        Powered by EduHub
-      </a>
+      <div class="home-v2-footer__providers" dir="ltr">
+        <a
+          class="home-v2-footer__powered-by"
+          href="https://eduhubco.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Powered by EduHub
+        </a>
+        <a
+          class="home-v2-footer__tech-lab-badge"
+          href="https://techlabeg.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="إحدى منتجات Tech Lab"
+        >
+          <strong>Tech Lab</strong>
+          <span dir="rtl">إحدى منتجات</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 10.3C9.2 8.4 8.5 6.4 9.4 4.7c.7-1.3 2.3-1.8 3.6-1.1 1.8.9 1.6 3.5-1 6.7Z" />
+            <path d="M13.7 12c1.9-2.8 3.9-3.5 5.6-2.6 1.3.7 1.8 2.3 1.1 3.6-.9 1.8-3.5 1.6-6.7-1Z" />
+            <path d="M12 13.7c2.8 1.9 3.5 3.9 2.6 5.6-.7 1.3-2.3 1.8-3.6 1.1-1.8-.9-1.6-3.5 1-6.7Z" />
+            <path d="M10.3 12c-1.9 2.8-3.9 3.5-5.6 2.6-1.3-.7-1.8-2.3-1.1-3.6.9-1.8 3.5-1.6 6.7 1Z" />
+            <circle cx="12" cy="12" r="1.8" />
+          </svg>
+        </a>
+      </div>
     </div>
   </footer>
 </template>
@@ -547,18 +565,58 @@ onBeforeUnmount(() => {
   color: var(--footer-accent-strong);
 }
 
-.home-v2-footer__powered-by {
-  display: inline-flex;
-  min-height: 44px;
+.home-v2-footer__providers {
+  display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.home-v2-footer__powered-by {
   color: var(--footer-secondary-light);
   font-weight: 900;
+  white-space: nowrap;
   transition: color 0.28s ease;
 }
 
 .home-v2-footer__powered-by:hover,
 .home-v2-footer__powered-by:focus-visible {
   color: var(--footer-accent-strong);
+}
+
+.home-v2-footer__tech-lab-badge {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 4px 10px;
+  border: 1px solid rgba(4, 169, 105, 0.32);
+  border-radius: 999px;
+  background: #f1fbf6;
+  color: #687b75;
+  font-size: 11px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-v2-footer__tech-lab-badge:hover,
+.home-v2-footer__tech-lab-badge:focus-visible {
+  transform: translateY(-1px);
+  border-color: #08a567;
+}
+
+.home-v2-footer__tech-lab-badge strong {
+  color: #08a567;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.home-v2-footer__tech-lab-badge svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 1px;
+  fill: #08a567;
 }
 
 @media (max-width: 900px) {

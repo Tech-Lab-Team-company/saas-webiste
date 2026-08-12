@@ -5,6 +5,7 @@ import countries from "~/data/countries.json";
 import FetchPaymentMethodsParams from '~/features/fetch_payment_methods/Core/Params/fetch_payment_methods_params';
 import FetchPaymentMethodController from '~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller';
 import { rememberAuthRedirect, sanitizeAuthRedirect } from '~/utils/authRedirect';
+import GuestAccessLink from '~/components/AuthLayout/GuestAccessLink.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -177,14 +178,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
                         <span aria-hidden="true">←</span>
                     </button>
 
-                    <nuxt-link class="login-home-guest" to="/">
-                        <span class="pi pi-globe" aria-hidden="true" />
-                        <span>
-                            <strong>{{ $t('المتابعة كزائر') }}</strong>
-                            <small>{{ $t('استكشف الموقع بدون تسجيل الدخول') }}</small>
-                        </span>
-                        <span class="pi pi-arrow-left" aria-hidden="true" />
-                    </nuxt-link>
+                    <GuestAccessLink />
                 </div>
 
                 <div class="login-home-benefits-title">

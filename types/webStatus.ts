@@ -1,6 +1,9 @@
-import type ImageModel from "~/features/FetchCourseDetails/Data/models/image_model";
 import type { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 
+export interface WebStatusImage {
+    img: string;
+    alt: string;
+}
 
 export default interface WebStatus {
     name: string;
@@ -13,6 +16,7 @@ export default interface WebStatus {
     twitter: string;
     facebook: string;
     whatsapp: string;
+    telegram: string;
     instagram: string;
     instapay: string;
     tikTok: string;
@@ -22,7 +26,7 @@ export default interface WebStatus {
     meta_keywords: string;
     allow_payment_gateway: boolean;
     expire_app: number;
-    image: ImageModel;
+    image: WebStatusImage;
     favicon?: {
         img?: string;
         image?: string;
@@ -30,11 +34,8 @@ export default interface WebStatus {
         url?: string;
         alt?: string;
     } | string;
-    app_image?: {
-        img: string;
-        alt: string;
-    };
-    cover: ImageModel;
+    app_image?: WebStatusImage;
+    cover: WebStatusImage;
     address: string;
     primary_color: string;
     secondary_color: string;
@@ -58,4 +59,9 @@ export default interface WebStatus {
     allow_coupon:boolean;
     allow_complete_data:boolean;
     categories: CategoryIdEnum[];
+    has_general: number;
+    allow_identity_number: boolean;
+    allow_identity_image: boolean;
+    allow_failing_subjects: boolean;
+    allow_identity_address: boolean;
 }

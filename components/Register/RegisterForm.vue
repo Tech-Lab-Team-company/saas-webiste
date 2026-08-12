@@ -11,6 +11,7 @@ import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_m
 import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
 import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 import countries from "~/data/countries.json";
+import GuestAccessLink from "~/components/AuthLayout/GuestAccessLink.vue";
 
 const UserSetting = useSettingStore();
 
@@ -384,6 +385,7 @@ const settingStore = useSettingStore();
             التالى
           </button>
         </div>
+        <GuestAccessLink />
         <!-- </NuxtLink> -->
         <!-- <NuxtLink to="/Auth/email" ><div class="btns btns-home">
             <button class="login-btn" > 
@@ -399,18 +401,34 @@ const settingStore = useSettingStore();
       </div>
     </div>
 
-    <div class="terms-dialog" v-if="showTermsDialog">
-      <div class="dialog-content">
-        <span class="close" @click="showTermsDialog = false">&times;</span>
-        <h3>الشروط والأحكام</h3>
-        <p>
-          هنا يمكنك كتابة الشروط والأحكام الخاصة بالمنصة. على سبيل المثال: يجب
-          أن تكون جميع البيانات المدخلة صحيحة ودقيقة، ويمنع استخدام المنصة
-          لأغراض غير قانونية، ويلتزم المستخدم بحماية خصوصية حسابه.
-        </p>
-        <button @click="showTermsDialog = false">إغلاق</button>
+    <Teleport to="body">
+      <div
+        v-if="showTermsDialog"
+        class="terms-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="register-terms-title"
+        @click.self="showTermsDialog = false"
+      >
+        <div class="dialog-content">
+          <button
+            class="close"
+            type="button"
+            aria-label="إغلاق"
+            @click="showTermsDialog = false"
+          >
+            &times;
+          </button>
+          <h3 id="register-terms-title">الشروط والأحكام</h3>
+          <p>
+            هنا يمكنك كتابة الشروط والأحكام الخاصة بالمنصة. على سبيل المثال:
+            يجب أن تكون جميع البيانات المدخلة صحيحة ودقيقة، ويمنع استخدام
+            المنصة لأغراض غير قانونية، ويلتزم المستخدم بحماية خصوصية حسابه.
+          </p>
+          <button type="button" @click="showTermsDialog = false">إغلاق</button>
+        </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -583,26 +601,28 @@ input:focus {
 
 .terms-dialog {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  padding: 20px;
+  background-color: rgba(5, 15, 40, 0.55);
+  z-index: 10000;
 }
 
 .dialog-content {
   background-color: white;
-  padding: 20px;
+  padding: 28px;
   border-radius: 10px;
-  width: 80%;
-  max-width: 500px;
+  width: min(500px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
   position: relative;
   text-align: right;
   direction: rtl;
+  box-shadow: 0 24px 70px rgba(5, 15, 40, 0.24);
 }
 
 .dialog-content h3 {
@@ -627,9 +647,17 @@ input:focus {
 
 .close {
   position: absolute;
-  left: 10px;
-  font-size: 20px;
-  cursor: pointer;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  background: transparent;
   color: #333;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
 }
 </style>

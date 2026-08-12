@@ -1,5 +1,15 @@
 <script setup lang="ts">
-defineProps<{ isDark: boolean }>();
+withDefaults(
+  defineProps<{
+    isDark: boolean;
+    iconOnly?: boolean;
+    inline?: boolean;
+  }>(),
+  {
+    iconOnly: false,
+    inline: false,
+  },
+);
 defineEmits<{ toggle: [] }>();
 </script>
 
@@ -7,7 +17,11 @@ defineEmits<{ toggle: [] }>();
   <button
     type="button"
     class="app-theme-toggle"
-    :class="{ 'app-theme-toggle--dark': isDark }"
+    :class="{
+      'app-theme-toggle--dark': isDark,
+      'app-theme-toggle--icon-only': iconOnly,
+      'app-theme-toggle--inline': inline,
+    }"
     :aria-label="isDark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
     :title="isDark ? 'الوضع الفاتح' : 'الوضع الداكن'"
     :aria-pressed="isDark"
@@ -26,7 +40,7 @@ defineEmits<{ toggle: [] }>();
         />
       </svg>
     </span>
-    <span class="app-theme-toggle__label">
+    <span :class="['app-theme-toggle__label', { 'sr-only': iconOnly }]">
       {{ isDark ? "الوضع الفاتح" : "الوضع الداكن" }}
     </span>
   </button>
@@ -43,7 +57,7 @@ defineEmits<{ toggle: [] }>();
   align-items: center;
   gap: 10px;
   padding: 6px 15px 6px 7px;
-  border: 1px solid var(--app-line);
+  border: 0;
   border-radius: 999px;
   background: color-mix(in srgb, var(--app-surface) 88%, transparent);
   box-shadow: 0 18px 45px -22px var(--app-shadow);
@@ -56,9 +70,28 @@ defineEmits<{ toggle: [] }>();
 }
 
 .app-theme-toggle:hover {
-  border-color: color-mix(in srgb, var(--app-accent) 55%, transparent);
   box-shadow: 0 22px 52px -23px var(--app-shadow);
   transform: translateY(-3px);
+}
+
+.app-theme-toggle--inline {
+  position: relative;
+  z-index: auto;
+  inset: auto;
+  box-shadow: none;
+}
+
+.app-theme-toggle--icon-only {
+  width: 42px;
+  min-height: 42px;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 11px;
+}
+
+.app-theme-toggle--inline:hover {
+  box-shadow: 0 8px 20px -14px var(--app-shadow);
+  transform: translateY(-1px);
 }
 
 .app-theme-toggle__icon {
@@ -73,6 +106,22 @@ defineEmits<{ toggle: [] }>();
   transition: background-color 0.25s ease, color 0.25s ease,
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   animation: rotateThemeIcon 2s linear infinite;
+}
+
+.app-theme-toggle--inline .app-theme-toggle__icon {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  animation: rotateThemeIcon 2s linear infinite;
+}
+
+.app-theme-toggle--inline:hover .app-theme-toggle__icon {
+  transform: rotate(12deg);
+}
+
+.app-theme-toggle--inline.app-theme-toggle--dark:hover
+  .app-theme-toggle__icon {
+  transform: rotate(102deg);
 }
 
 .app-theme-toggle--dark .app-theme-toggle__icon {
@@ -90,10 +139,25 @@ defineEmits<{ toggle: [] }>();
   stroke-linejoin: round;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (max-width: 620px) {
   .app-theme-toggle {
     width: 50px;
     padding: 6px;
+  }
+
+  .app-theme-toggle--icon-only {
+    width: 42px;
+    padding: 3px;
   }
 
   .app-theme-toggle__label {
@@ -111,6 +175,13 @@ defineEmits<{ toggle: [] }>();
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-theme-toggle__icon,
+  .app-theme-toggle--inline .app-theme-toggle__icon {
+    animation: none;
   }
 }
 </style>

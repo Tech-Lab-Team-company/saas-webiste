@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
+import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const props = defineProps<{
@@ -9,6 +10,7 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
+const { isDark, toggleTheme } = useAppTheme();
 const isHydrated = ref(false);
 
 const userImage = computed(
@@ -150,54 +152,64 @@ onBeforeUnmount(() => {
       </nav>
 
       <div
-        v-if="!isHydrated || !userStore.user"
-        class="home-v2-header__actions"
+        :class="[
+          'home-v2-header__actions',
+          { 'home-v2-header__actions--student': isHydrated && userStore.user },
+        ]"
       >
-        <NuxtLink
-          to="/loginhome"
-          prefetch-on="interaction"
-          class="home-v2-header__login"
-        >
-          دخول الطالب
-        </NuxtLink>
-        <NuxtLink to="/Auth/register" prefetch-on="interaction" class="button"
-          >إنشاء حساب <span aria-hidden="true">←</span></NuxtLink
-        >
-      </div>
+        <AppThemeToggle
+          :is-dark="isDark"
+          inline
+          icon-only
+          @toggle="toggleTheme"
+        />
 
-      <div
-        v-else
-        class="home-v2-header__actions home-v2-header__actions--student"
-      >
-        <NuxtLink
-          to="/profile"
-          prefetch-on="interaction"
-          class="home-v2-header__student"
-          aria-label="الذهاب إلى الملف الشخصي"
-        >
-          <img
-            :src="userImage"
-            width="38"
-            height="38"
-            :alt="
-              userStore.user.name
-                ? `صورة الطالب ${userStore.user.name}`
-                : 'صورة الملف الشخصي للطالب'
-            "
-            @error="handleUserImageError"
-          />
-          <span>
-            <small>مساحة الطالب</small>
-            <b>{{ userStore.user.name }}</b>
-          </span>
-        </NuxtLink>
-        <button
-          type="button"
-          class="home-v2-header__logout"
-          @click="handleLogout"
-        >
-          تسجيل الخروج
-        </button>
+        <template v-if="!isHydrated || !userStore.user">
+          <NuxtLink
+            to="/loginhome"
+            prefetch-on="interaction"
+            class="home-v2-header__login"
+          >
+            دخول الطالب
+          </NuxtLink>
+          <NuxtLink
+            to="/Auth/register"
+            prefetch-on="interaction"
+            class="button"
+          >إنشاء حساب <span aria-hidden="true">←</span></NuxtLink>
+        </template>
+
+        <template v-else>
+          <NuxtLink
+            to="/profile"
+            prefetch-on="interaction"
+            class="home-v2-header__student"
+            aria-label="الذهاب إلى الملف الشخصي"
+          >
+            <img
+              :src="userImage"
+              width="38"
+              height="38"
+              :alt="
+                userStore.user.name
+                  ? `صورة الطالب ${userStore.user.name}`
+                  : 'صورة الملف الشخصي للطالب'
+              "
+              @error="handleUserImageError"
+            />
+            <span>
+              <small>مساحة الطالب</small>
+              <b>{{ userStore.user.name }}</b>
+            </span>
+          </NuxtLink>
+          <button
+            type="button"
+            class="home-v2-header__logout"
+            @click="handleLogout"
+          >
+            تسجيل الخروج
+          </button>
+        </template>
       </div>
     </div>
     <nav

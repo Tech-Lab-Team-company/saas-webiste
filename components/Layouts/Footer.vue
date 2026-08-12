@@ -151,9 +151,39 @@ const setting = computed(() => settingStore.setting);
       </div>
     </div>
 
-    <!-- <hr class="hr" /> -->
-    <!-- <hr class="rights-hr" /> -->
-    <!-- <TechLabRights class="tech-lab-rights"/> -->
+    <div class="tech-lab-rights">
+      <a
+        class="powered-by-eduhub"
+        href="https://eduhubco.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        dir="ltr"
+      >
+        Powered by EduHub
+      </a>
+      <a
+        class="tech-lab-badge"
+        href="https://techlabeg.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        dir="ltr"
+        aria-label="إحدى منتجات Tech Lab"
+      >
+        <strong>Tech Lab</strong>
+        <span dir="rtl">إحدى منتجات</span>
+        <svg
+          class="tech-lab-mark"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M12 10.3C9.2 8.4 8.5 6.4 9.4 4.7c.7-1.3 2.3-1.8 3.6-1.1 1.8.9 1.6 3.5-1 6.7Z" />
+          <path d="M13.7 12c1.9-2.8 3.9-3.5 5.6-2.6 1.3.7 1.8 2.3 1.1 3.6-.9 1.8-3.5 1.6-6.7-1Z" />
+          <path d="M12 13.7c2.8 1.9 3.5 3.9 2.6 5.6-.7 1.3-2.3 1.8-3.6 1.1-1.8-.9-1.6-3.5 1-6.7Z" />
+          <path d="M10.3 12c-1.9 2.8-3.9 3.5-5.6 2.6-1.3-.7-1.8-2.3-1.1-3.6.9-1.8 3.5-1.6 6.7 1Z" />
+          <circle cx="12" cy="12" r="1.8" />
+        </svg>
+      </a>
+    </div>
   </div>
 </template>
 
@@ -186,6 +216,7 @@ const setting = computed(() => settingStore.setting);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   .stores-logos-link {
     width: 50%;
 
@@ -193,6 +224,19 @@ const setting = computed(() => settingStore.setting);
       width: 88%;
     }
   }
+}
+
+.powered-by-eduhub {
+  color: #687b75;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.powered-by-eduhub:hover,
+.powered-by-eduhub:focus-visible {
+  color: #08a567;
 }
 
 .col {
@@ -226,16 +270,56 @@ const setting = computed(() => settingStore.setting);
   grid-column: span 4;
 }
 .tech-lab-rights {
+  display: flex;
   width: 100%;
+  align-items: center;
+  justify-content: center;
   grid-column: span 4;
-  // @media (max-width:768px) {
-  //     grid-column: span 3;
-  // }
-  // @media (max-width:400px) {
-  //     grid-column: span 2;
-  // }
-  // @media (max-width:300px) {
-  //     grid-column: span 1;
-  // }
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(4, 169, 105, 0.16);
+}
+
+.tech-lab-badge {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 4px 10px;
+  border: 1px solid rgba(4, 169, 105, 0.28);
+  border-radius: 999px;
+  background: #f1fbf6;
+  color: #687b75;
+  font-size: 11px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tech-lab-badge:hover,
+.tech-lab-badge:focus-visible {
+  transform: translateY(-1px);
+  border-color: #08a567;
+}
+
+.tech-lab-badge strong {
+  color: #08a567;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.tech-lab-mark {
+  width: 20px;
+  height: 20px;
+  margin-left: 1px;
+  fill: #08a567;
+}
+
+@media (max-width: 768px) {
+  .tech-lab-rights {
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+  }
 }
 </style>

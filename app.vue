@@ -41,9 +41,14 @@ const isHomeV2 = computed(
     isCourseDetailsPage.value ||
     isCourseExamPage.value,
 );
+const hasNavbarThemeToggle = computed(
+  () =>
+    isHomeV2.value ||
+    route.meta.layout === undefined ||
+    route.meta.layout === "default",
+);
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
-const SITE_IMAGE_KEYS = ["favicon", "image", "cover", "app_image"] as const;
 
 const getSiteImageSource = (image: unknown): string => {
   if (typeof image === "string") return image.trim();
@@ -59,52 +64,6 @@ const getSiteImageSource = (image: unknown): string => {
   ).trim();
 };
 
-const imageRespondsSuccessfully = async (url: string): Promise<boolean> => {
-  if (!/^https?:\/\//iu.test(url)) return true;
-
-  try {
-    const response = await fetch(url, {
-      method: "HEAD",
-      signal: AbortSignal.timeout(2500),
-    });
-
-    return (
-      response.ok &&
-      /^image\//iu.test(response.headers.get("content-type") || "")
-    );
-  } catch {
-    return false;
-  }
-};
-
-const removeUnavailableSiteImages = async (
-  settings: WebStatus,
-): Promise<WebStatus> => {
-  const checkedImages = await Promise.all(
-    SITE_IMAGE_KEYS.map(async (key) => {
-      const source = getSiteImageSource(settings[key]);
-
-      return {
-        key,
-        available: !source || (await imageRespondsSuccessfully(source)),
-      };
-    }),
-  );
-  const unavailableKeys = checkedImages
-    .filter(({ available }) => !available)
-    .map(({ key }) => key);
-
-  if (unavailableKeys.length === 0) return settings;
-
-  return unavailableKeys.reduce<WebStatus>(
-    (sanitizedSettings, key) => ({
-      ...sanitizedSettings,
-      [key]: { img: "", alt: "" },
-    }),
-    settings,
-  );
-};
-
 const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
   "webStatus",
   async () => {
@@ -112,16 +71,14 @@ const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
       const response = await $fetch<{
         data: WebStatus;
         message: string;
-        status: number;
+        status: boolean | number;
       }>(`${baseUrl}/fetch_web_status`, {
         method: "GET",
         headers: {
           "web-domain": getWebDomain(),
         },
       });
-      return response.data
-        ? await removeUnavailableSiteImages(response.data)
-        : null;
+      return response.data || null;
     } catch (requestError) {
       // Site settings enhance branding, but a temporary API failure must never
       // replace an indexable page with the global noindex error document.
@@ -503,7 +460,11 @@ onMounted(() => {
       <LazyMainDialog v-if="!pending && !isHomeV2" />
     </NuxtLayout>
   </div>
-  <AppThemeToggle :is-dark="isDark" @toggle="toggleTheme" />
+  <AppThemeToggle
+    v-if="!hasNavbarThemeToggle"
+    :is-dark="isDark"
+    @toggle="toggleTheme"
+  />
 </template>
 
 <style scoped lang="scss">
