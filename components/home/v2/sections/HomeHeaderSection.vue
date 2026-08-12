@@ -47,12 +47,12 @@ const navItems = computed(() => [
   ...(route.path === "/" ? [] : [{ label: "الرئيسية", to: "/" }]),
   { label: "الكورسات", to: "/course" },
   { label: "الكتب", to: "/books" },
-  { label: "المدونة", to: "/blogs" },
-  { label: "التطبيق", to: "/app" },
   {
     label: props.site.brandName ? `عن ${props.site.brandName}` : "عن المنصة",
     to: "/about-teacher",
   },
+  { label: "المدونة", to: "/blogs" },
+  { label: "التطبيق", to: "/app" },
 ]);
 
 const isScrolled = ref(false);
@@ -462,6 +462,7 @@ onBeforeUnmount(() => {
   position: relative;
   padding: 8px 13px;
   border-radius: 999px;
+  color: var(--home-v2-blue);
   line-height: 1.2;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -473,7 +474,8 @@ onBeforeUnmount(() => {
 
 .home-v2-header__nav a:hover,
 .home-v2-header__nav a.router-link-active {
-  background: #fff;
+  background: var(--home-v2-blue-light);
+  color: var(--home-v2-blue);
   box-shadow: 0 3px 12px rgb(8 27 58 / 8%);
 }
 
@@ -555,7 +557,7 @@ onBeforeUnmount(() => {
     justify-content: center;
     padding: 7px 13px;
     border-radius: 999px;
-    color: var(--home-v2-muted);
+    color: var(--home-v2-blue);
     font-size: 12px;
     font-weight: 800;
   }
@@ -567,7 +569,7 @@ onBeforeUnmount(() => {
       var(--home-v2-blue) 16%,
       var(--home-v2-surface)
     );
-    color: var(--home-v2-ink);
+    color: var(--home-v2-blue);
   }
 }
 

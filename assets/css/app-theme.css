@@ -11,7 +11,7 @@
   --app-muted: #4f617c;
   --app-line: rgb(8 27 58 / 14%);
   --app-shadow: rgb(6 17 71 / 40%);
-  --app-footer-bg: color-mix(in srgb, var(--app-brand-secondary) 82%, #071020);
+  --app-footer-bg: color-mix(in srgb, var(--app-brand-primary) 82%, #071020);
 }
 
 html {

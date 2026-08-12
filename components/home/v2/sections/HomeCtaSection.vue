@@ -132,8 +132,8 @@ onBeforeUnmount(() => {
   border-radius: 14px;
   background: linear-gradient(
     135deg,
-    var(--home-v2-blue),
-    color-mix(in srgb, var(--home-v2-blue) 82%, var(--home-v2-deep))
+    color-mix(in srgb, var(--home-v2-deep) 82%, #071020),
+    var(--home-v2-deep)
   );
   color: #fff;
   text-align: center;
@@ -222,7 +222,15 @@ onBeforeUnmount(() => {
   min-height: 48px;
   align-items: center;
   border-bottom: 1px solid #ffffffa6;
+  color: #fff;
   font-weight: 800;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.home-v2-cta__actions > a:last-child:hover,
+.home-v2-cta__actions > a:last-child:focus-visible {
+  border-color: #ffdb8b;
+  color: #ffdb8b;
 }
 
 @media (prefers-reduced-motion: reduce) {

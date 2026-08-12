@@ -197,10 +197,16 @@ onBeforeUnmount(() => {
 
     <div v-else class="container home-v2-about-teacher__grid">
       <div
-        v-if="about.data.description || about.data.experience.value || about.data.experience.prefix"
+        v-if="
+          about.data.description ||
+          about.data.experience.value ||
+          about.data.experience.prefix
+        "
         class="home-v2-about-teacher__quote"
       >
-        <span class="home-v2-about-teacher__quote-mark" aria-hidden="true">“</span>
+        <span class="home-v2-about-teacher__quote-mark" aria-hidden="true"
+          >“</span
+        >
         <p v-if="about.data.description">{{ about.data.description }}</p>
         <div
           v-if="about.data.experience.value || about.data.experience.prefix"
@@ -228,7 +234,9 @@ onBeforeUnmount(() => {
           {{ about.data.linkLabel }}
         </span>
         <h2 v-if="about.data.title" id="home-v2-about-teacher-title">
-          {{ titleParts.before }}<em v-if="titleParts.value">{{ titleParts.value }}</em>{{ titleParts.after }}
+          {{ titleParts.before
+          }}<em v-if="titleParts.value">{{ titleParts.value }}</em
+          >{{ titleParts.after }}
         </h2>
         <p v-if="about.data.subTitle">{{ about.data.subTitle }}</p>
         <ul
@@ -237,14 +245,25 @@ onBeforeUnmount(() => {
           aria-label="مميزات الدراسة مع المدرس"
         >
           <li v-for="benefit in about.data.benefits" :key="benefit.id">
-            <span class="home-v2-about-teacher__benefit-icon" aria-hidden="true">
+            <span
+              class="home-v2-about-teacher__benefit-icon"
+              aria-hidden="true"
+            >
               <svg viewBox="0 0 24 24" fill="none">
-                <path d="m7 12.5 3.1 3L17.5 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <path
+                  d="m7 12.5 3.1 3L17.5 8"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </span>
             <span>
               <strong>{{ benefit.title }}</strong>
-              <small v-if="benefit.description">{{ benefit.description }}</small>
+              <small v-if="benefit.description">{{
+                benefit.description
+              }}</small>
             </span>
           </li>
         </ul>
@@ -350,8 +369,7 @@ onBeforeUnmount(() => {
   pointer-events: none;
   transform-origin: bottom left;
   transition: width 0.78s cubic-bezier(0.22, 1, 0.36, 1),
-    height 0.78s cubic-bezier(0.22, 1, 0.36, 1),
-    border-width 0.5s ease,
+    height 0.78s cubic-bezier(0.22, 1, 0.36, 1), border-width 0.5s ease,
     background-color 0.5s ease;
 }
 
@@ -423,7 +441,8 @@ onBeforeUnmount(() => {
   display: grid;
   margin: 34px 0 32px;
   padding: 0;
-  border-top: 1px solid color-mix(in srgb, var(--home-v2-muted) 24%, transparent);
+  border-top: 1px solid
+    color-mix(in srgb, var(--home-v2-muted) 24%, transparent);
   list-style: none;
   perspective: 700px;
 }
@@ -436,7 +455,8 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 10px;
   padding: 14px 7px;
-  border-bottom: 1px solid color-mix(in srgb, var(--home-v2-muted) 24%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--home-v2-muted) 24%, transparent);
   color: var(--home-v2-deep);
   transition: color 0.3s ease, border-color 0.3s ease,
     padding 0.38s cubic-bezier(0.22, 1, 0.36, 1),
@@ -457,8 +477,7 @@ onBeforeUnmount(() => {
   opacity: 0;
   transform: scaleX(0.25);
   transform-origin: right center;
-  transition: opacity 0.3s ease,
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .home-v2-about-teacher li:hover {
@@ -517,7 +536,8 @@ onBeforeUnmount(() => {
   display: inline-flex;
   gap: 12px;
   padding-bottom: 7px;
-  border-bottom: 1px solid color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--home-v2-blue) 55%, transparent);
   color: var(--home-v2-blue);
   font-weight: 800;
   transition: gap 0.2s ease, border-color 0.2s ease;
@@ -565,7 +585,6 @@ onBeforeUnmount(() => {
     top: 28px;
     inset-inline-start: 28px;
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {

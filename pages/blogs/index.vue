@@ -456,7 +456,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .blog-listing__hero {
   position: relative;
   overflow: hidden;
-  background: var(--home-v2-deep);
+  background: var(--home-v2-blue);
   color: #fff;
 }
 

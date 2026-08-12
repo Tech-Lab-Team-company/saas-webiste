@@ -449,7 +449,7 @@ useHead(() => ({
   overflow: hidden;
   padding-top: 86px;
   color: #fff;
-  background: var(--home-v2-deep);
+  background: var(--home-v2-blue);
 }
 .blog-v2__hero:before,
 .blog-v2__hero:after {
@@ -474,7 +474,7 @@ useHead(() => ({
   background: var(--home-v2-blue);
 }
 .blog-v2__hero--coral {
-  background: var(--coral);
+  background: color-mix(in srgb, var(--home-v2-blue) 82%, var(--coral));
 }
 .blog-v2__hero-grid {
   position: relative;

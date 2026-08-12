@@ -62,13 +62,13 @@ html[data-theme='dark'] .home-v2 .home-v2-header--scrolled {
 } */
 
 html[data-theme='dark'] .home-v2 .home-v2-header__nav a {
-  color: var(--home-v2-muted);
+  color: var(--home-v2-blue);
 }
 
 html[data-theme='dark'] .home-v2 .home-v2-header__nav a:hover,
 html[data-theme='dark'] .home-v2 .home-v2-header__nav a.router-link-active {
   background: color-mix(in srgb, var(--home-v2-blue) 17%, var(--home-v2-surface));
-  color: var(--home-v2-ink);
+  color: var(--home-v2-blue);
   box-shadow: 0 5px 16px -10px var(--home-v2-shadow);
 }
 
@@ -391,7 +391,7 @@ html[data-theme='dark'] .home-v2 .home-v2-app__phone {
   color: #fff;
   background:
     radial-gradient(circle at 14% 15%, color-mix(in srgb, var(--home-v2-blue) 55%, transparent), transparent 34%),
-    linear-gradient(135deg, var(--home-v2-deep), color-mix(in srgb, var(--home-v2-deep) 70%, #081b3a));
+    linear-gradient(135deg, var(--home-v2-blue), color-mix(in srgb, var(--home-v2-blue) 70%, #081b3a));
 }
 
 .information-page__hero::after {

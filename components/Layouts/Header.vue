@@ -106,7 +106,7 @@ const droplist = ref(false);
   padding: 10px;
   color: white;
   &:hover{
-    color: #1f41bb;
+    color: var(--primary-color);
   }
 }
 
@@ -139,7 +139,7 @@ li:hover {
 }
 
 .active {
-  color: #032855;
+  color: var(--primary-color);
 }
 
 .user-info {
@@ -162,7 +162,7 @@ li:hover {
   }
 
   .user-name {
-    color: #032855;
+    color: var(--primary-color);
     font-weight: bold;
     font-size: 16px;
   }

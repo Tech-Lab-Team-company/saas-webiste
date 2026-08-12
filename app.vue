@@ -181,8 +181,8 @@ const themeVariables = computed<Record<string, string>>(() => ({
   "--app-line": isDark.value ? "rgb(205 220 245 / 16%)" : "rgb(8 27 58 / 14%)",
   "--app-shadow": isDark.value ? "rgb(0 0 0 / 72%)" : "rgb(6 17 71 / 40%)",
   "--app-footer-bg": isDark.value
-    ? `color-mix(in srgb, ${secondaryColor.value} 24%, #070a11)`
-    : `color-mix(in srgb, ${secondaryColor.value} 82%, #071020)`,
+    ? `color-mix(in srgb, ${primaryColor.value} 24%, #070a11)`
+    : `color-mix(in srgb, ${primaryColor.value} 82%, #071020)`,
 }));
 
 const themeInlineStyle = computed(() =>

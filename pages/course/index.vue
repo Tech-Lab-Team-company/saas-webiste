@@ -87,7 +87,7 @@ useHead({
   position: relative;
   min-height: 335px;
   overflow: hidden;
-  background: linear-gradient(115deg, color-mix(in srgb, var(--home-v2-deep) 82%, #06113d), var(--home-v2-deep));
+  background: linear-gradient(115deg, color-mix(in srgb, var(--home-v2-blue) 82%, #06113d), var(--home-v2-blue));
   color: #fff;
 }
 

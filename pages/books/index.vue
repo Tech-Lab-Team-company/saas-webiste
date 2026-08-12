@@ -638,7 +638,7 @@ useHead({
 .books-page__hero {
   padding: 150px 0 78px;
   overflow: hidden;
-  background: linear-gradient(145deg, var(--home-v2-deep), var(--home-v2-blue));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--home-v2-blue) 76%, #071020), var(--home-v2-blue));
 }
 
 .books-page__hero-layout {

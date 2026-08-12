@@ -257,12 +257,21 @@ onBeforeUnmount(() => {
 .home-v2-learning-journey {
   --journey-accent: #1682ff;
   --journey-gold: #ffc84a;
-  --journey-background: color-mix(in srgb, var(--home-v2-deep) 48%, #031449);
+  --journey-background: var(--home-v2-blue);
   position: relative;
   isolation: isolate;
   overflow: hidden;
   /* min-height: 720px; */
-  background: var(--journey-background);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--journey-background) 76%, #031449),
+    color-mix(
+      in srgb,
+      var(--journey-background) 84%,
+      var(--home-v2-deep)
+    ) 58%,
+    var(--journey-background)
+  );
   color: #fff;
 }
 

@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: var(--home-v2-deep);
+  background: var(--home-v2-blue);
   color: #fff;
 }
 

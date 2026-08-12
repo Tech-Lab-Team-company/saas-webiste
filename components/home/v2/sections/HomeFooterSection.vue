@@ -300,7 +300,7 @@ onBeforeUnmount(() => {
   --footer-secondary: var(--secondary-color, #3a3e7e);
   --footer-background: var(
     --app-footer-bg,
-    color-mix(in srgb, var(--footer-secondary) 82%, #071020)
+    color-mix(in srgb, var(--footer-primary) 82%, #071020)
   );
   --footer-accent: color-mix(in srgb, var(--footer-primary) 42%, white);
   --footer-accent-strong: color-mix(in srgb, var(--footer-primary) 58%, white);
@@ -345,6 +345,18 @@ onBeforeUnmount(() => {
   max-width: 100%;
   align-items: center;
   gap: 11px;
+  color: #fff;
+  transition: color 0.25s ease;
+}
+
+.home-v2-footer__brand.router-link-active,
+.home-v2-footer__brand.router-link-exact-active {
+  color: #fff;
+}
+
+.home-v2-footer__brand:hover,
+.home-v2-footer__brand:focus-visible {
+  color: var(--footer-accent-strong);
 }
 
 .home-v2-footer__logo {
@@ -379,6 +391,7 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__brand b {
+  color: inherit;
   font: 900 17px/1 var(--home-v2-heading);
   letter-spacing: 0.04em;
 }

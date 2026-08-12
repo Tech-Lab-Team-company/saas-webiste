@@ -256,7 +256,12 @@ onBeforeUnmount(() => {
                 {{ blog.description || blog.subtitle }}
               </p>
               <span class="home-v2-blog__read"
-                >اقرأ المقال <i aria-hidden="true">←</i></span
+                >اقرأ المقال
+                <span class="home-v2-blog__read-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M19 12H5m6-6-6 6 6 6" />
+                  </svg>
+                </span></span
               >
             </div>
           </NuxtLink>
@@ -306,14 +311,14 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--home-v2-blue);
+  color: var(--home-v2-deep);
   font-weight: 800;
   transition: color 0.22s ease, gap 0.22s ease;
 }
 
 .home-v2-blog__heading a:hover {
   gap: 15px;
-  color: var(--home-v2-coral);
+  color: color-mix(in srgb, var(--home-v2-deep) 78%, #071020);
 }
 
 .home-v2-blog__grid {
@@ -390,7 +395,7 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 0 22px;
   color: #fff;
-  background: var(--home-v2-deep);
+  background: var(--home-v2-blue);
   transition: filter 0.24s ease;
 }
 
@@ -459,22 +464,44 @@ onBeforeUnmount(() => {
 
 .home-v2-blog__read {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   margin-top: auto;
   padding-top: 22px;
-  color: var(--home-v2-blue);
+  color: var(--home-v2-deep);
   font-size: 13px;
   font-weight: 900;
   transition: color 0.22s ease;
 }
 
-.home-v2-blog__read i {
-  font-size: 19px;
-  font-style: normal;
-  transition: transform 0.22s ease;
+.home-v2-blog__read-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--home-v2-deep) 28%, transparent);
+  border-radius: 7px;
+  background: var(--home-v2-blue);
+  color: var(--home-v2-deep);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--home-v2-blue) 22%, transparent);
+  transition: background-color 0.22s ease, box-shadow 0.22s ease,
+    transform 0.22s ease;
 }
 
-.home-v2-blog__card:hover .home-v2-blog__read i {
+.home-v2-blog__read-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.home-v2-blog__card:hover .home-v2-blog__read-icon,
+.home-v2-blog__card:focus-within .home-v2-blog__read-icon {
+  box-shadow: 0 9px 20px color-mix(in srgb, var(--home-v2-blue) 34%, transparent);
   transform: translateX(-5px);
 }
 
