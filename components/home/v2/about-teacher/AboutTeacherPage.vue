@@ -16,6 +16,7 @@ import AboutTeacherCtaSection from "./sections/AboutTeacherCtaSection.vue";
 import AboutTeacherExperienceSection from "./sections/AboutTeacherExperienceSection.vue";
 import AboutTeacherHeroSection from "./sections/AboutTeacherHeroSection.vue";
 import AboutTeacherMethodSection from "./sections/AboutTeacherMethodSection.vue";
+import AboutTeacherOurStudents from "./sections/AboutTeacherOurStudents.vue";
 
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
@@ -739,6 +740,7 @@ onBeforeUnmount(() => {
         :teacher-role="teacherRole"
       />
       <AboutTeacherMethodSection />
+      <AboutTeacherOurStudents />
       <AboutTeacherExperienceSection :teacher-role="teacherRole" />
       <AboutTeacherContactSection
         :site="site"
