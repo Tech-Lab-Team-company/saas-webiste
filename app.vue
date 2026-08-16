@@ -457,7 +457,7 @@ onMounted(() => {
       <div class="app-route-view">
         <NuxtPage />
       </div>
-      <LazyMainDialog v-if="!pending && !isHomeV2" />
+      <LazyMainDialog v-if="!pending" />
     </NuxtLayout>
   </div>
   <AppThemeToggle

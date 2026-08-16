@@ -512,6 +512,7 @@ useHead(() => ({
               </article>
             </div>
 
+            <div class="book-details-page__sidebar">
             <aside class="book-details-page__buy-card">
               <h2>اختار نسختك</h2>
               <div
@@ -564,6 +565,33 @@ useHead(() => ({
               </div>
               <NuxtLink to="/books">العودة إلى كل الكتب</NuxtLink>
             </aside>
+
+            <a
+              v-if="book.freeBookUrl"
+              class="book-details-page__free-book-card"
+              :href="book.freeBookUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="`اقرأ النسخة المجانية من ${book.title} - يفتح في نافذة جديدة`"
+            >
+              <span class="book-details-page__free-book-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4.5 4.75A2.75 2.75 0 0 1 7.25 2H11a2 2 0 0 1 2 2v15.25c-.63-.78-1.6-1.25-2.65-1.25h-3.1A2.75 2.75 0 0 0 4.5 20.75v-16Zm15 0A2.75 2.75 0 0 0 16.75 2H15a.75.75 0 0 0-.75.75v16.5A3.48 3.48 0 0 1 16.9 18h2.6V4.75Zm1.25 15.5H16.9c-.86 0-1.64.48-2.02 1.25h5.87a.75.75 0 0 0 0-1.5v.25Zm-9 1.25a2 2 0 0 0-1.4-.5h-3.1a.75.75 0 0 0 0 1.5h4.5v-1Z" />
+                </svg>
+              </span>
+              <span class="book-details-page__free-book-copy">
+                <small>هدية لك</small>
+                <strong>اقرأ النسخة المجانية</strong>
+                <span>افتح نسخة الكتاب المتاحة وابدأ القراءة الآن.</span>
+              </span>
+              <span class="book-details-page__free-book-action">
+                فتح النسخة
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M14 4h6v6h-2V7.41l-7.29 7.3-1.42-1.42L16.59 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z" />
+                </svg>
+              </span>
+            </a>
+            </div>
           </div>
         </section>
 
@@ -1119,13 +1147,133 @@ useHead(() => ({
   cursor: pointer;
 }
 
-.book-details-page__buy-card {
+.book-details-page__sidebar {
   position: sticky;
   top: 105px;
+  display: grid;
+  gap: 16px;
+}
+
+.book-details-page__buy-card {
   padding: 24px;
   border: 1px solid var(--home-v2-line);
   background: var(--home-v2-surface);
   color: var(--home-v2-ink);
+}
+
+.book-details-page__free-book-card {
+  position: relative;
+  display: grid;
+  min-height: 205px;
+  padding: 24px;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: start;
+  gap: 15px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 34%, var(--home-v2-line));
+  border-radius: 3px 24px 3px 24px;
+  background:
+    radial-gradient(circle at 5% 5%, color-mix(in srgb, var(--home-v2-blue) 21%, transparent), transparent 37%),
+    linear-gradient(145deg, var(--home-v2-surface-raised), var(--home-v2-surface));
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--home-v2-deep) 11%, transparent);
+  color: var(--home-v2-ink);
+  isolation: isolate;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.book-details-page__free-book-card::before {
+  position: absolute;
+  z-index: -1;
+  top: -65px;
+  left: -58px;
+  width: 160px;
+  height: 160px;
+  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 15%, transparent);
+  border-radius: 50%;
+  content: "";
+}
+
+.book-details-page__free-book-card:hover {
+  border-color: color-mix(in srgb, var(--home-v2-blue) 60%, var(--home-v2-line));
+  box-shadow: 0 24px 55px color-mix(in srgb, var(--home-v2-deep) 18%, transparent);
+  transform: translateY(-4px);
+}
+
+.book-details-page__free-book-card:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--home-v2-blue) 38%, transparent);
+  outline-offset: 4px;
+}
+
+.book-details-page__free-book-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 28%, var(--home-v2-line));
+  border-radius: 18px 6px 18px 6px;
+  background: color-mix(in srgb, var(--home-v2-blue) 13%, var(--home-v2-surface));
+  color: var(--home-v2-blue);
+}
+
+.book-details-page__free-book-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+.book-details-page__free-book-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.book-details-page__free-book-copy small {
+  width: fit-content;
+  margin-bottom: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--home-v2-blue) 12%, var(--home-v2-surface));
+  color: var(--home-v2-blue);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.book-details-page__free-book-copy strong {
+  color: var(--home-v2-ink);
+  font: 900 18px/1.45 var(--home-v2-heading);
+}
+
+.book-details-page__free-book-copy > span {
+  margin-top: 4px;
+  color: var(--home-v2-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.book-details-page__free-book-action {
+  display: flex;
+  min-height: 44px;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 4px 14px 4px 14px;
+  background: linear-gradient(135deg, var(--home-v2-blue), var(--home-v2-deep));
+  color: var(--book-details-action-text);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.book-details-page__free-book-action svg {
+  width: 17px;
+  height: 17px;
+  fill: currentColor;
+  transition: transform 180ms ease;
+}
+
+.book-details-page__free-book-card:hover .book-details-page__free-book-action svg {
+  transform: translate(-3px, -3px);
 }
 
 .book-details-page__buy-card > h2 {
@@ -1368,7 +1516,7 @@ useHead(() => ({
     grid-template-columns: 1fr;
   }
 
-  .book-details-page__buy-card {
+  .book-details-page__sidebar {
     position: static;
   }
 

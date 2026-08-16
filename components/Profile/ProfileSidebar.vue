@@ -112,18 +112,7 @@ const uploadImage = async () => {
         <p>الرئيسية</p>
       </NuxtLink>
 
-      <NuxtLink
-        :to="{ name: 'profile' }"
-        exact-active-class="active"
-        class="profile-option"
-      >
-        <span class="profile-icon profile-option-icon" aria-hidden="true">
-          <i class="pi pi-user" />
-        </span>
-        <p>الملف الشخصي</p>
-      </NuxtLink>
-
-      <NuxtLink
+            <NuxtLink
         :to="{ name: 'profilecourse' }"
         exact-active-class="active"
         class="profile-option"
@@ -132,6 +121,16 @@ const uploadImage = async () => {
           <i class="pi pi-book" />
         </span>
         <p>مشترياتي</p>
+      </NuxtLink>
+        <NuxtLink
+        :to="{ name: 'profileexams' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-file-edit" />
+        </span>
+        <p>اختباراتي</p>
       </NuxtLink>
       <NuxtLink
         :to="{ name: 'profileavailablecourses' }"
@@ -143,16 +142,30 @@ const uploadImage = async () => {
         </span>
         <p>الكورسات</p>
       </NuxtLink>
-      <NuxtLink
-        :to="{ name: 'profileexams' }"
+            <NuxtLink
+        :to="{ name: 'profilesubjectinfo' }"
         exact-active-class="active"
         class="profile-option"
       >
         <span class="profile-icon profile-option-icon" aria-hidden="true">
-          <i class="pi pi-file-edit" />
+          <i class="pi pi-graduation-cap" />
         </span>
-        <p>اختباراتي</p>
+        <p>المعلومات الدراسيه</p>
       </NuxtLink>
+
+      <NuxtLink
+        :to="{ name: 'profile' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-user" />
+        </span>
+        <p>الملف الشخصي</p>
+      </NuxtLink>
+
+
+    
       <!-- <NuxtLink
         to="/questions"
         exact-active-class="active"
@@ -163,16 +176,7 @@ const uploadImage = async () => {
         </span>
         <p>بنك الأسئلة</p>
       </NuxtLink> -->
-      <NuxtLink
-        :to="{ name: 'profilesubjectinfo' }"
-        exact-active-class="active"
-        class="profile-option"
-      >
-        <span class="profile-icon profile-option-icon" aria-hidden="true">
-          <i class="pi pi-graduation-cap" />
-        </span>
-        <p>المعلومات الدراسيه</p>
-      </NuxtLink>
+
       <NuxtLink
         :to="{ name: 'passwordupdate' }"
         exact-active-class="active"

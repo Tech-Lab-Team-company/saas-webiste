@@ -2,8 +2,11 @@
 import Dialog from "primevue/dialog";
 import NetworkService from "~/base/core/networkStructure/networking/network_service";
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
+import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import FetchPaymentMethodsParams from "~/features/fetch_payment_methods/Core/Params/fetch_payment_methods_params";
 import FetchPaymentMethodController from "~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 
 const props = defineProps<{
   bookId: number;
@@ -39,7 +42,6 @@ const loadingMethods = ref(false);
 const bookPaymentMethodsLoaded = ref(false);
 const submitting = ref(false);
 const errorMessage = ref("");
-const success = ref(false);
 const fieldErrors = ref<Record<string, string>>({});
 const locationMessage = ref("");
 const locationMessageType = ref<"success" | "error" | null>(null);
@@ -49,6 +51,8 @@ const paymentMethods = computed(() => paymentStore.Payment ?? []);
 const selectedMethod = computed(() =>
   paymentMethods.value.find((method) => method.id === selectedPaymentMethodId.value),
 );
+const isOnlinePayment = computed(() => Number(selectedMethod.value?.type) === 1);
+const isOfflinePayment = computed(() => Number(selectedMethod.value?.type) === 2);
 const receiptSize = computed(() => receiptFile.value
   ? `${(receiptFile.value.size / 1024 / 1024).toFixed(2)} MB`
   : "");
@@ -86,7 +90,6 @@ const open = async () => {
   fieldErrors.value = {};
   locationMessage.value = "";
   locationMessageType.value = null;
-  success.value = false;
   visible.value = true;
   await loadPaymentMethods();
 };
@@ -122,10 +125,10 @@ const validate = () => {
     if (selectedPaymentMethodId.value === null) {
       errors.paymentMethod = "اختر وسيلة الدفع التي استخدمتها.";
     }
-    if (transferredAccount.value.trim().length < 6) {
+    if (isOfflinePayment.value && transferredAccount.value.trim().length < 6) {
       errors.transferredAccount = "أدخل رقم الحساب أو الهاتف الذي تم التحويل منه.";
     }
-    if (!receiptFile.value) {
+    if (isOfflinePayment.value && !receiptFile.value) {
       errors.receipt = "أرفق صورة إيصال التحويل.";
     }
   }
@@ -139,6 +142,129 @@ const clearReceipt = () => {
   receiptFile.value = null;
   receiptPreviewUrl.value = "";
   if (receiptInput.value) receiptInput.value.value = "";
+};
+
+watch(selectedPaymentMethodId, () => {
+  errorMessage.value = "";
+  delete fieldErrors.value.paymentMethod;
+  delete fieldErrors.value.transferredAccount;
+  delete fieldErrors.value.receipt;
+
+  if (!isOfflinePayment.value) {
+    transferredAccount.value = "";
+    clearReceipt();
+  }
+});
+
+const gatewayUrlFromResponse = (response: any) =>
+  response?.data?.data?.url
+  || response?.data?.url
+  || response?.data?.data?.payment_url
+  || response?.data?.payment_url;
+
+const apiResponseMessage = (response: any) =>
+  response?.data?.message || response?.data?.data?.message;
+
+const translateBuyProductError = (message: string): string => {
+  const normalizedMessage = message.trim().toLowerCase();
+  if (normalizedMessage.includes("transferred account is required")) {
+    return "يرجى إدخال رقم الحساب أو الهاتف الذي تم التحويل منه.";
+  }
+  if (normalizedMessage.includes("receipt is required")) {
+    return "يرجى إرفاق صورة إيصال التحويل.";
+  }
+  if (normalizedMessage.includes("payment method") && normalizedMessage.includes("required")) {
+    return "يرجى اختيار وسيلة الدفع.";
+  }
+  return message;
+};
+
+const ensureSuccessfulBuyProductResponse = (response: any) => {
+  const httpStatus = Number(response?.status);
+  const apiStatus = response?.data?.status;
+  const apiSuccess = response?.data?.success;
+  const normalizedApiStatus = String(apiStatus ?? "").toLowerCase();
+  const normalizedApiSuccess = String(apiSuccess ?? "").toLowerCase();
+  const hasFailedApiStatus =
+    apiStatus === false
+    || apiStatus === 0
+    || ["0", "false", "error", "failed", "fail"].includes(normalizedApiStatus)
+    || apiSuccess === false
+    || apiSuccess === 0
+    || ["0", "false", "error", "failed", "fail"].includes(normalizedApiSuccess);
+
+  if (
+    !response
+    || !Number.isFinite(httpStatus)
+    || httpStatus < 200
+    || httpStatus >= 300
+    || hasFailedApiStatus
+  ) {
+    throw new Error(apiResponseMessage(response) || "تعذر إتمام طلب شراء الكتاب.");
+  }
+};
+
+const showSuccessfulPurchaseDialog = async (response: any) => {
+  const titleContent = props.requiresDelivery
+    ? "تم إرسال طلب شراء وتوصيل الكتاب بنجاح"
+    : mode.value === "join"
+      ? "تم إرسال طلب الانضمام بنجاح"
+      : "تم إرسال طلب شراء الكتاب بنجاح";
+  const messageContent = String(
+    apiResponseMessage(response)
+      || (props.requiresDelivery
+        ? "سنراجع الطلب وبيانات التوصيل، وسيتم تحديث حالته على حسابك."
+        : "سنراجع الطلب، وستظهر حالته على حسابك فور اعتماده."),
+  );
+
+  visible.value = false;
+  await nextTick();
+  DialogSelector.instance.successDialog.openDialog({
+    dialogName: "dialog",
+    titleContent,
+    imageElement: successImage,
+    messageContent,
+    autoCloseMs: 6500,
+  });
+};
+
+const errorMessageFromRequest = (error: any): string => {
+  const response = error?.response;
+  const responseMessage = apiResponseMessage(response);
+  const validationErrors = response?.data?.errors;
+
+  if (responseMessage) return translateBuyProductError(String(responseMessage));
+
+  if (validationErrors && typeof validationErrors === "object") {
+    const message = Object.values(validationErrors).flat().filter(Boolean).join(" ");
+    if (message) return translateBuyProductError(message);
+  }
+
+  if (!response && (error?.code === "ERR_NETWORK" || error?.request)) {
+    return "تعذر الاتصال بالخادم. تحقق من الإنترنت ثم حاول مرة أخرى.";
+  }
+
+  const status = Number(response?.status);
+  if (status === 401) return "انتهت جلسة تسجيل الدخول. سجّل الدخول ثم أعد المحاولة.";
+  if (status === 403) return "لا يمكنك إرسال هذا الطلب حاليًا.";
+  if (status === 404) return "خدمة شراء الكتاب غير متاحة حاليًا.";
+  if (status === 422) return "بعض بيانات الطلب غير صحيحة. راجعها ثم حاول مرة أخرى.";
+  if (status === 429) return "تم إرسال محاولات كثيرة. انتظر قليلًا ثم حاول مجددًا.";
+  if (status >= 500) return "حدث خطأ بالخادم أثناء إرسال الطلب. حاول مرة أخرى لاحقًا.";
+
+  return error?.message || "تعذر إرسال طلب الشراء. راجع البيانات وحاول مرة أخرى.";
+};
+
+const showPurchaseErrorDialog = async (messageContent: string) => {
+  visible.value = false;
+  await nextTick();
+  DialogSelector.instance.errorDialog.openDialog({
+    dialogName: "dialog",
+    titleContent: "لم يتم إرسال طلب شراء الكتاب",
+    imageElement: errorImage,
+    messageContent,
+    autoCloseMs: 6500,
+  });
 };
 
 const selectReceipt = (event: Event) => {
@@ -209,8 +335,12 @@ const submit = async () => {
       ...(mode.value === "offline"
         ? {
             payment_method_id: selectedPaymentMethodId.value,
-            transferred_account: transferredAccount.value.trim(),
-            receipt: receiptFile.value,
+            ...(isOfflinePayment.value
+              ? {
+                  transferred_account: transferredAccount.value.trim(),
+                  receipt: receiptFile.value,
+                }
+              : {}),
           }
         : {}),
     };
@@ -220,21 +350,29 @@ const submit = async () => {
       data: payload,
       isAuth: true,
     };
-    if (mode.value === "offline") {
-      await NetworkService.instance.postFormData(request);
+    let response;
+    if (mode.value === "offline" && isOfflinePayment.value) {
+      response = await NetworkService.instance.postFormData(request);
     } else {
-      await NetworkService.instance.post(request);
+      response = await NetworkService.instance.post(request);
     }
 
-    success.value = true;
+    ensureSuccessfulBuyProductResponse(response);
+
+    if (mode.value === "offline" && isOnlinePayment.value) {
+      const gatewayUrl = gatewayUrlFromResponse(response);
+      if (!gatewayUrl) {
+        throw new Error("تعذر فتح بوابة الدفع. حاول مرة أخرى.");
+      }
+      window.location.assign(gatewayUrl);
+      return;
+    }
+
     emit("purchased");
+    await showSuccessfulPurchaseDialog(response);
   } catch (error: any) {
-    const responseMessage = error?.response?.data?.message;
-    const validationErrors = error?.response?.data?.errors;
-    errorMessage.value = responseMessage
-      || (validationErrors && typeof validationErrors === "object"
-        ? Object.values(validationErrors).flat().join(" ")
-        : "تعذر إرسال طلب الشراء. راجع البيانات وحاول مرة أخرى.");
+    errorMessage.value = errorMessageFromRequest(error);
+    await showPurchaseErrorDialog(errorMessage.value);
   } finally {
     submitting.value = false;
   }
@@ -263,14 +401,7 @@ const submit = async () => {
       </div>
     </template>
 
-    <div v-if="success" class="buy-book-dialog__success" role="status">
-      <span aria-hidden="true">✓</span>
-      <h3>تم إرسال طلبك بنجاح</h3>
-      <p>سنراجع الطلب، وستظهر حالة الاشتراك على حسابك فور اعتماده.</p>
-      <button type="button" @click="visible = false">تم</button>
-    </div>
-
-    <form v-else class="buy-book-dialog__form" @submit.prevent="submit">
+    <form class="buy-book-dialog__form" @submit.prevent="submit">
       <div class="buy-book-dialog__summary">
         <div>
           <small>النسخة المختارة</small>
@@ -421,7 +552,7 @@ const submit = async () => {
         </legend>
         <label :class="{ active: mode === 'offline' }">
           <input v-model="mode" type="radio" value="offline" />
-          <span><b>دفعت بتحويل</b><small>أرسل بيانات التحويل للمراجعة</small></span>
+          <span><b>الدفع الآن</b><small>اختر الدفع الإلكتروني أو التحويل</small></span>
         </label>
         <label :class="{ active: mode === 'join' }">
           <input v-model="mode" type="radio" value="join" />
@@ -432,7 +563,7 @@ const submit = async () => {
       <template v-if="mode === 'offline'">
         <div class="buy-book-dialog__section-title">
           <b>وسيلة الدفع</b>
-          <small>اختر الوسيلة التي حوّلت إليها</small>
+          <small>اختر وسيلة الدفع المناسبة لك</small>
         </div>
         <p v-if="loadingMethods" class="buy-book-dialog__hint">جاري تحميل وسائل الدفع...</p>
         <p v-else-if="!paymentMethods.length" class="buy-book-dialog__error">
@@ -448,7 +579,6 @@ const submit = async () => {
               v-model="selectedPaymentMethodId"
               type="radio"
               :value="method.id"
-              @change="delete fieldErrors.paymentMethod"
             />
             <img v-if="method.image" :src="method.image" alt="" />
             <span>
@@ -459,7 +589,15 @@ const submit = async () => {
         </div>
         <p v-if="fieldErrors.paymentMethod" class="buy-book-dialog__field-error">{{ fieldErrors.paymentMethod }}</p>
 
-        <label class="buy-book-dialog__field buy-book-dialog__field--full">
+        <div v-if="isOnlinePayment" class="buy-book-dialog__gateway-note" role="status">
+          <span class="pi pi-shield" aria-hidden="true" />
+          <div>
+            <b>دفع آمن عبر Fawaterk</b>
+            <small>سيتم تحويلك إلى بوابة الدفع لإتمام العملية، ولا تحتاج إلى رفع إيصال.</small>
+          </div>
+        </div>
+
+        <label v-if="isOfflinePayment" class="buy-book-dialog__field buy-book-dialog__field--full">
           <span>رقم الحساب أو الهاتف المحوّل منه</span>
           <input
             v-model="transferredAccount"
@@ -476,7 +614,7 @@ const submit = async () => {
           </small>
         </label>
 
-        <div class="buy-book-dialog__field buy-book-dialog__field--full">
+        <div v-if="isOfflinePayment" class="buy-book-dialog__field buy-book-dialog__field--full">
           <span>صورة إيصال التحويل <em>*</em></span>
           <input
             :id="receiptInputId"
@@ -518,7 +656,15 @@ const submit = async () => {
         class="buy-book-dialog__submit"
         :disabled="submitting || (mode === 'offline' && (loadingMethods || !paymentMethods.length))"
       >
-        {{ submitting ? "جاري إرسال الطلب..." : mode === "join" ? "إرسال طلب الانضمام" : "تأكيد بيانات التحويل" }}
+        {{
+          submitting
+            ? mode === "offline" && isOnlinePayment ? "جاري فتح بوابة الدفع..." : "جاري إرسال الطلب..."
+            : mode === "join"
+              ? "إرسال طلب الانضمام"
+              : isOnlinePayment
+                ? "المتابعة إلى الدفع"
+                : "تأكيد بيانات التحويل"
+        }}
       </button>
       <p class="buy-book-dialog__privacy">بياناتك محمية وتُستخدم فقط للتحقق من عملية الشراء.</p>
     </form>
@@ -527,8 +673,7 @@ const submit = async () => {
 
 <style scoped>
 .buy-book-trigger,
-.buy-book-dialog__submit,
-.buy-book-dialog__success button {
+.buy-book-dialog__submit {
   display: inline-flex;
   min-height: 48px;
   width: 100%;
@@ -544,8 +689,7 @@ const submit = async () => {
 }
 .buy-book-trigger span { transition: transform .2s ease; }
 .buy-book-trigger:hover span { transform: translateX(-4px); }
-:global(html[data-theme="dark"]) .buy-book-dialog__submit,
-:global(html[data-theme="dark"]) .buy-book-dialog__success button {
+:global(html[data-theme="dark"]) .buy-book-dialog__submit {
   color: #07101f;
 }
 .buy-book-dialog__header { display: grid; gap: 3px; }
@@ -599,15 +743,15 @@ const submit = async () => {
 .buy-book-dialog__location-message.success { background: color-mix(in srgb, #32a762 11%, transparent); color: #27824d; }
 .buy-book-dialog__methods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .buy-book-dialog__methods img { width: 38px; height: 38px; border-radius: 7px; object-fit: contain; }
+.buy-book-dialog__gateway-note { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid color-mix(in srgb, #32a762 35%, var(--home-v2-line, var(--app-line, #d9dce4))); border-radius: 9px; background: color-mix(in srgb, #32a762 9%, var(--home-v2-surface, var(--app-surface, #fff))); }
+.buy-book-dialog__gateway-note > span { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 50%; background: color-mix(in srgb, #32a762 16%, transparent); color: #27824d; font-size: 17px; }
+.buy-book-dialog__gateway-note > div { display: grid; gap: 3px; }
+.buy-book-dialog__gateway-note b { color: var(--home-v2-ink, var(--app-text, #172033)); font-size: 13px; }
+.buy-book-dialog__gateway-note small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; line-height: 1.7; }
 .buy-book-dialog__field small:not(.buy-book-dialog__field-error), .buy-book-dialog__hint, .buy-book-dialog__privacy { margin: 0; color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; }
 .buy-book-dialog__error { margin: 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, #dc4a4a 35%, transparent); border-radius: 7px; background: color-mix(in srgb, #dc4a4a 12%, var(--app-surface, #fff)); color: color-mix(in srgb, #dc4a4a 70%, var(--app-text, #172033)); font-size: 13px; }
 .buy-book-dialog__submit:disabled { opacity: .55; cursor: wait; }
 .buy-book-dialog__privacy { text-align: center; }
-.buy-book-dialog__success { display: grid; place-items: center; gap: 10px; padding: 24px 5px 8px; text-align: center; }
-.buy-book-dialog__success > span { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 50%; background: color-mix(in srgb, #32a762 15%, var(--app-surface, #fff)); color: color-mix(in srgb, #32a762 78%, var(--app-text, #172033)); font-size: 28px; font-weight: 900; }
-.buy-book-dialog__success h3, .buy-book-dialog__success p { margin: 0; }
-.buy-book-dialog__success p { max-width: 410px; color: var(--home-v2-muted, var(--app-muted, #747b8b)); line-height: 1.8; }
-.buy-book-dialog__success button { width: 160px; margin-top: 10px; }
 @media (max-width: 560px) {
   .buy-book-dialog__modes, .buy-book-dialog__methods, .buy-book-dialog__fields { grid-template-columns: 1fr; }
   .buy-book-dialog__field--full { grid-column: auto; }

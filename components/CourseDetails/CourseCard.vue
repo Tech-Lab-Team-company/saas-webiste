@@ -198,6 +198,9 @@ const userStore = useUserStore();
                 <div class="btns btns-container">
                   <PaymentDialog
                     :status="Status"
+                    :course-title="CardDetails?.title"
+                    :price="CardDetails?.CoursePrice"
+                    :currency="CardDetails?.currency"
                     class="payment-dialog"
                     v-if="CardDetails?.CoursePrice"
                   />
@@ -242,6 +245,9 @@ const userStore = useUserStore();
         <div class="btns final-cta-actions">
           <PaymentDialog
             :status="Status"
+            :course-title="CardDetails?.title"
+            :price="CardDetails?.CoursePrice"
+            :currency="CardDetails?.currency"
             class="payment-dialog"
             v-if="CardDetails?.CoursePrice"
           />

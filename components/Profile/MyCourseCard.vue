@@ -16,15 +16,21 @@ const educationLabel = computed(() => {
 });
 
 const courseStage = (course: CoursesModel) =>
-  educationLabel.value || course.subject?.title || "المستوى الدراسي";
+  course.subject?.title || educationLabel.value || "المستوى الدراسي";
 
 const courseDescription = (course: CoursesModel) =>
-  course.subtitle || `تابع محتوى ${course.title} ودروس الكورس من مكان واحد.`;
+  course.description || course.subtitle || `تابع محتوى ${course.title} ودروس الكورس من مكان واحد.`;
+
+const courseImage = (course: CoursesModel) => {
+  const image = course.image as CoursesModel["image"] | string | undefined;
+  return typeof image === "string" ? image : image?.img;
+};
 
 const courseMeta = (course: CoursesModel) => {
   const items = [
-    `${course.videos_number || 0} فيديو`,
-    course.docs_number ? `${course.docs_number} ملف` : null,
+    `${course.course_videos} فيديو`,
+    `${course.course_docs} ملف`,
+    `${course.course_records} تسجيل صوتي`,
     course.teacher?.name || null,
   ];
   return items.filter(Boolean).join(" · ");
@@ -76,7 +82,12 @@ const courseRoute = (course: CoursesModel) => ({
           :style="{ '--order': index }"
         >
           <div class="library-cover" :class="`tone-${index % 3}`">
-            <span>{{ course.title?.charAt(0) || "ك" }}</span>
+            <img
+              v-if="courseImage(course)"
+              :src="courseImage(course)"
+              :alt="course.image?.alt || course.title"
+            />
+            <span v-else>{{ course.title?.charAt(0) || "ك" }}</span>
 
             <div class="cover-caption">
               <small>{{ courseStage(course) }}</small>
@@ -166,6 +177,16 @@ const courseRoute = (course: CoursesModel) => ({
   opacity: .13;
   transition: opacity 260ms ease, transform 350ms ease;
 }
+
+.library-cover > img {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  object-fit: cover;
+  transition: transform 350ms ease;
+}
+
+.library-course:hover .library-cover > img { transform: scale(1.035); }
 
 .library-course:hover .library-cover > span { opacity: .19; transform: scale(1.06) rotate(-2deg); }
 

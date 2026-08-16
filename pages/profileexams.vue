@@ -33,6 +33,9 @@ const selectedCourseId = ref("");
 const attendedExams = computed(() =>
   exams.value.lastExams.filter((exam) => exam.attended),
 );
+const availableExams = computed(() =>
+  exams.value.currentExams.filter((exam) => !exam.isFinished),
+);
 const averageScore = computed(() => {
   if (!attendedExams.value.length) return 0;
   const total = attendedExams.value.reduce(
@@ -168,7 +171,7 @@ onMounted(async () => {
           <section class="exam-statistics" aria-label="ملخص الاختبارات">
             <article>
               <span class="pi pi-bolt" />
-              <div><b>{{ exams.currentExams.length }}</b><small>اختبار متاح</small></div>
+              <div><b>{{ availableExams.length }}</b><small>اختبار متاح</small></div>
             </article>
             <article>
               <span class="pi pi-check-circle" />
@@ -202,9 +205,17 @@ onMounted(async () => {
               </header>
 
               <div v-if="exams.currentExams.length" class="current-exams-grid">
-                <article v-for="exam in exams.currentExams" :key="exam.id" class="current-exam-card">
+                <article
+                  v-for="exam in exams.currentExams"
+                  :key="exam.id"
+                  class="current-exam-card"
+                  :class="{ 'current-exam-card--finished': exam.isFinished }"
+                >
                   <div class="exam-card__topline">
-                    <span><i /> متاح الآن</span>
+                    <span v-if="exam.isFinished" class="exam-status--finished">
+                      <i class="pi pi-check" /> تم الانتهاء
+                    </span>
+                    <span v-else><i /> متاح الآن</span>
                     <small>{{ exam.subject?.title || "اختبار عام" }}</small>
                   </div>
                   <h3>{{ exam.title }}</h3>
@@ -217,7 +228,16 @@ onMounted(async () => {
                     <span><b>{{ exam.duration || "—" }}</b> دقيقة</span>
                     <span><b>{{ exam.examMark }}</b> درجة</span>
                   </div>
-                  <NuxtLink v-if="examRoute(exam)" :to="examRoute(exam)!">
+                  <button
+                    v-if="exam.isFinished"
+                    type="button"
+                    class="exam-finished-action"
+                    disabled
+                    aria-label="تم إنهاء هذا الاختبار ولا يمكن فتحه مرة أخرى"
+                  >
+                    <i class="pi pi-lock" /> تم إنهاء الاختبار
+                  </button>
+                  <NuxtLink v-else-if="examRoute(exam)" :to="examRoute(exam)!">
                     ابدأ الاختبار <span>←</span>
                   </NuxtLink>
                   <button
@@ -314,9 +334,13 @@ onMounted(async () => {
 .current-exams-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .current-exam-card { position: relative; overflow: hidden; padding: 25px; border: 1px solid var(--profile-border); border-radius: 16px; background: var(--profile-surface); box-shadow: 0 16px 38px color-mix(in srgb, var(--profile-primary) 7%, transparent); }
 .current-exam-card::before { position: absolute; top: 0; inset-inline: 0; height: 3px; background: linear-gradient(90deg, var(--profile-secondary), var(--profile-primary)); content: ""; }
+.current-exam-card--finished { box-shadow: none; }
+.current-exam-card--finished::before { background: #8a94a3; }
 .exam-card__topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--profile-secondary); font-size: 10px; font-weight: 900; }
 .exam-card__topline > span { display: inline-flex; align-items: center; gap: 6px; }
 .exam-card__topline > span i { width: 6px; height: 6px; border-radius: 50%; background: #2eb67d; box-shadow: 0 0 0 4px rgb(46 182 125 / 13%); }
+.exam-card__topline > .exam-status--finished { color: var(--profile-muted); }
+.exam-card__topline > .exam-status--finished i { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; background: #8a94a3; box-shadow: none; color: white; font-size: 9px; }
 .exam-card__topline small { color: var(--profile-muted); font-size: 10px; }
 .current-exam-card h3, .exam-result-card h3 { margin: 15px 0 7px; color: var(--profile-ink); font-size: 19px; font-weight: 900; line-height: 1.55; }
 .exam-schedule { display: flex; flex-wrap: wrap; gap: 10px 18px; color: var(--profile-muted); font-size: 10px; }
@@ -325,7 +349,8 @@ onMounted(async () => {
 .exam-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0 18px; padding: 15px 0; border-block: 1px solid var(--profile-border); }
 .exam-meta span { display: flex; flex-direction: column; color: var(--profile-muted); text-align: center; font-size: 9px; }
 .exam-meta b { color: var(--profile-ink); font-size: 15px; }
-.current-exam-card > a, .current-exam-card > .exam-route-fallback, .exam-state button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 18px; padding: 0 17px; border: 0; border-radius: 9px; background: var(--profile-action); color: var(--profile-on-action); cursor: pointer; font: 900 11px Cairo, sans-serif; text-decoration: none; }
+.current-exam-card > a, .current-exam-card > .exam-route-fallback, .current-exam-card > .exam-finished-action, .exam-state button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 10px; padding: 0 17px; border: 0; border-radius: 9px; background: var(--profile-action); color: var(--profile-on-action); cursor: pointer; font: 900 11px Cairo, sans-serif; text-decoration: none; }
+.current-exam-card > .exam-finished-action { background: var(--profile-surface-raised); color: var(--profile-muted); cursor: not-allowed; opacity: 1; }
 .exam-course-note { margin: 0; color: var(--profile-muted); font-size: 10px; }
 .exam-history-list { display: grid; gap: 14px; }
 .exam-result-card { display: grid; grid-template-columns: 132px minmax(0, 1fr); align-items: center; gap: 24px; padding: 22px; border: 1px solid var(--profile-border); border-radius: 16px; background: var(--profile-surface); }

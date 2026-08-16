@@ -161,8 +161,9 @@ onMounted(async () => {
                 <span class="eyebrow"><i /> تابع من حيث توقفت</span>
                 <h2>{{ featuredCourse.title }}</h2>
                 <div class="featured-meta">
-                  <span>▶ {{ featuredCourse.videos_number || 0 }} فيديو</span>
-                  <span>▤ {{ featuredCourse.docs_number || 0 }} ملف</span>
+                  <span>▶ {{ featuredCourse.course_videos }} فيديو</span>
+                  <span>▤ {{ featuredCourse.course_docs }} ملف</span>
+                  <span>♪ {{ featuredCourse.course_records }} تسجيل صوتي</span>
                   <span v-if="featuredCourse.teacher?.name"
                     >♙ {{ featuredCourse.teacher.name }}</span
                   >
@@ -328,8 +329,9 @@ onMounted(async () => {
                   <h3>{{ course.title }}</h3>
                   <p v-if="course.subtitle">{{ course.subtitle }}</p>
                   <div class="course-meta">
-                    <span>▶ {{ course.videos_number || 0 }} فيديو</span
-                    ><span>▤ {{ course.docs_number || 0 }} ملف</span>
+                    <span>▶ {{ course.course_videos }} فيديو</span
+                    ><span>▤ {{ course.course_docs }} ملف</span
+                    ><span>♪ {{ course.course_records }} تسجيل صوتي</span>
                   </div>
                   <div class="card-footer">
                     <div class="card-progress">

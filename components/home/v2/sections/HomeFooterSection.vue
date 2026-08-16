@@ -295,17 +295,24 @@ onBeforeUnmount(() => {
           href="https://techlabeg.com/"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="إحدى منتجات Tech Lab"
+          aria-label="Tech Lab — الشريك التقني ومطور المنصة، يفتح في نافذة جديدة"
         >
-          <strong>Tech Lab</strong>
-          <span dir="rtl">إحدى منتجات</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 10.3C9.2 8.4 8.5 6.4 9.4 4.7c.7-1.3 2.3-1.8 3.6-1.1 1.8.9 1.6 3.5-1 6.7Z" />
-            <path d="M13.7 12c1.9-2.8 3.9-3.5 5.6-2.6 1.3.7 1.8 2.3 1.1 3.6-.9 1.8-3.5 1.6-6.7-1Z" />
-            <path d="M12 13.7c2.8 1.9 3.5 3.9 2.6 5.6-.7 1.3-2.3 1.8-3.6 1.1-1.8-.9-1.6-3.5 1-6.7Z" />
-            <path d="M10.3 12c-1.9 2.8-3.9 3.5-5.6 2.6-1.3-.7-1.8-2.3-1.1-3.6.9-1.8 3.5-1.6 6.7 1Z" />
-            <circle cx="12" cy="12" r="1.8" />
-          </svg>
+          <span class="home-v2-footer__tech-lab-logo" aria-hidden="true">
+            <img
+              src="/images/logo-techlab.png"
+              alt=""
+              width="34"
+              height="42"
+              loading="lazy"
+              decoding="async"
+            />
+          </span>
+          <span class="home-v2-footer__tech-lab-copy">
+            <small dir="rtl">الشريك التقني ومطور المنصة</small>
+            <strong>Tech Lab</strong>
+            <span>Digital Solutions</span>
+          </span>
+          <span class="home-v2-footer__tech-lab-external" aria-hidden="true">↗</span>
         </a>
       </div>
     </div>
@@ -568,7 +575,8 @@ onBeforeUnmount(() => {
 .home-v2-footer__providers {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-end;
+  gap: 14px;
 }
 
 .home-v2-footer__powered-by {
@@ -584,39 +592,148 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__tech-lab-badge {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
-  min-height: 32px;
+  min-height: 66px;
   align-items: center;
-  gap: 5px;
-  padding: 4px 8px 4px 10px;
-  border: 1px solid rgba(4, 169, 105, 0.32);
-  border-radius: 999px;
-  background: #f1fbf6;
-  color: #687b75;
-  font-size: 11px;
+  gap: 10px;
+  overflow: hidden;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid rgba(51, 213, 139, 0.45);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(237, 251, 245, 0.97));
+  box-shadow:
+    0 12px 30px rgba(1, 13, 28, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  color: #536a64;
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.home-v2-footer__tech-lab-badge::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: linear-gradient(180deg, #072f59, #0ab46d 58%, #70e766);
+  content: "";
+}
+
+.home-v2-footer__tech-lab-badge::after {
+  position: absolute;
+  z-index: -1;
+  top: -45px;
+  right: -35px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(25, 199, 112, 0.1);
+  content: "";
+  transition: transform 0.35s ease;
 }
 
 .home-v2-footer__tech-lab-badge:hover,
 .home-v2-footer__tech-lab-badge:focus-visible {
-  transform: translateY(-1px);
-  border-color: #08a567;
+  border-color: rgba(38, 220, 136, 0.84);
+  box-shadow:
+    0 17px 38px rgba(1, 13, 28, 0.32),
+    0 0 0 3px rgba(10, 180, 109, 0.11);
+  transform: translateY(-3px);
 }
 
-.home-v2-footer__tech-lab-badge strong {
-  color: #08a567;
-  font-size: 16px;
+.home-v2-footer__tech-lab-badge:hover::after,
+.home-v2-footer__tech-lab-badge:focus-visible::after {
+  transform: scale(1.22);
+}
+
+.home-v2-footer__tech-lab-badge:focus-visible {
+  outline: 2px solid #74e56d;
+  outline-offset: 3px;
+}
+
+.home-v2-footer__tech-lab-logo {
+  display: grid;
+  width: 46px;
+  height: 50px;
+  flex: 0 0 46px;
+  place-items: center;
+  border: 1px solid rgba(8, 165, 103, 0.15);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 5px 14px rgba(7, 47, 89, 0.1);
+}
+
+.home-v2-footer__tech-lab-logo img {
+  width: 31px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(5, 52, 73, 0.15));
+  transition: transform 0.3s ease;
+}
+
+.home-v2-footer__tech-lab-badge:hover .home-v2-footer__tech-lab-logo img,
+.home-v2-footer__tech-lab-badge:focus-visible .home-v2-footer__tech-lab-logo img {
+  transform: scale(1.06);
+}
+
+.home-v2-footer__tech-lab-copy {
+  display: grid;
+  min-width: 132px;
+  gap: 3px;
+  text-align: left;
+}
+
+.home-v2-footer__tech-lab-copy small {
+  color: #64766f;
+  font-size: 9px;
   font-weight: 800;
+  line-height: 1.2;
+  text-align: left;
 }
 
-.home-v2-footer__tech-lab-badge svg {
-  width: 20px;
-  height: 20px;
-  margin-left: 1px;
-  fill: #08a567;
+.home-v2-footer__tech-lab-copy strong {
+  color: #07385a;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.home-v2-footer__tech-lab-copy > span {
+  color: #07975f;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.home-v2-footer__tech-lab-external {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  place-items: center;
+  border: 1px solid rgba(8, 165, 103, 0.18);
+  border-radius: 50%;
+  background: rgba(8, 165, 103, 0.09);
+  color: #087d55;
+  font-size: 13px;
+  font-weight: 900;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.home-v2-footer__tech-lab-badge:hover .home-v2-footer__tech-lab-external,
+.home-v2-footer__tech-lab-badge:focus-visible .home-v2-footer__tech-lab-external {
+  background: #07975f;
+  color: #fff;
+  transform: translate(2px, -2px);
 }
 
 @media (max-width: 900px) {
@@ -648,6 +765,11 @@ onBeforeUnmount(() => {
   .home-v2-footer__legal {
     justify-content: flex-start;
   }
+
+  .home-v2-footer__providers {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 430px) {
@@ -661,6 +783,28 @@ onBeforeUnmount(() => {
 
   .home-v2-footer__brand small {
     display: none;
+  }
+
+  .home-v2-footer__providers {
+    width: 100%;
+  }
+
+  .home-v2-footer__tech-lab-badge {
+    width: min(100%, 270px);
+  }
+
+  .home-v2-footer__tech-lab-copy {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-v2-footer__tech-lab-badge,
+  .home-v2-footer__tech-lab-badge::after,
+  .home-v2-footer__tech-lab-logo img,
+  .home-v2-footer__tech-lab-external {
+    transition: none;
   }
 }
 </style>
