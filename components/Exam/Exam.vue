@@ -2,15 +2,70 @@
 import ExamDetailsParams from '~/features/FetchExams/Core/Params/exam_details_params';
 import type ExamDetailsModel from '~/features/FetchExams/Data/models/exam_details_model';
 import ExamDetailsController from '~/features/FetchExams/presentation/controllers/exam_details_controller';
+import {
+  allowsMultipleExamAttempts,
+  hasCompletedExamAttempt,
+  getExamAvailability,
+  isExamAttemptLocked,
+} from '~/utils/examAttempts';
 
 const router = useRouter();
+const route = useRoute();
 const ExamDetails = ref<ExamDetailsModel | null>(null);
 const isLoading = ref(true);
 const hasError = ref(false);
+const errorMessage = ref('');
+const isClosedError = ref(false);
+
+const returnRoute = computed(() => {
+  const courseId = ExamDetails.value?.courseId || route.params.id;
+  return courseId ? `/course/${courseId}` : '/profileexams';
+});
+const examLocked = computed(() => isExamAttemptLocked(ExamDetails.value));
+const examAvailability = computed(() => getExamAvailability(ExamDetails.value));
+const examUnavailable = computed(
+  () => examLocked.value || examAvailability.value !== 'open',
+);
+const isRepeatAttempt = computed(() =>
+  hasCompletedExamAttempt(ExamDetails.value) &&
+  allowsMultipleExamAttempts(ExamDetails.value),
+);
+const resultValue = computed(() => {
+  if (!ExamDetails.value) return '';
+  if (ExamDetails.value.degreeType === 1 && ExamDetails.value.examMark) {
+    return `${((ExamDetails.value.mark / ExamDetails.value.examMark) * 100).toFixed(1)}%`;
+  }
+  return `${ExamDetails.value.mark} / ${ExamDetails.value.examMark}`;
+});
+
+const looksLikeClosedExamError = (message: string) =>
+  /already|attend|attempt|finished|closed|completed|انته|مغلق|محاولة|حضر/iu.test(message);
+
+const readableExamError = (error: unknown) => {
+  const rawMessage = error instanceof Error ? error.message : String(error ?? '');
+  const message = rawMessage.trim();
+
+  if (looksLikeClosedExamError(message)) {
+    return 'لقد أنهيت هذا الامتحان، ولا يسمح المدرس بمحاولة أخرى.';
+  }
+  if (/forbidden|unauthorized/iu.test(message)) {
+    return 'ليس لديك صلاحية لفتح هذا الامتحان.';
+  }
+  if (/not found/iu.test(message)) {
+    return 'تعذر العثور على هذا الامتحان أو لم يعد متاحًا.';
+  }
+  if (!message || /unknown error/iu.test(message)) {
+    return 'تعذر تحميل الامتحان الآن. تحقق من اتصالك وحاول مرة أخرى.';
+  }
+
+  return message;
+};
 
 const FetchExamQuestions = async () => {
   isLoading.value = true;
   hasError.value = false;
+  errorMessage.value = '';
+  isClosedError.value = false;
 
   try {
     const ExamParams = new ExamDetailsParams(
@@ -22,16 +77,26 @@ const FetchExamQuestions = async () => {
     if (state.value.data) {
       ExamDetails.value = state.value.data;
 
-      if (state.value.data.attended) {
+      if (
+        hasCompletedExamAttempt(state.value.data) ||
+        getExamAvailability(state.value.data) !== 'open'
+      ) {
         localStorage.removeItem(
           `exam-start-${router.currentRoute.value.params.exam}`,
         );
       }
     } else {
       hasError.value = true;
+      const message = readableExamError(state.value.error?.title);
+      errorMessage.value = message;
+      isClosedError.value = looksLikeClosedExamError(
+        state.value.error?.title || message,
+      );
     }
-  } catch {
+  } catch (error) {
     hasError.value = true;
+    errorMessage.value = readableExamError(error);
+    isClosedError.value = looksLikeClosedExamError(errorMessage.value);
   } finally {
     isLoading.value = false;
   }
@@ -48,28 +113,51 @@ onMounted(FetchExamQuestions);
     </div>
 
     <div v-else-if="hasError || !ExamDetails" class="exam-state exam-state--error">
-      <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
-      <h2>تعذر تحميل الامتحان</h2>
-      <p>حاول مرة أخرى، وتأكد من اتصالك بالإنترنت.</p>
-      <button type="button" @click="FetchExamQuestions">إعادة المحاولة</button>
+      <i :class="isClosedError ? 'pi pi-lock' : 'pi pi-exclamation-circle'" aria-hidden="true"></i>
+      <h2>{{ isClosedError ? 'الامتحان مغلق' : 'تعذر تحميل الامتحان' }}</h2>
+      <p>{{ errorMessage }}</p>
+      <button v-if="!isClosedError" type="button" @click="FetchExamQuestions">
+        إعادة المحاولة
+      </button>
+      <button v-else type="button" @click="router.push(returnRoute)">
+        العودة إلى الكورس
+      </button>
     </div>
 
-    <template v-else-if="ExamDetails.attended">
+    <template v-else-if="examUnavailable">
       <ExamHeader :course-data-header="ExamDetails" />
       <div class="exam-state exam-state--attended" role="status">
         <span class="exam-state__icon" aria-hidden="true">
           <i class="pi pi-check"></i>
         </span>
-        <small>تم حضور الامتحان</small>
-        <h2>لقد أنهيت هذا الامتحان بالفعل</h2>
-        <p>لا يمكن دخول الامتحان أو إرسال الإجابات مرة أخرى.</p>
-        <div v-if="ExamDetails.examMark" class="exam-state__result">
+        <small>{{ examAvailability === 'upcoming' ? 'الامتحان لم يبدأ' : 'الامتحان مغلق' }}</small>
+        <h2 v-if="examAvailability === 'upcoming'">لم يحن موعد الامتحان بعد</h2>
+        <h2 v-else-if="examAvailability === 'expired'">انتهى موعد هذا الامتحان</h2>
+        <h2 v-else>{{ ExamDetails.attended ? 'لقد أنهيت هذا الامتحان بالفعل' : 'لم يعد هذا الامتحان متاحًا' }}</h2>
+        <p v-if="examAvailability === 'upcoming'">سيصبح الامتحان متاحًا في الموعد الذي حدده المدرس.</p>
+        <p v-else-if="examAvailability === 'expired'">لا يمكن إرسال إجابات جديدة بعد انتهاء الموعد المحدد.</p>
+        <p v-else>لا يسمح المدرس بمحاولة أخرى أو تعديل الإجابات بعد الإنهاء.</p>
+        <div v-if="examLocked && ExamDetails.examMark" class="exam-state__result">
           <span>درجتك</span>
-          <strong>{{ ExamDetails.mark }} / {{ ExamDetails.examMark }}</strong>
+          <strong>{{ resultValue }}</strong>
+        </div>
+        <div v-if="examLocked" class="exam-state__answers" aria-label="تفاصيل الإجابات">
+          <span class="exam-state__answer exam-state__answer--correct">
+            <i class="pi pi-check-circle" aria-hidden="true"></i>
+            {{ ExamDetails.correctAnswersCount }} صحيحة
+          </span>
+          <span class="exam-state__answer exam-state__answer--wrong">
+            <i class="pi pi-times-circle" aria-hidden="true"></i>
+            {{ ExamDetails.wrongAnswersCount }} خاطئة
+          </span>
+          <span class="exam-state__answer">
+            <i class="pi pi-minus-circle" aria-hidden="true"></i>
+            {{ ExamDetails.unansweredQuestionsCount }} بدون إجابة
+          </span>
         </div>
         <button
           type="button"
-          @click="router.push(`/course/${router.currentRoute.value.params.id}`)"
+          @click="router.push(returnRoute)"
         >
           العودة إلى الكورس
         </button>
@@ -78,6 +166,13 @@ onMounted(FetchExamQuestions);
 
     <template v-else>
       <ExamHeader :course-data-header="ExamDetails" />
+      <div v-if="isRepeatAttempt" class="exam-repeat-notice" role="status">
+        <i class="pi pi-refresh" aria-hidden="true"></i>
+        <div>
+          <strong>محاولة جديدة متاحة</strong>
+          <p>يمكنك مراجعة إجاباتك السابقة وتعديلها ثم إرسال الامتحان مرة أخرى.</p>
+        </div>
+      </div>
       <ExamTime :exam-details="ExamDetails" />
     </template>
   </div>
@@ -182,6 +277,66 @@ onMounted(FetchExamQuestions);
   strong {
     color: var(--home-v2-ink, var(--app-text, #081b3a));
     font-size: 20px;
+  }
+}
+
+.exam-repeat-notice {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 18px;
+  padding: 15px 18px;
+  border: 1px solid color-mix(in srgb, #25834c 34%, var(--home-v2-line, var(--app-line, #e2e7ef)));
+  border-radius: 15px;
+  background: color-mix(in srgb, #25834c 9%, var(--home-v2-surface, var(--app-surface, #fff)));
+  color: var(--home-v2-ink, var(--app-text, #081b3a));
+
+  > i {
+    color: #25834c;
+    font-size: 22px;
+  }
+
+  strong,
+  p {
+    display: block;
+    margin: 0;
+  }
+
+  p {
+    margin-top: 3px;
+    color: var(--home-v2-muted, var(--app-muted, #65738a));
+    font-size: 13px;
+  }
+}
+
+.exam-state__answers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+
+  .exam-state__answer {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    color: var(--home-v2-muted, var(--app-muted, #65738a));
+    border-radius: 999px;
+    background: var(--home-v2-paper, var(--app-bg-muted, #f4f6fa));
+    font-size: 12px;
+
+    i {
+      color: inherit;
+      font-size: 14px;
+    }
+  }
+
+  .exam-state__answer--correct {
+    color: #237a48;
+  }
+
+  .exam-state__answer--wrong {
+    color: #b5403b;
   }
 }
 

@@ -5,29 +5,83 @@ import type ExamDetailsModel from "~/features/FetchExams/Data/models/exam_detail
 import QuestionAnswerController from "~/features/SubmitQuestionAnswer/presentation/controllers/submit_question_answer_controller";
 import QuestionAnswerParams from "~/features/SubmitQuestionAnswer/Core/Params/submit_question_answer_params";
 import { ExamShuffleStatus } from "../CourseDetails/Enum/Exam_status_enum";
-import type QuestionsModel from "~/features/FetchExams/Data/models/questions_model";
+import { allowsMultipleExamAttempts } from "~/utils/examAttempts";
 
 const SelectedAnswer = ref<string[]>([]);
 const CorrectAnswers = ref<(boolean | null)[]>([]);
 const QuestionIndex = ref(0);
+const isSubmitting = ref(false);
+const selected = ref<(number | undefined)[]>([]);
 const props = defineProps({
   questionDetailsData: {
     type: Object as () => ExamDetailsModel | null,
     default: null,
   },
-  remainingTimeMinutes: {
-    type: Number,
-  },
 });
-const RemainingTimeMinutes = ref<Number>(props.remainingTimeMinutes ?? 0);
 
 const questionDetails = ref(props.questionDetailsData);
+const currentQuestion = computed(
+  () => questionDetails.value?.questions?.[QuestionIndex.value] ?? null,
+);
+const supportsAnswerChoices = computed(() =>
+  [0, 1, 2].includes(Number(currentQuestion.value?.questionType ?? 0)),
+);
+const unsupportedRequirement = computed(() => {
+  if (currentQuestion.value?.questionType === 3) {
+    return "هذا السؤال مقالي، لكن خدمة إرسال الامتحان الحالية لا تستقبل إجابة نصية.";
+  }
+  if (currentQuestion.value?.imageRequired) {
+    return "هذا السؤال يتطلب رفع صورة، لكن خدمة إرسال الامتحان الحالية لا تستقبل ملفات.";
+  }
+  if (currentQuestion.value?.explainRequired) {
+    return "هذا السؤال يتطلب شرحًا، لكن خدمة إرسال الامتحان الحالية لا تستقبل نص الشرح.";
+  }
+  if (!supportsAnswerChoices.value) {
+    return "نوع هذا السؤال غير مدعوم حاليًا.";
+  }
+  return "";
+});
+const isAnswerRequired = computed(
+  () => currentQuestion.value?.answerIdRequired !== false,
+);
+
+const getSavedAnswerId = (question: any): number | undefined => {
+  const directAnswer =
+    question?.selectedAnswerId ??
+    question?.selected_answer_id ??
+    question?.student_answer_id ??
+    question?.user_answer_id ??
+    question?.submitted_answer_id ??
+    question?.selected_answer?.id ??
+    question?.student_answer?.id ??
+    question?.user_answer?.id;
+  const selectedAnswer = question?.answers?.find((answer: any) =>
+    answer?.is_selected === true ||
+    Number(answer?.is_selected) === 1 ||
+    answer?.selected === true ||
+    Number(answer?.selected) === 1,
+  )?.id;
+  const answerId = Number(directAnswer ?? selectedAnswer);
+
+  return Number.isFinite(answerId) && answerId > 0 ? answerId : undefined;
+};
+
+const hydrateSavedAnswers = (details: ExamDetailsModel | null) => {
+  details?.questions?.forEach((question, index) => {
+    if (selected.value[index] !== undefined) return;
+    const answerId = getSavedAnswerId(question);
+    if (answerId === undefined) return;
+    selected.value[index] = answerId;
+    SelectedAnswer.value[index] = String(answerId);
+    CorrectAnswers.value[index] = null;
+  });
+};
 
 watch(
   () => props.questionDetailsData,
   (newValue) => {
     questionDetails.value = newValue;
-    // GetExamShuffleStatus();
+    hydrateSavedAnswers(newValue);
   },
   { immediate: true },
 );
@@ -37,64 +91,87 @@ const SendEmit = () => {
   emit("SendAnswerIndex", QuestionIndex.value);
 };
 
-const selected = ref<(number | undefined)[]>([]);
-
 const router = useRouter();
 const toast = useToast();
 
-const checkIsCorrectAnswer = (answerId: number, question: QuestionsModel) => {
-  // const question = [...questionDetails.value?.questions[QuestionIndex.value]];
-
-  // console.log(question, "question");
-  return question?.answers?.find((answer) => answer.id === answerId)?.correct;
+const checkIsCorrectAnswer = (
+  answerId: number,
+  question: { answers?: Array<{ id: number; correct: unknown }> },
+) => {
+  const correct = question?.answers?.find((answer) => answer.id === answerId)?.correct;
+  if (correct == null) return null;
+  return correct === true || Number(correct) === 1;
 };
 
-const sendData = async (status: string) => {
-  // console.log(selected.value[QuestionIndex.value])
+const sendData = async (status = ""): Promise<boolean> => {
+  if (unsupportedRequirement.value) {
+    toast.add({
+      severity: "error",
+      summary: "تعذر إرسال السؤال",
+      detail: unsupportedRequirement.value,
+      life: 5500,
+    });
+    return false;
+  }
+
+  if (
+    isAnswerRequired.value &&
+    selected.value[QuestionIndex.value] === undefined
+  ) {
+    toast.add({
+      severity: "info",
+      summary: "تنبيه",
+      detail: "يجب اختيار إجابة أولًا",
+      life: 3000,
+    });
+    return false;
+  }
+
   const questionAnswerParams = new QuestionAnswerParams(
     Number(router.currentRoute.value.params.exam),
     Number(questionDetails?.value?.questions[QuestionIndex.value]?.id),
     selected.value[QuestionIndex.value] ?? 0,
   );
   const questionAnswerController = QuestionAnswerController.getInstance();
-  if (selected.value[QuestionIndex.value] !== undefined) {
-    // console.log("SubmitQuestionAnswer");
+
+  isSubmitting.value = true;
+  try {
     const state = await questionAnswerController.SubmitQuestionAnswer(
-      questionAnswerParams || null,
-      status || " ",
+      questionAnswerParams,
+      status,
     );
+    if (!state.value.data) {
+      toast.add({
+        severity: "error",
+        summary: "لم يتم حفظ الإجابة",
+        detail: state.value.error?.title || "تعذر إرسال الإجابة. حاول مرة أخرى.",
+        life: 4500,
+      });
+      return false;
+    }
+
     const isCorrect = checkIsCorrectAnswer(
       questionAnswerParams.AnswerId,
       state.value.data,
     );
     CorrectAnswers.value[QuestionIndex.value] = isCorrect;
-    // console.log("checkIsCorrectAnswer", isCorrect);
-  }
-};
-
-const IncreaseIndex = () => {
-  if (
-    QuestionIndex.value <
-    (questionDetails.value?.questions?.length ?? 0) - 1
-  ) {
-    QuestionIndex.value++;
-    SendEmit();
+    return true;
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "لم يتم حفظ الإجابة",
+      detail: error instanceof Error ? error.message : "تعذر إرسال الإجابة. حاول مرة أخرى.",
+      life: 4500,
+    });
+    return false;
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
 const SubmitAndIncrease = async () => {
-  if (selected.value[QuestionIndex.value] == undefined) {
-    toast.add({
-      severity: "info",
-      summary: "تنبيه",
-      detail: "يجب اختيار إجابة",
-      life: 3000,
-    });
-
-    return;
-  }
-
-  await sendData("");
+  const submitted = await sendData("");
+  if (!submitted) return;
 
   if (
     QuestionIndex.value <
@@ -105,34 +182,20 @@ const SubmitAndIncrease = async () => {
   }
 };
 
-const EndExam = () => {
-  sendData("final");
-  if (selected.value[QuestionIndex.value] == undefined) {
-    toast.add({
-      severity: "info",
-      summary: "تنبيه",
-      detail: "يجب اختيار إجابة",
-      life: 3000,
-    });
-
-    return;
-  } else if (
-    QuestionIndex.value <
-    (questionDetails.value?.questions?.length ?? 0) - 1
-  ) {
-    QuestionIndex.value++;
-    if (!selected.value[QuestionIndex.value]) {
-      toast.add({
-        severity: "info",
-        summary: "تنبيه",
-        detail: "يجب اختيار إجابة",
-        life: 3000,
-      });
-    }
+const SaveAndDecrease = async () => {
+  if (selected.value[QuestionIndex.value] !== undefined) {
+    const submitted = await sendData("");
+    if (!submitted) return;
   }
+  DeacreseIndes();
+};
+
+const EndExam = async () => {
+  const submitted = await sendData("final");
+  if (!submitted) return;
+
+  localStorage.removeItem(`exam-start-${router.currentRoute.value.params.exam}`);
   SendEmit();
-  // router.push(``)
-  router.push(`/course/${router.currentRoute.value.params.id}`);
 };
 
 const DeacreseIndes = () => {
@@ -143,13 +206,6 @@ const DeacreseIndes = () => {
   }
   SendEmit();
 };
-
-watch(
-  () => props.remainingTimeMinutes,
-  (NewValue) => {
-    RemainingTimeMinutes.value = NewValue ?? 0;
-  },
-);
 
 const GetExamShuffleStatus = () => {
   if (
@@ -168,15 +224,21 @@ const GetExamShuffleStatus = () => {
 };
 
 const examStatus = computed(() => GetExamShuffleStatus());
+const allowsMultipleAttempts = computed(() =>
+  allowsMultipleExamAttempts(questionDetails.value),
+);
 
 const canNavigateBack = computed(
   () =>
+    allowsMultipleAttempts.value ||
     examStatus.value === ExamShuffleStatus.shuffleAndEdit ||
     examStatus.value === ExamShuffleStatus.ShuffleOnly,
 );
 
 const canEdit = computed(
-  () => examStatus.value === ExamShuffleStatus.shuffleAndEdit,
+  () =>
+    allowsMultipleAttempts.value ||
+    examStatus.value === ExamShuffleStatus.shuffleAndEdit,
 );
 
 const canSelectAnswer = computed(
@@ -217,8 +279,18 @@ const answerLabel = (index: number) => answerLabels[index] || `${index + 1}`;
         dir="auto"
         v-html="questionDetails?.questions[QuestionIndex].question"
       ></p>
+      <span v-if="!isAnswerRequired && !unsupportedRequirement" class="question-optional">
+        الإجابة عن هذا السؤال اختيارية
+      </span>
     </div>
-    <form>
+    <div v-if="unsupportedRequirement" class="question-requirement-error" role="alert">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      <div>
+        <strong>لا يمكن إرسال هذا السؤال من الويب</strong>
+        <p>{{ unsupportedRequirement }}</p>
+      </div>
+    </div>
+    <form v-else>
       <div class="questions-img">
         <div
           class="question-img"
@@ -339,36 +411,25 @@ const answerLabel = (index: number) => answerLabels[index] || `${index + 1}`;
       <button
         type="button"
         v-if="canNavigateBack && QuestionIndex > 0"
-        @click="DeacreseIndes"
+        @click="SaveAndDecrease"
+        :disabled="isSubmitting"
       >
         <RightArrowIcon />
         {{ $t("السابق") }}
       </button>
 
-      <!-- Next Button (No Submit - for shuffle/edit exams) -->
+      <!-- Save before navigating so a selected answer is never lost. -->
       <button
         type="button"
         v-if="
           canNavigateBack &&
           QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
         "
-        @click="IncreaseIndex"
+        @click="SubmitAndIncrease"
+        :disabled="isSubmitting || Boolean(unsupportedRequirement)"
       >
         <LeftArrowIcon />
         {{ $t("التالي") }}
-      </button>
-
-      <!-- Submit Answer Button (Manual submit - for shuffle/edit exams) -->
-      <button
-        type="button"
-        v-if="
-          canNavigateBack &&
-          QuestionIndex < (questionDetails?.questions?.length ?? 0) - 1
-        "
-        @click="sendData"
-        class="btn-submit"
-      >
-        {{ $t("ارسال الاجابة") }}
       </button>
 
       <!-- Next Button (With Submit - for standard exams) -->
@@ -380,6 +441,7 @@ const answerLabel = (index: number) => answerLabels[index] || `${index + 1}`;
         "
         :class="!canNavigateBack ? 'w-full' : ''"
         @click="SubmitAndIncrease"
+        :disabled="isSubmitting || Boolean(unsupportedRequirement)"
       >
         <LeftArrowIcon />
         {{ $t("التالي") }}
@@ -395,8 +457,9 @@ const answerLabel = (index: number) => answerLabels[index] || `${index + 1}`;
             : ''
         "
         @click="EndExam"
+        :disabled="isSubmitting || Boolean(unsupportedRequirement)"
       >
-        {{ $t("ارسال الاجابة و انهاء الامتحان") }}
+        {{ isSubmitting ? "جاري الحفظ..." : $t("ارسال الاجابة و انهاء الامتحان") }}
       </button>
     </div>
   </div>
@@ -676,6 +739,47 @@ img {
   }
 }
 
+.question-optional {
+  align-self: flex-start;
+  margin-top: 12px;
+  padding: 6px 11px;
+  color: #246a45;
+  border-radius: 999px;
+  background: color-mix(in srgb, #2e9b63 12%, transparent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.question-requirement-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 16px;
+  color: #9d342d;
+  border: 1px solid color-mix(in srgb, #d6533a 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, #d6533a 9%, var(--home-v2-surface, #fff));
+
+  i {
+    margin-top: 3px;
+    font-size: 20px;
+  }
+
+  strong,
+  p {
+    display: block;
+    margin: 0;
+  }
+
+  p {
+    margin-top: 4px;
+    color: var(--home-v2-muted, var(--app-muted, #65738a));
+    line-height: 1.7;
+  }
+}
+
 .question-container .questions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -869,6 +973,13 @@ label.danger .answer-choice__marker {
     background: var(--home-v2-blue, var(--primary-color, #28366c));
     cursor: pointer;
     box-shadow: 0 10px 24px color-mix(in srgb, var(--home-v2-blue, #28366c) 18%, transparent);
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+    }
 
     :deep(svg path) {
       stroke: currentColor;

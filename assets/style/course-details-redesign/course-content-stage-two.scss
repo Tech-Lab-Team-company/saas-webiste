@@ -115,6 +115,26 @@
   stroke: currentColor;
 }
 
+.exam-inline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  color: #a4443d;
+  border: 1px solid rgb(169 68 61 / 18%);
+  border-radius: 999px;
+  background: rgb(169 68 61 / 8%);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.exam-inline-status--upcoming {
+  color: var(--primary-color, #237a57);
+  border-color: color-mix(in srgb, var(--primary-color, #237a57) 20%, transparent);
+  background: color-mix(in srgb, var(--primary-color, #237a57) 8%, transparent);
+}
+
 .session-name,
 .session-name2 {
   min-width: 0;

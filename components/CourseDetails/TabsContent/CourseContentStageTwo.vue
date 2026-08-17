@@ -13,6 +13,7 @@ import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons
 import { ContentTypeEnum } from "~/components/CourseDetails/Enum/content_type_enum";
 import LockIcon from '~/public/icons/LockIcon.vue';
 import { IconsBook } from '#components';
+import { isExamAttemptLocked } from '~/utils/examAttempts';
 const props = defineProps({
   CourseData: {
     type: Object as () => LessonsModel | null,
@@ -77,6 +78,9 @@ const sendactivetab = (activetabvalue: number, sessionId: number, link: string, 
 const toast = useToast();
 
 const userStore = useUserStore()
+const { isOpen, isExpired, isUpcoming } = useExamAvailabilityClock();
+const isExamAvailable = (exam: unknown) =>
+  isOpen(exam) && !isExamAttemptLocked(exam);
 const activeIndices = ref<number[]>([]);
 const isdisabled = ref(false)
 
@@ -130,24 +134,34 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
 const visible = ref(false);
 const UserSetting = useUserStore();
 const router = useRouter()
-const ExamTime = ref()
-const GotoExam = (examId: number, StartTime: string, EndTime: string, CourseId: number, IsFinished: boolean) => {
-  const start = new Date(StartTime).getTime();
-  const end = new Date(EndTime).getTime();
-  ExamTime.value = Math.floor((end - start) / 1000 / 60);
-  if (!IsFinished && ExamTime.value > 0) {
-    router.push(`/course/${CourseId}/timer?id=${examId}&time=${StartTime}`)
-  }
-}
-const handelExam = (isFinished: boolean) => {
-  if ((isFinished || !userStore?.user
-    || (props.isPaied == true && props?.isSubscribed == false))) {
-    toast.add({ severity: 'info', summary: 'تنبيه', detail: ' يجب شراء الكورس اولا ', life: 3000 })
+const GotoExam = (exam: any, courseId: number) => {
+  if (!userStore.user) {
+    toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول أولًا', life: 3000 });
     return;
-  } else {
-
+  }
+  if (props.isPaied && !props.isSubscribed) {
+    toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب شراء الكورس أولًا', life: 3000 });
+    return;
+  }
+  if (isExamAttemptLocked(exam)) {
+    toast.add({
+      severity: 'warn',
+      summary: 'الامتحان مغلق',
+      detail: 'لقد أنهيت هذا الامتحان ولا يسمح المدرس بمحاولة أخرى.',
+      life: 4500,
+    });
+    return;
+  }
+  if (isUpcoming(exam)) {
+    toast.add({ severity: 'info', summary: 'لم يبدأ الامتحان بعد', detail: 'سيصبح الامتحان متاحًا تلقائيًا في الموعد المحدد.', life: 4000 });
+    return;
+  }
+  if (isExpired(exam)) {
+    toast.add({ severity: 'warn', summary: 'انتهى موعد الامتحان', detail: 'لا يمكن بدء محاولة جديدة بعد انتهاء الموعد.', life: 4500 });
+    return;
   }
 
+  router.push(`/course/${courseId}/${exam?.id}`)
 }
 </script>
 
@@ -180,15 +194,16 @@ const handelExam = (isFinished: boolean) => {
 
         </div>
         <div class="course-body-details course-exam" v-if="session?.exam"
-          @click="GotoExam(session?.exam?.id, session?.exam?.start_time, session?.exam?.end_time, CourseId, session?.exam?.is_finished)">
+          :class="{ 'course-exam--unavailable': !isExamAvailable(session?.exam) }"
+          @click="GotoExam(session?.exam, CourseId)">
           <div class="session-name" :class="{
-            'disabled': session?.exam?.is_finished || !userStore?.user
+            'disabled': !isExamAvailable(session?.exam) || !userStore?.user
               || (isPaied == true && isSubscribed == false)
-          }" @click="handelExam(session?.exam?.is_finished)">
+          }">
 
             <p>{{ session?.exam?.title }} (امتحان) </p>
-            <component v-if="!session?.exam?.is_finished" :is="getIconByType(ContentTypeEnum.EXAM)" />
-            <div v-else>
+            <component v-if="isExamAvailable(session?.exam)" :is="getIconByType(ContentTypeEnum.EXAM)" />
+            <div v-else-if="isExamAttemptLocked(session?.exam)">
               <div class="exam-rate">
                 <p class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''">
                   {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}</p>
@@ -197,6 +212,12 @@ const handelExam = (isFinished: boolean) => {
                     ((session?.exam.mark / session?.exam.exam_mark) * 100).toFixed(2) }} %</p>
               </div>
             </div>
+            <span v-else-if="isExpired(session?.exam)" class="exam-inline-status">
+              <i class="pi pi-calendar-times"></i> انتهى الموعد
+            </span>
+            <span v-else-if="isUpcoming(session?.exam)" class="exam-inline-status exam-inline-status--upcoming">
+              <i class="pi pi-clock"></i> لم يبدأ بعد
+            </span>
           </div>
         </div>
       </AccordionContent>

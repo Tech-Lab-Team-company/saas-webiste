@@ -31,7 +31,7 @@ export default class QuestionAnswerController extends ControllerInterface<Questi
         if (status === "final") {
           DialogSelector.instance.successDialog.openDialog({
             dialogName: "dialog",
-            titleContent: "Exam Finished Successfully",
+            titleContent: "تم إنهاء الامتحان وحفظ إجاباتك بنجاح",
             imageElement: successImage,
             messageContent: null,
           });

@@ -1,68 +1,49 @@
-import type TitleModel from "~/base/core/Models/title_model";
-import type AnswersModel from "./answers_model";
-
+import { toBooleanFlag } from "~/utils/examAttempts";
+import AnswersModel from "./answers_model";
 
 export default class QuestionsModel {
-  public id: number;
-  public image: string;
-  public question: string;
-  public article: number;
-  public explainRequired: number;
-  public imageRequired: number;
-  public answerIdRequired: number;
-  public answers: AnswersModel[];
-  public questionType: number;
-
-
-
-
-
   constructor(
-    id: number,
-    image: string,
-    question: string,
-    article: number,
-    explainRequired: number,
-    imageRequired: number,
-    answerIdRequired: number,
-    answers: AnswersModel[],
-    questionType: number,
+    public id: number,
+    public image: string,
+    public question: string,
+    public article: number,
+    public explainRequired: boolean,
+    public imageRequired: boolean,
+    public answerIdRequired: boolean,
+    public answers: AnswersModel[],
+    public questionType: number,
+    public selectedAnswerId: number | null,
+  ) {}
 
+  static fromMap(map: Record<string, any>): QuestionsModel {
+    const selectedAnswer =
+      map.selected_answer_id ??
+      map.student_answer_id ??
+      map.user_answer_id ??
+      map.submitted_answer_id ??
+      map.selected_answer?.id ??
+      map.student_answer?.id ??
+      map.user_answer?.id ??
+      map.answers?.find((answer: Record<string, any>) =>
+        toBooleanFlag(answer.is_selected ?? answer.selected),
+      )?.id;
+    const selectedAnswerId = Number(selectedAnswer);
 
-
-  ) {
-    this.id = id;
-    this.image = image;
-    this.question = question;
-    this.article = article;
-    this.explainRequired = explainRequired;
-    this.imageRequired = imageRequired;
-    this.answerIdRequired = answerIdRequired;
-    this.answers = answers;
-    this.questionType = questionType;
-
- 
-  }
-
-
-  static fromMap(map: { [key: string]: any }): QuestionsModel {
     return new QuestionsModel(
-      map["id"],
-      map["image"],
-      map["question"],
-      map["article"],
-      map["explain_required"],
-      map["image_required"],
-      map["answer_id_required"],
-      map["answers"],
-      map["question_type"],
-
-
+      Number(map.id),
+      map.image ?? "",
+      map.question ?? "",
+      Number(map.article ?? 0),
+      toBooleanFlag(map.explain_required),
+      toBooleanFlag(map.image_required),
+      map.answer_id_required == null
+        ? true
+        : toBooleanFlag(map.answer_id_required),
+      Array.isArray(map.answers) ? map.answers.map(AnswersModel.fromMap) : [],
+      Number(map.question_type ?? 0),
+      Number.isFinite(selectedAnswerId) && selectedAnswerId > 0
+        ? selectedAnswerId
+        : null,
     );
   }
 }
-
-
-
-                      
-                

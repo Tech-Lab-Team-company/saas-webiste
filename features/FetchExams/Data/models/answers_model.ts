@@ -1,41 +1,24 @@
 
+import { toBooleanFlag } from "~/utils/examAttempts";
+
 export default class AnswersModel {
-  public id: number;
-  public answer: string;
-  public image: string;
-  public correct: number;
-
-
-
-
-
-
   constructor(
-    id: number,
-    answer: string,
-    image: string,
-    correct: number,
+    public id: number,
+    public answer: string,
+    public image: string,
+    public correct: boolean | null,
+    public isSelected: boolean,
+  ) {}
 
+  static fromMap(map: Record<string, any>): AnswersModel {
+    const correct = map.correct == null ? null : toBooleanFlag(map.correct);
 
-
-
-  ) {
-    this.id = id;
-    this.answer = answer;
-    this.image = image;
-    this.correct = correct;
-
-
- 
-  }
-
-
-  static fromMap(map: { [key: string]: any }): AnswersModel {
     return new AnswersModel(
-      map["id"],
-      map["answer"],
-      map["image"],
-      map["correct"],
+      Number(map.id),
+      map.answer ?? "",
+      map.image ?? "",
+      correct,
+      toBooleanFlag(map.is_selected ?? map.selected),
     );
   }
 }

@@ -7,6 +7,7 @@ import NumberOfQuestionIcon from "~/public/icons/NumberOfQuestionIcon.vue";
 // import CourseDetailsModel from '~/features/FetchCourseDetails/Data/models/course_details_model';
 import type ExamsModel from "~/features/FetchCourseDetails/Data/models/exam_model";
 import Tooltip from 'primevue/tooltip';
+import { allowsMultipleExamAttempts, hasCompletedExamAttempt, isExamAttemptLocked } from '~/utils/examAttempts';
 
 
 const route = useRoute();
@@ -47,37 +48,34 @@ const isDisabled = computed(() => {
   return !userStore.user || (props.isPaid && !props.isSubscribed);
 });
 const { locale } = useI18n();
-const currentTime = new Date();
+const { isOpen, isExpired, isUpcoming } = useExamAvailabilityClock();
+
+const examLink = (exam: any) =>
+  isOpen(exam) && !isDisabled.value && !isExamAttemptLocked(exam)
+    ? `/course/${course_id.value}/${exam.id}`
+    : null;
+
+const unavailableLabel = (exam: any) => {
+  if (isExpired(exam)) return 'انتهى موعد الامتحان';
+  if (isUpcoming(exam)) return 'لم يبدأ الامتحان بعد';
+  return 'الامتحان غير متاح';
+};
 </script>
 
 <template>
   <div
     class="course-exam-container"
+    :class="{
+      'course-exam-container--expired': isExpired(exam),
+      'course-exam-container--upcoming': isUpcoming(exam),
+      'course-exam-container--finished': isExamAttemptLocked(exam),
+    }"
     v-for="(exam, index) in CardDetails"
     :key="index"
   >
-    <NuxtLink
-      v-if="!exam?.is_finished"
-      :to="
-        isDisabled || exam?.is_finished
-          ? null
-          : `/course/${course_id}/timer?id=${exam.id}&time=${exam.start_time}`
-      "
-      @click.prevent="
-        (isDisabled || exam?.is_finished) && $event.preventDefault()
-      "
-    >
+    <NuxtLink v-if="examLink(exam)" :to="examLink(exam)!">
       <div class="btns">
         <button
-          v-if="new Date(exam.end_time).getTime() - currentTime.getTime() < 0"
-          disabled
-          class="disabled"
-        >
-          {{ $t("انتهى الوقت") }}
-        </button>
-
-        <button
-          v-else
           :disabled="isDisabled"
           :class="[
             props.isPaid && !props.isSubscribed ? 'disabled' : '',
@@ -85,14 +83,16 @@ const currentTime = new Date();
           ]"
         >
           {{
-            exam.mark > 0 && !exam?.is_finished
+            hasCompletedExamAttempt(exam) && allowsMultipleExamAttempts(exam)
+              ? 'العودة وتعديل الإجابات'
+              : exam.mark > 0
               ? $t("complate_exam")
               : $t("ابدأ الامتحان")
           }}
         </button>
-        <span class="degree" v-if="exam.mark > 0 && !exam?.is_finished">
+        <span class="degree" v-if="exam.mark > 0">
           {{
-            exam.mark > 0 && !exam?.is_finished
+            exam.mark > 0
               ? `${exam.mark} / ${exam.exam_mark} `
               : ""
           }}
@@ -100,7 +100,22 @@ const currentTime = new Date();
       </div>
     </NuxtLink>
     <div
-      v-else-if="exam?.is_finished"
+      v-else-if="!isExamAttemptLocked(exam)"
+      class="exam-availability-state"
+      role="status"
+    >
+      <span class="exam-availability-state__icon">
+        <i :class="isExpired(exam) ? 'pi pi-calendar-times' : 'pi pi-clock'" aria-hidden="true"></i>
+      </span>
+      <span>
+        <strong>{{ unavailableLabel(exam) }}</strong>
+        <small v-if="isExpired(exam)">لا يمكن بدء محاولة جديدة بعد انتهاء الموعد</small>
+        <small v-else-if="isUpcoming(exam)">سيتم تفعيل زر البدء تلقائيًا في الموعد المحدد</small>
+        <small v-else>سجّل الدخول واشترك في الكورس لبدء الامتحان</small>
+      </span>
+    </div>
+    <div
+      v-else-if="isExamAttemptLocked(exam)"
       class="exam-rate"
       v-tooltip.top="{
         value: `<div style='line-height:1.8'>

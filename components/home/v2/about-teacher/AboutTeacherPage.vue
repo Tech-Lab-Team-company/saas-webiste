@@ -741,7 +741,7 @@ onBeforeUnmount(() => {
       />
       <AboutTeacherMethodSection />
       <AboutTeacherOurStudents />
-      <AboutTeacherExperienceSection :teacher-role="teacherRole" />
+      <!-- <AboutTeacherExperienceSection :teacher-role="teacherRole" /> -->
       <AboutTeacherContactSection
         :site="site"
         :teacher-name="teacherName"

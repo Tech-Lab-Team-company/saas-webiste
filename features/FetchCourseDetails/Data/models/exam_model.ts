@@ -1,6 +1,7 @@
 import ReplayModel from "~/features/MakeCommentFeature/Data/models/replay_model";
 import type SessionsModel from "./sessions_model";
 import type TitleModel from "~/base/core/Models/title_model";
+import { toBooleanFlag } from "~/utils/examAttempts";
 
 export default class ExamsModel {
   public id: number;
@@ -17,6 +18,7 @@ export default class ExamsModel {
   public correct_answers_count: number;
   public wrong_answers_count: number;
   public unanswered_questions_count: number;
+  public allowMultipleAttempts: boolean;
 
   constructor(
     id: number,
@@ -33,6 +35,7 @@ export default class ExamsModel {
     correct_answers_count: number,
     wrong_answers_count: number,
     unanswered_questions_count: number,
+    allowMultipleAttempts: boolean,
   ) {
     this.id = id;
     this.title = title;
@@ -48,6 +51,7 @@ export default class ExamsModel {
     this.correct_answers_count = correct_answers_count;
     this.wrong_answers_count = wrong_answers_count;
     this.unanswered_questions_count = unanswered_questions_count;
+    this.allowMultipleAttempts = allowMultipleAttempts;
   }
 
   static fromMap(map: { [key: string]: any }): ExamsModel {
@@ -58,7 +62,7 @@ export default class ExamsModel {
       map["end_time"],
       map["date"],
       map["exam_mark"],
-      map["is_finished"],
+      toBooleanFlag(map["is_finished"]),
       map["mark"],
       map["subject"],
       map["degree_type"],
@@ -66,6 +70,7 @@ export default class ExamsModel {
       map["correct_answers_count"] ?? 0,
       map["wrong_answers_count"] ?? 0,
       map["unanswered_questions_count"] ?? 0,
+      toBooleanFlag(map["allow_multiple_attempts"]),
     );
   }
 }

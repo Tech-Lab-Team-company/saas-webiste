@@ -15,6 +15,7 @@ const examId = Number(router.currentRoute.value.params.exam);
 const startTimeKey = `exam-start-${examId}`;
 
 const questionCount = computed(() => props.examDetails.questions?.length || 1);
+const hasTimeLimit = computed(() => props.examDetails.isTimeRequired);
 const progressPercentage = computed(() =>
   Math.min(100, ((questionIndex.value + 1) / questionCount.value) * 100),
 );
@@ -45,6 +46,11 @@ const updateTimer = (endTime: number) => {
 const startTimer = () => {
   stopTimer();
 
+  if (!hasTimeLimit.value) {
+    localStorage.removeItem(startTimeKey);
+    return;
+  }
+
   const storedStart = localStorage.getItem(startTimeKey);
   const startTime = storedStart ? Number(storedStart) : Date.now();
 
@@ -59,23 +65,27 @@ const startTimer = () => {
 };
 
 onMounted(startTimer);
+watch(
+  () => [props.examDetails.isTimeRequired, props.examDetails.duration],
+  startTimer,
+);
 onBeforeUnmount(stopTimer);
 </script>
 
 <template>
   <section class="exam-workspace">
-    <div class="exam-status">
+    <div class="exam-status" :class="{ 'exam-status--untimed': !hasTimeLimit }">
       <div class="exam-status__item">
         <span class="exam-status__icon">
           <i class="pi pi-clock" aria-hidden="true"></i>
         </span>
         <div>
-          <small>المدة الكاملة</small>
-          <strong>{{ examDetails.duration }} دقيقة</strong>
+          <small>{{ hasTimeLimit ? "المدة الكاملة" : "نظام الوقت" }}</small>
+          <strong>{{ hasTimeLimit ? `${examDetails.duration} دقيقة` : "بدون وقت محدد" }}</strong>
         </div>
       </div>
 
-      <div class="exam-status__item exam-status__item--remaining" aria-live="polite">
+      <div v-if="hasTimeLimit" class="exam-status__item exam-status__item--remaining" aria-live="polite">
         <span class="exam-status__icon">
           <i class="pi pi-hourglass" aria-hidden="true"></i>
         </span>
@@ -105,7 +115,6 @@ onBeforeUnmount(stopTimer);
     </div>
 
     <ExamQuestionsText
-      :remaining-time-minutes="remainingTimeMinutes"
       :question-details-data="examDetails"
       @SendAnswerIndex="questionIndex = $event"
     />
@@ -126,6 +135,10 @@ onBeforeUnmount(stopTimer);
   border-radius: 20px;
   background: var(--home-v2-surface, var(--app-surface, #fff));
   box-shadow: 0 14px 42px rgb(8 27 58 / 6%);
+}
+
+.exam-status--untimed {
+  grid-template-columns: 1fr;
 }
 
 .exam-status__item {

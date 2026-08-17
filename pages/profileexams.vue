@@ -8,6 +8,11 @@ import type MyExamModel from "~/features/FetchMyExams/Data/models/my_exam_model"
 import MyExamsResource from "~/features/FetchMyExams/Data/models/my_exams_resource";
 import FetchMyExamsController from "~/features/FetchMyExams/presentation/controllers/fetch_my_exams_controller";
 import { useUserStore } from "~/stores/user";
+import {
+  allowsMultipleExamAttempts,
+  hasCompletedExamAttempt,
+  isExamAttemptLocked,
+} from "~/utils/examAttempts";
 
 definePageMeta({
   name: "profileexams",
@@ -29,12 +34,15 @@ const courseFilterSelect = ref<HTMLSelectElement | null>(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 const selectedCourseId = ref("");
+const { isOpen, isExpired, isUpcoming } = useExamAvailabilityClock();
 
 const attendedExams = computed(() =>
   exams.value.lastExams.filter((exam) => exam.attended),
 );
 const availableExams = computed(() =>
-  exams.value.currentExams.filter((exam) => !exam.isFinished),
+  exams.value.currentExams.filter(
+    (exam) => isOpen(exam) && !isExamAttemptLocked(exam),
+  ),
 );
 const averageScore = computed(() => {
   if (!attendedExams.value.length) return 0;
@@ -77,6 +85,7 @@ const examCourseId = (exam: MyExamModel) =>
   (selectedCourseId.value ? Number(selectedCourseId.value) : null);
 
 const examRoute = (exam: MyExamModel) => {
+  if (!isOpen(exam) || isExamAttemptLocked(exam)) return null;
   const courseId = examCourseId(exam);
   if (!courseId) return null;
   return {
@@ -84,6 +93,11 @@ const examRoute = (exam: MyExamModel) => {
     params: { id: courseId, exam: exam.id },
   };
 };
+
+const canRepeatExam = (exam: MyExamModel) =>
+  isOpen(exam) &&
+  hasCompletedExamAttempt(exam) &&
+  allowsMultipleExamAttempts(exam);
 
 const loadCourses = async () => {
   const categoryId = String(userStore.user?.category_id || "2");
@@ -199,7 +213,7 @@ onMounted(async () => {
               <header class="exam-section__heading">
                 <div>
                   <span>متاح لك الآن</span>
-                  <h2>الاختبارات الحالية</h2>
+                  <h2>الاختبارات</h2>
                 </div>
                 <b>{{ exams.currentExams.length }}</b>
               </header>
@@ -209,11 +223,25 @@ onMounted(async () => {
                   v-for="exam in exams.currentExams"
                   :key="exam.id"
                   class="current-exam-card"
-                  :class="{ 'current-exam-card--finished': exam.isFinished }"
+                  :class="{
+                    'current-exam-card--finished': isExamAttemptLocked(exam),
+                    'current-exam-card--expired': isExpired(exam),
+                    'current-exam-card--upcoming': isUpcoming(exam),
+                    'current-exam-card--repeatable': canRepeatExam(exam),
+                  }"
                 >
                   <div class="exam-card__topline">
-                    <span v-if="exam.isFinished" class="exam-status--finished">
+                    <span v-if="isExamAttemptLocked(exam)" class="exam-status--finished">
                       <i class="pi pi-check" /> تم الانتهاء
+                    </span>
+                    <span v-else-if="isExpired(exam)" class="exam-status--unavailable">
+                      <i class="pi pi-calendar-times" /> انتهى الموعد
+                    </span>
+                    <span v-else-if="isUpcoming(exam)" class="exam-status--unavailable exam-status--upcoming">
+                      <i class="pi pi-clock" /> لم يبدأ بعد
+                    </span>
+                    <span v-else-if="canRepeatExam(exam)" class="exam-status--repeatable">
+                      <i class="pi pi-refresh" /> متاح لمحاولة أخرى
                     </span>
                     <span v-else><i /> متاح الآن</span>
                     <small>{{ exam.subject?.title || "اختبار عام" }}</small>
@@ -228,8 +256,11 @@ onMounted(async () => {
                     <span><b>{{ exam.duration || "—" }}</b> دقيقة</span>
                     <span><b>{{ exam.examMark }}</b> درجة</span>
                   </div>
+                  <p v-if="canRepeatExam(exam)" class="exam-attempt-note">
+                    يمكنك الرجوع إلى الامتحان وتعديل إجاباتك ثم إرسالها مرة أخرى.
+                  </p>
                   <button
-                    v-if="exam.isFinished"
+                    v-if="isExamAttemptLocked(exam)"
                     type="button"
                     class="exam-finished-action"
                     disabled
@@ -237,8 +268,18 @@ onMounted(async () => {
                   >
                     <i class="pi pi-lock" /> تم إنهاء الاختبار
                   </button>
+                  <button
+                    v-else-if="!isOpen(exam)"
+                    type="button"
+                    class="exam-finished-action exam-unavailable-action"
+                    disabled
+                  >
+                    <i :class="isExpired(exam) ? 'pi pi-calendar-times' : 'pi pi-clock'" />
+                    {{ isExpired(exam) ? "انتهى موعد الاختبار" : "الاختبار لم يبدأ بعد" }}
+                  </button>
                   <NuxtLink v-else-if="examRoute(exam)" :to="examRoute(exam)!">
-                    ابدأ الاختبار <span>←</span>
+                    {{ canRepeatExam(exam) ? "العودة وتعديل الإجابات" : "ابدأ الاختبار" }}
+                    <span>←</span>
                   </NuxtLink>
                   <button
                     v-else
@@ -294,6 +335,15 @@ onMounted(async () => {
                       <span class="is-wrong"><b>{{ exam.wrongAnswersCount }}</b> خاطئة</span>
                       <span><b>{{ exam.unansweredQuestionsCount }}</b> بدون إجابة</span>
                     </div>
+
+                    <NuxtLink
+                      v-if="canRepeatExam(exam) && examRoute(exam)"
+                      :to="examRoute(exam)!"
+                      class="exam-result-retry"
+                    >
+                      <i class="pi pi-pencil" aria-hidden="true" />
+                      العودة وتعديل الإجابات
+                    </NuxtLink>
                   </div>
                 </article>
               </div>
@@ -336,11 +386,20 @@ onMounted(async () => {
 .current-exam-card::before { position: absolute; top: 0; inset-inline: 0; height: 3px; background: linear-gradient(90deg, var(--profile-secondary), var(--profile-primary)); content: ""; }
 .current-exam-card--finished { box-shadow: none; }
 .current-exam-card--finished::before { background: #8a94a3; }
+.current-exam-card--expired, .current-exam-card--upcoming { box-shadow: none; }
+.current-exam-card--expired::before { background: #b75a52; }
+.current-exam-card--upcoming::before { background: #d49b43; }
+.current-exam-card--repeatable::before { background: linear-gradient(90deg, #2eb67d, var(--profile-secondary)); }
 .exam-card__topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--profile-secondary); font-size: 10px; font-weight: 900; }
 .exam-card__topline > span { display: inline-flex; align-items: center; gap: 6px; }
 .exam-card__topline > span i { width: 6px; height: 6px; border-radius: 50%; background: #2eb67d; box-shadow: 0 0 0 4px rgb(46 182 125 / 13%); }
 .exam-card__topline > .exam-status--finished { color: var(--profile-muted); }
 .exam-card__topline > .exam-status--finished i { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; background: #8a94a3; box-shadow: none; color: white; font-size: 9px; }
+.exam-card__topline > .exam-status--repeatable { color: #25834c; }
+.exam-card__topline > .exam-status--repeatable i { display: inline; width: auto; height: auto; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font-size: 11px; }
+.exam-card__topline > .exam-status--unavailable { color: #a64740; }
+.exam-card__topline > .exam-status--unavailable i { display: inline; width: auto; height: auto; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font-size: 12px; }
+.exam-card__topline > .exam-status--upcoming { color: #a36c18; }
 .exam-card__topline small { color: var(--profile-muted); font-size: 10px; }
 .current-exam-card h3, .exam-result-card h3 { margin: 15px 0 7px; color: var(--profile-ink); font-size: 19px; font-weight: 900; line-height: 1.55; }
 .exam-schedule { display: flex; flex-wrap: wrap; gap: 10px 18px; color: var(--profile-muted); font-size: 10px; }
@@ -349,8 +408,10 @@ onMounted(async () => {
 .exam-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0 18px; padding: 15px 0; border-block: 1px solid var(--profile-border); }
 .exam-meta span { display: flex; flex-direction: column; color: var(--profile-muted); text-align: center; font-size: 9px; }
 .exam-meta b { color: var(--profile-ink); font-size: 15px; }
+.exam-attempt-note { margin: -7px 0 16px; color: #25834c; font-size: 10px; line-height: 1.7; }
 .current-exam-card > a, .current-exam-card > .exam-route-fallback, .current-exam-card > .exam-finished-action, .exam-state button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 10px; padding: 0 17px; border: 0; border-radius: 9px; background: var(--profile-action); color: var(--profile-on-action); cursor: pointer; font: 900 11px Cairo, sans-serif; text-decoration: none; }
 .current-exam-card > .exam-finished-action { background: var(--profile-surface-raised); color: var(--profile-muted); cursor: not-allowed; opacity: 1; }
+.current-exam-card > .exam-unavailable-action { width: 100%; border: 1px solid var(--profile-border); }
 .exam-course-note { margin: 0; color: var(--profile-muted); font-size: 10px; }
 .exam-history-list { display: grid; gap: 14px; }
 .exam-result-card { display: grid; grid-template-columns: 132px minmax(0, 1fr); align-items: center; gap: 24px; padding: 22px; border: 1px solid var(--profile-border); border-radius: 16px; background: var(--profile-surface); }
@@ -367,6 +428,7 @@ onMounted(async () => {
 .answer-statistics b { color: var(--profile-ink); font-size: 11px; }
 .answer-statistics .is-correct { color: #2e9b68; background: color-mix(in srgb, #2eb67d 12%, var(--profile-surface)); }
 .answer-statistics .is-wrong { color: #e06a61; background: color-mix(in srgb, #d94b43 12%, var(--profile-surface)); }
+.exam-result-retry { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 0 15px; border: 1px solid color-mix(in srgb, var(--profile-secondary) 35%, var(--profile-border)); border-radius: 9px; background: var(--profile-secondary-soft); color: var(--profile-secondary); font-size: 10px; font-weight: 900; text-decoration: none; }
 .exam-state { display: flex; min-height: 290px; flex-direction: column; align-items: center; justify-content: center; padding: 30px; border: 1px dashed var(--profile-border); border-radius: 16px; background: var(--profile-surface); text-align: center; }
 .exam-state > span { color: var(--profile-secondary); font-size: 30px; }
 .exam-state h2, .exam-state h3 { margin: 13px 0 3px; color: var(--profile-ink); }

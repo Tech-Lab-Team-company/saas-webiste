@@ -6,7 +6,15 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const courseUrl = computed(() => `/course/${route.params.id}`);
+const courseUrl = computed(() => {
+  const courseId = props.courseDataHeader.courseId || route.params.id;
+  return courseId ? `/course/${courseId}` : "/profileexams";
+});
+const questionsCount = computed(() =>
+  props.courseDataHeader.questions?.length ||
+  props.courseDataHeader.number_of_questions ||
+  0,
+);
 </script>
 
 <template>
@@ -27,7 +35,7 @@ const courseUrl = computed(() => `/course/${route.params.id}`);
         </span>
         <span>
           <i class="pi pi-list-check" aria-hidden="true"></i>
-          {{ props.courseDataHeader.number_of_questions }} سؤال
+          {{ questionsCount }} سؤال
         </span>
         <span>
           <i class="pi pi-star" aria-hidden="true"></i>

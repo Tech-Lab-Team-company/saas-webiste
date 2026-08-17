@@ -1,4 +1,5 @@
 import TitleModel from "~/base/core/Models/title_model";
+import { toBooleanFlag } from "~/utils/examAttempts";
 
 export default class MyExamModel {
   constructor(
@@ -22,6 +23,7 @@ export default class MyExamModel {
     public isTimeRequired: boolean,
     public duration: number,
     public numberOfQuestions: number,
+    public allowMultipleAttempts: boolean,
     public courseId: number | null,
   ) {}
 
@@ -33,20 +35,21 @@ export default class MyExamModel {
       map.end_time ?? "",
       map.date ?? "",
       Number(map.exam_mark ?? 0),
-      Boolean(map.is_finished),
+      toBooleanFlag(map.is_finished),
       Number(map.mark ?? 0),
-      Boolean(map.attended),
+      toBooleanFlag(map.attended),
       Number(map.wrong_answers_count ?? 0),
       Number(map.correct_answers_count ?? 0),
       Number(map.unanswered_questions_count ?? 0),
       map.subject ? TitleModel.fromMap(map.subject) : null,
       Number(map.exam_type ?? 0),
       Number(map.degree_type ?? 0),
-      Boolean(map.allow_shuffle),
-      Boolean(map.edit_answer),
-      Boolean(map.is_time_required),
+      toBooleanFlag(map.allow_shuffle),
+      toBooleanFlag(map.edit_answer),
+      toBooleanFlag(map.is_time_required),
       Number(map.duration ?? 0),
       Number(map.number_of_questions ?? 0),
+      toBooleanFlag(map.allow_multiple_attempts),
       map.course_id == null ? null : Number(map.course_id),
     );
   }
