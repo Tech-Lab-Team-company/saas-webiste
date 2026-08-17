@@ -5,8 +5,11 @@ import { ApiNames } from "~/base/core/networkStructure/apiNames";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import FetchPaymentMethodsParams from "~/features/fetch_payment_methods/Core/Params/fetch_payment_methods_params";
 import FetchPaymentMethodController from "~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
+import BookOnlinePaymentParams from "~/features/OnlinePayment/Core/Params/book_online_payment_params";
+import OnlinePaymentController from "~/features/OnlinePayment/presentation/controllers/online_payment_controller";
 import errorImage from "~/public/images/error.png";
 import successImage from "~/public/images/success-dialog.png";
+import { useSiteUrl } from "~/utils/siteUrl";
 
 const props = defineProps<{
   bookId: number;
@@ -15,6 +18,7 @@ const props = defineProps<{
   currency: string;
   optionLabel: string;
   requiresDelivery: boolean;
+  triggerLabel?: string;
 }>();
 
 const emit = defineEmits<{ purchased: [] }>();
@@ -23,6 +27,7 @@ const route = useRoute();
 const userStore = useUserStore();
 const paymentStore = usePaymentStore();
 const toast = useToast();
+const { buildSiteUrl } = useSiteUrl();
 
 const visible = ref(false);
 const mode = ref<"join" | "offline">("offline");
@@ -125,6 +130,9 @@ const validate = () => {
     if (selectedPaymentMethodId.value === null) {
       errors.paymentMethod = "اختر وسيلة الدفع التي استخدمتها.";
     }
+    if (selectedMethod.value && !isOnlinePayment.value && !isOfflinePayment.value) {
+      errors.paymentMethod = "وسيلة الدفع المختارة غير مدعومة حاليًا.";
+    }
     if (isOfflinePayment.value && transferredAccount.value.trim().length < 6) {
       errors.transferredAccount = "أدخل رقم الحساب أو الهاتف الذي تم التحويل منه.";
     }
@@ -155,12 +163,6 @@ watch(selectedPaymentMethodId, () => {
     clearReceipt();
   }
 });
-
-const gatewayUrlFromResponse = (response: any) =>
-  response?.data?.data?.url
-  || response?.data?.url
-  || response?.data?.data?.payment_url
-  || response?.data?.payment_url;
 
 const apiResponseMessage = (response: any) =>
   response?.data?.message || response?.data?.data?.message;
@@ -312,26 +314,68 @@ const useCurrentLocation = async () => {
   locationMessageType.value = "success";
 };
 
+const buildDeliveryData = () => props.requiresDelivery
+  ? {
+      city: city.value.trim(),
+      address: address.value.trim(),
+      lat: Number(latitude.value),
+      lng: Number(longitude.value),
+      teacher_district: teacherDistrict.value.trim(),
+      location_details: locationDetails.value.trim(),
+    }
+  : null;
+
+const submitOnlinePayment = async (deliveryData: ReturnType<typeof buildDeliveryData>) => {
+  if (!selectedMethod.value) return;
+
+  const callbackUrl = buildSiteUrl(
+    `/paymentverify/${selectedMethod.value.id}?source=book&bookId=${props.bookId}`,
+  );
+  const params = new BookOnlinePaymentParams(
+    props.bookId,
+    selectedMethod.value.id,
+    callbackUrl,
+    deliveryData,
+  );
+  const state = await OnlinePaymentController.getInstance().CreateOnlinePayment(params, router);
+  const paymentId = Number(state.value.data?.id);
+  const gatewayUrl = state.value.data?.url;
+
+  if (!Number.isFinite(paymentId) || paymentId <= 0 || !gatewayUrl) {
+    throw new Error(
+      state.value.error?.title || "تعذر إنشاء جلسة الدفع الآمن. حاول مرة أخرى.",
+    );
+  }
+
+  window.localStorage.setItem("onlinePaymentId", String(paymentId));
+  window.localStorage.setItem("onlinePaymentContext", JSON.stringify({
+    source: "book",
+    bookId: props.bookId,
+    title: props.title,
+    optionLabel: props.optionLabel,
+    returnUrl: route.fullPath,
+  }));
+  visible.value = false;
+  window.location.assign(gatewayUrl);
+};
+
 const submit = async () => {
   errorMessage.value = "";
   if (!validate()) return;
 
   submitting.value = true;
   try {
-    const deliveryData = props.requiresDelivery
-      ? {
-          city: city.value.trim(),
-          address: address.value.trim(),
-          lat: Number(latitude.value),
-          lng: Number(longitude.value),
-          teacher_district: teacherDistrict.value.trim(),
-          location_details: locationDetails.value.trim(),
-        }
-      : {};
+    const deliveryData = buildDeliveryData();
+
+    if (mode.value === "offline" && isOnlinePayment.value) {
+      await submitOnlinePayment(deliveryData);
+      return;
+    }
+
     const payload = {
       book_id: props.bookId,
       subscription_type: mode.value === "join" ? 5 : 1,
-      ...deliveryData,
+      ...(deliveryData ?? {}),
       ...(mode.value === "offline"
         ? {
             payment_method_id: selectedPaymentMethodId.value,
@@ -359,15 +403,6 @@ const submit = async () => {
 
     ensureSuccessfulBuyProductResponse(response);
 
-    if (mode.value === "offline" && isOnlinePayment.value) {
-      const gatewayUrl = gatewayUrlFromResponse(response);
-      if (!gatewayUrl) {
-        throw new Error("تعذر فتح بوابة الدفع. حاول مرة أخرى.");
-      }
-      window.location.assign(gatewayUrl);
-      return;
-    }
-
     emit("purchased");
     await showSuccessfulPurchaseDialog(response);
   } catch (error: any) {
@@ -381,7 +416,7 @@ const submit = async () => {
 
 <template>
   <button type="button" class="buy-book-trigger" @click="open">
-    شراء هذه النسخة
+    {{ triggerLabel || "شراء هذه النسخة" }}
     <span aria-hidden="true">←</span>
   </button>
 
@@ -396,8 +431,11 @@ const submit = async () => {
   >
     <template #header>
       <div class="buy-book-dialog__header">
-        <span>إتمام شراء الكتاب</span>
-        <small>{{ title }}</small>
+        <span class="buy-book-dialog__header-icon pi pi-book" aria-hidden="true" />
+        <span>
+          <strong>إتمام شراء الكتاب</strong>
+          <small>{{ title }}</small>
+        </span>
       </div>
     </template>
 
@@ -580,11 +618,20 @@ const submit = async () => {
               type="radio"
               :value="method.id"
             />
-            <img v-if="method.image" :src="method.image" alt="" />
-            <span>
-              <b>{{ method.title }}</b>
-              <small>{{ method.account_number || method.currency }}</small>
+            <span class="buy-book-dialog__method-visual">
+              <img v-if="method.image" :src="method.image" alt="" />
+              <i
+                v-else
+                :class="['pi', Number(method.type) === 1 ? 'pi-credit-card' : 'pi-wallet']"
+                aria-hidden="true"
+              />
             </span>
+            <span class="buy-book-dialog__method-copy">
+              <b>{{ method.title }}</b>
+              <small v-if="Number(method.type) === 1">دفع إلكتروني آمن</small>
+              <small v-else>{{ method.account_number || "تحويل فوري مع إرفاق الإيصال" }}</small>
+            </span>
+            <span class="buy-book-dialog__method-check pi pi-check" aria-hidden="true" />
           </label>
         </div>
         <p v-if="fieldErrors.paymentMethod" class="buy-book-dialog__field-error">{{ fieldErrors.paymentMethod }}</p>
@@ -672,6 +719,15 @@ const submit = async () => {
 </template>
 
 <style scoped>
+:global(.buy-book-dialog.p-dialog) {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 20%, var(--app-line, #dfe3eb));
+  border-radius: 18px;
+  background: var(--home-v2-surface, var(--app-surface, #fff));
+  box-shadow: 0 28px 80px rgb(8 20 48 / 26%);
+}
+:global(.buy-book-dialog .p-dialog-header) { padding: 20px 22px 16px; border-bottom: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); }
+:global(.buy-book-dialog .p-dialog-content) { padding: 20px 22px 24px; background: var(--home-v2-surface, var(--app-surface, #fff)); }
 .buy-book-trigger,
 .buy-book-dialog__submit {
   display: inline-flex;
@@ -692,9 +748,11 @@ const submit = async () => {
 :global(html[data-theme="dark"]) .buy-book-dialog__submit {
   color: #07101f;
 }
-.buy-book-dialog__header { display: grid; gap: 3px; }
-.buy-book-dialog__header span { color: var(--home-v2-ink, var(--app-text, #172033)); font-weight: 900; }
+.buy-book-dialog__header { display: flex; align-items: center; gap: 12px; }
+.buy-book-dialog__header > span:last-child { display: grid; gap: 3px; }
+.buy-book-dialog__header strong { color: var(--home-v2-ink, var(--app-text, #172033)); font-weight: 900; }
 .buy-book-dialog__header small { color: var(--home-v2-muted, var(--app-muted, #70778a)); font-size: 12px; }
+.buy-book-dialog__header-icon { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 12%, transparent); color: var(--home-v2-deep, var(--app-accent-secondary, #3a3e7e)); font-size: 18px; }
 .buy-book-dialog__form { display: grid; gap: 20px; }
 :deep(.p-dialog-content) { max-height: min(78vh, 760px); }
 .buy-book-dialog__summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 10px; background: var(--home-v2-cream, var(--app-bg-muted, #f7f5ef)); }
@@ -742,7 +800,14 @@ const submit = async () => {
 .buy-book-dialog__location-message { margin: 0; padding: 8px 10px; border-radius: 7px; background: color-mix(in srgb, #dc4a4a 10%, transparent); color: #b63c3c; font-size: 11px; }
 .buy-book-dialog__location-message.success { background: color-mix(in srgb, #32a762 11%, transparent); color: #27824d; }
 .buy-book-dialog__methods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-.buy-book-dialog__methods img { width: 38px; height: 38px; border-radius: 7px; object-fit: contain; }
+.buy-book-dialog__methods label { position: relative; min-height: 72px; padding: 12px; overflow: hidden; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+.buy-book-dialog__methods label:hover { transform: translateY(-1px); }
+.buy-book-dialog__methods label > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.buy-book-dialog__method-visual { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 10px; background: color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 9%, transparent); color: var(--home-v2-deep, var(--app-accent-secondary, #3a3e7e)); font-size: 18px; }
+.buy-book-dialog__method-visual img { width: 34px; height: 34px; border-radius: 6px; object-fit: contain; }
+.buy-book-dialog__method-copy { min-width: 0; flex: 1; }
+.buy-book-dialog__method-check { display: grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; border: 1px solid var(--home-v2-line, var(--app-line, #d9dce4)); border-radius: 50%; color: transparent; font-size: 10px; }
+.buy-book-dialog__methods label.active .buy-book-dialog__method-check { border-color: var(--home-v2-deep, #3a3e7e); background: var(--home-v2-deep, #3a3e7e); color: #fff; }
 .buy-book-dialog__gateway-note { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid color-mix(in srgb, #32a762 35%, var(--home-v2-line, var(--app-line, #d9dce4))); border-radius: 9px; background: color-mix(in srgb, #32a762 9%, var(--home-v2-surface, var(--app-surface, #fff))); }
 .buy-book-dialog__gateway-note > span { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 50%; background: color-mix(in srgb, #32a762 16%, transparent); color: #27824d; font-size: 17px; }
 .buy-book-dialog__gateway-note > div { display: grid; gap: 3px; }

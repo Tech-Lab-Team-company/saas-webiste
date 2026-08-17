@@ -1622,7 +1622,11 @@ const getStudentAlt = (student: any) => {
 
 .top-students-section {
   padding: 76px 0;
-  background: #f2f5fa;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-color, #327ef6) 9%, #f2f5fa),
+    color-mix(in srgb, var(--secondary-color, #1e5cbb) 9%, #f2f5fa)
+  );
 }
 
 .top-students-section::before {
@@ -1636,12 +1640,24 @@ const getStudentAlt = (student: any) => {
   margin-inline: auto;
   overflow: hidden;
   padding: 34px 28px 18px;
-  border: 1px solid rgb(104 164 255 / 32%);
+  border: 1px solid color-mix(in srgb, var(--primary-color, #68a4ff) 46%, transparent);
   border-radius: 22px;
   background:
-    radial-gradient(circle at 90% 4%, rgb(48 112 214 / 21%), transparent 28%),
-    radial-gradient(circle at 10% 100%, rgb(30 92 187 / 13%), transparent 30%),
-    linear-gradient(145deg, #071426 0%, #081a31 52%, #061222 100%);
+    radial-gradient(
+      circle at 90% 4%,
+      color-mix(in srgb, var(--primary-color, #3070d6) 30%, transparent),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 10% 100%,
+      color-mix(in srgb, var(--secondary-color, #1e5cbb) 24%, transparent),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary-color, #3070d6) 32%, #061222) 0%,
+      color-mix(in srgb, var(--secondary-color, #1e5cbb) 27%, #081426) 100%
+    );
   box-shadow:
     0 38px 90px -52px rgb(2 10 25 / 82%),
     inset 0 1px 0 rgb(255 255 255 / 5%);
@@ -1676,13 +1692,17 @@ const getStudentAlt = (student: any) => {
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  background: rgb(50 126 246 / 14%);
+  background: color-mix(in srgb, var(--primary-color, #327ef6) 34%, transparent);
   filter: blur(35px);
   pointer-events: none;
 }
 
 .top-students-board__glow--right { top: -170px; inset-inline-start: -80px; }
-.top-students-board__glow--left { bottom: -190px; inset-inline-end: -60px; }
+.top-students-board__glow--left {
+  bottom: -190px;
+  inset-inline-end: -60px;
+  background: color-mix(in srgb, var(--secondary-color, #1e5cbb) 30%, transparent);
+}
 
 .top-students-board__header {
   position: relative;
@@ -1710,11 +1730,20 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-board__intro h2 {
-  margin: 0;
-  color: #f8fbff;
+  width: fit-content;
+  margin: 0 auto;
+  background: linear-gradient(
+    105deg,
+    var(--primary-color, #74acff) 0%,
+    var(--secondary-color, #f8fbff) 100%
+  );
+  background-clip: text;
+  color: transparent;
   font: 900 clamp(29px, 3.4vw, 42px) / 1.25 var(--home-v2-heading, inherit);
   letter-spacing: -.025em;
-  text-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 8px 20px rgb(0 0 0 / 24%));
 }
 
 .top-students-board__intro p {
@@ -2530,7 +2559,7 @@ const getStudentAlt = (student: any) => {
   }
 
   .top-students-board__intro { text-align: start; }
-  .top-students-board__intro h2 { font-size: 24px; }
+  .top-students-board__intro h2 { margin-inline: 0 auto; font-size: 24px; }
   .top-students-board__intro p { font-size: 10px; line-height: 1.7; }
   .top-students-board__eyebrow { font-size: 8px; }
 
@@ -2631,9 +2660,21 @@ const getStudentAlt = (student: any) => {
 
 .home-sections--dark .top-students-section {
   background:
-    radial-gradient(circle at 88% 8%, rgb(74 132 225 / 20%), transparent 34%),
-    radial-gradient(circle at 8% 90%, rgb(80 112 190 / 11%), transparent 30%),
-    linear-gradient(180deg, #0d1627 0%, #09111f 100%);
+    radial-gradient(
+      circle at 88% 8%,
+      color-mix(in srgb, var(--primary-color, #4a84e1) 22%, transparent),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 8% 90%,
+      color-mix(in srgb, var(--secondary-color, #5070be) 18%, transparent),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary-color, #4a84e1) 10%, #0d1627),
+      color-mix(in srgb, var(--secondary-color, #5070be) 9%, #09111f)
+    );
 }
 
 .home-sections--dark .opinions-section { background: #0b1220; }

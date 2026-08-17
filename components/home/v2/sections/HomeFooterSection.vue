@@ -188,9 +188,18 @@ onBeforeUnmount(() => {
         </p>
 
         <address class="home-v2-footer__contacts" aria-label="بيانات التواصل">
-          <a v-if="site.phone" :href="`tel:${site.phone}`" dir="ltr">{{ site.phone }}</a>
-          <a v-if="site.email" :href="`mailto:${site.email}`" dir="ltr">{{ site.email }}</a>
-          <span v-if="site.address">{{ site.address }}</span>
+          <a v-if="site.phone" :href="`tel:${site.phone}`" dir="ltr">
+            <i class="pi pi-phone" aria-hidden="true"></i>
+            <span>{{ site.phone }}</span>
+          </a>
+          <a v-if="site.email" :href="`mailto:${site.email}`" dir="ltr">
+            <i class="pi pi-envelope" aria-hidden="true"></i>
+            <span>{{ site.email }}</span>
+          </a>
+          <span v-if="site.address">
+            <i class="pi pi-map-marker" aria-hidden="true"></i>
+            {{ site.address }}
+          </span>
         </address>
 
         <div
@@ -209,9 +218,7 @@ onBeforeUnmount(() => {
               aria-label="فيسبوك — يفتح في نافذة جديدة"
             >
               <span class="home-v2-footer__social-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M14 8h3V4.2c-.5-.1-2.2-.2-4-.2-3.9 0-6.5 2.4-6.5 6.7V14H3v4h3.5v6h4.3v-6h3.6l.6-4h-4.2v-2.9C10.8 10 11.1 8 14 8Z" />
-                </svg>
+                <IconsFacebook />
               </span>
               <span>فيسبوك</span>
             </a>
@@ -225,13 +232,7 @@ onBeforeUnmount(() => {
               aria-label="إنستجرام — يفتح في نافذة جديدة"
             >
               <span class="home-v2-footer__social-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path
-                    fill-rule="evenodd"
-                    d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6ZM18.3 6.7a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
+                <IconsInstagram />
               </span>
               <span>إنستجرام</span>
             </a>
@@ -245,9 +246,7 @@ onBeforeUnmount(() => {
               aria-label="واتساب — يفتح في نافذة جديدة"
             >
               <span class="home-v2-footer__social-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M20.5 3.5A11.7 11.7 0 0 0 12.1 0C5.6 0 .3 5.3.3 11.8c0 2.1.6 4.1 1.6 5.9L.2 24l6.4-1.7c1.7.9 3.6 1.4 5.5 1.4 6.5 0 11.8-5.3 11.8-11.8 0-3.1-1.2-6-3.4-8.4Zm-8.4 18.2c-1.7 0-3.4-.5-4.9-1.3l-.4-.2-3.8 1 1-3.7-.2-.4a9.7 9.7 0 1 1 8.3 4.6Zm5.3-7.3c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.8-.9-3-1.6-4.2-3.6-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.6L9 7.2c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.4 1.4 3.6c.2.2 2.5 3.8 6 5.3 2.2 1 3 .9 4.1.8.7-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.2-.3-.3-.6-.4Z" />
-                </svg>
+                <IconsWhatsApp />
               </span>
               <span>واتساب</span>
             </a>
@@ -288,31 +287,28 @@ onBeforeUnmount(() => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by EduHub
+          <span>Powered by</span>
+          <strong>EduHub</strong>
         </a>
         <a
           class="home-v2-footer__tech-lab-badge"
           href="https://techlabeg.com/"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Tech Lab — الشريك التقني ومطور المنصة، يفتح في نافذة جديدة"
+          dir="rtl"
+          aria-label="إحدى منتجات Tech Lab، يفتح في نافذة جديدة"
         >
-          <span class="home-v2-footer__tech-lab-logo" aria-hidden="true">
+          <span class="home-v2-footer__tech-lab-prefix" dir="rtl">إحدى منتجات</span>
+          <span class="home-v2-footer__tech-lab-logo">
             <img
-              src="/images/logo-techlab.png"
-              alt=""
-              width="34"
-              height="42"
+              src="/images/full-logo-techlab.webp"
+              alt="شعار Tech Lab"
+              width="138"
+              height="55"
               loading="lazy"
               decoding="async"
             />
           </span>
-          <span class="home-v2-footer__tech-lab-copy">
-            <small dir="rtl">الشريك التقني ومطور المنصة</small>
-            <strong>Tech Lab</strong>
-            <span>Digital Solutions</span>
-          </span>
-          <span class="home-v2-footer__tech-lab-external" aria-hidden="true">↗</span>
         </a>
       </div>
     </div>
@@ -321,15 +317,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .home-v2-footer {
-  --footer-primary: var(--primary-color, #28366c);
-  --footer-secondary: var(--secondary-color, #3a3e7e);
+  --footer-primary: var(--home-v2-blue, var(--primary-color, #28366c));
+  --footer-secondary: var(--home-v2-deep, var(--secondary-color, #3a3e7e));
   --footer-background: var(
     --app-footer-bg,
     color-mix(in srgb, var(--footer-primary) 82%, #071020)
   );
-  --footer-accent: color-mix(in srgb, var(--footer-primary) 42%, white);
-  --footer-accent-strong: color-mix(in srgb, var(--footer-primary) 58%, white);
-  --footer-secondary-light: color-mix(in srgb, var(--footer-secondary) 42%, white);
+  --footer-accent: color-mix(in srgb, var(--footer-primary) 48%, white);
+  --footer-accent-strong: color-mix(in srgb, var(--footer-secondary) 48%, white);
+  --footer-secondary-light: color-mix(in srgb, var(--footer-secondary) 36%, white);
   --footer-soft-border: color-mix(in srgb, var(--footer-accent) 25%, transparent);
   position: relative;
   isolation: isolate;
@@ -337,22 +333,54 @@ onBeforeUnmount(() => {
   padding-top: 70px;
   background:
     radial-gradient(
-      circle at 10% 4%,
-      color-mix(in srgb, var(--footer-primary) 30%, transparent),
-      transparent 31%
+      circle at 8% 88%,
+      color-mix(in srgb, var(--footer-primary) 52%, transparent) 0,
+      transparent 28%
     ),
     radial-gradient(
-      circle at 92% 92%,
-      color-mix(in srgb, var(--footer-secondary-light) 15%, transparent),
-      transparent 34%
+      circle at 92% 4%,
+      color-mix(in srgb, var(--footer-secondary) 26%, transparent) 0,
+      transparent 35%
     ),
     linear-gradient(
       135deg,
-      var(--footer-background),
-      color-mix(in srgb, var(--footer-primary) 24%, var(--footer-background))
+      color-mix(in srgb, var(--footer-secondary) 36%, #030a1c) 0%,
+      var(--footer-background) 52%,
+      color-mix(in srgb, var(--footer-primary) 40%, #020817) 100%
     );
   color: #fff;
   transition: background-color .3s ease, color .3s ease;
+}
+
+.home-v2-footer::before {
+  position: absolute;
+  z-index: -1;
+  bottom: -230px;
+  left: -225px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    transparent 0 22px,
+    color-mix(in srgb, var(--footer-primary) 60%, transparent) 23px 24px
+  );
+  content: "";
+  opacity: 0.5;
+}
+
+.home-v2-footer::after {
+  position: absolute;
+  z-index: -1;
+  bottom: -180px;
+  left: -115px;
+  width: 340px;
+  height: 280px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--footer-primary) 38%, transparent);
+  filter: blur(70px);
+  content: "";
+  opacity: 0.72;
 }
 
 .home-v2-footer__grid {
@@ -361,7 +389,7 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: clamp(52px, 6vw, 100px);
-  padding-bottom: 55px;
+  padding-bottom: 58px;
 }
 
 .home-v2-footer__brand {
@@ -438,19 +466,35 @@ onBeforeUnmount(() => {
 .home-v2-footer__contacts {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px 14px;
+  gap: 10px 0;
   margin-top: 18px;
   color: #ffffffb8;
   font-style: normal;
 }
 
 .home-v2-footer__contacts a,
-.home-v2-footer__contacts span {
+.home-v2-footer__contacts > span {
   display: inline-flex;
   min-height: 30px;
   align-items: center;
+  gap: 8px;
+  padding-inline: 14px;
+  border-inline-end: 1px solid var(--footer-soft-border);
   color: #ffffffb8;
   font-size: 13px;
+}
+
+.home-v2-footer__contacts > :first-child {
+  padding-inline-start: 0;
+}
+
+.home-v2-footer__contacts > :last-child {
+  border-inline-end: 0;
+}
+
+.home-v2-footer__contacts .pi {
+  color: var(--footer-accent-strong);
+  font-size: 14px;
 }
 
 .home-v2-footer__contacts a:hover {
@@ -459,30 +503,34 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__social-block {
-  margin-top: 22px;
+  margin-top: 26px;
 }
 
 .home-v2-footer__social-block > b {
   display: block;
-  color: var(--footer-accent);
-  font: 800 12px var(--home-v2-heading);
+  color: #fff;
+  font: 800 15px var(--home-v2-heading);
 }
 
 .home-v2-footer__socials {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .home-v2-footer__socials > a {
-  display: inline-flex;
-  min-height: 44px;
+  display: flex;
+  width: 96px;
+  min-height: 78px;
   align-items: center;
+  justify-content: center;
+  flex-direction: column;
   gap: 8px;
-  padding: 0 13px;
+  padding: 10px;
   border: 1px solid var(--footer-soft-border);
-  background: color-mix(in srgb, var(--footer-primary) 7%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--footer-primary) 13%, transparent);
   color: #ffffffc7;
   font-size: 11px;
   font-weight: 800;
@@ -491,26 +539,27 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__socials > a:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: var(--footer-accent);
-  background: color-mix(in srgb, var(--footer-primary) 18%, transparent);
+  background: color-mix(in srgb, var(--footer-primary) 27%, transparent);
+  box-shadow: 0 14px 28px color-mix(in srgb, #000 25%, transparent);
   color: #fff;
 }
 
 .home-v2-footer__social-icon {
   display: grid;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
   place-items: center;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--footer-primary) 20%, transparent);
-  color: var(--footer-accent);
+  border-radius: 7px;
+  background: transparent;
 }
 
-.home-v2-footer__social-icon svg {
-  width: 18px;
-  height: 18px;
-  fill: currentColor;
+.home-v2-footer__social-icon :deep(svg) {
+  display: block;
+  width: 22px;
+  height: 22px;
 }
 
 .home-v2-footer__links {
@@ -521,9 +570,23 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__links > b {
+  position: relative;
   margin-bottom: 8px;
-  color: var(--footer-accent);
-  font: 800 14px var(--home-v2-heading);
+  padding-bottom: 15px;
+  color: #fff;
+  font: 800 16px var(--home-v2-heading);
+}
+
+.home-v2-footer__links > b::after {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  width: 32px;
+  height: 2px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--footer-primary), var(--footer-secondary-light));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--footer-primary) 58%, transparent);
+  content: "";
 }
 
 .home-v2-footer__links > a {
@@ -532,10 +595,20 @@ onBeforeUnmount(() => {
   align-items: center;
   color: #ffffff9e;
   font-size: 14px;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.home-v2-footer__links > a::before {
+  margin-inline-end: 10px;
+  color: var(--footer-accent-strong);
+  content: "‹";
+  font-size: 17px;
+  line-height: 1;
 }
 
 .home-v2-footer__links > a:hover {
   color: var(--footer-accent-strong);
+  transform: translateX(-3px);
 }
 
 .home-v2-footer__bottom {
@@ -545,8 +618,8 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 22px 0;
-  border-top: 1px solid var(--footer-soft-border);
+  padding: 20px 0;
+  border-top: 1px solid color-mix(in srgb, var(--footer-accent) 42%, transparent);
   color: #ffffffb3;
   font-size: 12px;
 }
@@ -580,10 +653,23 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-footer__powered-by {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
   color: var(--footer-secondary-light);
-  font-weight: 900;
+  font-size: 10px;
+  font-weight: 700;
   white-space: nowrap;
   transition: color 0.28s ease;
+}
+
+.home-v2-footer__powered-by strong {
+  color: #f1ce78;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: .01em;
+  line-height: 1;
+  transition: color 0.28s ease, transform 0.28s ease;
 }
 
 .home-v2-footer__powered-by:hover,
@@ -591,22 +677,27 @@ onBeforeUnmount(() => {
   color: var(--footer-accent-strong);
 }
 
+.home-v2-footer__powered-by:hover strong,
+.home-v2-footer__powered-by:focus-visible strong {
+  color: #ffe09a;
+  transform: translateY(-1px);
+}
+
 .home-v2-footer__tech-lab-badge {
   position: relative;
   isolation: isolate;
   display: inline-flex;
-  min-height: 66px;
+  min-height: 62px;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   overflow: hidden;
-  padding: 8px 10px 8px 12px;
-  border: 1px solid rgba(51, 213, 139, 0.45);
-  border-radius: 16px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.99), rgba(237, 251, 245, 0.97));
+  padding: 6px 8px 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--footer-primary) 38%, #d9eee7);
+  border-radius: 13px;
+  background: #fff;
   box-shadow:
-    0 12px 30px rgba(1, 13, 28, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+    0 8px 20px rgba(1, 13, 28, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
   color: #536a64;
   line-height: 1;
   text-decoration: none;
@@ -621,119 +712,57 @@ onBeforeUnmount(() => {
   position: absolute;
   z-index: -1;
   inset: 0 auto 0 0;
-  width: 4px;
-  background: linear-gradient(180deg, #072f59, #0ab46d 58%, #70e766);
+  width: 3px;
+  background: linear-gradient(180deg, var(--footer-primary), var(--footer-secondary));
   content: "";
 }
 
 .home-v2-footer__tech-lab-badge::after {
-  position: absolute;
-  z-index: -1;
-  top: -45px;
-  right: -35px;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: rgba(25, 199, 112, 0.1);
-  content: "";
-  transition: transform 0.35s ease;
+  content: none;
 }
 
 .home-v2-footer__tech-lab-badge:hover,
 .home-v2-footer__tech-lab-badge:focus-visible {
-  border-color: rgba(38, 220, 136, 0.84);
+  border-color: color-mix(in srgb, var(--footer-primary) 72%, white);
   box-shadow:
-    0 17px 38px rgba(1, 13, 28, 0.32),
-    0 0 0 3px rgba(10, 180, 109, 0.11);
-  transform: translateY(-3px);
-}
-
-.home-v2-footer__tech-lab-badge:hover::after,
-.home-v2-footer__tech-lab-badge:focus-visible::after {
-  transform: scale(1.22);
+    0 11px 24px rgba(1, 13, 28, 0.24),
+    0 0 0 2px color-mix(in srgb, var(--footer-primary) 13%, transparent);
+  transform: translateY(-2px);
 }
 
 .home-v2-footer__tech-lab-badge:focus-visible {
-  outline: 2px solid #74e56d;
+  outline: 2px solid var(--footer-accent-strong);
   outline-offset: 3px;
 }
 
 .home-v2-footer__tech-lab-logo {
-  display: grid;
-  width: 46px;
+  display: flex;
+  width: 138px;
   height: 50px;
-  flex: 0 0 46px;
-  place-items: center;
-  border: 1px solid rgba(8, 165, 103, 0.15);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 5px 14px rgba(7, 47, 89, 0.1);
+  flex: 0 0 138px;
+  align-items: center;
+  justify-content: center;
 }
 
 .home-v2-footer__tech-lab-logo img {
-  width: 31px;
-  height: 38px;
+  display: block;
+  width: 138px;
+  height: 55px;
   object-fit: contain;
-  filter: drop-shadow(0 3px 4px rgba(5, 52, 73, 0.15));
+  filter: contrast(1.12) saturate(1.12);
   transition: transform 0.3s ease;
 }
 
 .home-v2-footer__tech-lab-badge:hover .home-v2-footer__tech-lab-logo img,
 .home-v2-footer__tech-lab-badge:focus-visible .home-v2-footer__tech-lab-logo img {
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 
-.home-v2-footer__tech-lab-copy {
-  display: grid;
-  min-width: 132px;
-  gap: 3px;
-  text-align: left;
-}
-
-.home-v2-footer__tech-lab-copy small {
-  color: #64766f;
-  font-size: 9px;
-  font-weight: 800;
-  line-height: 1.2;
-  text-align: left;
-}
-
-.home-v2-footer__tech-lab-copy strong {
-  color: #07385a;
-  font-size: 18px;
+.home-v2-footer__tech-lab-prefix {
+  color: color-mix(in srgb, var(--footer-primary) 46%, #44554f);
+  font-size: 11px;
   font-weight: 900;
-  letter-spacing: 0.01em;
-  line-height: 1;
-}
-
-.home-v2-footer__tech-lab-copy > span {
-  color: #07975f;
-  font-size: 8px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.home-v2-footer__tech-lab-external {
-  display: grid;
-  width: 25px;
-  height: 25px;
-  flex: 0 0 25px;
-  place-items: center;
-  border: 1px solid rgba(8, 165, 103, 0.18);
-  border-radius: 50%;
-  background: rgba(8, 165, 103, 0.09);
-  color: #087d55;
-  font-size: 13px;
-  font-weight: 900;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
-}
-
-.home-v2-footer__tech-lab-badge:hover .home-v2-footer__tech-lab-external,
-.home-v2-footer__tech-lab-badge:focus-visible .home-v2-footer__tech-lab-external {
-  background: #07975f;
-  color: #fff;
-  transform: translate(2px, -2px);
+  line-height: 1.4;
 }
 
 @media (max-width: 900px) {
@@ -774,36 +803,62 @@ onBeforeUnmount(() => {
 
 @media (max-width: 430px) {
   .home-v2-footer__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 16px;
   }
 
   .home-v2-footer__brand-column {
-    grid-column: auto;
+    grid-column: 1 / -1;
   }
 
   .home-v2-footer__brand small {
     display: none;
   }
 
+  .home-v2-footer__bottom {
+    align-items: center;
+    text-align: center;
+  }
+
+  .home-v2-footer__legal {
+    justify-content: center;
+  }
+
   .home-v2-footer__providers {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     width: 100%;
+    align-items: start;
+    justify-items: center;
+    gap: 10px;
+  }
+
+  .home-v2-footer__powered-by {
+    width: fit-content;
   }
 
   .home-v2-footer__tech-lab-badge {
-    width: min(100%, 270px);
+    width: min(100%, 235px);
+    max-width: 100%;
+    justify-content: center;
   }
 
-  .home-v2-footer__tech-lab-copy {
-    min-width: 0;
-    flex: 1;
+}
+
+@media (max-width: 340px) {
+  .home-v2-footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-v2-footer__brand-column {
+    grid-column: auto;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .home-v2-footer__tech-lab-badge,
   .home-v2-footer__tech-lab-badge::after,
-  .home-v2-footer__tech-lab-logo img,
-  .home-v2-footer__tech-lab-external {
+  .home-v2-footer__tech-lab-logo img {
     transition: none;
   }
 }

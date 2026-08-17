@@ -8,6 +8,7 @@ type FaqResponse = {
   data: Fqs[]
 }
 
+const HOME_FAQ_LIMIT = 6
 const webDomain = getWebDomain()
 
 const { data: faqs, pending, error } = await useAsyncData(
@@ -21,7 +22,7 @@ const { data: faqs, pending, error } = await useAsyncData(
       },
     })
 
-    return response.data ?? []
+    return (response.data ?? []).slice(0, HOME_FAQ_LIMIT)
   },
   {
     default: () => [],

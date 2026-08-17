@@ -190,7 +190,9 @@ const submitOfflinePayment = async () => {
 const submitOnlinePayment = async () => {
   if (!selectedMethod.value) return;
 
-  const callbackUrl = buildSiteUrl(`/paymentverify/${selectedMethod.value.id}`);
+  const callbackUrl = buildSiteUrl(
+    `/paymentverify/${selectedMethod.value.id}?source=course&courseId=${route.params.id}`,
+  );
   const params = new OnlinePaymentParams(
     String(route.params.id),
     String(selectedMethod.value.id),
@@ -203,14 +205,21 @@ const submitOnlinePayment = async () => {
   );
   const state = await OnlinePaymentController.getInstance().CreateOnlinePayment(params, router);
   const gatewayUrl = state.value.data?.url;
+  const paymentId = Number(state.value.data?.id);
 
-  if (!gatewayUrl) {
+  if (!gatewayUrl || !Number.isFinite(paymentId) || paymentId <= 0) {
     errorMessage.value =
       state.value.error?.title || "تعذر فتح بوابة الدفع. حاول مرة أخرى.";
     return;
   }
 
-  window.localStorage.setItem("onlinePaymentId", String(state.value.data?.id));
+  window.localStorage.setItem("onlinePaymentId", String(paymentId));
+  window.localStorage.setItem("onlinePaymentContext", JSON.stringify({
+    source: "course",
+    courseId: Number(route.params.id),
+    title: props.courseTitle,
+    returnUrl: route.fullPath,
+  }));
   window.location.assign(gatewayUrl);
 };
 

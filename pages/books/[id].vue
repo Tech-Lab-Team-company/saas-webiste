@@ -217,30 +217,91 @@ const purchaseOptions = computed(() => {
   if (!currentBook) return [];
 
   if (currentBook.bookTypes.length) {
-    return currentBook.bookTypes.map((type) => ({
-      id: type.id,
-      label: type.label,
-      price: currentBook.isFree ? 0 : type.price,
-      isDigital: /إلكتروني|رقمي/u.test(type.label),
-      requiresDelivery: currentBook.bookType === BookTypeEnum.PAPER
-        || currentBook.bookType === BookTypeEnum.BOTH,
-    }));
+    return currentBook.bookTypes.map((type) => {
+      const hasPrintedCopy = type.id === BookTypeEnum.PAPER
+        || type.id === BookTypeEnum.BOTH
+        || /مطبوع|ورقي/u.test(type.label);
+      const isDigital = !hasPrintedCopy && (
+        type.id === BookTypeEnum.EBOOK
+        || /إلكتروني|رقمي/u.test(type.label)
+      );
+
+      return {
+        id: type.id,
+        label: type.label,
+        price: currentBook.isFree ? 0 : type.price,
+        isDigital,
+        requiresDelivery: hasPrintedCopy,
+        description: isDigital ? "قراءة داخل حسابك" : "توصيل إلى عنوانك",
+        benefits: isDigital
+          ? [
+              currentBook.hasFreePreview
+                ? "نموذج قراءة متاح للمشاهدة الآن"
+                : "وصول إلكتروني من خلال حسابك",
+              "النسخة الكاملة تظهر بعد إتمام الطلب",
+              ...(currentBook.numberOfPages
+                ? [`${currentBook.numberOfPages} صفحة من المحتوى التعليمي`]
+                : []),
+            ]
+          : [
+              "نسخة مطبوعة مستقلة من الكتاب",
+              "تأكيد بيانات وعنوان التوصيل داخل الطلب",
+              currentBook.fees > 0
+                ? `رسوم الشحن ${currentBook.fees} ${currentBook.currency}`
+                : "تأكيد تكلفة الشحن قبل إتمام الطلب",
+            ],
+        triggerLabel: isDigital ? "اشترِ النسخة الرقمية" : "ابدأ طلب النسخة المطبوعة",
+      };
+    });
   }
+
+  const isDigital = currentBook.bookType === BookTypeEnum.EBOOK;
+  const requiresDelivery = currentBook.bookType === BookTypeEnum.PAPER
+    || currentBook.bookType === BookTypeEnum.BOTH;
 
   return [{
     id: currentBook.bookType ?? currentBook.id,
     label: currentBook.bookType === 1
-      ? "كتاب إلكتروني"
+      ? "نسخة رقمية"
       : currentBook.bookType === 2
         ? "نسخة مطبوعة"
         : currentBook.bookType === 3
-          ? "إلكتروني ومطبوع"
+          ? "نسخة رقمية ومطبوعة"
           : "نسخة الكتاب",
     price: currentBook.isFree ? 0 : Number(currentBook.price),
-    isDigital: currentBook.bookType === 1,
-    requiresDelivery: currentBook.bookType === BookTypeEnum.PAPER
-      || currentBook.bookType === BookTypeEnum.BOTH,
+    isDigital,
+    requiresDelivery,
+    description: requiresDelivery ? "توصيل إلى عنوانك" : "قراءة داخل حسابك",
+    benefits: requiresDelivery
+      ? [
+          "نسخة مطبوعة مستقلة من الكتاب",
+          "تأكيد بيانات وعنوان التوصيل داخل الطلب",
+          currentBook.fees > 0
+            ? `رسوم الشحن ${currentBook.fees} ${currentBook.currency}`
+            : "تأكيد تكلفة الشحن قبل إتمام الطلب",
+        ]
+      : [
+          currentBook.hasFreePreview
+            ? "نموذج قراءة متاح للمشاهدة الآن"
+            : "وصول إلكتروني من خلال حسابك",
+          "النسخة الكاملة تظهر بعد إتمام الطلب",
+          ...(currentBook.numberOfPages
+            ? [`${currentBook.numberOfPages} صفحة من المحتوى التعليمي`]
+            : []),
+        ],
+    triggerLabel: requiresDelivery ? "ابدأ طلب النسخة المطبوعة" : "اشترِ النسخة الرقمية",
   }];
+});
+
+const printedPurchaseOption = computed(() =>
+  purchaseOptions.value.find((option) => option.requiresDelivery) ?? null,
+);
+const printedOrderTotal = computed(() => {
+  const currentBook = book.value;
+  const printedOption = printedPurchaseOption.value;
+  if (!currentBook || !printedOption || Number(printedOption.price) <= 0) return null;
+
+  return Number(printedOption.price) + Math.max(0, Number(currentBook.fees) || 0);
 });
 
 const bookUrl = computed(() => buildSiteUrl(route.path));
@@ -513,84 +574,131 @@ useHead(() => ({
             </div>
 
             <div class="book-details-page__sidebar">
-            <aside class="book-details-page__buy-card">
-              <h2>اختار نسختك</h2>
-              <div
-                v-for="option in purchaseOptions"
-                :key="option.id"
-                :class="['book-details-page__format', { 'book-details-page__format--print': !option.isDigital }]"
-              >
-                <div>
-                  <span aria-hidden="true">{{ option.isDigital ? "▣" : "▤" }}</span>
-                  <p>
-                    <b>{{ option.label }}</b>
-                    <small>{{ option.isDigital ? "قراءة إلكترونية" : "نسخة مستقلة من الكتاب" }}</small>
-                  </p>
-                </div>
-                <strong>
-                  {{ option.price === 0 ? "مجاني" : option.price }}
-                  <small v-if="option.price !== 0">{{ book.currency }}</small>
-                </strong>
-                <ul>
-                  <li>شراء مستقل عن الكورسات</li>
-                  <li v-if="book.numberOfPages">{{ book.numberOfPages }} صفحة</li>
-                  <li>الوصول حسب نوع النسخة المتاحة</li>
-                </ul>
-                <button
-                  v-if="option.price === 0 && primaryAction?.kind === 'reader'"
-                  type="button"
-                  @click="openReader"
-                >
-                  {{ primaryAction.label }} ←
-                </button>
-                <a
-                  v-else-if="option.price === 0 && primaryAction"
-                  :href="primaryAction.url"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {{ primaryAction.label }} ←
-                </a>
-                <BuyBookDialog
-                  v-else-if="option.price > 0"
-                  :book-id="book.bookId"
-                  :title="book.title"
-                  :price="option.price"
-                  :currency="book.currency"
-                  :option-label="option.label"
-                  :requires-delivery="option.requiresDelivery"
-                  @purchased="refresh"
-                />
-                <span v-else class="book-details-page__format-unavailable">غير متاح حاليًا</span>
-              </div>
-              <NuxtLink to="/books">العودة إلى كل الكتب</NuxtLink>
-            </aside>
+              <aside class="book-details-page__buy-card" aria-labelledby="book-purchase-title">
+                <header class="book-details-page__buy-heading">
+                  <small>نسخ الكتاب المتاحة</small>
+                  <h2 id="book-purchase-title">اختار نسختك</h2>
+                </header>
 
-            <a
-              v-if="book.freeBookUrl"
-              class="book-details-page__free-book-card"
-              :href="book.freeBookUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              :aria-label="`اقرأ النسخة المجانية من ${book.title} - يفتح في نافذة جديدة`"
-            >
-              <span class="book-details-page__free-book-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <path d="M4.5 4.75A2.75 2.75 0 0 1 7.25 2H11a2 2 0 0 1 2 2v15.25c-.63-.78-1.6-1.25-2.65-1.25h-3.1A2.75 2.75 0 0 0 4.5 20.75v-16Zm15 0A2.75 2.75 0 0 0 16.75 2H15a.75.75 0 0 0-.75.75v16.5A3.48 3.48 0 0 1 16.9 18h2.6V4.75Zm1.25 15.5H16.9c-.86 0-1.64.48-2.02 1.25h5.87a.75.75 0 0 0 0-1.5v.25Zm-9 1.25a2 2 0 0 0-1.4-.5h-3.1a.75.75 0 0 0 0 1.5h4.5v-1Z" />
-                </svg>
-              </span>
-              <span class="book-details-page__free-book-copy">
-                <small>هدية لك</small>
-                <strong>اقرأ النسخة المجانية</strong>
-                <span>افتح نسخة الكتاب المتاحة وابدأ القراءة الآن.</span>
-              </span>
-              <span class="book-details-page__free-book-action">
-                فتح النسخة
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M14 4h6v6h-2V7.41l-7.29 7.3-1.42-1.42L16.59 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z" />
-                </svg>
-              </span>
-            </a>
+                <div
+                  v-for="option in purchaseOptions"
+                  :key="option.id"
+                  :class="[
+                    'book-details-page__format',
+                    option.isDigital
+                      ? 'book-details-page__format--digital'
+                      : 'book-details-page__format--print',
+                  ]"
+                >
+                  <header class="book-details-page__format-header">
+                    <span class="book-details-page__format-icon" aria-hidden="true">
+                      <svg v-if="option.isDigital" viewBox="0 0 24 24">
+                        <path d="M6.75 2.5h8.5A2.75 2.75 0 0 1 18 5.25v13.5a2.75 2.75 0 0 1-2.75 2.75h-8.5A2.75 2.75 0 0 1 4 18.75V5.25A2.75 2.75 0 0 1 6.75 2.5Zm0 1.5A1.25 1.25 0 0 0 5.5 5.25v13.5A1.25 1.25 0 0 0 6.75 20h8.5a1.25 1.25 0 0 0 1.25-1.25V5.25A1.25 1.25 0 0 0 15.25 4h-8.5Zm2.5 13.25h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1 0-1.5Z" />
+                      </svg>
+                      <svg v-else viewBox="0 0 24 24">
+                        <path d="M6 3.25A2.75 2.75 0 0 1 8.75.5h6.5A2.75 2.75 0 0 1 18 3.25V7h.75A3.25 3.25 0 0 1 22 10.25v5.5A3.25 3.25 0 0 1 18.75 19H18v1.75a2.75 2.75 0 0 1-2.75 2.75h-6.5A2.75 2.75 0 0 1 6 20.75V19h-.75A3.25 3.25 0 0 1 2 15.75v-5.5A3.25 3.25 0 0 1 5.25 7H6V3.25ZM7.5 7h9V3.25A1.25 1.25 0 0 0 15.25 2h-6.5A1.25 1.25 0 0 0 7.5 3.25V7Zm0 9.5v4.25A1.25 1.25 0 0 0 8.75 22h6.5a1.25 1.25 0 0 0 1.25-1.25V16.5h-9ZM5.25 8.5a1.75 1.75 0 0 0-1.75 1.75v5.5c0 .97.78 1.75 1.75 1.75H6v-1.75a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 .75.75v1.75h.75c.97 0 1.75-.78 1.75-1.75v-5.5c0-.97-.78-1.75-1.75-1.75H5.25Zm12.5 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z" />
+                      </svg>
+                    </span>
+                    <span class="book-details-page__format-copy">
+                      <b>{{ option.label }}</b>
+                      <small>{{ option.description }}</small>
+                    </span>
+                  </header>
+
+                  <p class="book-details-page__format-price">
+                    <strong>{{ option.price === 0 ? "مجاني" : option.price }}</strong>
+                    <small v-if="option.price !== 0">{{ book.currency }}</small>
+                  </p>
+
+                  <ul>
+                    <li v-for="benefit in option.benefits" :key="benefit">{{ benefit }}</li>
+                  </ul>
+
+                  <div class="book-details-page__format-action">
+                    <button
+                      v-if="option.price === 0 && primaryAction?.kind === 'reader'"
+                      type="button"
+                      @click="openReader"
+                    >
+                      {{ primaryAction.label }}
+                      <span aria-hidden="true">←</span>
+                    </button>
+                    <a
+                      v-else-if="option.price === 0 && primaryAction"
+                      :href="primaryAction.url"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {{ primaryAction.label }}
+                      <span aria-hidden="true">←</span>
+                    </a>
+                    <BuyBookDialog
+                      v-else-if="option.price > 0"
+                      :book-id="book.bookId"
+                      :title="book.title"
+                      :price="option.price"
+                      :currency="book.currency"
+                      :option-label="option.label"
+                      :requires-delivery="option.requiresDelivery"
+                      :trigger-label="option.triggerLabel"
+                      @purchased="refresh"
+                    />
+                    <span v-else class="book-details-page__format-unavailable">غير متاح حاليًا</span>
+                  </div>
+                </div>
+
+                <div v-if="printedOrderTotal !== null" class="book-details-page__order-total">
+                  <p>
+                    إجمالي النسخة المطبوعة
+                    <span v-if="book.fees > 0">مع الشحن</span>
+                    <strong>{{ printedOrderTotal }} {{ book.currency }}</strong>
+                  </p>
+                  <small>سيتم تأكيد بيانات الطلب وطريقة الدفع داخل نموذج الشراء.</small>
+                </div>
+
+                <NuxtLink class="book-details-page__all-books-link" to="/books">
+                  العودة إلى كل الكتب
+                </NuxtLink>
+              </aside>
+
+              <aside v-if="book.freeBookUrl" class="book-details-page__free-book-card">
+                <h2>اقرأ النسخة المجانية</h2>
+
+                <div class="book-details-page__free-book-option">
+                  <header>
+                    <span class="book-details-page__free-book-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M4.5 4.75A2.75 2.75 0 0 1 7.25 2H11a2 2 0 0 1 2 2v15.25c-.63-.78-1.6-1.25-2.65-1.25h-3.1A2.75 2.75 0 0 0 4.5 20.75v-16Zm15 0A2.75 2.75 0 0 0 16.75 2H15a.75.75 0 0 0-.75.75v16.5A3.48 3.48 0 0 1 16.9 18h2.6V4.75Zm1.25 15.5H16.9c-.86 0-1.64.48-2.02 1.25h5.87a.75.75 0 0 0 0-1.5v.25Zm-9 1.25a2 2 0 0 0-1.4-.5h-3.1a.75.75 0 0 0 0 1.5h4.5v-1Z" />
+                      </svg>
+                    </span>
+                    <span class="book-details-page__free-book-copy">
+                      <strong>نسخة قراءة مجانية</strong>
+                      <small>متاحة الآن عبر عارض الكتاب</small>
+                    </span>
+                  </header>
+
+                  <strong class="book-details-page__free-book-price">مجاني</strong>
+
+                  <ul>
+                    <li>افتح نموذج القراءة مباشرة من المتصفح</li>
+                    <li>لا تحتاج إلى تحميل أي ملفات</li>
+                    <li>تُفتح النسخة في نافذة جديدة</li>
+                  </ul>
+
+                  <a
+                    class="book-details-page__free-book-action"
+                    :href="book.freeBookUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :aria-label="`اقرأ النسخة المجانية من ${book.title} - يفتح في نافذة جديدة`"
+                  >
+                    شاهد نموذج القراءة
+                    <span aria-hidden="true">←</span>
+                  </a>
+                </div>
+
+                <p>استمتع بنموذج مجاني من الكتاب قبل اختيار النسخة المناسبة لك.</p>
+              </aside>
             </div>
           </div>
         </section>
@@ -1155,69 +1263,56 @@ useHead(() => ({
 }
 
 .book-details-page__buy-card {
-  padding: 24px;
+  padding: 28px 24px 22px;
   border: 1px solid var(--home-v2-line);
+  border-radius: 4px;
   background: var(--home-v2-surface);
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--home-v2-deep) 9%, transparent);
   color: var(--home-v2-ink);
 }
 
 .book-details-page__free-book-card {
-  position: relative;
-  display: grid;
-  min-height: 205px;
-  padding: 24px;
-  grid-template-columns: 58px minmax(0, 1fr);
-  align-items: start;
-  gap: 15px;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 34%, var(--home-v2-line));
-  border-radius: 3px 24px 3px 24px;
-  background:
-    radial-gradient(circle at 5% 5%, color-mix(in srgb, var(--home-v2-blue) 21%, transparent), transparent 37%),
-    linear-gradient(145deg, var(--home-v2-surface-raised), var(--home-v2-surface));
-  box-shadow: 0 18px 44px color-mix(in srgb, var(--home-v2-deep) 11%, transparent);
+  padding: 28px 24px 22px;
+  border: 1px solid var(--home-v2-line);
+  border-radius: 4px;
+  background: var(--home-v2-surface);
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--home-v2-deep) 9%, transparent);
   color: var(--home-v2-ink);
-  isolation: isolate;
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-.book-details-page__free-book-card::before {
-  position: absolute;
-  z-index: -1;
-  top: -65px;
-  left: -58px;
-  width: 160px;
-  height: 160px;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 15%, transparent);
-  border-radius: 50%;
-  content: "";
+.book-details-page__free-book-card > h2 {
+  margin: 0 0 20px;
+  color: var(--home-v2-ink);
+  font: 900 22px/1.35 var(--home-v2-heading);
 }
 
-.book-details-page__free-book-card:hover {
-  border-color: color-mix(in srgb, var(--home-v2-blue) 60%, var(--home-v2-line));
-  box-shadow: 0 24px 55px color-mix(in srgb, var(--home-v2-deep) 18%, transparent);
-  transform: translateY(-4px);
+.book-details-page__free-book-option {
+  padding: 17px 15px 15px;
+  border: 1px solid color-mix(in srgb, var(--home-v2-deep) 17%, var(--home-v2-line));
+  border-radius: 10px;
+  background: linear-gradient(150deg, var(--home-v2-surface-raised), var(--home-v2-surface));
 }
 
-.book-details-page__free-book-card:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--home-v2-blue) 38%, transparent);
-  outline-offset: 4px;
+.book-details-page__free-book-option > header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
 }
 
 .book-details-page__free-book-icon {
   display: grid;
-  width: 58px;
-  height: 58px;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 28%, var(--home-v2-line));
-  border-radius: 18px 6px 18px 6px;
-  background: color-mix(in srgb, var(--home-v2-blue) 13%, var(--home-v2-surface));
-  color: var(--home-v2-blue);
+  border: 1px solid color-mix(in srgb, var(--home-v2-deep) 16%, var(--home-v2-line));
+  background: color-mix(in srgb, var(--home-v2-deep) 10%, var(--home-v2-surface));
+  color: var(--home-v2-deep);
 }
 
 .book-details-page__free-book-icon svg {
-  width: 28px;
-  height: 28px;
+  width: 21px;
+  height: 21px;
   fill: currentColor;
 }
 
@@ -1225,168 +1320,300 @@ useHead(() => ({
   display: flex;
   min-width: 0;
   flex-direction: column;
-}
-
-.book-details-page__free-book-copy small {
-  width: fit-content;
-  margin-bottom: 5px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--home-v2-blue) 12%, var(--home-v2-surface));
-  color: var(--home-v2-blue);
-  font-size: 9px;
-  font-weight: 900;
+  gap: 2px;
 }
 
 .book-details-page__free-book-copy strong {
   color: var(--home-v2-ink);
-  font: 900 18px/1.45 var(--home-v2-heading);
+  font: 900 13px/1.45 var(--home-v2-heading);
 }
 
-.book-details-page__free-book-copy > span {
-  margin-top: 4px;
+.book-details-page__free-book-copy small {
   color: var(--home-v2-muted);
   font-size: 10px;
-  line-height: 1.7;
 }
 
-.book-details-page__free-book-action {
-  display: flex;
-  min-height: 44px;
-  grid-column: 1 / -1;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding: 10px 14px;
-  border-radius: 4px 14px 4px 14px;
-  background: linear-gradient(135deg, var(--home-v2-blue), var(--home-v2-deep));
-  color: var(--book-details-action-text);
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.book-details-page__free-book-action svg {
-  width: 17px;
-  height: 17px;
-  fill: currentColor;
-  transition: transform 180ms ease;
-}
-
-.book-details-page__free-book-card:hover .book-details-page__free-book-action svg {
-  transform: translate(-3px, -3px);
-}
-
-.book-details-page__buy-card > h2 {
-  margin: 0 0 15px;
-  font: 800 20px var(--home-v2-heading);
-}
-
-.book-details-page__format {
-  margin-bottom: 12px;
-  padding: 15px;
-  border: 1px solid var(--home-v2-line);
-}
-
-.book-details-page__format > div {
-  display: flex;
-  gap: 10px;
-}
-
-.book-details-page__format > div > span {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  flex: none;
-  place-items: center;
-  background: color-mix(in srgb, var(--home-v2-deep) 16%, var(--home-v2-surface-raised));
-  color: var(--home-v2-deep);
-}
-
-.book-details-page__format--print > div > span {
-  background: color-mix(in srgb, var(--home-v2-blue) 16%, var(--home-v2-surface-raised));
-  color: var(--home-v2-blue);
-}
-
-.book-details-page__format p {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-}
-
-.book-details-page__format p b {
-  font: 800 12px var(--home-v2-heading);
-}
-
-.book-details-page__format p small {
-  color: var(--home-v2-muted);
-  font-size: 9px;
-}
-
-.book-details-page__format > strong {
+.book-details-page__free-book-price {
   display: block;
-  margin-top: 12px;
+  min-height: 46px;
+  margin-top: 11px;
   color: var(--home-v2-ink);
-  font: 900 25px var(--home-v2-heading);
+  font: 900 27px/1.5 var(--home-v2-heading);
 }
 
-.book-details-page__format > strong small {
-  font-size: 9px;
-}
-
-.book-details-page__format ul {
-  margin: 12px 0;
-  padding: 10px 0;
+.book-details-page__free-book-option ul {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding: 12px 0 0;
   border-top: 1px solid var(--home-v2-line);
   list-style: none;
 }
 
-.book-details-page__format li {
+.book-details-page__free-book-option li {
   position: relative;
-  padding: 4px 17px 4px 0;
+  padding-inline-start: 18px;
   color: var(--home-v2-muted);
-  font-size: 9px;
+  font-size: 10px;
+  line-height: 1.65;
 }
 
-.book-details-page__format li::before {
+.book-details-page__free-book-option li::before {
   position: absolute;
-  right: 0;
-  color: var(--home-v2-blue);
-  content: "✓";
+  top: .48em;
+  right: 1px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid color-mix(in srgb, var(--home-v2-deep) 60%, var(--home-v2-line));
+  content: "";
 }
 
-.book-details-page__format > a,
-.book-details-page__format > button,
-.book-details-page__format-unavailable {
+.book-details-page__free-book-action {
   display: flex;
-  min-height: 42px;
+  width: 100%;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-radius: 2px;
   background: var(--home-v2-blue);
+  box-shadow: 0 9px 20px color-mix(in srgb, var(--home-v2-blue) 17%, transparent);
   color: var(--book-details-action-text);
-  border: 0;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
-  cursor: pointer;
+  transition: box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
 }
 
-.book-details-page__format--print > a,
-.book-details-page__format--print > button {
-  background: var(--home-v2-deep);
+.book-details-page__free-book-action:hover {
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--home-v2-blue) 25%, transparent);
+  filter: brightness(1.07);
+  transform: translateY(-1px);
 }
 
-.book-details-page__format-unavailable {
-  background: var(--home-v2-surface-raised);
-  color: var(--home-v2-muted);
+.book-details-page__free-book-action:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--home-v2-blue) 28%, transparent);
+  outline-offset: 3px;
 }
 
-.book-details-page__buy-card > p {
+.book-details-page__free-book-card > p {
+  margin: 12px 8px 0;
   color: var(--home-v2-muted);
   font-size: 9px;
   line-height: 1.7;
   text-align: center;
 }
 
-.book-details-page__buy-card > a {
+.book-details-page__buy-heading {
+  margin-bottom: 20px;
+}
+
+.book-details-page__buy-heading small {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--home-v2-blue);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.book-details-page__buy-heading h2 {
+  margin: 0;
+  color: var(--home-v2-ink);
+  font: 900 22px/1.35 var(--home-v2-heading);
+}
+
+.book-details-page__format {
+  --book-format-accent: var(--home-v2-deep);
+  --book-format-tint: color-mix(in srgb, var(--book-format-accent) 10%, var(--home-v2-surface));
+  position: relative;
+  margin-bottom: 14px;
+  padding: 17px 15px 15px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--book-format-accent) 17%, var(--home-v2-line));
+  border-radius: 10px;
+  background: linear-gradient(150deg, var(--home-v2-surface-raised), var(--home-v2-surface));
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.book-details-page__format::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--book-format-accent);
+  content: "";
+  opacity: .62;
+}
+
+.book-details-page__format:hover {
+  border-color: color-mix(in srgb, var(--book-format-accent) 40%, var(--home-v2-line));
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--book-format-accent) 10%, transparent);
+  transform: translateY(-2px);
+}
+
+.book-details-page__format--digital {
+  --book-format-accent: var(--home-v2-deep);
+}
+
+.book-details-page__format--print {
+  --book-format-accent: var(--home-v2-blue);
+}
+
+.book-details-page__format-header {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.book-details-page__format-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--book-format-accent) 16%, var(--home-v2-line));
+  background: var(--book-format-tint);
+  color: var(--book-format-accent);
+}
+
+.book-details-page__format-icon svg {
+  width: 21px;
+  height: 21px;
+  fill: currentColor;
+}
+
+.book-details-page__format-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.book-details-page__format-copy b {
+  color: var(--home-v2-ink);
+  font: 900 13px/1.45 var(--home-v2-heading);
+}
+
+.book-details-page__format-copy small {
+  color: var(--home-v2-muted);
+  font-size: 10px;
+}
+
+.book-details-page__format-price {
+  display: flex;
+  min-height: 46px;
+  align-items: baseline;
+  gap: 6px;
+  margin: 11px 0 0;
+  color: var(--home-v2-ink);
+}
+
+.book-details-page__format-price strong {
+  font: 900 27px/1.5 var(--home-v2-heading);
+}
+
+.book-details-page__format-price small {
+  color: var(--home-v2-ink);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.book-details-page__format ul {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--home-v2-line);
+  list-style: none;
+}
+
+.book-details-page__format li {
+  position: relative;
+  padding-inline-start: 18px;
+  color: var(--home-v2-muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.book-details-page__format li::before {
+  position: absolute;
+  top: .48em;
+  right: 1px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid color-mix(in srgb, var(--book-format-accent) 60%, var(--home-v2-line));
+  content: "";
+}
+
+.book-details-page__format-action > a,
+.book-details-page__format-action > button,
+.book-details-page__format-action :deep(.buy-book-trigger),
+.book-details-page__format-unavailable {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--book-format-accent);
+  box-shadow: 0 9px 20px color-mix(in srgb, var(--book-format-accent) 17%, transparent);
+  color: var(--book-details-action-text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: box-shadow 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.book-details-page__format-action > a:hover,
+.book-details-page__format-action > button:hover,
+.book-details-page__format-action :deep(.buy-book-trigger:hover) {
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--book-format-accent) 25%, transparent);
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+.book-details-page__format-unavailable {
+  background: var(--home-v2-surface-raised);
+  box-shadow: none;
+  color: var(--home-v2-muted);
+  cursor: default;
+}
+
+.book-details-page__order-total {
+  padding: 0 8px 4px;
+  color: var(--home-v2-muted);
+  text-align: center;
+}
+
+.book-details-page__order-total p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.book-details-page__order-total p > span {
+  margin-inline-start: 3px;
+}
+
+.book-details-page__order-total strong {
+  margin-inline-start: 4px;
+  color: var(--home-v2-ink);
+  font-size: 11px;
+}
+
+.book-details-page__order-total small {
+  display: block;
+  margin-top: 2px;
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.book-details-page__all-books-link {
   display: block;
   width: fit-content;
   margin: 16px auto 0;

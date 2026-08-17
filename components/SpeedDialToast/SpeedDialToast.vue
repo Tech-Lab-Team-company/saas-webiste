@@ -16,20 +16,27 @@ interface ContactItem extends MenuItem {
     description: string
 }
 
+interface SpeedDialInstance {
+    hide: () => void
+}
+
 const UserSetting = useSettingStore();
-const DESKTOP_WIDGET_WIDTH = 184;
-const MOBILE_WIDGET_WIDTH = 68;
-const WIDGET_HEIGHT = 68;
+const DESKTOP_WIDGET_WIDTH = 56;
+const MOBILE_WIDGET_WIDTH = 56;
+const WIDGET_HEIGHT = 56;
 const EDGE_GAP = 8;
 const MENU_CLEARANCE = 260;
 const POSITION_STORAGE_KEY = 'contact-speed-dial-position';
 const DRAG_THRESHOLD = 6;
 
 const dragger = ref<HTMLElement | null>(null);
+const speedDial = ref<SpeedDialInstance | null>(null);
 const position = reactive({ left: 32, top: 0 });
+const viewport = reactive({ width: 0, height: 0 });
 const hasBeenMoved = ref(false);
 const showDragHint = ref(true);
 const isDragging = ref(false);
+const isContactMenuOpen = ref(false);
 let didDrag = false;
 let activePointerId: number | null = null;
 let activeCaptureTarget: HTMLElement | null = null;
@@ -98,8 +105,31 @@ const items = computed<ContactItem[]>(() => {
     ].filter((item): item is ContactItem => Boolean(item));
 });
 
+const opensMenuDown = computed(() => {
+    if (!viewport.height) return false;
+
+    const spaceAbove = position.top - 16;
+    const spaceBelow = viewport.height - position.top - WIDGET_HEIGHT - 16;
+    return spaceBelow >= MENU_CLEARANCE || spaceBelow > spaceAbove;
+});
+
+const opensMenuTowardRight = computed(() => (
+    viewport.width > 0 && position.left + (DESKTOP_WIDGET_WIDTH / 2) < viewport.width / 2
+));
+
+const menuMaxHeight = computed(() => {
+    if (!viewport.height) return 260;
+
+    const availableSpace = opensMenuDown.value
+        ? viewport.height - position.top - WIDGET_HEIGHT - 24
+        : position.top - 24;
+
+    return Math.max(72, Math.floor(availableSpace));
+});
+
 const floatingStyle = computed(() => ({
     ...contactThemeStyle.value,
+    '--contact-menu-max-height': `${menuMaxHeight.value}px`,
     left: `${position.left}px`,
     top: `${position.top}px`,
 }));
@@ -111,10 +141,7 @@ const getWidgetWidth = () => (
 const keepInsideViewport = (left: number, top: number) => {
     const widgetWidth = getWidgetWidth();
     const maxLeft = Math.max(EDGE_GAP, window.innerWidth - widgetWidth - EDGE_GAP);
-    const minTop = Math.min(
-        MENU_CLEARANCE,
-        Math.max(EDGE_GAP, window.innerHeight - WIDGET_HEIGHT - EDGE_GAP),
-    );
+    const minTop = EDGE_GAP;
     const maxTop = Math.max(minTop, window.innerHeight - WIDGET_HEIGHT - EDGE_GAP);
 
     position.left = Math.min(Math.max(left, EDGE_GAP), maxLeft);
@@ -224,10 +251,22 @@ const handleLauncherClick = (
         return;
     }
 
+    if (isContactMenuOpen.value) {
+        speedDial.value?.hide();
+        return;
+    }
+
     toggleCallback(event);
 };
 
+const closeContactMenu = () => {
+    speedDial.value?.hide();
+};
+
 const handleResize = () => {
+    viewport.width = window.innerWidth;
+    viewport.height = window.innerHeight;
+
     if (hasBeenMoved.value) {
         keepInsideViewport(position.left, position.top);
         return;
@@ -237,6 +276,8 @@ const handleResize = () => {
 };
 
 onMounted(() => {
+    viewport.width = window.innerWidth;
+    viewport.height = window.innerHeight;
     if (!restorePosition()) setDefaultPosition();
     window.addEventListener('resize', handleResize);
     dragHintTimer = window.setTimeout(() => {
@@ -282,11 +323,18 @@ onBeforeUnmount(() => {
         </button>
 
         <SpeedDial
+            ref="speedDial"
             class="contact-speed-dial"
+            :class="{
+                'contact-speed-dial--toward-right': opensMenuTowardRight,
+                'contact-speed-dial--down': opensMenuDown,
+            }"
             :model="items"
             :transition-delay="55"
             direction="up"
             aria-label="خيارات التواصل معنا"
+            @show="isContactMenuOpen = true"
+            @hide="isContactMenuOpen = false"
         >
             <template #button="{ visible, toggleCallback }">
                 <button
@@ -298,20 +346,12 @@ onBeforeUnmount(() => {
                     aria-label="فتح خيارات التواصل معنا"
                     title="اضغط للتواصل أو اسحب لتحريك الزر"
                     @click="handleLauncherClick($event, toggleCallback)"
+                    @keydown.esc.prevent.stop="closeContactMenu"
                 >
                     <span class="contact-launcher__icon" aria-hidden="true">
                         <i :class="visible ? 'pi pi-times' : 'pi pi-comments'"></i>
                         <span v-if="!visible" class="contact-launcher__status"></span>
                     </span>
-                    <span class="contact-launcher__copy">
-                        <small>لديك استفسار؟</small>
-                        <strong>{{ visible ? 'إغلاق القائمة' : 'تواصل معنا' }}</strong>
-                    </span>
-                    <i
-                        class="contact-launcher__chevron pi pi-chevron-up"
-                        :class="{ 'is-open': visible }"
-                        aria-hidden="true"
-                    ></i>
                 </button>
             </template>
 
@@ -348,8 +388,8 @@ onBeforeUnmount(() => {
     --contact-border: color-mix(in srgb, var(--contact-primary) 17%, #d9e1ed);
     position: fixed;
     z-index: 9999;
-    width: 184px;
-    height: 68px;
+    width: 56px;
+    height: 56px;
     direction: rtl;
     user-select: none;
 }
@@ -357,17 +397,17 @@ onBeforeUnmount(() => {
 .contact-speed-dial-drag-handle {
     position: absolute;
     z-index: 4;
-    top: -11px;
-    right: 18px;
+    top: -8px;
+    right: 10px;
     display: flex;
-    width: 40px;
-    height: 20px;
+    width: 32px;
+    height: 16px;
     padding: 0;
     align-items: center;
     justify-content: center;
     gap: 3px;
     border: 1px solid var(--contact-border);
-    border-radius: 10px 10px 5px 5px;
+    border-radius: 9px 9px 4px 4px;
     background: var(--contact-surface);
     box-shadow: 0 5px 15px color-mix(in srgb, var(--contact-primary) 18%, transparent);
     color: var(--contact-primary);
@@ -447,7 +487,7 @@ onBeforeUnmount(() => {
     position: relative !important;
     display: block !important;
     width: 100%;
-    height: 68px;
+    height: 56px;
 }
 
 .contact-speed-dial .p-speeddial-list {
@@ -456,26 +496,62 @@ onBeforeUnmount(() => {
     bottom: calc(100% + 14px) !important;
     left: auto !important;
     display: flex !important;
-    width: 278px;
+    width: min(240px, calc(100vw - 16px));
+    max-height: var(--contact-menu-max-height, 260px);
     flex-direction: column !important;
     align-items: stretch !important;
-    padding: 8px !important;
-    gap: 7px !important;
+    padding: 7px !important;
+    gap: 5px !important;
     border: 1px solid var(--contact-border);
-    border-radius: 20px;
+    border-radius: 17px;
     background: color-mix(in srgb, var(--contact-surface) 95%, transparent);
     box-shadow: 0 22px 55px color-mix(in srgb, var(--contact-primary) 22%, transparent);
     backdrop-filter: blur(16px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transform-origin: bottom right;
+    visibility: visible;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear;
+}
+
+.contact-speed-dial--toward-right .p-speeddial-list {
+    right: auto !important;
+    left: 0 !important;
+    transform-origin: bottom left;
+}
+
+.contact-speed-dial--down .p-speeddial-list {
+    top: calc(100% + 14px) !important;
+    bottom: auto !important;
+    transform-origin: top right;
+}
+
+.contact-speed-dial--down.contact-speed-dial--toward-right .p-speeddial-list {
+    transform-origin: top left;
+}
+
+.contact-speed-dial:not(.p-speeddial-open) .p-speeddial-list {
+    pointer-events: none !important;
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+    visibility: hidden;
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0s linear 0.16s;
+}
+
+.contact-speed-dial--down:not(.p-speeddial-open) .p-speeddial-list {
+    transform: translateY(-10px) scale(0.97);
 }
 
 .contact-speed-dial .p-speeddial-list::before {
     display: block;
     width: 100%;
-    padding: 5px 8px 8px;
+    padding: 4px 7px 7px;
     border-bottom: 1px solid var(--contact-border);
     color: var(--contact-muted);
     content: 'اختر وسيلة التواصل المناسبة لك';
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
     text-align: right;
 }
@@ -487,15 +563,15 @@ onBeforeUnmount(() => {
 .contact-launcher {
     position: relative;
     display: grid;
-    width: 184px;
-    height: 64px;
-    padding: 7px 12px 7px 10px;
-    grid-template-columns: 46px minmax(0, 1fr) 18px;
+    width: 52px;
+    height: 52px;
+    padding: 6px;
+    grid-template-columns: 1fr;
     align-items: center;
-    gap: 9px;
+    gap: 0;
     overflow: hidden;
     border: 1px solid color-mix(in srgb, var(--contact-secondary) 50%, white);
-    border-radius: 20px 7px 20px 7px;
+    border-radius: 17px 7px 17px 7px;
     background:
         radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.24), transparent 36%),
         linear-gradient(135deg, var(--contact-secondary), var(--contact-primary));
@@ -505,7 +581,7 @@ onBeforeUnmount(() => {
     color: #fff;
     cursor: grab;
     isolation: isolate;
-    text-align: right;
+    text-align: center;
     touch-action: none;
     transition: transform 0.22s ease, border-radius 0.22s ease, box-shadow 0.22s ease;
 }
@@ -539,80 +615,48 @@ onBeforeUnmount(() => {
 }
 
 .contact-launcher.is-open {
-    border-radius: 9px 20px 9px 20px;
+    border-radius: 7px 17px 7px 17px;
     transform: translateY(-1px);
 }
 
 .contact-launcher__icon {
     position: relative;
     display: grid;
-    width: 46px;
-    height: 46px;
+    width: 38px;
+    height: 38px;
     place-items: center;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px 7px 16px 7px;
+    border-radius: 13px 6px 13px 6px;
     background: rgba(255, 255, 255, 0.13);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .contact-speed-dial .contact-launcher__icon > .pi {
-    font-size: 1.28rem;
+    font-size: 1.08rem;
 }
 
 .contact-launcher__status {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 9px;
-    height: 9px;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
     border: 2px solid var(--contact-primary);
     border-radius: 50%;
     background: #7cf3b0;
     box-shadow: 0 0 0 3px rgba(124, 243, 176, 0.15);
 }
 
-.contact-launcher__copy {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 1px;
-}
-
-.contact-launcher__copy small {
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.76);
-    font-size: 9px;
-    line-height: 1.35;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.contact-launcher__copy strong {
-    font-size: 13px;
-    font-weight: 800;
-    line-height: 1.4;
-}
-
-.contact-speed-dial .contact-launcher__chevron {
-    font-size: 0.7rem;
-    opacity: 0.72;
-    transition: transform 0.22s ease;
-}
-
-.contact-speed-dial .contact-launcher__chevron.is-open {
-    transform: rotate(180deg);
-}
-
 .contact-action {
     display: grid;
     width: 100%;
-    min-height: 62px;
-    padding: 8px 10px;
-    grid-template-columns: 44px minmax(0, 1fr) 22px;
+    min-height: 52px;
+    padding: 6px 8px;
+    grid-template-columns: 38px minmax(0, 1fr) 18px;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     border: 1px solid transparent;
-    border-radius: 14px;
+    border-radius: 12px;
     background: transparent;
     color: var(--contact-text);
     cursor: pointer;
@@ -636,10 +680,10 @@ onBeforeUnmount(() => {
 
 .contact-action__icon {
     display: grid;
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     place-items: center;
-    border-radius: 14px 6px 14px 6px;
+    border-radius: 12px 5px 12px 5px;
     background: linear-gradient(
         145deg,
         color-mix(in srgb, var(--contact-secondary) 17%, var(--contact-surface)),
@@ -649,7 +693,7 @@ onBeforeUnmount(() => {
 }
 
 .contact-speed-dial .contact-action__icon .pi {
-    font-size: 1.15rem;
+    font-size: 1rem;
 }
 
 .contact-action__copy {
@@ -660,7 +704,7 @@ onBeforeUnmount(() => {
 }
 
 .contact-action__copy strong {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     line-height: 1.35;
 }
@@ -668,7 +712,7 @@ onBeforeUnmount(() => {
 .contact-action__copy small {
     overflow: hidden;
     color: var(--contact-muted);
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.4;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -698,11 +742,11 @@ body.dark-mode .contact-speed-dial-dragger,
 
 @media (max-width: 560px) {
     .contact-speed-dial-dragger {
-        width: 68px;
+        width: 56px;
     }
 
     .contact-speed-dial-drag-handle {
-        right: 14px;
+        right: 10px;
     }
 
     .contact-speed-dial-drag-hint {
@@ -710,33 +754,26 @@ body.dark-mode .contact-speed-dial-dragger,
     }
 
     .contact-speed-dial .p-speeddial-list {
-        right: 0 !important;
-        width: min(278px, calc(100vw - 24px));
+        width: min(240px, calc(100vw - 16px));
     }
 
     .contact-launcher {
-        width: 64px;
-        padding: 7px;
-        grid-template-columns: 1fr;
-        border-radius: 20px 8px 20px 8px;
+        width: 52px;
+        padding: 6px;
+        border-radius: 17px 7px 17px 7px;
     }
 
     .contact-launcher__icon {
         margin: auto;
     }
 
-    .contact-launcher__copy,
-    .contact-launcher__chevron {
-        display: none;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .contact-launcher,
     .contact-launcher::before,
     .contact-action,
-    .contact-action__arrow,
-    .contact-launcher__chevron {
+    .contact-action__arrow {
         transition: none !important;
     }
 }

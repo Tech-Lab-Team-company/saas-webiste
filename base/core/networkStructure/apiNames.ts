@@ -164,8 +164,8 @@ class ApiNames {
 
   public FetchGenralSubjects = this.baseUrl + "fetch_general_subjects";
   public FetchGenralTeachers = this.baseUrl + "fetch_teachers ";
-  public CreateOnlinePayment = this.baseUrl + "create_payment_session ";
-  public CreateVerifyPayment = this.baseUrl + "verify_payment ";
+  public CreateOnlinePayment = this.baseUrl + "create_payment_session";
+  public CreateVerifyPayment = this.baseUrl + "verify_payment";
 
   //Courses
   public fetch_courses = "fetch_my_courses";
