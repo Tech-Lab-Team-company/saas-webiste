@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay, FreeMode } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -216,7 +216,9 @@ const { data: aboutusOpinions } = await useAsyncData(
 
 
 
-const modules = [Navigation, Pagination, Autoplay]
+const modules = [Navigation, Pagination, Autoplay, FreeMode]
+
+const isAllStudentsView = computed(() => selectedTopStudentsYearId.value === null)
 
 const swiperOptions = {
   modules,
@@ -271,21 +273,34 @@ const swiperOptions = {
 }
 
 const studentSwiperOptions = computed(() => ({
-  modules: [Navigation, Pagination],
+  modules,
   slidesPerView: 'auto',
   centeredSlides: topStudents.value.length > 5,
   centerInsufficientSlides: false,
   spaceBetween: 14,
   initialSlide: 0,
-  loop: topStudents.value.length > 5,
-  rewind: topStudents.value.length > 1 && topStudents.value.length <= 5,
-  allowTouchMove: topStudents.value.length > 5,
-  grabCursor: topStudents.value.length > 5,
-  slideToClickedSlide: topStudents.value.length > 5,
-  navigation: topStudents.value.length > 5,
-  pagination: topStudents.value.length > 5
+  loop: isAllStudentsView.value
+    ? topStudents.value.length > 1
+    : topStudents.value.length > 5,
+  rewind: !isAllStudentsView.value && topStudents.value.length > 1 && topStudents.value.length <= 5,
+  allowTouchMove: !isAllStudentsView.value && topStudents.value.length > 5,
+  grabCursor: !isAllStudentsView.value && topStudents.value.length > 5,
+  slideToClickedSlide: !isAllStudentsView.value && topStudents.value.length > 5,
+  navigation: !isAllStudentsView.value && topStudents.value.length > 5,
+  pagination: !isAllStudentsView.value && topStudents.value.length > 5
     ? { clickable: true, dynamicBullets: true }
     : false,
+  autoplay: isAllStudentsView.value && topStudents.value.length > 1
+    ? {
+        delay: 0,
+        disableOnInteraction: false,
+        pauseOnMouseEnter: false,
+      }
+    : false,
+  freeMode: isAllStudentsView.value
+    ? { enabled: true, momentum: false }
+    : false,
+  speed: isAllStudentsView.value ? 6000 : 900,
   watchOverflow: true,
   watchSlidesProgress: true,
   observer: true,
@@ -354,12 +369,12 @@ const getStudentAlt = (student: any) => {
               لوحة الشرف
             </span>
             <h2 id="top-students-title">طلابنا المتفوقون</h2>
-            <p>نفخر بطلابنا المتميزين الذين حققوا إنجازات رائعة في مسيرتهم التعليمية.</p>
+            <p>شاهد المتفوقين، أو اختر مرحلتك وصفك لتجد زملاءك بسهولة.</p>
           </div>
 
           <div v-if="topStudents.length" class="top-students-count" aria-label="عدد الطلاب المتفوقين">
-            <span>طالب<br />معروض</span>
             <strong>{{ topStudents.length }}</strong>
+            <span>طلاب</span>
           </div>
         </header>
 
@@ -376,10 +391,10 @@ const getStudentAlt = (student: any) => {
         <div v-else-if="topStudentsStages.length" class="top-students-filters">
           <div class="top-students-filters__header">
             <div class="top-students-filters__title">
-              <span class="pi pi-filter" aria-hidden="true" />
+              <span class="pi pi-search" aria-hidden="true" />
               <span>
-                <strong>فلترة لوحة الشرف</strong>
-                <small>اختر المرحلة أولاً، ثم اختر الصف الدراسي.</small>
+                <strong>ابحث عن طلاب صفك</strong>
+                <small>اختر مرحلتك، ثم اختر صفك.</small>
               </span>
             </div>
 
@@ -391,7 +406,7 @@ const getStudentAlt = (student: any) => {
               @click="showAllTopStudents"
             >
               <span class="pi pi-users" aria-hidden="true" />
-              عرض جميع الطلاب
+              كل الطلاب
             </button>
           </div>
 
@@ -400,8 +415,8 @@ const getStudentAlt = (student: any) => {
               <div class="top-students-filter-label">
                 <b>1</b>
                 <span>
-                  <strong>المرحلة التعليمية</strong>
-                  <small>ابدأ باختيار المرحلة</small>
+                  <strong>اختر مرحلتك</strong>
+                  <small>مثل: ابتدائي أو إعدادي أو ثانوي</small>
                 </span>
               </div>
 
@@ -431,8 +446,8 @@ const getStudentAlt = (student: any) => {
                 <div class="top-students-filter-label">
                   <b>2</b>
                   <span>
-                    <strong>الصف الدراسي</strong>
-                    <small>حدد الصف لعرض المتفوقين</small>
+                    <strong>اختر صفك</strong>
+                    <small>ستظهر أسماء المتفوقين مباشرة</small>
                   </span>
                 </div>
 
@@ -455,8 +470,8 @@ const getStudentAlt = (student: any) => {
                 <div class="top-students-filter-label">
                   <b>2</b>
                   <span>
-                    <strong>الصف الدراسي</strong>
-                    <small>اختر مرحلة لتظهر الصفوف المتاحة</small>
+                    <strong>اختر صفك</strong>
+                    <small>اختر مرحلتك أولًا لتظهر الصفوف</small>
                   </span>
                 </div>
               </div>
@@ -465,7 +480,7 @@ const getStudentAlt = (student: any) => {
 
           <div class="top-students-filter-summary" role="status" aria-live="polite">
             <span class="pi pi-eye" aria-hidden="true" />
-            <span>يتم الآن عرض:</span>
+            <span>تشاهد الآن:</span>
             <strong>{{ currentTopStudentsFilterLabel }}</strong>
             <span v-if="topStudentsPending" class="top-students-filter-summary__count">
               <span class="pi pi-spin pi-spinner" aria-hidden="true" />
@@ -477,7 +492,10 @@ const getStudentAlt = (student: any) => {
           </div>
         </div>
 
-        <div class="students-slider-container">
+        <div
+          class="students-slider-container"
+          :class="{ 'students-slider-container--all': isAllStudentsView }"
+        >
           <div v-if="topStudentsPending" class="students-loading" aria-label="جارٍ تحميل الطلاب المتفوقين">
             <span v-for="item in 5" :key="item" />
           </div>
@@ -496,7 +514,10 @@ const getStudentAlt = (student: any) => {
             :class="[
               'students-swiper',
               `students-swiper--count-${Math.min(topStudents.length, 5)}`,
-              { 'students-swiper--few': topStudents.length <= 5 },
+              {
+                'students-swiper--all': isAllStudentsView,
+                'students-swiper--few': !isAllStudentsView && topStudents.length <= 5,
+              },
             ]"
           >
             <SwiperSlide
@@ -507,10 +528,14 @@ const getStudentAlt = (student: any) => {
               <article
                 :class="[
                   'student-podium',
-                  getStudentRankClass(getStudentRank(student, index)),
+                  !isAllStudentsView && getStudentRankClass(getStudentRank(student, index)),
                 ]"
               >
-                <span class="student-podium__rank" :aria-label="getStudentRankLabel(getStudentRank(student, index))">
+                <span
+                  v-if="!isAllStudentsView"
+                  class="student-podium__rank"
+                  :aria-label="getStudentRankLabel(getStudentRank(student, index))"
+                >
                   {{ getStudentRank(student, index) }}
                 </span>
 
@@ -523,7 +548,7 @@ const getStudentAlt = (student: any) => {
                   <span class="student-podium__shine" aria-hidden="true" />
                 </div>
 
-                <span class="student-podium__position">
+                <span v-if="!isAllStudentsView" class="student-podium__position">
                   {{ getStudentRankLabel(getStudentRank(student, index)) }}
                 </span>
                 <h3 class="student-podium__title">{{ student.title }}</h3>
@@ -1712,6 +1737,7 @@ const getStudentAlt = (student: any) => {
   gap: 20px;
   width: min(1120px, calc(100% - 32px));
   margin-inline: auto;
+  padding-block: 8px 4px;
 }
 
 .top-students-board__intro {
@@ -1722,9 +1748,13 @@ const getStudentAlt = (student: any) => {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 7px;
-  color: #74acff;
-  font-size: 10px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border: 1px solid rgb(116 172 255 / 24%);
+  border-radius: 999px;
+  background: rgb(70 136 235 / 12%);
+  color: #9bc4ff;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: .03em;
 }
@@ -1732,25 +1762,19 @@ const getStudentAlt = (student: any) => {
 .top-students-board__intro h2 {
   width: fit-content;
   margin: 0 auto;
-  background: linear-gradient(
-    105deg,
-    var(--primary-color, #74acff) 0%,
-    var(--secondary-color, #f8fbff) 100%
-  );
-  background-clip: text;
-  color: transparent;
-  font: 900 clamp(29px, 3.4vw, 42px) / 1.25 var(--home-v2-heading, inherit);
+  color: #f8fbff;
+  font: 950 clamp(34px, 3.6vw, 48px) / 1.2 var(--home-v2-heading, inherit);
   letter-spacing: -.025em;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 8px 20px rgb(0 0 0 / 24%));
+  text-shadow: 0 5px 24px rgb(55 132 250 / 36%);
 }
 
 .top-students-board__intro p {
-  margin: 6px 0 0;
-  color: #aebbd0;
-  font-size: 12px;
-  font-weight: 600;
+  max-width: 610px;
+  margin: 10px auto 0;
+  color: #c4d0e2;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.7;
 }
 
 .top-students-trophy {
@@ -1779,8 +1803,9 @@ const getStudentAlt = (student: any) => {
   min-height: 64px;
   justify-self: end;
   justify-content: center;
-  gap: 7px;
-  padding: 9px 11px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
   border-color: rgb(93 153 244 / 24%);
   border-radius: 15px;
   background: rgb(19 44 80 / 62%);
@@ -1788,23 +1813,23 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-board .top-students-count strong {
-  color: #70aaff;
-  font-size: 27px;
+  color: #91bdff;
+  font-size: 30px;
 }
 
 .top-students-board .top-students-count span {
-  max-width: 38px;
-  color: #9fb0c8;
-  font-size: 8px;
-  line-height: 1.45;
+  max-width: none;
+  color: #c2cee0;
+  font-size: 10px;
+  line-height: 1.2;
 }
 
 .top-students-board .top-students-filters {
   display: grid;
   width: min(1080px, calc(100% - 64px));
-  gap: 13px;
-  margin: 26px auto 4px;
-  padding: 16px;
+  gap: 16px;
+  margin: 30px auto 4px;
+  padding: 18px;
   border: 1px solid rgb(119 163 224 / 18%);
   border-radius: 18px;
   background: rgb(9 24 44 / 88%);
@@ -1849,27 +1874,28 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-filters__title strong {
-  font-size: 13px;
+  color: #fff;
+  font-size: 15px;
   font-weight: 900;
 }
 
 .top-students-filters__title small {
-  color: #8799b2;
-  font-size: 9px;
+  color: #a7b7cd;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .top-students-filter-all {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 42px;
   align-items: center;
   gap: 7px;
-  padding: 0 13px;
+  padding: 0 16px;
   border: 1px solid rgb(111 164 240 / 20%);
   border-radius: 10px;
   background: rgb(16 38 66 / 78%);
   color: #aebed4;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 850;
   cursor: pointer;
   transition: border-color .25s ease, background-color .25s ease, color .25s ease, transform .25s ease;
@@ -1898,7 +1924,7 @@ const getStudentAlt = (student: any) => {
   align-content: start;
   gap: 11px;
   min-width: 0;
-  padding: 12px;
+  padding: 15px;
   border: 1px solid rgb(115 162 228 / 12%);
   border-radius: 13px;
   background: rgb(14 31 55 / 66%);
@@ -1918,15 +1944,15 @@ const getStudentAlt = (student: any) => {
 
 .top-students-board .top-students-filter-label b {
   display: grid;
-  width: 25px;
-  height: 25px;
-  flex: 0 0 25px;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
   place-items: center;
   border: 1px solid rgb(108 166 255 / 28%);
   border-radius: 50%;
   background: rgb(75 139 236 / 15%);
   color: #7caeff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 950;
 }
 
@@ -1936,14 +1962,14 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-board .top-students-filter-label strong {
-  color: #dce7f7;
-  font-size: 11px;
+  color: #f3f7fd;
+  font-size: 13px;
   font-weight: 900;
 }
 
 .top-students-board .top-students-filter-label small {
-  color: #7e90a9;
-  font-size: 8px;
+  color: #9aabc2;
+  font-size: 10px;
   font-weight: 700;
 }
 
@@ -1960,17 +1986,17 @@ const getStudentAlt = (student: any) => {
 
 .top-students-board .top-students-filter-options button {
   display: inline-flex;
-  min-height: 40px;
+  min-height: 44px;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 0 13px;
+  padding: 0 16px;
   border: 1px solid rgb(119 163 224 / 15%);
   border-radius: 10px;
   background: rgb(9 23 43 / 82%);
   color: #becbdd;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   transition: border-color .25s ease, background-color .25s ease, color .25s ease, box-shadow .25s ease, transform .25s ease;
@@ -2017,15 +2043,15 @@ const getStudentAlt = (student: any) => {
 
 .top-students-filter-summary {
   display: flex;
-  min-height: 36px;
+  min-height: 42px;
   align-items: center;
   gap: 7px;
   padding: 7px 11px;
   border: 1px solid rgb(105 158 234 / 13%);
   border-radius: 10px;
   background: rgb(8 20 38 / 62%);
-  color: #8394ac;
-  font-size: 9px;
+  color: #a9b8cc;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -2034,8 +2060,8 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-filter-summary strong {
-  color: #d7e6fa;
-  font-size: 10px;
+  color: #fff;
+  font-size: 12px;
   font-weight: 900;
 }
 
@@ -2064,9 +2090,23 @@ const getStudentAlt = (student: any) => {
   width: min(1340px, calc(100% - 4px));
 }
 
+.top-students-board .students-slider-container--all {
+  width: 100%;
+  max-width: none;
+}
+
 .top-students-board .students-swiper {
   overflow: visible;
   padding: 60px 28px 72px;
+}
+
+.top-students-board .students-swiper--all {
+  padding-inline: 0;
+}
+
+.top-students-board .students-swiper--all :deep(.swiper-wrapper) {
+  align-items: end;
+  transition-timing-function: linear !important;
 }
 
 .top-students-board .student-slide {
@@ -2094,6 +2134,33 @@ const getStudentAlt = (student: any) => {
   opacity: 1;
   filter: none;
   transform: translateY(-11px) scale(1.12);
+}
+
+.top-students-board .students-swiper--all .student-slide,
+.top-students-board .students-swiper--all .student-slide.swiper-slide-visible,
+.top-students-board .students-swiper--all .student-slide.swiper-slide-active {
+  z-index: 1;
+  width: clamp(250px, 18vw, 310px);
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: none;
+}
+
+.top-students-board .students-swiper--all .student-podium,
+.top-students-board .students-swiper--all .swiper-slide-active .student-podium {
+  min-height: 430px;
+  border-color: rgb(125 164 218 / 22%);
+  background:
+    radial-gradient(circle at 50% 14%, rgb(83 143 232 / 12%), transparent 29%),
+    linear-gradient(160deg, rgb(18 38 65 / 96%), rgb(7 20 38 / 98%));
+  box-shadow:
+    0 24px 46px -34px rgb(0 0 0 / 95%),
+    inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+.top-students-board .students-swiper--all .student-podium::before {
+  animation: none;
 }
 
 .top-students-board .students-swiper--few :deep(.swiper-wrapper) {
