@@ -34,15 +34,11 @@ const courseFilterSelect = ref<HTMLSelectElement | null>(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 const selectedCourseId = ref("");
+const activeExamTab = ref<"current" | "finished">("current");
 const { isOpen, isExpired, isUpcoming } = useExamAvailabilityClock();
 
 const attendedExams = computed(() =>
   exams.value.lastExams.filter((exam) => exam.attended),
-);
-const availableExams = computed(() =>
-  exams.value.currentExams.filter(
-    (exam) => isOpen(exam) && !isExamAttemptLocked(exam),
-  ),
 );
 const averageScore = computed(() => {
   if (!attendedExams.value.length) return 0;
@@ -98,6 +94,40 @@ const canRepeatExam = (exam: MyExamModel) =>
   isOpen(exam) &&
   hasCompletedExamAttempt(exam) &&
   allowsMultipleExamAttempts(exam);
+
+const uniqueExams = (items: MyExamModel[]) => {
+  const byId = new Map<number, MyExamModel>();
+  items.forEach((exam) => byId.set(exam.id, exam));
+  return [...byId.values()];
+};
+
+const currentAndAvailableExams = computed(() =>
+  uniqueExams([
+    ...exams.value.currentExams.filter(
+      (exam) => !isExpired(exam) && !isExamAttemptLocked(exam),
+    ),
+    ...exams.value.lastExams.filter((exam) => canRepeatExam(exam)),
+  ]),
+);
+
+const finishedAndExpiredExams = computed(() =>
+  uniqueExams([
+    ...exams.value.currentExams.filter(
+      (exam) => isExpired(exam) || isExamAttemptLocked(exam),
+    ),
+    ...exams.value.lastExams.filter((exam) => !canRepeatExam(exam)),
+  ]),
+);
+
+const availableExams = computed(() =>
+  currentAndAvailableExams.value.filter((exam) => isOpen(exam)),
+);
+
+const archivedExamIsFinished = (exam: MyExamModel) =>
+  hasCompletedExamAttempt(exam);
+
+const archivedExamStatus = (exam: MyExamModel) =>
+  archivedExamIsFinished(exam) ? "تم الانتهاء" : "انتهى الموعد";
 
 const loadCourses = async () => {
   const categoryId = String(userStore.user?.category_id || "2");
@@ -189,7 +219,7 @@ onMounted(async () => {
             </article>
             <article>
               <span class="pi pi-check-circle" />
-              <div><b>{{ exams.lastExams.length }}</b><small>اختبار سابق</small></div>
+              <div><b>{{ finishedAndExpiredExams.length }}</b><small>منتهي أو مكتمل</small></div>
             </article>
             <article>
               <span class="pi pi-chart-line" />
@@ -209,18 +239,60 @@ onMounted(async () => {
           </section>
 
           <template v-else>
-            <section class="exam-section">
+            <nav class="exam-tabs" role="tablist" aria-label="أقسام الاختبارات">
+              <button
+                id="current-exams-tab"
+                type="button"
+                role="tab"
+                :aria-selected="activeExamTab === 'current'"
+                aria-controls="current-exams-panel"
+                :class="{ active: activeExamTab === 'current' }"
+                @click="activeExamTab = 'current'"
+              >
+                <span class="pi pi-bolt" aria-hidden="true" />
+                <span>
+                  <strong>الحالية والمتاحة</strong>
+                  <small>اختبارات يمكنك دخولها الآن أو قريبًا</small>
+                </span>
+                <b>{{ currentAndAvailableExams.length }}</b>
+              </button>
+
+              <button
+                id="finished-exams-tab"
+                type="button"
+                role="tab"
+                :aria-selected="activeExamTab === 'finished'"
+                aria-controls="finished-exams-panel"
+                :class="{ active: activeExamTab === 'finished' }"
+                @click="activeExamTab = 'finished'"
+              >
+                <span class="pi pi-history" aria-hidden="true" />
+                <span>
+                  <strong>المنتهية والمكتملة</strong>
+                  <small>نتائجك والاختبارات التي انتهى موعدها</small>
+                </span>
+                <b>{{ finishedAndExpiredExams.length }}</b>
+              </button>
+            </nav>
+
+            <section
+              v-if="activeExamTab === 'current'"
+              id="current-exams-panel"
+              class="exam-section"
+              role="tabpanel"
+              aria-labelledby="current-exams-tab"
+            >
               <header class="exam-section__heading">
                 <div>
-                  <span>متاح لك الآن</span>
-                  <h2>الاختبارات</h2>
+                  <span>ابدأ أو استعد</span>
+                  <h2>الاختبارات الحالية والمتاحة</h2>
                 </div>
-                <b>{{ exams.currentExams.length }}</b>
+                <b>{{ currentAndAvailableExams.length }}</b>
               </header>
 
-              <div v-if="exams.currentExams.length" class="current-exams-grid">
+              <div v-if="currentAndAvailableExams.length" class="current-exams-grid">
                 <article
-                  v-for="exam in exams.currentExams"
+                  v-for="exam in currentAndAvailableExams"
                   :key="exam.id"
                   class="current-exam-card"
                   :class="{
@@ -293,23 +365,29 @@ onMounted(async () => {
               </div>
 
               <div v-else class="exam-state exam-state--compact">
-                <span class="pi pi-calendar-times" />
-                <h3>لا توجد اختبارات حالية</h3>
-                <p>سنُظهر لك الاختبارات هنا فور إتاحتها.</p>
+                <span class="pi pi-calendar" />
+                <h3>لا توجد اختبارات متاحة الآن</h3>
+                <p>ستظهر هنا الاختبارات الجديدة والقادمة فور إضافتها.</p>
               </div>
             </section>
 
-            <section class="exam-section exam-section--history">
+            <section
+              v-else
+              id="finished-exams-panel"
+              class="exam-section exam-section--history"
+              role="tabpanel"
+              aria-labelledby="finished-exams-tab"
+            >
               <header class="exam-section__heading">
                 <div>
                   <span>سجل الأداء</span>
-                  <h2>الاختبارات السابقة</h2>
+                  <h2>الاختبارات المنتهية والمكتملة</h2>
                 </div>
-                <b>{{ exams.lastExams.length }}</b>
+                <b>{{ finishedAndExpiredExams.length }}</b>
               </header>
 
-              <div v-if="exams.lastExams.length" class="exam-history-list">
-                <article v-for="exam in exams.lastExams" :key="exam.id" class="exam-result-card">
+              <div v-if="finishedAndExpiredExams.length" class="exam-history-list">
+                <article v-for="exam in finishedAndExpiredExams" :key="exam.id" class="exam-result-card">
                   <div
                     class="result-score"
                     :class="{ 'result-score--absent': !exam.attended }"
@@ -323,8 +401,13 @@ onMounted(async () => {
 
                   <div class="result-content">
                     <div class="exam-card__topline">
-                      <span>{{ exam.subject?.title || "اختبار عام" }}</span>
-                      <small>{{ formatDate(exam.date) }}</small>
+                      <span
+                        :class="archivedExamIsFinished(exam) ? 'exam-status--finished' : 'exam-status--unavailable'"
+                      >
+                        <i :class="archivedExamIsFinished(exam) ? 'pi pi-check' : 'pi pi-calendar-times'" />
+                        {{ archivedExamStatus(exam) }}
+                      </span>
+                      <small>{{ exam.subject?.title || "اختبار عام" }} · {{ formatDate(exam.date || exam.endTime) }}</small>
                     </div>
                     <h3>{{ exam.title }}</h3>
                     <p v-if="exam.attended">حصلت على {{ exam.mark }} من {{ exam.examMark }} درجة.</p>
@@ -350,8 +433,8 @@ onMounted(async () => {
 
               <div v-else class="exam-state exam-state--compact">
                 <span class="pi pi-inbox" />
-                <h3>لا توجد نتائج سابقة</h3>
-                <p>بعد إنهاء أول اختبار ستظهر نتيجتك وتفاصيل الإجابات هنا.</p>
+                <h3>لا توجد اختبارات منتهية</h3>
+                <p>بعد إنهاء أول اختبار ستظهر نتيجتك وتفاصيله هنا.</p>
               </div>
             </section>
           </template>
@@ -377,6 +460,18 @@ onMounted(async () => {
 .exam-statistics div { display: flex; flex-direction: column; }
 .exam-statistics b { color: var(--profile-ink); font-size: 24px; line-height: 1.1; }
 .exam-statistics small { margin-top: 5px; color: var(--profile-muted); font-size: 10px; }
+.exam-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 34px; padding: 7px; border: 1px solid var(--profile-border); border-radius: 16px; background: var(--profile-surface-raised); }
+.exam-tabs > button { display: grid; min-width: 0; min-height: 78px; grid-template-columns: 42px minmax(0, 1fr) 32px; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: var(--profile-muted); text-align: start; cursor: pointer; font-family: Cairo, sans-serif; transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, color .2s ease; }
+.exam-tabs > button:hover { border-color: var(--profile-border); background: var(--profile-surface); color: var(--profile-ink); }
+.exam-tabs > button.active { border-color: color-mix(in srgb, var(--profile-secondary) 38%, var(--profile-border)); background: var(--profile-surface); box-shadow: 0 10px 28px color-mix(in srgb, var(--profile-primary) 9%, transparent); color: var(--profile-ink); }
+.exam-tabs > button > .pi { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 11px; background: var(--profile-surface); color: var(--profile-muted); font-size: 16px; }
+.exam-tabs > button.active > .pi { background: var(--profile-secondary-soft); color: var(--profile-secondary); }
+.exam-tabs > button > span:nth-child(2) { display: grid; min-width: 0; gap: 3px; }
+.exam-tabs strong { overflow: hidden; color: inherit; font-size: 13px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+.exam-tabs small { overflow: hidden; color: var(--profile-muted); font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.exam-tabs b { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--profile-surface); color: var(--profile-muted); font-size: 11px; }
+.exam-tabs > button.active b { background: var(--profile-secondary); color: var(--profile-on-action); }
+.exam-tabs > button:focus-visible { outline: 3px solid color-mix(in srgb, var(--profile-secondary) 30%, transparent); outline-offset: 2px; }
 .exam-section + .exam-section { margin-top: 48px; }
 .exam-section__heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
 .exam-section__heading h2 { margin: 3px 0 0; color: var(--profile-ink); font-size: 25px; font-weight: 900; }
@@ -439,6 +534,6 @@ onMounted(async () => {
 .exam-loading span { height: 260px; border: 1px solid var(--profile-border); border-radius: 16px; background: linear-gradient(100deg, var(--profile-surface), var(--profile-surface-raised), var(--profile-surface)); background-size: 200%; animation: exam-loading 1.2s infinite; }
 @keyframes exam-loading { to { background-position: -200% 0; } }
 @media (max-width: 820px) { .exams-heading { align-items: stretch; flex-direction: column; } .current-exams-grid { grid-template-columns: 1fr; } }
-@media (max-width: 620px) { .exams-dashboard-main { width: calc(100% - 28px); } .exam-statistics { grid-template-columns: 1fr; } .exam-statistics article { min-height: 82px; } .exam-result-card { grid-template-columns: 1fr; text-align: center; } .exam-result-card .exam-card__topline { flex-direction: column; } .answer-statistics { justify-content: center; } .exam-loading { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .exams-dashboard-main { width: calc(100% - 28px); } .exam-statistics { grid-template-columns: 1fr; } .exam-statistics article { min-height: 82px; } .exam-tabs { grid-template-columns: 1fr; } .exam-tabs > button { min-height: 70px; } .exam-result-card { grid-template-columns: 1fr; text-align: center; } .exam-result-card .exam-card__topline { flex-direction: column; } .answer-statistics { justify-content: center; } .exam-loading { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .exam-loading span { animation: none; } }
 </style>
