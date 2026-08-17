@@ -478,8 +478,8 @@ onBeforeUnmount(() => {
   min-height: 30px;
   align-items: center;
   gap: 8px;
-  padding-inline: 14px;
-  border-inline-end: 1px solid var(--footer-soft-border);
+  padding-inline: 24px;
+  /* border-inline-end: 1px solid var(--footer-soft-border); */
   color: #ffffffb8;
   font-size: 13px;
 }
