@@ -239,6 +239,17 @@ onMounted(async () => {
           </section>
 
           <template v-else>
+            <aside class="exam-tabs-guide" aria-labelledby="exam-tabs-guide-title">
+              <span class="pi pi-info-circle" aria-hidden="true" />
+              <div>
+                <strong id="exam-tabs-guide-title">أين تجد اختبارك؟</strong>
+                <p>
+                  اختر <b>الحالية والمتاحة</b> لبدء اختبار أو معرفة موعده، واختر
+                  <b>المنتهية والمكتملة</b> لمشاهدة نتيجتك أو الاختبارات التي فات موعدها.
+                </p>
+              </div>
+            </aside>
+
             <nav class="exam-tabs" role="tablist" aria-label="أقسام الاختبارات">
               <button
                 id="current-exams-tab"
@@ -252,7 +263,7 @@ onMounted(async () => {
                 <span class="pi pi-bolt" aria-hidden="true" />
                 <span>
                   <strong>الحالية والمتاحة</strong>
-                  <small>اختبارات يمكنك دخولها الآن أو قريبًا</small>
+                  <small>ابدأ الاختبار أو اعرف موعده</small>
                 </span>
                 <b>{{ currentAndAvailableExams.length }}</b>
               </button>
@@ -269,7 +280,7 @@ onMounted(async () => {
                 <span class="pi pi-history" aria-hidden="true" />
                 <span>
                   <strong>المنتهية والمكتملة</strong>
-                  <small>نتائجك والاختبارات التي انتهى موعدها</small>
+                  <small>شاهد النتيجة أو الاختبارات الفائتة</small>
                 </span>
                 <b>{{ finishedAndExpiredExams.length }}</b>
               </button>
@@ -460,6 +471,12 @@ onMounted(async () => {
 .exam-statistics div { display: flex; flex-direction: column; }
 .exam-statistics b { color: var(--profile-ink); font-size: 24px; line-height: 1.1; }
 .exam-statistics small { margin-top: 5px; color: var(--profile-muted); font-size: 10px; }
+.exam-tabs-guide { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; padding: 15px 17px; border: 1px solid color-mix(in srgb, var(--profile-secondary) 24%, var(--profile-border)); border-radius: 13px; background: var(--profile-secondary-soft); color: var(--profile-ink); }
+.exam-tabs-guide > .pi { display: grid; width: 32px; height: 32px; flex: 0 0 32px; place-items: center; border-radius: 50%; background: var(--profile-secondary); color: var(--profile-on-action); font-size: 14px; }
+.exam-tabs-guide > div { min-width: 0; }
+.exam-tabs-guide strong { display: block; margin-bottom: 3px; font-size: 12px; font-weight: 900; }
+.exam-tabs-guide p { margin: 0; color: var(--profile-muted); font-size: 10px; font-weight: 700; line-height: 1.8; }
+.exam-tabs-guide p b { color: var(--profile-secondary); font-weight: 900; }
 .exam-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 34px; padding: 7px; border: 1px solid var(--profile-border); border-radius: 16px; background: var(--profile-surface-raised); }
 .exam-tabs > button { display: grid; min-width: 0; min-height: 78px; grid-template-columns: 42px minmax(0, 1fr) 32px; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: var(--profile-muted); text-align: start; cursor: pointer; font-family: Cairo, sans-serif; transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, color .2s ease; }
 .exam-tabs > button:hover { border-color: var(--profile-border); background: var(--profile-surface); color: var(--profile-ink); }
@@ -534,6 +551,6 @@ onMounted(async () => {
 .exam-loading span { height: 260px; border: 1px solid var(--profile-border); border-radius: 16px; background: linear-gradient(100deg, var(--profile-surface), var(--profile-surface-raised), var(--profile-surface)); background-size: 200%; animation: exam-loading 1.2s infinite; }
 @keyframes exam-loading { to { background-position: -200% 0; } }
 @media (max-width: 820px) { .exams-heading { align-items: stretch; flex-direction: column; } .current-exams-grid { grid-template-columns: 1fr; } }
-@media (max-width: 620px) { .exams-dashboard-main { width: calc(100% - 28px); } .exam-statistics { grid-template-columns: 1fr; } .exam-statistics article { min-height: 82px; } .exam-tabs { grid-template-columns: 1fr; } .exam-tabs > button { min-height: 70px; } .exam-result-card { grid-template-columns: 1fr; text-align: center; } .exam-result-card .exam-card__topline { flex-direction: column; } .answer-statistics { justify-content: center; } .exam-loading { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .exams-dashboard-main { width: calc(100% - 28px); } .exam-statistics { grid-template-columns: 1fr; } .exam-statistics article { min-height: 82px; } .exam-tabs-guide { padding: 13px; } .exam-tabs-guide p { font-size: 9px; } .exam-tabs { grid-template-columns: 1fr; } .exam-tabs > button { min-height: 70px; } .exam-result-card { grid-template-columns: 1fr; text-align: center; } .exam-result-card .exam-card__topline { flex-direction: column; } .answer-statistics { justify-content: center; } .exam-loading { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .exam-loading span { animation: none; } }
 </style>
