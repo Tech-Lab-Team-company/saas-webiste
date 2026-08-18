@@ -12,9 +12,12 @@ const props = defineProps<{
   pending: boolean;
   loadCoursesByYear: (
     stageId: number,
-    yearId: number,
+    yearId: number
   ) => Promise<HomeSectionState<HomeCourseViewModel[]>>;
 }>();
+
+const homeRoot = ref<HTMLElement | null>(null);
+useHomePageCinematicMotion(homeRoot);
 
 const themeStyles = computed(() => {
   const primary = props.home.site.colors.primary || "#28366c";
@@ -31,11 +34,17 @@ const themeStyles = computed(() => {
 
 <template>
   <div
+    ref="homeRoot"
     class="home-v2"
     dir="rtl"
     :data-home-pending="props.pending ? 'true' : 'false'"
     :style="themeStyles"
   >
+    <div class="home-v2-motion-trail" aria-hidden="true">
+      <span />
+      <span />
+      <span />
+    </div>
     <main>
       <HomeHeroSection :hero="props.home.hero" :site="props.home.site" />
       <LazyHomeV2SectionsHomeCoursesSection
@@ -55,7 +64,7 @@ const themeStyles = computed(() => {
         :journey="props.home.learningJourney"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
-        <LazyHomeV2SectionsHomeAboutTeacherSection
+      <LazyHomeV2SectionsHomeAboutTeacherSection
         :about="props.home.aboutTeacher"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
@@ -73,3 +82,51 @@ const themeStyles = computed(() => {
     </main>
   </div>
 </template>
+
+<style scoped>
+.home-v2-motion-trail {
+  position: fixed;
+  z-index: 9000;
+  inset: 0;
+  pointer-events: none;
+}
+
+.home-v2-motion-trail > span {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 50%;
+  background: var(--home-v2-coral);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--home-v2-coral) 58%, transparent);
+  opacity: 0;
+  will-change: transform;
+}
+
+.home-v2-motion-trail > span:nth-child(2) {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border: 0;
+  background: color-mix(in srgb, var(--home-v2-blue) 52%, #fff);
+}
+
+.home-v2-motion-trail > span:nth-child(3) {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 0 12px rgb(255 255 255 / 72%);
+}
+
+@media (max-width: 780px), (prefers-reduced-motion: reduce) {
+  .home-v2-motion-trail {
+    display: none;
+  }
+}
+</style>
