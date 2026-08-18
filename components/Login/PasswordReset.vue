@@ -38,7 +38,9 @@ const sendotp =()=>{
     <div class="login-form">
    
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
-        <img :src="UserSettingStore.setting?.image?.img" width="150px" alt="logo">
+        <NuxtLink to="/" aria-label="العودة إلى الصفحة الرئيسية">
+          <img :src="UserSettingStore.setting?.image?.img" width="150" alt="شعار الموقع">
+        </NuxtLink>
         <h3>{{ $t('نسيت كلمة المرور') }}</h3>
         <p>{{ $t('ادخل البريد الالكترونى الذى سوف نرسل اليك كود استرجاع كلمه المرور عليه') }}</p>
 

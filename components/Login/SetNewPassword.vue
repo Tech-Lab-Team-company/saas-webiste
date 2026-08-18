@@ -60,7 +60,9 @@ const UserSettingStore = useSettingStore();
 
     <img class="background-circle" src="../../public/images/Component15.png" alt="">
 
-    <img :src="UserSettingStore.setting.image.img" width="150px" alt="logo">
+    <NuxtLink to="/" aria-label="العودة إلى الصفحة الرئيسية">
+      <img :src="UserSettingStore.setting.image.img" width="150" alt="شعار الموقع">
+    </NuxtLink>
     <h3>{{ $t('كلمه مرور جديده') }}</h3>
     <p>{{ $t('ادخل كلمه مرور جديده و احرص على ان تكون تحتوى على اكثر من 8 حروف و علامات قويه مثل # @ &') }}</p>
 

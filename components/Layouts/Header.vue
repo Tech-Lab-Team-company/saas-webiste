@@ -41,6 +41,19 @@ const handleLogout = () => {
 const settingStore = useSettingStore();
 const { isDark, toggleTheme } = useAppTheme();
 const droplist = ref(false);
+const logoLoadFailed = ref(false);
+
+const headerLogo = computed(() => {
+  if (logoLoadFailed.value) return "/favicon.ico";
+  return settingStore.setting?.image?.img?.trim() || "/favicon.ico";
+});
+
+watch(
+  () => settingStore.setting?.image?.img,
+  () => {
+    logoLoadFailed.value = false;
+  },
+);
 
 
 
@@ -93,19 +106,16 @@ const droplist = ref(false);
         <NuxtLink to="/aboutus" exactActiveClass="active" class="nav-link"><li>نبذه عنا</li></NuxtLink>
         <NuxtLink to="/" exactActiveClass="active" class="nav-link"><li>الرئيسيه</li></NuxtLink>
       </ul>
-      <NuxtLink to="/" class="logo">
-        <!-- <Logo /> -->
-        <!-- setting?.image?.img-->
-               <!-- <pre>Image path: {{ settingStore.setting?.image?.img }}</pre> -->
-
-      <NuxtImg
-        v-if="settingStore.setting?.image?.img"
-        :src="settingStore.setting.image.img"
-        :alt="settingStore.setting.image.alt || ''"
-        width="75"
-        format="webp"
-      />
-    </NuxtLink>
+      <NuxtLink to="/" class="logo" aria-label="الصفحة الرئيسية">
+        <img
+          :src="headerLogo"
+          :alt="settingStore.setting?.image?.alt || settingStore.setting?.name || 'شعار الموقع'"
+          class="header-logo-image"
+          width="163"
+          height="52"
+          @error="logoLoadFailed = true"
+        />
+      </NuxtLink>
     </nav>
   </header>
 </template>
@@ -138,6 +148,23 @@ const droplist = ref(false);
 
 .header-theme-toggle {
   flex: 0 0 42px;
+}
+
+.logo {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 75px;
+  min-height: 52px;
+}
+
+.header-logo-image {
+  display: block;
+  width: auto;
+  max-width: 163px;
+  height: 52px;
+  object-fit: contain;
 }
 
 li {

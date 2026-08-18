@@ -12,16 +12,23 @@ const UserSettingStore = useSettingStore();
     </section>
 
     <aside class="login-home-visual" aria-label="مميزات مساحة الطالب">
-      <div class="login-home-brand">
+      <NuxtLink
+        to="/"
+        class="login-home-brand"
+        aria-label="العودة إلى الصفحة الرئيسية"
+      >
         <img
+          v-if="UserSettingStore.setting?.image?.img"
           :src="UserSettingStore.setting?.image?.img"
           :alt="UserSettingStore.setting?.name || 'logo'"
+          width="52"
+          height="52"
         >
         <div>
           <strong>{{ UserSettingStore.setting?.name }}</strong>
           <small>{{ UserSettingStore.setting?.description }}</small>
         </div>
-      </div>
+      </NuxtLink>
 
       <div class="login-home-visual-copy">
         <span>{{ $t("مساحة الطالب") }}</span>

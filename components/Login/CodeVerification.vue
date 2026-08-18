@@ -38,7 +38,9 @@ const UserSettingStore = useSettingStore();
     <div class="login-form">
  
         <img class="background-circle" src="../../public/images/Component15.png" alt="">
-        <img :src="UserSettingStore.setting.image.img" width="150px" alt="logo">
+        <NuxtLink to="/" aria-label="العودة إلى الصفحة الرئيسية">
+          <img :src="UserSettingStore.setting.image.img" width="150" alt="شعار الموقع">
+        </NuxtLink>
         <h3>{{  }}</h3>
         <p class="pass-code">{{ $t(`ادخل الكود الذى تم ارساله اليك على بريدك الاكترونى sarael*****@gmail.com`) }}</p>
 

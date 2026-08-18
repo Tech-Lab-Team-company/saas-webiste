@@ -107,7 +107,7 @@ onBeforeUnmount(() => {
             { 'home-v2-header__logo--empty': !site.logo },
           ]"
         >
-          <NuxtImg
+          <img
             v-if="site.logo"
             :src="site.logo.src"
             :alt="
@@ -118,8 +118,6 @@ onBeforeUnmount(() => {
             "
             width="163"
             height="52"
-            format="webp"
-            quality="80"
             loading="eager"
           />
           <span v-else aria-hidden="true">+</span>
@@ -350,22 +348,19 @@ onBeforeUnmount(() => {
 
 .home-v2-header__logo {
   display: grid;
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
   place-items: center;
   overflow: hidden;
-  border: 3px solid #fff;
-  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 22%, transparent);
+  border-radius: 9px;
   background: #fff;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--home-v2-blue) 22%, transparent),
-    0 8px 22px rgb(8 27 58 / 14%);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 6px 18px rgb(8 27 58 / 12%);
+  transition: transform 0.2s ease;
 }
 
 .home-v2-header__brand:hover .home-v2-header__logo {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue) 18%, transparent),
-    0 10px 24px rgb(8 27 58 / 18%);
   transform: translateY(-1px);
 }
 
@@ -373,7 +368,7 @@ onBeforeUnmount(() => {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 
@@ -547,7 +542,9 @@ onBeforeUnmount(() => {
     display: flex;
     width: 100%;
     align-items: center;
-    justify-content: center;
+    /* Keep the row centered when it fits, but anchor it to the safe edge on
+       narrow screens so the first/last links remain reachable by scrolling. */
+    justify-content: safe center;
     gap: 5px;
     overflow-x: auto;
     padding: 6px max(15px, calc((100vw - 1180px) / 2));
@@ -563,7 +560,7 @@ onBeforeUnmount(() => {
 
   .home-v2-header__mobile-nav a {
     display: flex;
-    min-height: 38px;
+    min-height: 44px;
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
@@ -593,6 +590,12 @@ onBeforeUnmount(() => {
 
   .home-v2-header__brand {
     min-width: 0;
+  }
+
+  .home-v2-header__logo {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
   }
 
   .home-v2-header__brand > span:last-child {

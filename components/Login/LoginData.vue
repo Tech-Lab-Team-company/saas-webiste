@@ -217,13 +217,13 @@ const handleKeyPress = (event: KeyboardEvent) => {
         </section>
 
         <aside class="login-home-visual" aria-label="مميزات مساحة الطالب">
-            <div class="login-home-brand">
+            <NuxtLink to="/" class="login-home-brand" aria-label="العودة إلى الصفحة الرئيسية">
                 <img :src="UserSettingStore.setting?.image?.img" :alt="UserSettingStore.setting?.name || 'logo'">
                 <div>
                     <strong>{{ UserSettingStore.setting?.name }}</strong>
                     <small>{{ UserSettingStore.setting?.description }}</small>
                 </div>
-            </div>
+            </NuxtLink>
 
             <div class="login-home-visual-copy">
                 <span>{{ $t('مساحة الطالب') }}</span>

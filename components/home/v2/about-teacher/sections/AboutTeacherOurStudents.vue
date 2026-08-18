@@ -161,7 +161,7 @@ const getStudentYearLabel = (student: TopStudent) =>
   topStudentsYearLabels.value.get(student.year_id) || `المستوى ${student.year_id}`
 
 const {
-  data: topStudents,
+  data: topStudentsResponse,
   pending: topStudentsPending,
   error: topStudentsError,
   refresh: refreshTopStudents,
@@ -183,12 +183,19 @@ const {
     )
 
     const students = Array.isArray(response) ? response : response?.data ?? []
-    return [...students].sort((first, second) => first.order - second.order)
+    return students
   },
   {
     default: () => [],
     watch: [selectedTopStudentsYearId],
   },
+)
+
+const topStudents = computed(() =>
+  [...topStudentsResponse.value].sort((first, second) => {
+    const orderDifference = Number(first.order) - Number(second.order)
+    return orderDifference || first.id - second.id
+  }),
 )
 
 

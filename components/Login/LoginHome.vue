@@ -34,7 +34,9 @@ onMounted(() => {
         src="../../public/images/Component15.png"
         alt=""
       />
-      <img :src="UserSettingStore?.setting?.image?.img" alt="" width="150" />
+      <NuxtLink to="/" aria-label="العودة إلى الصفحة الرئيسية">
+        <img :src="UserSettingStore?.setting?.image?.img" alt="شعار الموقع" width="150" />
+      </NuxtLink>
       <h3>{{ $t("مرحبا بك فى منصتنا التعليمية") }}</h3>
       <p>{{ $t(`${UserSettingStore.setting?.description}`) }}</p>
 

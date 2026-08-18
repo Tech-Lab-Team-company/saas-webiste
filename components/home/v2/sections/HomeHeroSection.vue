@@ -625,7 +625,7 @@ onMounted(() => {
   place-items: center;
   padding: 7px;
   border: 1px solid #ffffffa6;
-  border-radius: 50%;
+  border-radius: 16px;
   background: #fffffff0;
   box-shadow: 0 10px 28px #06114738;
 }
@@ -671,7 +671,7 @@ onMounted(() => {
 .home-v2-hero__brand-logo img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 10px;
   object-fit: contain;
 }
 
