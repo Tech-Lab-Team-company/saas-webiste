@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { gsap } from 'gsap'
 import type Fqs from '~/types/fqs'
-import { baseUrl } from '~/constant/baseUrl'
+import { useBaseUrls } from '~/constant/baseUrl'
 import { getWebDomain } from '~/constant/webDomain'
 
 type FaqResponse = {
@@ -14,7 +14,7 @@ const webDomain = getWebDomain()
 const { data: faqs, pending, error } = await useAsyncData(
   `home-v2-faqs:${webDomain}`,
   async () => {
-    const response = await $fetch<FaqResponse>(`${baseUrl}/fetch_faqs`, {
+    const response = await $fetch<FaqResponse>(`${useBaseUrls().baseUrl}/fetch_faqs`, {
       method: 'GET',
       headers: {
         'Accept-Language': 'ar',
