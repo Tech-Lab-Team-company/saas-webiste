@@ -29,6 +29,21 @@ test("developer tools viewport detection handles side and bottom docks", () => {
   assert.equal(hasDeveloperToolsViewportGap(bottomDock, 170), true);
 });
 
+test("responsive device emulation still detects the desktop viewport gap", () => {
+  assert.equal(
+    hasDeveloperToolsViewportGap(
+      {
+        innerWidth: 1571,
+        innerHeight: 1001,
+        outerWidth: 1920,
+        outerHeight: 1080,
+      },
+      170,
+    ),
+    true,
+  );
+});
+
 test("invalid or unavailable browser dimensions do not block content", () => {
   assert.equal(
     hasDeveloperToolsViewportGap(

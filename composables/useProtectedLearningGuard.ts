@@ -11,9 +11,6 @@ export function useProtectedLearningGuard(
   let detectionTimer: ReturnType<typeof setInterval> | null = null;
   let consecutiveClosedChecks = 0;
 
-  const isDesktopBrowser = () =>
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-
   const readViewportMetrics = () => ({
     innerWidth: window.innerWidth,
     innerHeight: window.innerHeight,
@@ -36,6 +33,23 @@ export function useProtectedLearningGuard(
 
   const setDeveloperToolsState = (nextState: boolean) => {
     if (isDeveloperToolsOpen.value === nextState) return;
+
+    if (nextState) {
+      document.documentElement.setAttribute(
+        "data-protected-content-blocked",
+        "true",
+      );
+      document
+        .querySelectorAll<HTMLMediaElement>(
+          ".app-route-view--protected video, .app-route-view--protected audio",
+        )
+        .forEach((media) => media.pause());
+    } else {
+      document.documentElement.removeAttribute(
+        "data-protected-content-blocked",
+      );
+    }
+
     isDeveloperToolsOpen.value = nextState;
     if (nextState) {
       clearNuxtData((key) => key.startsWith("course-details:"));
@@ -45,12 +59,6 @@ export function useProtectedLearningGuard(
 
   const checkDeveloperTools = (immediate = false) => {
     if (!toValue(protectionActive) || !config.developerToolsGuard) {
-      consecutiveClosedChecks = 0;
-      setDeveloperToolsState(false);
-      return;
-    }
-
-    if (!isDesktopBrowser()) {
       consecutiveClosedChecks = 0;
       setDeveloperToolsState(false);
       return;
@@ -118,6 +126,7 @@ export function useProtectedLearningGuard(
       document.removeEventListener(eventName, blockProtectedCopy, true);
     });
     if (detectionTimer) clearInterval(detectionTimer);
+    document.documentElement.removeAttribute("data-protected-content-blocked");
   });
 
   return {

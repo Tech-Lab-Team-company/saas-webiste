@@ -28,6 +28,12 @@ Application-wide controls and their shared notice are implemented by:
   or receives a supported screen-capture keyboard event.
 - Detects the viewport change produced by docked browser developer tools on
   desktop course and exam routes.
+- Keeps detection active when Chrome/Brave Responsive Device Mode emulates a
+  coarse mobile pointer. Pointer emulation is never trusted as proof that the
+  browser is a real mobile device.
+- Applies a synchronous HTML security lock before Vue's next render and pauses
+  active media immediately, preventing the previous page frame from remaining
+  visible while component state is being unmounted.
 - Immediately unmounts the course or exam page when developer tools are
   detected, which removes rendered questions, lesson content, and component
   state from the DOM.

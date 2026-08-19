@@ -456,3 +456,17 @@ html[data-theme='dark'] .course-card-layout :is(
     transition: none;
   }
 }
+/* Fail closed synchronously while Vue unmounts protected course/exam content. */
+html[data-protected-content-blocked='true']
+  .app-route-view--protected
+  > :not(.developer-tools-blocker) {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+html[data-protected-content-blocked='true']
+  .app-route-view--protected
+  :is(video, audio, iframe, embed, object) {
+  display: none !important;
+  visibility: hidden !important;
+}
