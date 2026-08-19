@@ -11,14 +11,14 @@ import Panel from 'primevue/panel';
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from "../Home/home/enum/section_type_enum";
 import { getWebDomain } from "~/constant/webDomain";
-import { baseUrl } from '~/constant/baseUrl';
+import { useBaseUrls } from '~/constant/baseUrl';
 
 const { data: studentopinionssection } = await useAsyncData("studentopinionssection", async () => {
     const response = await $fetch<{
         data: HomeFirstSection[];
         message: string;
         status: number;
-    }>(`${baseUrl}/fetch_home_website_section`, {
+    }>(`${useBaseUrls().baseUrl}/fetch_home_website_section`, {
         method: "POST",
         headers: {
             "Accept-Language": "ar",

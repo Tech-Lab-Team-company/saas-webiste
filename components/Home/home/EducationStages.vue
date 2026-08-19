@@ -9,12 +9,10 @@ import { useBaseUrls } from "~/constant/baseUrl";
 import { useFiltersStore } from '~/stores/courses_filter';
 import { useSettingStore } from "~/stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
-import type GeneralCoursesModel from "~/features/FetchGeneralCourseSubject/Data/models/general_course_subjects_model";
 import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
-import FetchGeneralCoursesSubjectController from "~/features/FetchGeneralCourseSubject/presentation/controllers/fetch_general_course_subjects_controller.js";
-import FetchGeneralCoursesSubjectParams from "~/features/FetchGeneralCourseSubject/Core/Params/fetch_general_course_subjects_params.js";
 
 const settingStore = useSettingStore();
+const isGeneralMode = computed(() => Number(settingStore.setting?.has_general) === 1);
 
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
@@ -27,6 +25,8 @@ const props = defineProps({
 });
 
 const { data: stages } = await useAsyncData("stages", async () => {
+  if (isGeneralMode.value) return [];
+
   const response = await $fetch<{
     data: Stages[];
     message: string;
@@ -43,7 +43,7 @@ const { data: stages } = await useAsyncData("stages", async () => {
 
 
 const stageYears = ref<Stages[]>([]);
-const SelectedStage = ref<number>() //level
+const SelectedStage = ref<number | null>() //level
 const ActiveStage = ref(false)
 const fetchStageYears = async (stageId: number, stagetitle: string) => {
   ActiveStage.value = !ActiveStage.value;
@@ -51,7 +51,7 @@ const fetchStageYears = async (stageId: number, stagetitle: string) => {
     data: Stages[];
     message: string;    
     status: number; 
-  }>(`${useBaseUrls().baseUrl}  /fetch_stage_years`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_stage_years`, {
     method: "POST",
     body: { stage_id: stageId },
     headers: {
@@ -67,7 +67,7 @@ const fetchStageYears = async (stageId: number, stagetitle: string) => {
   else {
     SelectedStage.value = null;
     SelectedStageTitle.value = null;
-    stageYears.value = null;
+    stageYears.value = [];
   }
 
   SendData();
@@ -186,17 +186,25 @@ const fetchCollegeDepartmentDivision = async (typeId: number) => {
 
 const SelectedCollegeDepartmentDivision = ref(filtersStore.SelectedCollegeDepartmentDivision)
 const Subjects = ref<Universitiey[]>([]);
-const GeneralSubjects = ref<GeneralCoursesModel[]>([]);
+const hasGeneralSubjects = isGeneralMode;
 
 const fetchGeneralSubjects = async () => {
-  if (settingStore.setting?.has_general == 1 || GeneralSubjects.value.length) return;
+  if (!hasGeneralSubjects.value || Subjects.value.length) return;
 
-  const controller = FetchGeneralCoursesSubjectController.getInstance();
-  const state = await controller.fetchGeneralCoursesSubject(
-    new FetchGeneralCoursesSubjectParams(0),
-  );
+  const response = await $fetch<{
+    data: Universitiey[];
+    message: string;
+    status: number;
+  }>(`${useBaseUrls().baseUrl}/fetch_subjects`, {
+    method: "POST",
+    body: { category_id: CategoryIdEnum.GENERAL },
+    headers: {
+      "Accept-Language": "ar",
+      "web-domain": getWebDomain(),
+    },
+  });
 
-  if (state.value.data) GeneralSubjects.value = state.value.data;
+  Subjects.value = response.data;
 };
 
 const fetchSubjects = async (typeId: number) => {
@@ -225,11 +233,6 @@ const SelectSubject = (typeId: number) => {
   SendData();
 }
 
-const SelectGeneralSubject = (typeId: number) => {
-  CategryId.value = CategoryIdEnum.GENERAL;
-  SelectSubject(typeId);
-};
-
 const CategryId = ref((settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(1) ) ? 1: 
     (settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(2) ) ? 2 :filtersStore.CategryId)
 
@@ -242,8 +245,8 @@ watch(
 )
 const emit = defineEmits(['UpdateData'])
 
-const SelectedStageTitle = ref<string>()
-const SelectedStageYearTitle = ref<string>()
+const SelectedStageTitle = ref<string | null>()
+const SelectedStageYearTitle = ref<string | null>()
 
 const SendData = () => {
   filtersStore.updateFilters({
@@ -261,7 +264,7 @@ const SendData = () => {
   });
   emit('UpdateData', {
     CategryId: CategryId.value,
-    SelectedEductionType: SelectedEducatiobaseUrlnTypeId.value,
+    SelectedEductionType: SelectedEducationTypeId.value,
     SelectedUniversity: SelectedUniversity.value,
     SelectedCollege: SelectedCollege.value,
     SelectedCollegeDepartment: SelectedCollegeDepartment.value,
@@ -275,6 +278,7 @@ const SendData = () => {
 };
 
 onMounted(() => {
+  if (isGeneralMode.value) CategryId.value = CategoryIdEnum.GENERAL;
   SendData();
   fetchGeneralSubjects();
 })
@@ -282,10 +286,13 @@ onMounted(() => {
 watch(
   () => settingStore.setting?.has_general,
   (hasGeneral) => {
-    if (hasGeneral === 1) fetchGeneralSubjects();
+    if (Number(hasGeneral) === 1) {
+      CategryId.value = CategoryIdEnum.GENERAL;
+      fetchGeneralSubjects();
+    }
   },
 );
-const SelectedYearId = ref<number>()
+const SelectedYearId = ref<number | null>()
 const ActiveStageYear = ref<boolean>(false)
 const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
   ActiveStageYear.value = !ActiveStageYear.value
@@ -295,8 +302,8 @@ const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
     SelectedStageYearTitle.value = stageYearTitle;
   }
   else {
-    SelectedYearId.value = null;
-    SelectedStageYearTitle.value = null;
+    SelectedYearId.value = undefined;
+    SelectedStageYearTitle.value = undefined;
 
   }
   SendData();
@@ -319,22 +326,22 @@ watch(() => props.with_text,
 </script>
 
 <template>
-  <div class="stage-container stage-container-dots" v-if="settingStore?.setting?.has_general === 1">
+  <div class="stage-container stage-container-dots" v-if="hasGeneralSubjects">
     <div class="stages-background">
       <LeftDots class="background-icon" />
       <RightDots class="background-icon" />
     </div>
 
     <div class="stages stages-dot">
-      <StagesTitle v-if="TextShow" :maintitle="`المواد العامة`"
+      <StagesTitle v-if="TextShow" :maintitle="`المواد`"
         :subtitle="`اختر المادة للوصول إلى الكورسات المتاحة`" />
 
       <div class="stages-buttons mt-4 flex flex-wrap gap-3">
-        <NuxtLink v-for="subject in GeneralSubjects" :key="`general-${subject.id}`" to="/course">
+        <NuxtLink v-for="subject in Subjects" :key="`gender-subject-${subject.id}`" to="/course">
           <button
             class="btn btn-secondary btn-stages btn-stages-education"
             :class="{ 'active-btn': SelectedSubject === subject.id }"
-            @click="SelectGeneralSubject(subject.id)"
+            @click="SelectSubject(subject.id)"
           >
             {{ subject.title }}
           </button>

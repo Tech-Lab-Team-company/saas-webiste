@@ -1,56 +1,59 @@
 <script setup lang="ts">
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Navigation, Pagination, Autoplay, FreeMode } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
+import { Swiper, SwiperSlide } from "swiper/vue";
+import { Navigation, Pagination, Autoplay, FreeMode } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
-
-import { useBaseUrls } from '~/constant/baseUrl'
-import type AboutUsInterface from '~/types/about_us_interface'
-import { SectionTypeEnum } from '~/components/Home/home/enum/section_type_enum'
-import { getWebDomain } from '~/constant/webDomain'
-import { HomePageApi } from '~/features/HomePageFeature/api/homePageApi'
+import { useBaseUrls } from "~/constant/baseUrl";
+import type AboutUsInterface from "~/types/about_us_interface";
+import { SectionTypeEnum } from "~/components/Home/home/enum/section_type_enum";
+import { getWebDomain } from "~/constant/webDomain";
+import { HomePageApi } from "~/features/HomePageFeature/api/homePageApi";
+import { useSettingStore } from "~/stores/setting";
 import {
   mapHomeCourseStages,
   mapHomeCourseYears,
-} from '~/features/HomePageFeature/mappers/homePageMapper'
+} from "~/features/HomePageFeature/mappers/homePageMapper";
 import type {
   HomeCourseStageViewModel,
   HomeCourseTabViewModel,
-} from '~/features/HomePageFeature/models/HomePageViewModel'
-
+} from "~/features/HomePageFeature/models/HomePageViewModel";
 
 interface ApiResponse<T> {
-  data: T[]
-  message: string
-  status: number
+  data: T[];
+  message: string;
+  status: number;
 }
 
 interface TopStudentMedia {
-  id: number
-  file: string
-  alt: string
+  id: number;
+  file: string;
+  alt: string;
 }
 
 interface TopStudent {
-  id: number
-  title: string
-  subtitle: string
-  description: string
-  order: number
-  year_id: number
-  media: TopStudentMedia[]
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  order: number;
+  year_id: number;
+  media: TopStudentMedia[];
 }
 
 interface TopStudentsStage extends HomeCourseStageViewModel {
-  years: HomeCourseTabViewModel[]
+  years: HomeCourseTabViewModel[];
 }
 
-const webDomain = getWebDomain()
-const baseUrl = useBaseUrls().baseUrl
-const homeApi = new HomePageApi(webDomain)
-const { isDark } = useAppTheme()
+const webDomain = getWebDomain();
+const baseUrl = useBaseUrls().baseUrl;
+const homeApi = new HomePageApi(webDomain);
+const settingStore = useSettingStore();
+const isGeneralMode = computed(
+  () => Number(settingStore.setting?.has_general) === 1,
+);
+const { isDark } = useAppTheme();
 
 const {
   data: topStudentsStages,
@@ -60,106 +63,121 @@ const {
 } = await useAsyncData<TopStudentsStage[]>(
   `top-students-taxonomy:${webDomain}`,
   async () => {
-    const stages = mapHomeCourseStages(await homeApi.fetchStages())
+    if (isGeneralMode.value) return [];
+
+    const stages = mapHomeCourseStages(await homeApi.fetchStages());
     const yearResults = await Promise.allSettled(
       stages.map(async (stage) => ({
         stage,
-        years: mapHomeCourseYears(stage, await homeApi.fetchStageYears(stage.id)),
+        years: mapHomeCourseYears(
+          stage,
+          await homeApi.fetchStageYears(stage.id),
+        ),
       })),
-    )
+    );
 
-    if (stages.length && yearResults.every((result) => result.status === 'rejected')) {
+    if (
+      stages.length &&
+      yearResults.every((result) => result.status === "rejected")
+    ) {
       const failure = yearResults.find(
-        (result): result is PromiseRejectedResult => result.status === 'rejected',
-      )
-      if (failure) throw failure.reason
+        (result): result is PromiseRejectedResult =>
+          result.status === "rejected",
+      );
+      if (failure) throw failure.reason;
     }
 
     return yearResults.flatMap((result, index) => {
-      if (result.status === 'fulfilled') {
-        return [{ ...result.value.stage, years: result.value.years }]
+      if (result.status === "fulfilled") {
+        return [{ ...result.value.stage, years: result.value.years }];
       }
 
-      const stage = stages[index]
-      return stage ? [{ ...stage, years: [] }] : []
-    })
+      const stage = stages[index];
+      return stage ? [{ ...stage, years: [] }] : [];
+    });
   },
-  { default: () => [], dedupe: 'defer' },
-)
+  { default: () => [], dedupe: "defer" },
+);
 
-const selectedTopStudentsStageId = ref<number | null>(null)
-const selectedTopStudentsYearId = ref<number | null>(null)
-const selectedTopStudentsStage = computed(() =>
-  topStudentsStages.value.find(
-    (stage) => stage.id === selectedTopStudentsStageId.value,
-  ) ?? null,
-)
+const selectedTopStudentsStageId = ref<number | null>(null);
+const selectedTopStudentsYearId = ref<number | null>(null);
+const selectedTopStudentsStage = computed(
+  () =>
+    topStudentsStages.value.find(
+      (stage) => stage.id === selectedTopStudentsStageId.value,
+    ) ?? null,
+);
 
-const selectedTopStudentsYear = computed(() =>
-  selectedTopStudentsStage.value?.years.find(
-    (year) => year.yearId === selectedTopStudentsYearId.value,
-  ) ?? null,
-)
+const selectedTopStudentsYear = computed(
+  () =>
+    selectedTopStudentsStage.value?.years.find(
+      (year) => year.yearId === selectedTopStudentsYearId.value,
+    ) ?? null,
+);
 
 const currentTopStudentsFilterLabel = computed(() => {
-  if (selectedTopStudentsYear.value) return selectedTopStudentsYear.value.label
-  if (selectedTopStudentsStage.value) return selectedTopStudentsStage.value.label
-  return 'جميع المراحل والصفوف'
-})
+  if (selectedTopStudentsYear.value) return selectedTopStudentsYear.value.label;
+  if (selectedTopStudentsStage.value)
+    return selectedTopStudentsStage.value.label;
+  return "جميع المراحل والصفوف";
+});
 
 watch(
   topStudentsStages,
   (stages) => {
     if (!stages.length) {
-      selectedTopStudentsStageId.value = null
-      selectedTopStudentsYearId.value = null
-      return
+      selectedTopStudentsStageId.value = null;
+      selectedTopStudentsYearId.value = null;
+      return;
     }
 
-    const currentStage = stages.find(
-      (stage) => stage.id === selectedTopStudentsStageId.value,
-    ) ?? stages.find((stage) => stage.years.length) ?? stages[0]
-    selectedTopStudentsStageId.value = currentStage?.id ?? null
+    const currentStage =
+      stages.find((stage) => stage.id === selectedTopStudentsStageId.value) ??
+      stages.find((stage) => stage.years.length) ??
+      stages[0];
+    selectedTopStudentsStageId.value = currentStage?.id ?? null;
 
     const currentYearIsValid = currentStage?.years.some(
       (year) => year.yearId === selectedTopStudentsYearId.value,
-    )
+    );
     if (!currentYearIsValid) {
-      selectedTopStudentsYearId.value = currentStage?.years[0]?.yearId ?? null
+      selectedTopStudentsYearId.value = currentStage?.years[0]?.yearId ?? null;
     }
   },
   { immediate: true },
-)
+);
 
 const selectTopStudentsStage = (stage: TopStudentsStage) => {
-  if (!stage.years.length) return
+  if (!stage.years.length) return;
   if (
     selectedTopStudentsStageId.value === stage.id &&
     selectedTopStudentsYearId.value !== null
-  ) return
-  selectedTopStudentsStageId.value = stage.id
-  selectedTopStudentsYearId.value = stage.years[0]?.yearId ?? null
-}
+  )
+    return;
+  selectedTopStudentsStageId.value = stage.id;
+  selectedTopStudentsYearId.value = stage.years[0]?.yearId ?? null;
+};
 
 const selectTopStudentsYear = (yearId: number | null) => {
-  selectedTopStudentsYearId.value = yearId
-}
+  selectedTopStudentsYearId.value = yearId;
+};
 
 const showAllTopStudents = () => {
-  selectedTopStudentsStageId.value = null
-  selectedTopStudentsYearId.value = null
-}
+  selectedTopStudentsStageId.value = null;
+  selectedTopStudentsYearId.value = null;
+};
 
 const topStudentsYearLabels = computed(() => {
-  const labels = new Map<number, string>()
+  const labels = new Map<number, string>();
   topStudentsStages.value.forEach((stage) => {
-    stage.years.forEach((year) => labels.set(year.yearId, year.label))
-  })
-  return labels
-})
+    stage.years.forEach((year) => labels.set(year.yearId, year.label));
+  });
+  return labels;
+});
 
 const getStudentYearLabel = (student: TopStudent) =>
-  topStudentsYearLabels.value.get(student.year_id) || `المستوى ${student.year_id}`
+  topStudentsYearLabels.value.get(student.year_id) ||
+  `المستوى ${student.year_id}`;
 
 const {
   data: topStudentsResponse,
@@ -172,61 +190,59 @@ const {
     const response = await $fetch<TopStudent[] | ApiResponse<TopStudent>>(
       `${useBaseUrls().baseUrl}/fetch_top_students`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Accept-Language': 'ar',
-          'web-domain': webDomain,
+          "Accept-Language": "ar",
+          "web-domain": webDomain,
         },
         body: selectedTopStudentsYearId.value
           ? { year_id: selectedTopStudentsYearId.value }
           : {},
       },
-    )
+    );
 
-    const students = Array.isArray(response) ? response : response?.data ?? []
-    return students
+    const students = Array.isArray(response) ? response : response?.data ?? [];
+    return students;
   },
   {
     default: () => [],
     watch: [selectedTopStudentsYearId],
   },
-)
+);
 
 const topStudents = computed(() =>
   [...topStudentsResponse.value].sort((first, second) => {
-    const orderDifference = Number(first.order) - Number(second.order)
-    return orderDifference || first.id - second.id
+    const orderDifference = Number(first.order) - Number(second.order);
+    return orderDifference || first.id - second.id;
   }),
-)
-
-
+);
 
 const { data: aboutusOpinions } = await useAsyncData(
-  'AboutOpinions',
+  "AboutOpinions",
   async () => {
     const response = await $fetch<ApiResponse<AboutUsInterface>>(
       `${baseUrl}/fetch_website_sections`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Accept-Language': 'ar',
-          'web-domain': getWebDomain(),
+          "Accept-Language": "ar",
+          "web-domain": getWebDomain(),
         },
         body: {
           type: SectionTypeEnum.Opinions,
         },
       },
-    )
+    );
 
-    return response?.data?.[response.data.length - 1] ?? null
+    return response?.data?.[response.data.length - 1] ?? null;
   },
-)
+);
 
+const modules = [Navigation, Pagination, Autoplay, FreeMode];
 
-
-const modules = [Navigation, Pagination, Autoplay, FreeMode]
-
-const isAllStudentsView = computed(() => selectedTopStudentsYearId.value === null)
+const isAllStudentsView = computed(
+  () => selectedTopStudentsYearId.value === null,
+);
 
 const swiperOptions = {
   modules,
@@ -278,11 +294,11 @@ const swiperOptions = {
       spaceBetween: 26,
     },
   },
-}
+};
 
 const studentSwiperOptions = computed(() => ({
   modules,
-  slidesPerView: 'auto' as const,
+  slidesPerView: "auto" as const,
   centeredSlides: topStudents.value.length > 5,
   centerInsufficientSlides: false,
   spaceBetween: 14,
@@ -290,21 +306,26 @@ const studentSwiperOptions = computed(() => ({
   loop: isAllStudentsView.value
     ? topStudents.value.length > 1
     : topStudents.value.length > 5,
-  rewind: !isAllStudentsView.value && topStudents.value.length > 1 && topStudents.value.length <= 5,
+  rewind:
+    !isAllStudentsView.value &&
+    topStudents.value.length > 1 &&
+    topStudents.value.length <= 5,
   allowTouchMove: !isAllStudentsView.value && topStudents.value.length > 5,
   grabCursor: !isAllStudentsView.value && topStudents.value.length > 5,
   slideToClickedSlide: !isAllStudentsView.value && topStudents.value.length > 5,
   navigation: !isAllStudentsView.value && topStudents.value.length > 5,
-  pagination: !isAllStudentsView.value && topStudents.value.length > 5
-    ? { clickable: true, dynamicBullets: true }
-    : false,
-  autoplay: isAllStudentsView.value && topStudents.value.length > 1
-    ? {
-        delay: 0,
-        disableOnInteraction: false,
-        pauseOnMouseEnter: false,
-      }
-    : false,
+  pagination:
+    !isAllStudentsView.value && topStudents.value.length > 5
+      ? { clickable: true, dynamicBullets: true }
+      : false,
+  autoplay:
+    isAllStudentsView.value && topStudents.value.length > 1
+      ? {
+          delay: 0,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: false,
+        }
+      : false,
   freeMode: isAllStudentsView.value
     ? { enabled: true, momentum: false }
     : false,
@@ -318,53 +339,55 @@ const studentSwiperOptions = computed(() => ({
     640: { spaceBetween: 14 },
     1024: { spaceBetween: 18 },
   },
-}))
+}));
 
-const topStudentsSwiperKey = computed(() => [
-  selectedTopStudentsStageId.value ?? 'stage',
-  selectedTopStudentsYearId.value ?? 'all',
-  topStudents.value.map((student) => student.id).join('-'),
-].join(':'))
+const topStudentsSwiperKey = computed(() =>
+  [
+    selectedTopStudentsStageId.value ?? "stage",
+    selectedTopStudentsYearId.value ?? "all",
+    topStudents.value.map((student) => student.id).join("-"),
+  ].join(":"),
+);
 
-const getStudentRank = (_student: TopStudent, index: number) => index + 1
+const getStudentRank = (_student: TopStudent, index: number) => index + 1;
 
 const getStudentRankLabel = (rank: number) => {
-  if (rank === 1) return 'المركز الأول'
-  if (rank === 2) return 'المركز الثاني'
-  if (rank === 3) return 'المركز الثالث'
-  return `المركز ${rank}`
-}
+  if (rank === 1) return "المركز الأول";
+  if (rank === 2) return "المركز الثاني";
+  if (rank === 3) return "المركز الثالث";
+  return `المركز ${rank}`;
+};
 
 const getStudentRankClass = (rank: number) =>
-  `student-podium--rank-${Math.min(rank, 4)}`
-
+  `student-podium--rank-${Math.min(rank, 4)}`;
 
 const getStudentImage = (student: any) => {
   return (
-    student?.media?.[0]?.file ||
-    '/eduhub/assets/student profile-DGGWKr-W.png'
-  )
-}
+    student?.media?.[0]?.file || "/eduhub/assets/student profile-DGGWKr-W.png"
+  );
+};
 
 const getStudentAlt = (student: any) => {
-  return (
-    student?.media?.[0]?.alt ||
-    student?.title ||
-    'الطالب'
-  )
-}
-
+  return student?.media?.[0]?.alt || student?.title || "الطالب";
+};
 </script>
 
 <template>
   <div :class="['home-sections', { 'home-sections--dark': isDark }]">
-
-
-
-    <section class="top-students-section" dir="rtl" aria-labelledby="top-students-title">
+    <section
+      class="top-students-section"
+      dir="rtl"
+      aria-labelledby="top-students-title"
+    >
       <div class="top-students-board">
-        <span class="top-students-board__glow top-students-board__glow--right" aria-hidden="true" />
-        <span class="top-students-board__glow top-students-board__glow--left" aria-hidden="true" />
+        <span
+          class="top-students-board__glow top-students-board__glow--right"
+          aria-hidden="true"
+        />
+        <span
+          class="top-students-board__glow top-students-board__glow--left"
+          aria-hidden="true"
+        />
 
         <header class="top-students-board__header">
           <div class="top-students-trophy" aria-hidden="true">
@@ -380,20 +403,34 @@ const getStudentAlt = (student: any) => {
             <p>شاهد المتفوقين، أو اختر مرحلتك وصفك لتجد زملاءك بسهولة.</p>
           </div>
 
-          <div v-if="topStudents.length" class="top-students-count" aria-label="عدد الطلاب المتفوقين">
+          <div
+            v-if="topStudents.length"
+            class="top-students-count"
+            aria-label="عدد الطلاب المتفوقين"
+          >
             <strong>{{ topStudents.length }}</strong>
             <span>طلاب</span>
           </div>
         </header>
 
-        <div v-if="topStudentsFiltersPending" class="top-students-filters-loading" role="status">
+        <div
+          v-if="topStudentsFiltersPending"
+          class="top-students-filters-loading"
+          role="status"
+        >
           <span class="pi pi-spin pi-spinner" aria-hidden="true" />
           جاري تحميل المراحل والسنوات الدراسية...
         </div>
 
-        <div v-else-if="topStudentsFiltersError" class="top-students-filters-error" role="alert">
+        <div
+          v-else-if="topStudentsFiltersError"
+          class="top-students-filters-error"
+          role="alert"
+        >
           <span>تعذر تحميل فلاتر السنوات الدراسية.</span>
-          <button type="button" @click="refreshTopStudentsFilters()">إعادة المحاولة</button>
+          <button type="button" @click="refreshTopStudentsFilters()">
+            إعادة المحاولة
+          </button>
         </div>
 
         <div v-else-if="topStudentsStages.length" class="top-students-filters">
@@ -428,7 +465,11 @@ const getStudentAlt = (student: any) => {
                 </span>
               </div>
 
-              <div class="top-students-filter-options" role="group" aria-label="اختر المرحلة التعليمية">
+              <div
+                class="top-students-filter-options"
+                role="group"
+                aria-label="اختر المرحلة التعليمية"
+              >
                 <button
                   v-for="stage in topStudentsStages"
                   :key="stage.id"
@@ -459,12 +500,18 @@ const getStudentAlt = (student: any) => {
                   </span>
                 </div>
 
-                <div class="top-students-filter-options" role="group" aria-label="اختر الصف الدراسي">
+                <div
+                  class="top-students-filter-options"
+                  role="group"
+                  aria-label="اختر الصف الدراسي"
+                >
                   <button
                     v-for="year in selectedTopStudentsStage.years"
                     :key="year.key"
                     type="button"
-                    :class="{ active: selectedTopStudentsYearId === year.yearId }"
+                    :class="{
+                      active: selectedTopStudentsYearId === year.yearId,
+                    }"
                     :aria-pressed="selectedTopStudentsYearId === year.yearId"
                     @click="selectTopStudentsYear(year.yearId)"
                   >
@@ -474,7 +521,11 @@ const getStudentAlt = (student: any) => {
                 </div>
               </div>
 
-              <div v-else key="all-students" class="top-students-filter-group top-students-filter-group--hint">
+              <div
+                v-else
+                key="all-students"
+                class="top-students-filter-group top-students-filter-group--hint"
+              >
                 <div class="top-students-filter-label">
                   <b>2</b>
                   <span>
@@ -486,11 +537,18 @@ const getStudentAlt = (student: any) => {
             </Transition>
           </div>
 
-          <div class="top-students-filter-summary" role="status" aria-live="polite">
+          <div
+            class="top-students-filter-summary"
+            role="status"
+            aria-live="polite"
+          >
             <span class="pi pi-eye" aria-hidden="true" />
             <span>تشاهد الآن:</span>
             <strong>{{ currentTopStudentsFilterLabel }}</strong>
-            <span v-if="topStudentsPending" class="top-students-filter-summary__count">
+            <span
+              v-if="topStudentsPending"
+              class="top-students-filter-summary__count"
+            >
               <span class="pi pi-spin pi-spinner" aria-hidden="true" />
               جاري التحديث
             </span>
@@ -504,15 +562,27 @@ const getStudentAlt = (student: any) => {
           class="students-slider-container"
           :class="{ 'students-slider-container--all': isAllStudentsView }"
         >
-          <div v-if="topStudentsPending" class="students-loading" aria-label="جارٍ تحميل الطلاب المتفوقين">
+          <div
+            v-if="topStudentsPending"
+            class="students-loading"
+            aria-label="جارٍ تحميل الطلاب المتفوقين"
+          >
             <span v-for="item in 5" :key="item" />
           </div>
 
-          <div v-else-if="topStudentsError" class="students-empty students-empty--error" role="alert">
-            <div class="students-empty__icon"><span class="pi pi-exclamation-circle" /></div>
+          <div
+            v-else-if="topStudentsError"
+            class="students-empty students-empty--error"
+            role="alert"
+          >
+            <div class="students-empty__icon">
+              <span class="pi pi-exclamation-circle" />
+            </div>
             <h3>تعذر تحميل الطلاب المتفوقين</h3>
             <p>حدث خطأ مؤقت أثناء تحميل البيانات.</p>
-            <button type="button" @click="() => refreshTopStudents()">إعادة المحاولة</button>
+            <button type="button" @click="() => refreshTopStudents()">
+              إعادة المحاولة
+            </button>
           </div>
 
           <Swiper
@@ -524,7 +594,8 @@ const getStudentAlt = (student: any) => {
               `students-swiper--count-${Math.min(topStudents.length, 5)}`,
               {
                 'students-swiper--all': isAllStudentsView,
-                'students-swiper--few': !isAllStudentsView && topStudents.length <= 5,
+                'students-swiper--few':
+                  !isAllStudentsView && topStudents.length <= 5,
               },
             ]"
           >
@@ -536,13 +607,16 @@ const getStudentAlt = (student: any) => {
               <article
                 :class="[
                   'student-podium',
-                  !isAllStudentsView && getStudentRankClass(getStudentRank(student, index)),
+                  !isAllStudentsView &&
+                    getStudentRankClass(getStudentRank(student, index)),
                 ]"
               >
                 <span
                   v-if="!isAllStudentsView"
                   class="student-podium__rank"
-                  :aria-label="getStudentRankLabel(getStudentRank(student, index))"
+                  :aria-label="
+                    getStudentRankLabel(getStudentRank(student, index))
+                  "
                 >
                   {{ getStudentRank(student, index) }}
                 </span>
@@ -556,17 +630,27 @@ const getStudentAlt = (student: any) => {
                   <span class="student-podium__shine" aria-hidden="true" />
                 </div>
 
-                <span v-if="!isAllStudentsView" class="student-podium__position">
+                <span
+                  v-if="!isAllStudentsView"
+                  class="student-podium__position"
+                >
                   {{ getStudentRankLabel(getStudentRank(student, index)) }}
                 </span>
                 <h3 class="student-podium__title">{{ student.title }}</h3>
-                <p v-if="student.subtitle" class="student-podium__subtitle">{{ student.subtitle }}</p>
-                <p v-if="student.description" class="student-podium__description">
+                <p v-if="student.subtitle" class="student-podium__subtitle">
+                  {{ student.subtitle }}
+                </p>
+                <p
+                  v-if="student.description"
+                  class="student-podium__description"
+                >
                   {{ student.description }}
                 </p>
 
                 <footer class="student-podium__footer">
-                  <span class="student-podium__year">{{ getStudentYearLabel(student) }}</span>
+                  <span class="student-podium__year">{{
+                    getStudentYearLabel(student)
+                  }}</span>
                   <span class="student-podium__honor" aria-hidden="true">
                     <span class="pi pi-trophy" />
                   </span>
@@ -584,36 +668,19 @@ const getStudentAlt = (student: any) => {
       </div>
     </section>
 
-
-
-
-    <section
-      v-if="aboutusOpinions"
-      class="opinions-section"
-      dir="rtl"
-    >
-
+    <section v-if="aboutusOpinions" class="opinions-section" dir="rtl">
       <div class="section-container">
-
         <div class="section-heading">
-
           <div class="section-heading__content">
-
-            <span class="section-eyebrow">
-              آراء وتجارب
-            </span>
+            <span class="section-eyebrow"> آراء وتجارب </span>
 
             <h2 class="section-title">
               {{ aboutusOpinions?.title }}
             </h2>
 
-            <p
-              v-if="aboutusOpinions?.description"
-              class="section-description"
-            >
+            <p v-if="aboutusOpinions?.description" class="section-description">
               {{ aboutusOpinions.description }}
             </p>
-
           </div>
 
           <div class="section-heading__decoration">
@@ -621,30 +688,22 @@ const getStudentAlt = (student: any) => {
             <span></span>
             <span></span>
           </div>
-
         </div>
-
       </div>
 
       <div class="students-slider-container">
-
         <Swiper
           v-if="aboutusOpinions?.children?.length"
           v-bind="swiperOptions"
           class="opinions-swiper"
         >
-
           <SwiperSlide
             v-for="opinion in aboutusOpinions.children"
             :key="opinion.id"
           >
-
             <article class="opinion-card">
-
               <div class="opinion-card__top">
-
                 <div class="opinion-card__avatar-wrapper">
-
                   <img
                     :src="
                       opinion?.icon ||
@@ -655,11 +714,9 @@ const getStudentAlt = (student: any) => {
                     class="opinion-card__avatar"
                     loading="lazy"
                   />
-
                 </div>
 
                 <div class="opinion-card__identity">
-
                   <h3>
                     {{ opinion?.title }}
                   </h3>
@@ -667,21 +724,15 @@ const getStudentAlt = (student: any) => {
                   <span>
                     {{ opinion?.subtitle }}
                   </span>
-
                 </div>
 
-                <div class="opinion-card__quote">
-                  “
-                </div>
-
+                <div class="opinion-card__quote">“</div>
               </div>
 
               <div class="opinion-card__body">
-
                 <p>
                   {{ opinion?.description }}
                 </p>
-
               </div>
 
               <div class="opinion-card__bottom">
@@ -689,22 +740,15 @@ const getStudentAlt = (student: any) => {
                 <span></span>
                 <span></span>
               </div>
-
             </article>
-
           </SwiperSlide>
-
         </Swiper>
-
       </div>
     </section>
-
   </div>
 </template>
 
 <style scoped>
-
-
 .home-sections {
   --section-blue: var(--home-v2-blue, #155eef);
   --section-blue-dark: #1047b8;
@@ -719,9 +763,6 @@ const getStudentAlt = (student: any) => {
   background: #fff;
 }
 
-
-
-
 .top-students-section,
 .opinions-section {
   position: relative;
@@ -731,24 +772,22 @@ const getStudentAlt = (student: any) => {
 .top-students-section {
   isolation: isolate;
   overflow: hidden;
-  background:
-    radial-gradient(
+  background: radial-gradient(
       circle at 90% 10%,
       rgba(21, 94, 239, 0.11),
       transparent 32%
     ),
-    linear-gradient(
-      180deg,
-      #f9fbff 0%,
-      #ffffff 100%
-    );
+    linear-gradient(180deg, #f9fbff 0%, #ffffff 100%);
 }
 
 .top-students-section::before {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background-image: radial-gradient(rgba(21, 94, 239, 0.14) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(21, 94, 239, 0.14) 1px,
+    transparent 1px
+  );
   background-size: 28px 28px;
   opacity: 0.32;
   mask-image: linear-gradient(90deg, transparent, #000 48%, transparent);
@@ -767,26 +806,32 @@ const getStudentAlt = (student: any) => {
   animation: student-orb-drift 9s ease-in-out infinite alternate;
 }
 
-.top-students-section__orb--one { top: -180px; inset-inline-start: -80px; }
-.top-students-section__orb--two { right: auto; bottom: -210px; inset-inline-end: -70px; animation-delay: -4s; }
+.top-students-section__orb--one {
+  top: -180px;
+  inset-inline-start: -80px;
+}
+.top-students-section__orb--two {
+  right: auto;
+  bottom: -210px;
+  inset-inline-end: -70px;
+  animation-delay: -4s;
+}
 
 @keyframes student-orb-drift {
-  to { transform: translate3d(22px, 18px, 0) scale(1.08); }
+  to {
+    transform: translate3d(22px, 18px, 0) scale(1.08);
+  }
 }
 
 .opinions-section {
   background: #fff;
 }
 
-
-
 .section-container,
 .students-slider-container {
   width: min(1180px, calc(100% - 40px));
   margin-inline: auto;
 }
-
-
 
 .section-heading {
   position: relative;
@@ -804,7 +849,9 @@ const getStudentAlt = (student: any) => {
   max-width: 720px;
 }
 
-.top-students-heading { align-items: center; }
+.top-students-heading {
+  align-items: center;
+}
 
 .top-students-count {
   display: flex;
@@ -820,8 +867,18 @@ const getStudentAlt = (student: any) => {
   backdrop-filter: blur(14px);
 }
 
-.top-students-count strong { color: var(--section-blue); font-size: 28px; line-height: 1; }
-.top-students-count span { max-width: 54px; color: var(--section-muted); font-size: 10px; font-weight: 800; line-height: 1.5; }
+.top-students-count strong {
+  color: var(--section-blue);
+  font-size: 28px;
+  line-height: 1;
+}
+.top-students-count span {
+  max-width: 54px;
+  color: var(--section-muted);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.5;
+}
 
 .top-students-filters {
   display: grid;
@@ -835,9 +892,23 @@ const getStudentAlt = (student: any) => {
   backdrop-filter: blur(14px);
 }
 
-.top-students-filter-group { display: grid; grid-template-columns: 118px minmax(0, 1fr); align-items: center; gap: 14px; }
-.top-students-filter-label { color: var(--section-muted); font-size: 10px; font-weight: 900; }
-.top-students-filter-options { display: flex; min-width: 0; flex-wrap: wrap; gap: 8px; }
+.top-students-filter-group {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+.top-students-filter-label {
+  color: var(--section-muted);
+  font-size: 10px;
+  font-weight: 900;
+}
+.top-students-filter-options {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 .top-students-filter-options button {
   display: inline-flex;
   min-height: 38px;
@@ -851,12 +922,35 @@ const getStudentAlt = (student: any) => {
   color: var(--section-muted);
   font: 800 10px inherit;
   cursor: pointer;
-  transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+    transform 0.2s ease;
 }
 
-.top-students-filter-options button:hover { border-color: color-mix(in srgb, var(--section-blue) 38%, var(--section-line)); color: var(--section-blue); transform: translateY(-1px); }
-.top-students-filter-options button.active { border-color: var(--section-blue); background: var(--section-blue); color: #fff; box-shadow: 0 8px 22px -13px var(--section-blue); }
-.top-students-filter-options small { display: grid; min-width: 20px; height: 20px; place-items: center; border-radius: 7px; background: color-mix(in srgb, currentColor 10%, transparent); color: inherit; font-size: 8px; }
+.top-students-filter-options button:hover {
+  border-color: color-mix(
+    in srgb,
+    var(--section-blue) 38%,
+    var(--section-line)
+  );
+  color: var(--section-blue);
+  transform: translateY(-1px);
+}
+.top-students-filter-options button.active {
+  border-color: var(--section-blue);
+  background: var(--section-blue);
+  color: #fff;
+  box-shadow: 0 8px 22px -13px var(--section-blue);
+}
+.top-students-filter-options small {
+  display: grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 7px;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: inherit;
+  font-size: 8px;
+}
 
 .top-students-filters-loading,
 .top-students-filters-error {
@@ -874,10 +968,28 @@ const getStudentAlt = (student: any) => {
   font-weight: 800;
 }
 
-.top-students-filters-error button { min-height: 34px; padding: 0 12px; border: 0; border-radius: 8px; background: var(--section-blue); color: #fff; font: 800 10px inherit; cursor: pointer; }
-.students-filter-swap-enter-active, .students-filter-swap-leave-active { transition: opacity .18s ease, transform .18s ease; }
-.students-filter-swap-enter-from { opacity: 0; transform: translateY(7px); }
-.students-filter-swap-leave-to { opacity: 0; transform: translateY(-5px); }
+.top-students-filters-error button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--section-blue);
+  color: #fff;
+  font: 800 10px inherit;
+  cursor: pointer;
+}
+.students-filter-swap-enter-active,
+.students-filter-swap-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.students-filter-swap-enter-from {
+  opacity: 0;
+  transform: translateY(7px);
+}
+.students-filter-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
 
 .section-eyebrow {
   display: inline-flex;
@@ -900,7 +1012,10 @@ const getStudentAlt = (student: any) => {
   letter-spacing: 0.02em;
 }
 
-.section-eyebrow .pi { margin-inline-end: 6px; font-size: 10px; }
+.section-eyebrow .pi {
+  margin-inline-end: 6px;
+  font-size: 10px;
+}
 
 .section-title {
   margin: 0;
@@ -956,8 +1071,6 @@ const getStudentAlt = (student: any) => {
   opacity: 1;
 }
 
-
-
 .students-swiper,
 .opinions-swiper {
   width: 100%;
@@ -970,13 +1083,13 @@ const getStudentAlt = (student: any) => {
   height: auto;
   opacity: 0.4;
   transform: translateY(16px) scale(0.98);
-  transition: opacity .5s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.student-slide.swiper-slide-visible { opacity: 1; transform: translateY(0) scale(1); }
-
-
-
+.student-slide.swiper-slide-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 
 .student-card {
   position: relative;
@@ -990,28 +1103,20 @@ const getStudentAlt = (student: any) => {
 
   background: #fff;
 
-  box-shadow:
-    0 8px 30px rgba(16, 33, 63, 0.055),
+  box-shadow: 0 8px 30px rgba(16, 33, 63, 0.055),
     0 2px 8px rgba(16, 33, 63, 0.025);
 
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .student-card:hover {
   border-color: rgba(21, 94, 239, 0.2);
 
-  box-shadow:
-    0 22px 55px rgba(16, 33, 63, 0.12),
+  box-shadow: 0 22px 55px rgba(16, 33, 63, 0.12),
     0 5px 15px rgba(21, 94, 239, 0.07);
 
   transform: translateY(-8px);
 }
-
-
-
 
 .student-card__media {
   position: relative;
@@ -1020,12 +1125,7 @@ const getStudentAlt = (student: any) => {
 
   overflow: hidden;
 
-  background:
-    linear-gradient(
-      135deg,
-      #eef4ff,
-      #dfe9fb
-    );
+  background: linear-gradient(135deg, #eef4ff, #dfe9fb);
 }
 
 .student-card__image {
@@ -1036,7 +1136,7 @@ const getStudentAlt = (student: any) => {
 
   object-fit: cover;
 
-  transition: transform 0.7s cubic-bezier(.22, 1, .36, 1), filter .4s ease;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
 }
 
 .student-card:hover .student-card__image {
@@ -1048,18 +1148,14 @@ const getStudentAlt = (student: any) => {
   position: absolute;
   inset: 0;
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(16, 33, 63, 0.01) 30%,
-      rgba(16, 33, 63, 0.68) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(16, 33, 63, 0.01) 30%,
+    rgba(16, 33, 63, 0.68) 100%
+  );
 
   pointer-events: none;
 }
-
-
-
 
 .student-card__number {
   position: absolute;
@@ -1109,9 +1205,10 @@ const getStudentAlt = (student: any) => {
   backdrop-filter: blur(10px);
 }
 
-.student-card__achievement .pi { color: #ffd15c; font-size: 10px; }
-
-
+.student-card__achievement .pi {
+  color: #ffd15c;
+  font-size: 10px;
+}
 
 .student-card__media-badge {
   position: absolute;
@@ -1137,8 +1234,6 @@ const getStudentAlt = (student: any) => {
 
   backdrop-filter: blur(8px);
 }
-
-
 
 .student-card__content {
   display: flex;
@@ -1221,8 +1316,6 @@ const getStudentAlt = (student: any) => {
   -webkit-line-clamp: 3;
 }
 
-
-
 .student-card__footer {
   display: flex;
 
@@ -1247,10 +1340,21 @@ const getStudentAlt = (student: any) => {
   color: #c58a00;
 }
 
-.student-card__honor-icon .pi { font-size: 15px; }
-.student-card__footer > div { display: grid; gap: 1px; }
-.student-card__footer small { color: var(--section-muted); font-size: 9px; }
-.student-card__footer b { color: var(--section-ink); font-size: 11px; }
+.student-card__honor-icon .pi {
+  font-size: 15px;
+}
+.student-card__footer > div {
+  display: grid;
+  gap: 1px;
+}
+.student-card__footer small {
+  color: var(--section-muted);
+  font-size: 9px;
+}
+.student-card__footer b {
+  color: var(--section-ink);
+  font-size: 11px;
+}
 
 .student-card__media-title {
   max-width: 45%;
@@ -1284,17 +1388,14 @@ const getStudentAlt = (student: any) => {
 
   color: #fff;
 
-  box-shadow:
-    0 7px 18px rgba(21, 94, 239, 0.18);
+  box-shadow: 0 7px 18px rgba(21, 94, 239, 0.18);
 
   font-size: 11px;
   font-weight: 900;
 
   text-decoration: none;
 
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease,
+  transition: background-color 0.2s ease, transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
@@ -1305,8 +1406,7 @@ const getStudentAlt = (student: any) => {
 .student-card__link:hover {
   background: var(--section-blue-dark);
 
-  box-shadow:
-    0 10px 25px rgba(21, 94, 239, 0.25);
+  box-shadow: 0 10px 25px rgba(21, 94, 239, 0.25);
 
   transform: translateY(-2px);
 }
@@ -1314,8 +1414,6 @@ const getStudentAlt = (student: any) => {
 .student-card__link:hover svg {
   transform: translateX(-3px);
 }
-
-
 
 :deep(.students-swiper .swiper-button-next),
 :deep(.students-swiper .swiper-button-prev),
@@ -1333,13 +1431,9 @@ const getStudentAlt = (student: any) => {
 
   color: var(--section-blue);
 
-  box-shadow:
-    0 8px 25px rgba(16, 33, 63, 0.1);
+  box-shadow: 0 8px 25px rgba(16, 33, 63, 0.1);
 
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 :deep(.students-swiper .swiper-button-next:hover),
@@ -1360,9 +1454,6 @@ const getStudentAlt = (student: any) => {
   font-weight: 900;
 }
 
-
-
-
 :deep(.swiper-pagination) {
   bottom: 15px;
 }
@@ -1375,9 +1466,7 @@ const getStudentAlt = (student: any) => {
 
   opacity: 1;
 
-  transition:
-    width 0.2s ease,
-    background-color 0.2s ease;
+  transition: width 0.2s ease, background-color 0.2s ease;
 }
 
 :deep(.swiper-pagination-bullet-active) {
@@ -1387,8 +1476,6 @@ const getStudentAlt = (student: any) => {
 
   background: var(--section-blue);
 }
-
-
 
 .students-empty {
   display: flex;
@@ -1457,7 +1544,10 @@ const getStudentAlt = (student: any) => {
   cursor: pointer;
 }
 
-.students-empty--error .students-empty__icon { color: #c43e3e; background: color-mix(in srgb, #dc4a4a 12%, #fff); }
+.students-empty--error .students-empty__icon {
+  color: #c43e3e;
+  background: color-mix(in srgb, #dc4a4a 12%, #fff);
+}
 
 .students-loading {
   display: grid;
@@ -1475,10 +1565,11 @@ const getStudentAlt = (student: any) => {
   animation: students-shimmer 1.25s linear infinite;
 }
 
-@keyframes students-shimmer { to { background-position: -240% 0; } }
-
-
-
+@keyframes students-shimmer {
+  to {
+    background-position: -240% 0;
+  }
+}
 
 .opinion-card {
   position: relative;
@@ -1494,20 +1585,15 @@ const getStudentAlt = (student: any) => {
 
   background: #fff;
 
-  box-shadow:
-    0 8px 30px rgba(16, 33, 63, 0.05);
+  box-shadow: 0 8px 30px rgba(16, 33, 63, 0.05);
 
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .opinion-card:hover {
   border-color: rgba(21, 94, 239, 0.18);
 
-  box-shadow:
-    0 20px 50px rgba(16, 33, 63, 0.1);
+  box-shadow: 0 20px 50px rgba(16, 33, 63, 0.1);
 
   transform: translateY(-6px);
 }
@@ -1649,7 +1735,6 @@ const getStudentAlt = (student: any) => {
   opacity: 1;
 }
 
-
 /* =========================================================
    TOP STUDENTS — HONOR BOARD
    ========================================================= */
@@ -1674,10 +1759,10 @@ const getStudentAlt = (student: any) => {
   margin-inline: auto;
   overflow: hidden;
   padding: 34px 28px 18px;
-  border: 1px solid color-mix(in srgb, var(--primary-color, #68a4ff) 46%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--primary-color, #68a4ff) 46%, transparent);
   border-radius: 22px;
-  background:
-    radial-gradient(
+  background: radial-gradient(
       circle at 90% 4%,
       color-mix(in srgb, var(--primary-color, #3070d6) 30%, transparent),
       transparent 30%
@@ -1692,8 +1777,7 @@ const getStudentAlt = (student: any) => {
       color-mix(in srgb, var(--primary-color, #3070d6) 32%, #061222) 0%,
       color-mix(in srgb, var(--secondary-color, #1e5cbb) 27%, #081426) 100%
     );
-  box-shadow:
-    0 38px 90px -52px rgb(2 10 25 / 82%),
+  box-shadow: 0 38px 90px -52px rgb(2 10 25 / 82%),
     inset 0 1px 0 rgb(255 255 255 / 5%);
   color: #f6f9ff;
 }
@@ -1726,16 +1810,27 @@ const getStudentAlt = (student: any) => {
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--primary-color, #327ef6) 34%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--primary-color, #327ef6) 34%,
+    transparent
+  );
   filter: blur(35px);
   pointer-events: none;
 }
 
-.top-students-board__glow--right { top: -170px; inset-inline-start: -80px; }
+.top-students-board__glow--right {
+  top: -170px;
+  inset-inline-start: -80px;
+}
 .top-students-board__glow--left {
   bottom: -190px;
   inset-inline-end: -60px;
-  background: color-mix(in srgb, var(--secondary-color, #1e5cbb) 30%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--secondary-color, #1e5cbb) 30%,
+    transparent
+  );
 }
 
 .top-students-board__header {
@@ -1765,7 +1860,7 @@ const getStudentAlt = (student: any) => {
   color: #9bc4ff;
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: .03em;
+  letter-spacing: 0.03em;
 }
 
 .top-students-board__intro h2 {
@@ -1773,7 +1868,7 @@ const getStudentAlt = (student: any) => {
   margin: 0 auto;
   color: #f8fbff;
   font: 950 clamp(34px, 3.6vw, 48px) / 1.2 var(--home-v2-heading, inherit);
-  letter-spacing: -.025em;
+  letter-spacing: -0.025em;
   text-shadow: 0 5px 24px rgb(55 132 250 / 36%);
 }
 
@@ -1794,8 +1889,7 @@ const getStudentAlt = (student: any) => {
   justify-self: start;
   border: 1px solid rgb(91 157 255 / 28%);
   border-radius: 50%;
-  background:
-    radial-gradient(circle, rgb(59 135 255 / 24%), transparent 68%),
+  background: radial-gradient(circle, rgb(59 135 255 / 24%), transparent 68%),
     rgb(17 43 76 / 72%);
   box-shadow: 0 16px 38px -20px rgb(60 137 255 / 72%);
   color: #69a7ff;
@@ -1842,9 +1936,7 @@ const getStudentAlt = (student: any) => {
   border: 1px solid rgb(119 163 224 / 18%);
   border-radius: 18px;
   background: rgb(9 24 44 / 88%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 4%),
-    0 20px 44px -34px #000;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%), 0 20px 44px -34px #000;
   backdrop-filter: blur(16px);
 }
 
@@ -1907,7 +1999,8 @@ const getStudentAlt = (student: any) => {
   font-size: 12px;
   font-weight: 850;
   cursor: pointer;
-  transition: border-color .25s ease, background-color .25s ease, color .25s ease, transform .25s ease;
+  transition: border-color 0.25s ease, background-color 0.25s ease,
+    color 0.25s ease, transform 0.25s ease;
 }
 
 .top-students-filter-all:hover {
@@ -1940,7 +2033,7 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-board .top-students-filter-group--hint {
-  opacity: .68;
+  opacity: 0.68;
 }
 
 .top-students-board .top-students-filter-label {
@@ -2008,7 +2101,8 @@ const getStudentAlt = (student: any) => {
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
-  transition: border-color .25s ease, background-color .25s ease, color .25s ease, box-shadow .25s ease, transform .25s ease;
+  transition: border-color 0.25s ease, background-color 0.25s ease,
+    color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .top-students-board .top-students-filter-options button:hover {
@@ -2039,7 +2133,7 @@ const getStudentAlt = (student: any) => {
 }
 
 .top-students-board .top-students-filter-options button:disabled {
-  opacity: .42;
+  opacity: 0.42;
   cursor: not-allowed;
 }
 
@@ -2122,20 +2216,18 @@ const getStudentAlt = (student: any) => {
   width: 252px;
   height: auto;
   padding: 38px 0 14px;
-  opacity: .3;
-  filter: saturate(.65);
-  transform: translateY(18px) scale(.87);
+  opacity: 0.3;
+  filter: saturate(0.65);
+  transform: translateY(18px) scale(0.87);
   transform-origin: center bottom;
-  transition:
-    opacity .45s ease,
-    filter .45s ease,
-    transform .55s cubic-bezier(.22, 1, .36, 1);
+  transition: opacity 0.45s ease, filter 0.45s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .top-students-board .student-slide.swiper-slide-visible {
-  opacity: .72;
-  filter: saturate(.88);
-  transform: translateY(9px) scale(.94);
+  opacity: 0.72;
+  filter: saturate(0.88);
+  transform: translateY(9px) scale(0.94);
 }
 
 .top-students-board .student-slide.swiper-slide-active {
@@ -2160,11 +2252,13 @@ const getStudentAlt = (student: any) => {
 .top-students-board .students-swiper--all .swiper-slide-active .student-podium {
   min-height: 430px;
   border-color: rgb(125 164 218 / 22%);
-  background:
-    radial-gradient(circle at 50% 14%, rgb(83 143 232 / 12%), transparent 29%),
+  background: radial-gradient(
+      circle at 50% 14%,
+      rgb(83 143 232 / 12%),
+      transparent 29%
+    ),
     linear-gradient(160deg, rgb(18 38 65 / 96%), rgb(7 20 38 / 98%));
-  box-shadow:
-    0 24px 46px -34px rgb(0 0 0 / 95%),
+  box-shadow: 0 24px 46px -34px rgb(0 0 0 / 95%),
     inset 0 1px 0 rgb(255 255 255 / 4%);
 }
 
@@ -2191,29 +2285,39 @@ const getStudentAlt = (student: any) => {
 .top-students-board .students-swiper--count-2 .student-slide:first-child,
 .top-students-board .students-swiper--count-3 .student-slide:first-child,
 .top-students-board .students-swiper--count-4 .student-slide:first-child,
-.top-students-board .students-swiper--few.students-swiper--count-5 .student-slide:first-child {
+.top-students-board
+  .students-swiper--few.students-swiper--count-5
+  .student-slide:first-child {
   grid-column: 3;
 }
 
 .top-students-board .students-swiper--count-2 .student-slide:nth-child(2),
 .top-students-board .students-swiper--count-3 .student-slide:nth-child(2),
 .top-students-board .students-swiper--count-4 .student-slide:nth-child(2),
-.top-students-board .students-swiper--few.students-swiper--count-5 .student-slide:nth-child(2) {
+.top-students-board
+  .students-swiper--few.students-swiper--count-5
+  .student-slide:nth-child(2) {
   grid-column: 4;
 }
 
 .top-students-board .students-swiper--count-3 .student-slide:nth-child(3),
 .top-students-board .students-swiper--count-4 .student-slide:nth-child(3),
-.top-students-board .students-swiper--few.students-swiper--count-5 .student-slide:nth-child(3) {
+.top-students-board
+  .students-swiper--few.students-swiper--count-5
+  .student-slide:nth-child(3) {
   grid-column: 2;
 }
 
 .top-students-board .students-swiper--count-4 .student-slide:nth-child(4),
-.top-students-board .students-swiper--few.students-swiper--count-5 .student-slide:nth-child(4) {
+.top-students-board
+  .students-swiper--few.students-swiper--count-5
+  .student-slide:nth-child(4) {
   grid-column: 5;
 }
 
-.top-students-board .students-swiper--few.students-swiper--count-5 .student-slide:nth-child(5) {
+.top-students-board
+  .students-swiper--few.students-swiper--count-5
+  .student-slide:nth-child(5) {
   grid-column: 1;
 }
 
@@ -2226,27 +2330,34 @@ const getStudentAlt = (student: any) => {
   padding: 56px 23px 21px;
   border: 1px solid rgb(125 164 218 / 22%);
   border-radius: 17px;
-  background:
-    radial-gradient(circle at 50% 14%, rgb(83 143 232 / 12%), transparent 29%),
+  background: radial-gradient(
+      circle at 50% 14%,
+      rgb(83 143 232 / 12%),
+      transparent 29%
+    ),
     linear-gradient(160deg, rgb(18 38 65 / 96%), rgb(7 20 38 / 98%));
-  box-shadow:
-    0 24px 46px -34px rgb(0 0 0 / 95%),
+  box-shadow: 0 24px 46px -34px rgb(0 0 0 / 95%),
     inset 0 1px 0 rgb(255 255 255 / 4%);
   color: #f6f9ff;
   text-align: center;
-  animation: podium-card-reveal .8s both cubic-bezier(.16, 1, .3, 1);
-  transition:
-    min-height .45s ease,
-    transform .4s cubic-bezier(.16, 1, .3, 1),
-    border-color .35s ease,
-    box-shadow .35s ease,
-    background-color .35s ease;
+  animation: podium-card-reveal 0.8s both cubic-bezier(0.16, 1, 0.3, 1);
+  transition: min-height 0.45s ease,
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease,
+    box-shadow 0.35s ease, background-color 0.35s ease;
 }
 
-.student-slide:nth-child(2) .student-podium { animation-delay: .08s; }
-.student-slide:nth-child(3) .student-podium { animation-delay: .16s; }
-.student-slide:nth-child(4) .student-podium { animation-delay: .24s; }
-.student-slide:nth-child(5) .student-podium { animation-delay: .32s; }
+.student-slide:nth-child(2) .student-podium {
+  animation-delay: 0.08s;
+}
+.student-slide:nth-child(3) .student-podium {
+  animation-delay: 0.16s;
+}
+.student-slide:nth-child(4) .student-podium {
+  animation-delay: 0.24s;
+}
+.student-slide:nth-child(5) .student-podium {
+  animation-delay: 0.32s;
+}
 
 .student-podium::before {
   position: absolute;
@@ -2262,23 +2373,22 @@ const getStudentAlt = (student: any) => {
 
 .student-podium:hover {
   border-color: rgb(116 172 255 / 58%);
-  box-shadow:
-    0 34px 62px -34px rgb(0 0 0 / 98%),
-    0 0 34px -22px rgb(87 151 248 / 75%),
-    inset 0 1px 0 rgb(255 255 255 / 8%);
+  box-shadow: 0 34px 62px -34px rgb(0 0 0 / 98%),
+    0 0 34px -22px rgb(87 151 248 / 75%), inset 0 1px 0 rgb(255 255 255 / 8%);
   transform: translateY(-8px);
 }
 
 .swiper-slide-active .student-podium {
   min-height: 460px;
   border-color: rgb(255 200 67 / 88%);
-  background:
-    radial-gradient(circle at 50% 12%, rgb(255 197 58 / 15%), transparent 34%),
+  background: radial-gradient(
+      circle at 50% 12%,
+      rgb(255 197 58 / 15%),
+      transparent 34%
+    ),
     linear-gradient(160deg, rgb(24 43 69 / 98%), rgb(7 20 37 / 99%));
-  box-shadow:
-    0 24px 58px -30px rgb(0 0 0 / 95%),
-    0 0 35px -18px rgb(255 195 52 / 78%),
-    inset 0 1px 0 rgb(255 229 153 / 14%);
+  box-shadow: 0 24px 58px -30px rgb(0 0 0 / 95%),
+    0 0 35px -18px rgb(255 195 52 / 78%), inset 0 1px 0 rgb(255 229 153 / 14%);
 }
 
 .swiper-slide-active .student-podium::before {
@@ -2299,7 +2409,15 @@ const getStudentAlt = (student: any) => {
   background: linear-gradient(145deg, #5f6f85, #2e3d51);
   box-shadow: 0 8px 18px rgb(0 0 0 / 34%);
   color: #fff;
-  clip-path: polygon(50% 0, 88% 19%, 100% 58%, 72% 100%, 28% 100%, 0 58%, 12% 19%);
+  clip-path: polygon(
+    50% 0,
+    88% 19%,
+    100% 58%,
+    72% 100%,
+    28% 100%,
+    0 58%,
+    12% 19%
+  );
   font-size: 18px;
   font-weight: 950;
   transform: translateX(-50%);
@@ -2340,7 +2458,8 @@ const getStudentAlt = (student: any) => {
   background: #152b47;
   box-shadow: 0 13px 28px -16px #000;
   animation: student-portrait-float 5s ease-in-out infinite;
-  transition: width .45s ease, height .45s ease, flex-basis .45s ease, border-color .35s ease;
+  transition: width 0.45s ease, height 0.45s ease, flex-basis 0.45s ease,
+    border-color 0.35s ease;
 }
 
 .student-slide:nth-child(even) .student-podium__portrait {
@@ -2352,9 +2471,7 @@ const getStudentAlt = (student: any) => {
   height: 184px;
   flex-basis: 184px;
   border-color: #f3c443;
-  box-shadow:
-    0 16px 30px -16px #000,
-    0 0 28px -12px rgb(247 194 54 / 72%);
+  box-shadow: 0 16px 30px -16px #000, 0 0 28px -12px rgb(247 194 54 / 72%);
   animation-name: champion-portrait-float;
   animation-duration: 3.6s;
 }
@@ -2370,10 +2487,15 @@ const getStudentAlt = (student: any) => {
 .student-podium__shine {
   position: absolute;
   inset: -50% 45% -50% -20%;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 14%), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 14%),
+    transparent
+  );
   pointer-events: none;
   transform: rotate(18deg) translateX(-180%);
-  transition: transform .8s cubic-bezier(.22, 1, .36, 1);
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .student-podium:hover .student-podium__shine,
@@ -2472,7 +2594,9 @@ const getStudentAlt = (student: any) => {
   color: #f2c344;
 }
 
-.student-podium__honor .pi { font-size: 14px; }
+.student-podium__honor .pi {
+  font-size: 14px;
+}
 
 .top-students-board :deep(.students-swiper .swiper-button-next),
 .top-students-board :deep(.students-swiper .swiper-button-prev) {
@@ -2536,23 +2660,37 @@ const getStudentAlt = (student: any) => {
   background: rgb(10 26 47 / 64%);
 }
 
-.top-students-board .students-empty h3 { color: #f3f7ff; }
-.top-students-board .students-empty p { color: #98a8be; }
+.top-students-board .students-empty h3 {
+  color: #f3f7ff;
+}
+.top-students-board .students-empty p {
+  color: #98a8be;
+}
 
 @keyframes honor-trophy-float {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-6px) rotate(-3deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-3deg);
+  }
 }
 
 @keyframes honor-medal-glow {
-  0%, 100% { filter: drop-shadow(0 0 0 rgb(240 175 29 / 0%)); }
-  50% { filter: drop-shadow(0 0 10px rgb(240 175 29 / 52%)); }
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgb(240 175 29 / 0%));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgb(240 175 29 / 52%));
+  }
 }
 
 @keyframes podium-card-reveal {
   from {
     opacity: 0;
-    filter: blur(8px) saturate(.6);
+    filter: blur(8px) saturate(0.6);
   }
   to {
     opacity: 1;
@@ -2561,8 +2699,9 @@ const getStudentAlt = (student: any) => {
 }
 
 @keyframes champion-card-aura {
-  0%, 100% {
-    opacity: .45;
+  0%,
+  100% {
+    opacity: 0.45;
     box-shadow: 0 0 0 0 rgb(248 195 55 / 0%);
   }
   50% {
@@ -2572,19 +2711,39 @@ const getStudentAlt = (student: any) => {
 }
 
 @keyframes student-portrait-float {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-6px) rotate(.5deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-6px) rotate(0.5deg);
+  }
 }
 
 @keyframes champion-portrait-float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-9px) scale(1.025); }
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-9px) scale(1.025);
+  }
 }
 
 @keyframes champion-shine {
-  0%, 55% { transform: rotate(18deg) translateX(-190%); opacity: 0; }
-  65% { opacity: 1; }
-  86%, 100% { transform: rotate(18deg) translateX(230%); opacity: 0; }
+  0%,
+  55% {
+    transform: rotate(18deg) translateX(-190%);
+    opacity: 0;
+  }
+  65% {
+    opacity: 1;
+  }
+  86%,
+  100% {
+    transform: rotate(18deg) translateX(230%);
+    opacity: 0;
+  }
 }
 
 @media (max-width: 900px) {
@@ -2598,8 +2757,13 @@ const getStudentAlt = (student: any) => {
     width: 100%;
   }
 
-  .top-students-trophy { width: 64px; height: 64px; }
-  .top-students-trophy .pi { font-size: 25px; }
+  .top-students-trophy {
+    width: 64px;
+    height: 64px;
+  }
+  .top-students-trophy .pi {
+    font-size: 25px;
+  }
 
   .top-students-board .top-students-filters,
   .top-students-board .top-students-filters-loading,
@@ -2611,11 +2775,15 @@ const getStudentAlt = (student: any) => {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .top-students-board .students-loading span:nth-child(n + 4) { display: none; }
+  .top-students-board .students-loading span:nth-child(n + 4) {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
-  .top-students-section { padding: 46px 0; }
+  .top-students-section {
+    padding: 46px 0;
+  }
 
   .top-students-board {
     width: calc(100% - 18px);
@@ -2623,7 +2791,10 @@ const getStudentAlt = (student: any) => {
     border-radius: 18px;
   }
 
-  .top-students-board::after { inset: 8px; border-radius: 13px; }
+  .top-students-board::after {
+    inset: 8px;
+    border-radius: 13px;
+  }
 
   .top-students-board__header {
     grid-template-columns: 58px minmax(0, 1fr);
@@ -2635,10 +2806,20 @@ const getStudentAlt = (student: any) => {
     height: 54px;
   }
 
-  .top-students-board__intro { text-align: start; }
-  .top-students-board__intro h2 { margin-inline: 0 auto; font-size: 24px; }
-  .top-students-board__intro p { font-size: 10px; line-height: 1.7; }
-  .top-students-board__eyebrow { font-size: 8px; }
+  .top-students-board__intro {
+    text-align: start;
+  }
+  .top-students-board__intro h2 {
+    margin-inline: 0 auto;
+    font-size: 24px;
+  }
+  .top-students-board__intro p {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .top-students-board__eyebrow {
+    font-size: 8px;
+  }
 
   .top-students-board .top-students-count {
     grid-column: 1 / -1;
@@ -2648,8 +2829,12 @@ const getStudentAlt = (student: any) => {
     padding: 7px 12px;
   }
 
-  .top-students-board .top-students-count strong { font-size: 21px; }
-  .top-students-board .top-students-count span { max-width: none; }
+  .top-students-board .top-students-count strong {
+    font-size: 21px;
+  }
+  .top-students-board .top-students-count span {
+    max-width: none;
+  }
 
   .top-students-board .top-students-filters {
     display: grid;
@@ -2683,8 +2868,12 @@ const getStudentAlt = (student: any) => {
     scrollbar-width: none;
   }
 
-  .top-students-board .top-students-filter-options::-webkit-scrollbar { display: none; }
-  .top-students-board .top-students-filter-options button { flex: 0 0 auto; }
+  .top-students-board .top-students-filter-options::-webkit-scrollbar {
+    display: none;
+  }
+  .top-students-board .top-students-filter-options button {
+    flex: 0 0 auto;
+  }
 
   .top-students-filter-summary {
     align-items: flex-start;
@@ -2717,9 +2906,10 @@ const getStudentAlt = (student: any) => {
     padding: 38px 22px 48px;
   }
 
-  .top-students-board .students-loading span:nth-child(n + 2) { display: none; }
+  .top-students-board .students-loading span:nth-child(n + 2) {
+    display: none;
+  }
 }
-
 
 /* =========================================================
    RESPONSIVE
@@ -2736,8 +2926,7 @@ const getStudentAlt = (student: any) => {
 }
 
 .home-sections--dark .top-students-section {
-  background:
-    radial-gradient(
+  background: radial-gradient(
       circle at 88% 8%,
       color-mix(in srgb, var(--primary-color, #4a84e1) 22%, transparent),
       transparent 34%
@@ -2754,16 +2943,30 @@ const getStudentAlt = (student: any) => {
     );
 }
 
-.home-sections--dark .opinions-section { background: #0b1220; }
-.home-sections--dark .opinion-card { border-color: var(--section-line); background: #111c30; box-shadow: 0 18px 46px -34px rgb(0 0 0 / 85%); }
-
-.home-sections--dark .top-students-section::before {
-  background-image: radial-gradient(rgb(130 174 246 / 22%) 1px, transparent 1px);
-  opacity: .22;
+.home-sections--dark .opinions-section {
+  background: #0b1220;
+}
+.home-sections--dark .opinion-card {
+  border-color: var(--section-line);
+  background: #111c30;
+  box-shadow: 0 18px 46px -34px rgb(0 0 0 / 85%);
 }
 
-.home-sections--dark .top-students-section__orb { background: rgb(72 130 225 / 10%); }
-.home-sections--dark .top-students-section .section-eyebrow { border-color: rgb(112 170 255 / 25%); background: rgb(112 170 255 / 11%); }
+.home-sections--dark .top-students-section::before {
+  background-image: radial-gradient(
+    rgb(130 174 246 / 22%) 1px,
+    transparent 1px
+  );
+  opacity: 0.22;
+}
+
+.home-sections--dark .top-students-section__orb {
+  background: rgb(72 130 225 / 10%);
+}
+.home-sections--dark .top-students-section .section-eyebrow {
+  border-color: rgb(112 170 255 / 25%);
+  background: rgb(112 170 255 / 11%);
+}
 
 .home-sections--dark .top-students-count,
 .home-sections--dark .top-students-filters,
@@ -2774,9 +2977,15 @@ const getStudentAlt = (student: any) => {
   box-shadow: 0 22px 55px -38px rgb(0 0 0 / 85%);
 }
 
-.home-sections--dark .top-students-count { background: rgb(20 33 56 / 76%); }
-.home-sections--dark .top-students-count strong { text-shadow: 0 0 24px rgb(112 170 255 / 28%); }
-.home-sections--dark .top-students-filter-label { color: #c4cee0; }
+.home-sections--dark .top-students-count {
+  background: rgb(20 33 56 / 76%);
+}
+.home-sections--dark .top-students-count strong {
+  text-shadow: 0 0 24px rgb(112 170 255 / 28%);
+}
+.home-sections--dark .top-students-filter-label {
+  color: #c4cee0;
+}
 
 .home-sections--dark .top-students-filter-options button {
   border-color: var(--section-line);
@@ -2784,42 +2993,111 @@ const getStudentAlt = (student: any) => {
   color: #bcc8da;
 }
 
-.home-sections--dark .top-students-filter-options button:hover { border-color: rgb(112 170 255 / 55%); background: #192a46; color: #dce9ff; }
-.home-sections--dark .top-students-filter-options button.active { border-color: #70aaff; background: linear-gradient(135deg, #548fe8, #70aaff); color: #071426; box-shadow: 0 10px 28px -16px #70aaff; }
+.home-sections--dark .top-students-filter-options button:hover {
+  border-color: rgb(112 170 255 / 55%);
+  background: #192a46;
+  color: #dce9ff;
+}
+.home-sections--dark .top-students-filter-options button.active {
+  border-color: #70aaff;
+  background: linear-gradient(135deg, #548fe8, #70aaff);
+  color: #071426;
+  box-shadow: 0 10px 28px -16px #70aaff;
+}
 .home-sections--dark .top-students-filters-loading,
-.home-sections--dark .top-students-filters-error { border-color: var(--section-line); background: rgb(17 28 48 / 68%); color: #b8c5d9; }
+.home-sections--dark .top-students-filters-error {
+  border-color: var(--section-line);
+  background: rgb(17 28 48 / 68%);
+  color: #b8c5d9;
+}
 
-.home-sections--dark .student-card:hover { border-color: rgb(112 170 255 / 48%); box-shadow: 0 28px 64px -32px rgb(0 0 0 / 90%), 0 12px 32px -24px rgb(112 170 255 / 45%); }
-.home-sections--dark .student-card__media { background: linear-gradient(135deg, #17253e, #223455); }
-.home-sections--dark .student-card__overlay { background: linear-gradient(180deg, rgb(4 11 22 / 3%) 25%, rgb(4 11 22 / 84%) 100%); }
-.home-sections--dark .student-card__number { border-color: rgb(255 255 255 / 16%); background: rgb(12 24 43 / 82%); color: #a9ccff; box-shadow: 0 10px 25px rgb(0 0 0 / 30%); }
-.home-sections--dark .student-card__achievement { border-color: rgb(255 255 255 / 14%); background: rgb(7 17 33 / 78%); }
-.home-sections--dark .student-card__year { background: rgb(112 170 255 / 12%); color: #a9ccff; }
-.home-sections--dark .student-card__honor-icon { background: rgb(245 184 46 / 12%); color: #ffd36b; }
+.home-sections--dark .student-card:hover {
+  border-color: rgb(112 170 255 / 48%);
+  box-shadow: 0 28px 64px -32px rgb(0 0 0 / 90%),
+    0 12px 32px -24px rgb(112 170 255 / 45%);
+}
+.home-sections--dark .student-card__media {
+  background: linear-gradient(135deg, #17253e, #223455);
+}
+.home-sections--dark .student-card__overlay {
+  background: linear-gradient(
+    180deg,
+    rgb(4 11 22 / 3%) 25%,
+    rgb(4 11 22 / 84%) 100%
+  );
+}
+.home-sections--dark .student-card__number {
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(12 24 43 / 82%);
+  color: #a9ccff;
+  box-shadow: 0 10px 25px rgb(0 0 0 / 30%);
+}
+.home-sections--dark .student-card__achievement {
+  border-color: rgb(255 255 255 / 14%);
+  background: rgb(7 17 33 / 78%);
+}
+.home-sections--dark .student-card__year {
+  background: rgb(112 170 255 / 12%);
+  color: #a9ccff;
+}
+.home-sections--dark .student-card__honor-icon {
+  background: rgb(245 184 46 / 12%);
+  color: #ffd36b;
+}
 
-.home-sections--dark .student-card__footer { border-color: var(--section-line); }
-.home-sections--dark .students-empty__icon { background: rgb(112 170 255 / 12%); color: #8ebaff; }
-.home-sections--dark .students-empty--error .students-empty__icon { background: rgb(220 74 74 / 13%); color: #ff8b8b; }
+.home-sections--dark .student-card__footer {
+  border-color: var(--section-line);
+}
+.home-sections--dark .students-empty__icon {
+  background: rgb(112 170 255 / 12%);
+  color: #8ebaff;
+}
+.home-sections--dark .students-empty--error .students-empty__icon {
+  background: rgb(220 74 74 / 13%);
+  color: #ff8b8b;
+}
 .home-sections--dark .students-loading span {
   border-color: var(--section-line);
   background: linear-gradient(105deg, #111c30 20%, #21314e 38%, #111c30 56%);
   background-size: 240% 100%;
 }
 
-.home-sections--dark .top-students-section :deep(.students-swiper .swiper-button-next),
-.home-sections--dark .top-students-section :deep(.students-swiper .swiper-button-prev) {
+.home-sections--dark
+  .top-students-section
+  :deep(.students-swiper .swiper-button-next),
+.home-sections--dark
+  .top-students-section
+  :deep(.students-swiper .swiper-button-prev) {
   border-color: #31445f;
   background: rgb(19 31 52 / 94%);
   color: #91bdff;
   box-shadow: 0 12px 30px rgb(0 0 0 / 30%);
 }
 
-.home-sections--dark .top-students-section :deep(.students-swiper .swiper-button-next:hover),
-.home-sections--dark .top-students-section :deep(.students-swiper .swiper-button-prev:hover) { border-color: #70aaff; background: #70aaff; color: #071426; }
-.home-sections--dark .top-students-section :deep(.swiper-pagination-bullet) { background: #41516b; }
-.home-sections--dark .top-students-section :deep(.swiper-pagination-bullet-active) { background: #70aaff; box-shadow: 0 0 12px rgb(112 170 255 / 42%); }
+.home-sections--dark
+  .top-students-section
+  :deep(.students-swiper .swiper-button-next:hover),
+.home-sections--dark
+  .top-students-section
+  :deep(.students-swiper .swiper-button-prev:hover) {
+  border-color: #70aaff;
+  background: #70aaff;
+  color: #071426;
+}
+.home-sections--dark .top-students-section :deep(.swiper-pagination-bullet) {
+  background: #41516b;
+}
+.home-sections--dark
+  .top-students-section
+  :deep(.swiper-pagination-bullet-active) {
+  background: #70aaff;
+  box-shadow: 0 0 12px rgb(112 170 255 / 42%);
+}
 
-.home-sections--dark .top-students-section button:focus-visible { outline: 3px solid rgb(112 170 255 / 38%); outline-offset: 3px; }
+.home-sections--dark .top-students-section button:focus-visible {
+  outline: 3px solid rgb(112 170 255 / 38%);
+  outline-offset: 3px;
+}
 
 @media (max-width: 768px) {
   .top-students-section,
@@ -2838,8 +3116,14 @@ const getStudentAlt = (student: any) => {
     margin-bottom: 30px;
   }
 
-  .top-students-count { min-width: 120px; min-height: 68px; }
-  .top-students-filter-group { grid-template-columns: 1fr; gap: 8px; }
+  .top-students-count {
+    min-width: 120px;
+    min-height: 68px;
+  }
+  .top-students-filter-group {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 
   .section-heading__decoration {
     display: none;
@@ -2869,8 +3153,12 @@ const getStudentAlt = (student: any) => {
     display: none;
   }
 
-  .students-loading { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .students-loading span:last-child { display: none; }
+  .students-loading {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .students-loading span:last-child {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2887,14 +3175,39 @@ const getStudentAlt = (student: any) => {
     font-size: 10px;
   }
 
-  .top-students-heading { align-items: flex-start; flex-direction: column; }
-  .top-students-count { min-width: 0; min-height: 0; padding: 10px 13px; border-radius: 14px; }
-  .top-students-count strong { font-size: 22px; }
-  .top-students-count span { max-width: none; }
-  .top-students-filters { margin-top: -10px; padding: 14px; border-radius: 16px; }
-  .top-students-filter-options { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
-  .top-students-filter-options::-webkit-scrollbar { display: none; }
-  .top-students-filter-options button { flex: 0 0 auto; }
+  .top-students-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .top-students-count {
+    min-width: 0;
+    min-height: 0;
+    padding: 10px 13px;
+    border-radius: 14px;
+  }
+  .top-students-count strong {
+    font-size: 22px;
+  }
+  .top-students-count span {
+    max-width: none;
+  }
+  .top-students-filters {
+    margin-top: -10px;
+    padding: 14px;
+    border-radius: 16px;
+  }
+  .top-students-filter-options {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 3px;
+    scrollbar-width: none;
+  }
+  .top-students-filter-options::-webkit-scrollbar {
+    display: none;
+  }
+  .top-students-filter-options button {
+    flex: 0 0 auto;
+  }
 
   .student-card__media {
     height: 230px;
@@ -2921,12 +3234,16 @@ const getStudentAlt = (student: any) => {
     padding: 20px;
   }
 
-  .students-loading { grid-template-columns: 1fr; }
-  .students-loading span { min-height: 480px; }
-  .students-loading span:nth-child(n + 2) { display: none; }
+  .students-loading {
+    grid-template-columns: 1fr;
+  }
+  .students-loading span {
+    min-height: 480px;
+  }
+  .students-loading span:nth-child(n + 2) {
+    display: none;
+  }
 }
-
-
 
 @media (prefers-reduced-motion: reduce) {
   .student-card,
