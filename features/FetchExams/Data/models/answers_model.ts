@@ -11,13 +11,13 @@ export default class AnswersModel {
   ) {}
 
   static fromMap(map: Record<string, any>): AnswersModel {
-    const correct = map.correct == null ? null : toBooleanFlag(map.correct);
-
     return new AnswersModel(
       Number(map.id),
       map.answer ?? "",
       map.image ?? "",
-      correct,
+      // Correctness must not live in the active exam's client-side model.
+      // The API must also omit it so it is never exposed in the response.
+      null,
       toBooleanFlag(map.is_selected ?? map.selected),
     );
   }

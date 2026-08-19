@@ -103,6 +103,10 @@ const FetchExamQuestions = async () => {
 };
 
 onMounted(FetchExamQuestions);
+onBeforeUnmount(() => {
+  ExamDetails.value = null;
+  errorMessage.value = "";
+});
 </script>
 
 <template>

@@ -6,6 +6,7 @@ import { getWebDomain } from "~/constant/webDomain";
 import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 import AppRouteTransition from "~/components/Global/AppRouteTransition.vue";
 import { resolveSiteOrigin } from "~/utils/siteUrl";
+import { isProtectedLearningPath } from "~/utils/protectedLearningRoute";
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();
@@ -20,6 +21,15 @@ const isCourseDetailsPage = computed(() =>
 );
 const isCourseExamPage = computed(() =>
   /^\/course\/[^/]+\/(?!timer(?:\/|$))[^/]+\/?$/u.test(route.path),
+);
+const isProtectedLearningPage = computed(() =>
+  isProtectedLearningPath(route.path),
+);
+const { isDeveloperToolsOpen } = useProtectedLearningGuard(
+  isProtectedLearningPage,
+);
+const isProtectedContentBlocked = computed(
+  () => isProtectedLearningPage.value && isDeveloperToolsOpen.value,
 );
 const isHomeV2 = computed(
   () =>
@@ -454,10 +464,14 @@ onMounted(() => {
       <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
       <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" />
       <LazyToast v-if="!isHomeV2" />
-      <div class="app-route-view">
-        <NuxtPage />
+      <div
+        class="app-route-view"
+        :class="{ 'app-route-view--protected': isProtectedLearningPage }"
+      >
+        <GlobalDeveloperToolsBlocker v-if="isProtectedContentBlocked" />
+        <NuxtPage v-else />
       </div>
-      <LazyMainDialog v-if="!pending" />
+      <LazyMainDialog v-if="!pending && !isProtectedContentBlocked" />
     </NuxtLayout>
   </div>
   <AppThemeToggle
@@ -468,6 +482,12 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+@media print {
+  .app-route-view--protected {
+    display: none !important;
+  }
+}
+
 .chat-bot-button {
   position: absolute;
 

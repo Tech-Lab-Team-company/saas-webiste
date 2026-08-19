@@ -26,11 +26,25 @@ Application-wide controls and their shared notice are implemented by:
 
 - Covers active lesson content when the browser tab loses focus, becomes hidden,
   or receives a supported screen-capture keyboard event.
+- Detects the viewport change produced by docked browser developer tools on
+  desktop course and exam routes.
+- Immediately unmounts the course or exam page when developer tools are
+  detected, which removes rendered questions, lesson content, and component
+  state from the DOM.
+- Clears cached course-detail async data when the guard activates.
+- Shows a full-screen, non-dismissible security message until developer tools
+  are closed. The page is mounted and fetched again only after three clean
+  checks, preventing resize flicker from restoring it early.
+- Keeps timed exams tied to their original stored start time. Opening developer
+  tools does not pause or extend an exam deadline.
+- Blocks copy, cut, and drag operations on protected learning routes.
 - Removes course media from printed pages.
 
 These controls are implemented by:
 
 - `composables/useCourseContentProtection.ts`
+- `composables/useProtectedLearningGuard.ts`
+- `components/Global/DeveloperToolsBlocker.vue`
 - `components/CourseDetails/CourseTabs.vue`
 - `assets/style/course-details-redesign/course-tabs.scss`
 
@@ -144,11 +158,28 @@ capture shielding, PDF behavior and video-control restrictions.
 
 Frontend code cannot completely disable browser developer tools, operating
 system screenshots or external screen-recording software. These changes are
-deterrents and provide student accountability through watermarking.
+deterrents and provide student accountability through watermarking. Browsers do
+not expose an official developer-tools state API. The viewport guard reliably
+handles normal side- and bottom-docked tools, but a determined user can bypass
+client code or use separately docked/remote tools.
+
+The active exam model now discards any `correct` flag returned for an answer.
+This reduces accidental exposure in Vue component state, but it cannot remove
+the value from the browser Network panel if the API already sent it.
 
 Real course security must also be enforced by the backend:
 
 - Verify authentication and course enrollment for every protected request.
+- Never include `correct`, `is_correct`, answer explanations, or the correct
+  answer ID in the exam-details response before the attempt is finalized.
+- Return only a server-generated question/answer ID and display value; validate
+  correctness exclusively on the server.
+- Use a signed, short-lived exam-attempt token tied to the student, exam,
+  device/session, start time, and server-side deadline.
+- Enforce start time, end time, duration, attempt count, and final-submission
+  state on every answer request using server time, never browser time.
+- Rate-limit answer requests and log concurrent sessions, IP/device changes,
+  repeated reconnects, and security events for review.
 - Never return paid lesson URLs to an unauthorized student.
 - Use short-lived signed video and PDF URLs tied to the authorized user.
 - Expire or rotate media URLs and prevent public bucket access.
