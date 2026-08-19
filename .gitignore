@@ -20,5 +20,5 @@ logs
 
 # Environment variants stay local. The root .env is intentionally tracked
 # because it contains this SaaS storefront's non-secret tenant identity.
-.env.*
+.env
 !.env.example
