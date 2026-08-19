@@ -1,9 +1,14 @@
 <script setup lang="ts">
 const UserSettingStore = useSettingStore();
+const route = useRoute();
 </script>
 
 <template>
-  <div class="login-home-redesign auth-unified-shell" dir="rtl">
+  <div
+    class="login-home-redesign auth-unified-shell"
+    :class="{ 'auth-unified-shell--register': route.path.toLowerCase() === '/auth/register' }"
+    dir="rtl"
+  >
     <section class="login-home-form-panel">
       <div class="login-home-form-wrap auth-unified-content">
         <span class="login-home-kicker">{{ $t("مساحة الطالب") }}</span>
