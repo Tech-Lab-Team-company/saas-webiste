@@ -78,18 +78,17 @@ const toast = useToast();
 const isdisabled = ref(false)
 
 function handleSessionClick(index: number, sessionId: number, link: string, title: string, text: string, show: boolean) {
+  if (show === false) {
+    visible.value = true;
+    return;
+  }
+
   if (!userStore.user) {
     toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب تسجيل الدخول', life: 3000 });
     // return;
   }
   else {
-    if (show === false) {
-      if ((UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-') && (UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-')) {
-        visible.value = true;
-      }
-    }
-
-    else if (show === true) {
+    if (show === true) {
       // console.log(props.isSubscribed, "props.isSubscribed")
       // console.log(props.isPaid, "props.isPaid")
       if (!props.isSubscribed && props.isPaied) {
@@ -118,7 +117,6 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
 
 const router = useRouter();
 const visible = ref(false);
-const UserSetting = useUserStore();
 
 
 const isFinished = ref(false)
@@ -195,7 +193,7 @@ const GotoExam = (exam:any, CourseId:number)=>{
 
                     <LockIcon v-if="!session?.web_show_video" />
                     <p>{{ session?.title }} </p>
-                    <p v-if="!session?.web_show_video">(هذا المحتوى حصرى للتطبيق فقط)</p>
+                    <p v-if="!session?.web_show_video">(هذا المحتوى حصري لتطبيق الموبايل فقط)</p>
                   </div>
                 </div>
                 <div>
@@ -236,19 +234,7 @@ const GotoExam = (exam:any, CourseId:number)=>{
     <NuxtImg class="empty-content" src="/images/EmptyContent.png" alt="empty content" />
   </div>
 
-  <Dialog v-model:visible="visible" modal :dismissableMask="true" :style="{ width: '25rem' }">
-    <div class="stores-logos-container">
-      <a v-if="UserSetting.setting?.app_store && UserSetting.setting?.app_store != '-'" class="stores-logos-link"
-        target="_blank" :href="UserSetting.setting?.app_store">
-        <NuxtImg class="stores-logos stores-logos-apple" src="/images/Download_on_the_App_Store_Badge.svg.webp" />
-
-      </a>
-      <a v-if="UserSetting.setting?.play_store && UserSetting.setting?.play_store != '-'" class="stores-logos-link"
-        target="_blank" :href="UserSetting.setting?.play_store">
-        <NuxtImg class="stores-logos" src="/images/en_badge_web_generic.png" />
-      </a>
-    </div>
-  </Dialog>
+  <CourseDetailsAppOnlyContentDialog v-model:visible="visible" />
 
 
 
