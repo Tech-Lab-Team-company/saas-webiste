@@ -306,7 +306,7 @@ onBeforeUnmount(() => {
     >
         <Transition name="drag-hint">
             <span v-if="showDragHint" class="contact-speed-dial-drag-hint">
-                اسحب الزر لتحريكه، واضغط لفتح وسائل التواصل
+                اسحب الزر لتحريكه، واضغط لوسائل التواصل
             </span>
         </Transition>
 

@@ -9,8 +9,9 @@ import EducationStagesUseCase from "../../Domain/use_case/submit_education_data_
 import type TitleModel from "~/base/core/Models/title_model";
 import CollegeDepartmentUseCase from "../../Domain/use_case/submit_education_data_use_case";
 import CollegeDepartmentDivisionsUseCase from "../../Domain/use_case/submit_education_data_use_case";
-import type UserModel from "../../Data/models/submit_education_data_model";
+import type UserModel from "~/features/LoginFeature/Data/models/user_model";
 import SubmitEducationDataUseCase from "../../Domain/use_case/submit_education_data_use_case";
+import { useUserStore } from "~/stores/user";
 
 export default class SubmitEducationDataController extends ControllerInterface<UserModel> {
   private static instance: SubmitEducationDataController;
@@ -36,6 +37,9 @@ export default class SubmitEducationDataController extends ControllerInterface<U
         await this.submitEducationDataUseCase.call(params);
       this.setState(dataState);
       if (this.isDataSuccess()) {
+        if (this.state.value.data) {
+          useUserStore().updateUser(this.state.value.data);
+        }
         // DialogSelector.instance.successDialog.openDialog({
         //   dialogName: "dialog",
         //   titleContent: "Vote Success",

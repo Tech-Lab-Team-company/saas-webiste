@@ -46,7 +46,7 @@ export default class RegisterController extends ControllerInterface<UserModel> {
           await router.push("/Auth/varifyotp");
         }
         else if(settingStore.setting?.allow_student_education){
-          await router.push("/Auth/categories");
+          await router.push("/Auth/education");
         }
         else{
           await router.push("/Auth/education");

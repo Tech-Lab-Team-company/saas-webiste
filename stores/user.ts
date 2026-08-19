@@ -12,6 +12,11 @@ export const useUserStore = defineStore('user', {
       this.user = data;
       this.isAuth = true;
     },
+    updateUser(data: Partial<UserModel>) {
+      if (!this.user) return;
+
+      Object.assign(this.user, data);
+    },
     setImage(img: string) {
       this.image = img;
     },

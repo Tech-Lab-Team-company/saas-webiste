@@ -6,7 +6,7 @@ import type ServicesInterface from "~/base/Data/ApiService/api_service_interface
 import {SubmitEducationDataApiService, } from "../../Data/api_services/submet_education_data_api_services";
 // import UserModel from "../../Data/models/education_stages_model";
 import  TitleModel from "~/base/core/Models/title_model";
-import UserModel from "../../Data/models/submit_education_data_model";
+import UserModel from "~/features/LoginFeature/Data/models/user_model";
 
 class SubmitEducationDataRepo extends RepoInterface<UserModel> {
   private static instance: SubmitEducationDataRepo;
@@ -25,7 +25,7 @@ class SubmitEducationDataRepo extends RepoInterface<UserModel> {
 
 
 
-  onParse(data: any): UserModel   {
+  onParse(data: any): UserModel {
     return UserModel.fromMap(data);
   }
 

@@ -36,24 +36,7 @@ export default class UpdateProfileController extends ControllerInterface<UserMod
           messageContent: null,
         });
         const userStore = useUserStore();
-        if (this.state.value.data && this.state.value.data) {
-          const user = useUserStore().user;
-          if (user) {
-            user.firstName = this.state.value.data.firstName;
-            user.lastName = this.state.value.data.lastName;
-            user.email = this.state.value.data.email;
-            user.phone = this.state.value.data.phone;
-            user.name = this.state.value.data.name;
-            user.aboutMe = this.state.value.data.aboutMe;
-            user.sendNotifications = this.state.value.data.sendNotifications;
-            user.facebook = this.state.value.data.facebook;
-            user.x = this.state.value.data.x;
-            user.instagram = this.state.value.data.instagram;
-            user.youtube = this.state.value.data.youtube;
-            user.linkedin = this.state.value.data.linkedin;
-            user.whatsapp = this.state.value.data.whatsapp;
-          }
-        }
+        if (this.state.value.data) userStore.updateUser(this.state.value.data);
       }else {
         throw new Error(this.state.value.error?.title);
       }
