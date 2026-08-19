@@ -1,12 +1,16 @@
 <script setup lang="ts">
 const UserSettingStore = useSettingStore();
 const route = useRoute();
+const { isDark } = useAppTheme();
 </script>
 
 <template>
   <div
     class="login-home-redesign auth-unified-shell"
-    :class="{ 'auth-unified-shell--register': route.path.toLowerCase() === '/auth/register' }"
+    :class="{
+      'auth-unified-shell--register': route.path.toLowerCase() === '/auth/register',
+      'auth-unified-shell--dark': isDark,
+    }"
     dir="rtl"
   >
     <section class="login-home-form-panel">
@@ -62,3 +66,86 @@ const route = useRoute();
 </template>
 
 <style scoped src="~/assets/style/login-home-redesign/login-home.css"></style>
+
+<style>
+html[data-theme="dark"] .auth-unified-shell--register .login-home-form-panel {
+  background: #f8faff !important;
+  background-image: none !important;
+  color: #0b1d3b !important;
+}
+
+html[data-theme="dark"]
+  .auth-unified-shell--register
+  .auth-unified-content
+  .login-form > h3 {
+  color: #28366c !important;
+}
+
+html[data-theme="dark"]
+  .auth-unified-shell--register
+  .auth-unified-content
+  .login-form > p {
+  color: #71809a !important;
+}
+
+html[data-theme="dark"]
+  .auth-unified-shell--register
+  .auth-unified-content
+  .auth-field-label {
+  color: #28366c !important;
+}
+
+html[data-theme="dark"]
+  .auth-unified-shell--register
+  .auth-unified-content
+  .login-input input,
+html[data-theme="dark"]
+  .auth-unified-shell--register
+  .auth-unified-content
+  .login-input select,
+html[data-theme="dark"]
+  .auth-unified-shell--register
+  .auth-unified-content
+  .student-select {
+  border-color: #cdd8e8 !important;
+  background: #fff !important;
+  color: #28366c !important;
+  color-scheme: light;
+}
+
+.auth-unified-shell--register.auth-unified-shell--dark
+  .login-home-form-panel {
+  background: #f8faff !important;
+  background-image: none !important;
+}
+
+.auth-unified-shell--register.auth-unified-shell--dark
+  .auth-unified-content
+  .login-form > h3,
+.auth-unified-shell--register.auth-unified-shell--dark
+  .auth-unified-content
+  .auth-field-label {
+  color: #28366c !important;
+}
+
+.auth-unified-shell--register.auth-unified-shell--dark
+  .auth-unified-content
+  .login-form > p {
+  color: #71809a !important;
+}
+
+.auth-unified-shell--register.auth-unified-shell--dark
+  .auth-unified-content
+  .login-input input,
+.auth-unified-shell--register.auth-unified-shell--dark
+  .auth-unified-content
+  .login-input select,
+.auth-unified-shell--register.auth-unified-shell--dark
+  .auth-unified-content
+  .student-select {
+  border-color: #cdd8e8 !important;
+  background: #fff !important;
+  color: #28366c !important;
+  color-scheme: light;
+}
+</style>

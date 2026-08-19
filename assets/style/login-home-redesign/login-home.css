@@ -18,8 +18,11 @@
   justify-content: center;
   min-width: 0;
   padding: 54px clamp(28px, 5vw, 86px) 34px;
-  background:
-    radial-gradient(circle at 10% 8%, color-mix(in srgb, var(--secondary-color, #3a3e7e) 8%, transparent) 0 2px, transparent 3px),
+  background: radial-gradient(
+      circle at 10% 8%,
+      color-mix(in srgb, var(--secondary-color, #3a3e7e) 8%, transparent) 0 2px,
+      transparent 3px
+    ),
     #f8faff;
 }
 
@@ -63,7 +66,8 @@
   gap: 14px;
   min-height: 76px;
   padding: 15px 16px;
-  border: 1px solid color-mix(in srgb, var(--secondary-color, #3a3e7e) 24%, #dce5f4);
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color, #3a3e7e) 24%, #dce5f4);
   background: color-mix(in srgb, var(--secondary-color, #3a3e7e) 7%, white);
 }
 
@@ -193,7 +197,8 @@
 
 .login-home-input input:focus {
   border-color: var(--secondary-color, #3a3e7e);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color, #3a3e7e) 13%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--secondary-color, #3a3e7e) 13%, transparent);
 }
 
 .login-home-password input {
@@ -218,7 +223,8 @@
   color: #718096;
   cursor: pointer;
   transform: translateY(-50%);
-  transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+  transition: color 160ms ease, background-color 160ms ease,
+    transform 160ms ease;
 }
 
 .login-home-password-toggle svg {
@@ -228,7 +234,11 @@
 
 .login-home-password-toggle:hover,
 .login-home-password-toggle:focus-visible {
-  background: color-mix(in srgb, var(--secondary-color, #3a3e7e) 10%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 10%,
+    transparent
+  );
   color: var(--secondary-color, #3a3e7e);
   transform: translateY(-50%) scale(1.06);
 }
@@ -323,7 +333,8 @@
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+  transition: transform 160ms ease, background-color 160ms ease,
+    color 160ms ease;
 }
 
 .login-home-submit:hover {
@@ -355,11 +366,7 @@
   height: 34px;
   place-items: center;
   border-radius: 9px;
-  background: color-mix(
-    in srgb,
-    var(--secondary-color, #3a3e7e) 10%,
-    #fff
-  );
+  background: color-mix(in srgb, var(--secondary-color, #3a3e7e) 10%, #fff);
   color: var(--secondary-color, #3a3e7e);
   font-size: 14px;
 }
@@ -394,11 +401,7 @@
     var(--secondary-color, #3a3e7e) 46%,
     #d3ddeb
   );
-  background: color-mix(
-    in srgb,
-    var(--secondary-color, #3a3e7e) 4%,
-    #fff
-  );
+  background: color-mix(in srgb, var(--secondary-color, #3a3e7e) 4%, #fff);
   box-shadow: 0 10px 24px rgb(22 43 78 / 8%);
   transform: translateY(-1px);
 }
@@ -408,11 +411,8 @@
 }
 
 .login-home-guest:focus-visible {
-  outline: 3px solid color-mix(
-    in srgb,
-    var(--secondary-color, #3a3e7e) 25%,
-    transparent
-  );
+  outline: 3px solid
+    color-mix(in srgb, var(--secondary-color, #3a3e7e) 25%, transparent);
   outline-offset: 3px;
 }
 
@@ -501,8 +501,7 @@
   flex-direction: column;
   overflow: hidden;
   padding: 48px clamp(40px, 6vw, 112px);
-  background:
-    radial-gradient(
+  background: radial-gradient(
       circle at 78% 36%,
       rgba(255, 255, 255, 0.09),
       transparent 25rem
@@ -641,11 +640,8 @@
   bottom: -270px;
   width: 470px;
   height: 470px;
-  border: 1px solid color-mix(
-    in srgb,
-    var(--login-visual-accent) 30%,
-    transparent
-  );
+  border: 1px solid
+    color-mix(in srgb, var(--login-visual-accent) 30%, transparent);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -879,7 +875,8 @@
 .auth-unified-content :deep(.login-input input:focus),
 .auth-unified-content :deep(.login-input select:focus) {
   border-color: var(--secondary-color, #3a3e7e) !important;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color, #3a3e7e) 13%, transparent) !important;
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--secondary-color, #3a3e7e) 13%, transparent) !important;
 }
 
 .auth-unified-content :deep(.login-call-icon) {
@@ -1042,7 +1039,7 @@
 }
 
 /* Keep the legacy education form readable when the application theme is dark. */
-:global(html[data-theme='dark']) .auth-unified-shell {
+:global(html[data-theme="dark"]) .auth-unified-shell {
   --auth-dark-surface: #111a2e;
   --auth-dark-field: #19243b;
   --auth-dark-border: #33415e;
@@ -1051,7 +1048,7 @@
   --auth-dark-accent: #66a9ff;
 }
 
-:global(html[data-theme='dark']) .auth-unified-shell .login-home-form-panel {
+:global(html[data-theme="dark"]) .auth-unified-shell .login-home-form-panel {
   background-color: var(--auth-dark-surface) !important;
   background-image: radial-gradient(
     circle at 10% 8%,
@@ -1060,80 +1057,124 @@
   ) !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(.login-form > h3),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.skills-container > h3) {
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.login-form > h3),
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.skills-container > h3) {
   color: var(--auth-dark-text) !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(.login-form > p),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.skills-container > p) {
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.login-form > p),
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.skills-container > p) {
   color: var(--auth-dark-muted) !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(.auth-field-label) {
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.auth-field-label) {
   color: #dce6f6 !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-shell--register {
+:global(html[data-theme="dark"]) .auth-unified-shell--register {
   color-scheme: light;
 }
 
-:global(html[data-theme='dark']) .auth-unified-shell--register .login-home-form-panel {
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .login-home-form-panel {
   background: #f8faff !important;
   background-image: none !important;
   color: #0b1d3b !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.login-form > h3),
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.login-form > p),
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.auth-field-label) {
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-form > h3),
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.auth-field-label) {
   color: #28366c !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.login-form > p) {
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-form > p) {
   color: #71809a !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.login-input input),
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.login-input select),
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.student-select),
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.natioal-select),
-:global(html[data-theme='dark']) .auth-unified-shell--register .auth-unified-content :deep(.city-select) {
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-input input),
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-input select),
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.student-select),
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.natioal-select),
+:global(html[data-theme="dark"])
+  .auth-unified-shell--register
+  .auth-unified-content
+  :deep(.city-select) {
   border-color: #cdd8e8 !important;
   background: #fff !important;
   color: #28366c !important;
+  color-scheme: light;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(.login-input input),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.login-input select),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.student-select),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.natioal-select),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.city-select),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.phone-number input),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.code-number-box) {
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.login-input input),
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.login-input select),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.student-select),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.natioal-select),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.city-select),
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.phone-number input),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.code-number-box) {
   border-color: var(--auth-dark-border) !important;
   background: var(--auth-dark-field) !important;
   color: var(--auth-dark-text) !important;
   color-scheme: dark;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(select:disabled) {
+:global(html[data-theme="dark"]) .auth-unified-content :deep(select:disabled) {
   border-color: #2a354d !important;
   background: #141e32 !important;
   color: #8795ac !important;
   opacity: 1 !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(.login-input input:focus),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.login-input select:focus) {
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.login-input input:focus),
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.login-input select:focus) {
   border-color: var(--auth-dark-accent) !important;
   box-shadow: 0 0 0 3px rgb(102 169 255 / 18%) !important;
 }
 
-:global(html[data-theme='dark']) .auth-unified-content :deep(.select-placeholder),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.remember-mee),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.remember-me),
-:global(html[data-theme='dark']) .auth-unified-content :deep(.resend-code) {
+:global(html[data-theme="dark"])
+  .auth-unified-content
+  :deep(.select-placeholder),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.remember-mee),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.remember-me),
+:global(html[data-theme="dark"]) .auth-unified-content :deep(.resend-code) {
   color: var(--auth-dark-muted) !important;
 }
 
@@ -1190,9 +1231,14 @@
 .auth-unified-content :deep(.skills-list button) {
   margin: 0 !important;
   padding: 8px 12px !important;
-  border: 1px solid color-mix(in srgb, var(--secondary-color, #3a3e7e) 25%, #dce4ef) !important;
+  border: 1px solid
+    color-mix(in srgb, var(--secondary-color, #3a3e7e) 25%, #dce4ef) !important;
   border-radius: 999px !important;
-  background: color-mix(in srgb, var(--secondary-color, #3a3e7e) 7%, white) !important;
+  background: color-mix(
+    in srgb,
+    var(--secondary-color, #3a3e7e) 7%,
+    white
+  ) !important;
   color: var(--secondary-color, #3a3e7e) !important;
   font-size: 11px !important;
 }
