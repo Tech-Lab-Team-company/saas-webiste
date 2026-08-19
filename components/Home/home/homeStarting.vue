@@ -3,7 +3,7 @@ import BackgoundCircle from "~/public/icons/BackgoundCircle.vue";
 import { ref, onMounted } from "vue";
 // import EducationStages from './EducationStages.vue';
 import Students from "./Students.vue";
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import type { SwiperHome } from "~/types/swiperhome";
 import { register } from "swiper/element/bundle";
 import { getWebDomain } from "~/constant/webDomain"; // For web components
@@ -37,7 +37,7 @@ const {
       data: SwiperHome[];
       message: string;
       status: number;
-    }>(`${baseUrl}/fetch_sliders`, {
+    }>(`${useBaseUrls().baseUrl}/fetch_sliders`, {
       method: "POST",
       headers: {
         "Accept-Language": "ar",

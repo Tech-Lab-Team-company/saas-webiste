@@ -4,7 +4,7 @@ import { register } from 'swiper/element/bundle'
 import 'swiper/css'
 import banner from '../../Global/banner.vue'
 import type Terms from "~/types/terms";
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import { SectionTypeEnum } from './enum/section_type_enum';
 import {getWebDomain} from "~/constant/webDomain";
@@ -17,7 +17,7 @@ const { data: homefirstsection } = await useAsyncData("homefirstsection", async 
     data: HomeFirstSection[]; 
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_home_website_section`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_home_website_section`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",

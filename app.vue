@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import type WebStatus from "./types/webStatus";
 import { useSettingStore } from "./stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
@@ -77,12 +77,14 @@ const getSiteImageSource = (image: unknown): string => {
 const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
   "webStatus",
   async () => {
+
+    console.log(useBaseUrls().baseUrl);
     try {
       const response = await $fetch<{
         data: WebStatus;
         message: string;
         status: boolean | number;
-      }>(`${baseUrl}/fetch_web_status`, {
+      }>(`${useBaseUrls().baseUrl}/fetch_web_status`, {
         method: "GET",
         headers: {
           "web-domain": getWebDomain(),

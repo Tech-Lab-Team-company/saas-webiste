@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type  BlogsCard  from "~/types/blogscard";
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import {getWebDomain} from "~/constant/webDomain";
 
 // Fetch blog data
@@ -10,7 +10,7 @@ const { data: blogscard } = await useAsyncData("blogscard", async () => {
       data: BlogsCard[];
       message: string;
       status: number;
-    }>(`${baseUrl}/fetch_blogs`, {
+    }>(`${useBaseUrls().baseUrl}/fetch_blogs`, {
       method: "POST",
       headers: {
         "Accept-Language": "ar",

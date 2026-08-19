@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type BlogsDetails from "~/types/blogsdetails";
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import {getWebDomain} from "~/constant/webDomain";
 
 const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
@@ -9,7 +9,7 @@ const { data: blogdetails } = await useAsyncData("blogsdetails", async () => {
       data: BlogsDetails;
       message: string;
       status: number;
-    }>("https://saas.crazyidea.online/api/website/show_blog", {
+    }>(`${useBaseUrls().baseUrl}/show_blog`, {
       method: "POST",
       headers: {
         "Accept-Language": "ar",

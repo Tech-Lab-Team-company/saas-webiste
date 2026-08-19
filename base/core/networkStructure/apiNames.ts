@@ -1,3 +1,6 @@
+import { useBaseUrls } from "~/constant/baseUrl";
+
+
 class ApiNames {
   private static _instance: ApiNames;
   // eslint-disable-next-line ~typescript-eslint/no-empty-function
@@ -9,7 +12,7 @@ class ApiNames {
     return this._instance;
   }
 
-  public baseUrl = "https://dev.saas.techlabeg.com/api/website/";
+  public baseUrl = useBaseUrls().baseUrl + "/";
 
   //auth
   public login = "login";
@@ -129,23 +132,23 @@ class ApiNames {
   // Home V2
   // This endpoint is available on the development API only.
   public fetch_hero_sections =
-    "https://dev.saas.techlabeg.com/api/website/fetch_hero_sections";
+    this.baseUrl + "fetch_hero_sections";
   public fetch_home_learning_journey =
-    "https://dev.saas.techlabeg.com/api/website/fetch_home_learning_journey";
+    this.baseUrl + "fetch_home_learning_journey";
   public fetch_about_teacher =
-    "https://dev.saas.techlabeg.com/api/website/fetch_about_teacher";
+    this.baseUrl + "fetch_about_teacher";
   public fetch_study_process =
-    "https://dev.saas.techlabeg.com/api/website/fetch_study_process";
+    this.baseUrl + "fetch_study_process";
   public fetch_ready_section =
-    "https://dev.saas.techlabeg.com/api/website/fetch_ready_section";
-  public fetch_books = "https://dev.saas.techlabeg.com/api/website/fetch_books";
+    this.baseUrl + "fetch_ready_section";
+  public fetch_books = this.baseUrl + "fetch_books";
   public fetch_home_book_section =
-    "https://dev.saas.techlabeg.com/api/website/fetch_home_book_section";
+    this.baseUrl + "fetch_home_book_section";
   public fetch_home_websection_book_details =
-    "https://dev.saas.techlabeg.com/api/website/fetch_home_websection_book_details";
+    this.baseUrl + "fetch_home_websection_book_details";
   public buy_product = this.baseUrl + "v3/buy_product";
-  public fetch_home_website_section = "fetch_home_website_section";
-  public filter_courses = "filter_courses";
+  public fetch_home_website_section = this.baseUrl + "fetch_home_website_section";
+  public filter_courses = this.baseUrl + "filter_courses";
 
 //  public show_blog = "show_blog";
 

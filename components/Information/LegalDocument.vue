@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import { getWebDomain } from "~/constant/webDomain";
 
 interface LegalDocument {
@@ -23,7 +23,7 @@ const { data: document, pending, error, refresh } = await useAsyncData(
       data: LegalDocument;
       message: string;
       status: boolean | number;
-    }>(`${baseUrl}/${props.endpoint}`, {
+    }>(`${useBaseUrls().baseUrl}/${props.endpoint}`, {
       method: "GET",
       headers: {
         "Accept-Language": "ar",

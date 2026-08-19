@@ -3,7 +3,7 @@ import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css/skyblue"; // Using skyblue theme for better visibility
 import { Autoplay, EffectCreative } from "swiper/modules";
 import { ref, onMounted } from 'vue';
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import type HomeFirstSection from '~/types/home_first_section';
 import StagesTitle from '../Home/home/StagesTitle.vue'
 import { getWebDomain } from "~/constant/webDomain";
@@ -56,7 +56,7 @@ const { data: Blogs } = await useAsyncData("BlogsHome", async () => {
     data: HomeFirstSection[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_blogs`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_blogs`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",

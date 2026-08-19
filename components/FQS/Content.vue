@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import { getWebDomain } from "~/constant/webDomain";
 import type Fqs from "~/types/fqs";
 
@@ -12,7 +12,7 @@ const { data: fqs, pending, error, refresh } = await useAsyncData(
       data: Fqs[];
       message: string;
       status: boolean | number;
-    }>(`${baseUrl}/fetch_faqs`, {
+    }>(`${useBaseUrls().baseUrl}/fetch_faqs`, {
       method: "GET",
       headers: {
         "Accept-Language": "ar",

@@ -58,6 +58,8 @@ export default defineNuxtConfig({
       // Preferred public frontend origin for canonical and absolute URLs.
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || '',
       googleAnalyticsId: process.env.NUXT_PUBLIC_GOOGLE_ANALYTICS_ID || '',
+      baseUrl: process.env.BASE_URL || "https://dev.saas.techlabeg.com/api/website",
+      dashboardBaseUrl: process.env.DASHBOARD_BASE_URL || "https://dev.saas.techlabeg.com/api/dashboard",
     },
   },
   routeRules: {

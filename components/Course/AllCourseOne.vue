@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { baseUrl } from "~/constant/baseUrl";
+// import { useBaseUrls } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 import Loder from "../Loader/Loder.vue";
 const props = defineProps<{

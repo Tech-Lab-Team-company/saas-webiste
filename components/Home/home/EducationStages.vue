@@ -5,7 +5,7 @@ import LeftDots from "~/public/icons/LeftDots.vue";
 import StagesTitle from "./StagesTitle.vue";
 import type Stages from "~/types/stages";
 import type Universitiey from "~/types/universitey";
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import { useFiltersStore } from '~/stores/courses_filter';
 import { useSettingStore } from "~/stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
@@ -27,7 +27,7 @@ const { data: stages } = await useAsyncData("stages", async () => {
     data: Stages[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_stages`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_stages`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",

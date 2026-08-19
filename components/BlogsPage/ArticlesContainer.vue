@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type  SidebarHashtag  from "~/types/sidebarhashtag";
 
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
+
 import {getWebDomain} from "~/constant/webDomain";
 // Fetch blog data
 const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () => {
@@ -10,7 +11,7 @@ const { data: sidebarhashtag } = await useAsyncData("sidebarhashtag", async () =
       data: SidebarHashtag[];
       message: string;
       status: number;
-    }>(`${baseUrl}/fetch_hashtags`, {
+    }>(`${useBaseUrls().baseUrl}/fetch_hashtags`, {
       method: "POST",
       headers: {
         "Accept-Language": "ar",

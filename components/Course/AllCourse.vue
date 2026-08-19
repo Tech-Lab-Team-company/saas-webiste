@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import toggleone from "~/public/icons/toggleone.vue";
 import toggletwo from "~/public/icons/toggletwo.vue";
-import { baseUrl } from "~/constant/baseUrl";
+import { useBaseUrls } from "~/constant/baseUrl";
 import type CoursesFilterModel from "~/features/CoursesFilter/Data/models/courses_filter_model";
 import { useFiltersStore } from '~/stores/courses_filter';
 import { getWebDomain } from "~/constant/webDomain";
@@ -42,7 +42,7 @@ const fetchCourses = async () => {
       data: CoursesFilterModel[];
       message: string;
       status: number;
-    }>(`${baseUrl}/filter_courses`, {
+    }>(`${useBaseUrls().baseUrl}/filter_courses`, {
       method: "POST",
       body: {
         category_id: (Year_id ? 1 : Division_id ? 2 : CategoryId.value) || CategoryId.value,
