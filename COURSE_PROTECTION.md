@@ -34,6 +34,9 @@ Application-wide controls and their shared notice are implemented by:
 - Applies a synchronous HTML security lock before Vue's next render and pauses
   active media immediately, preventing the previous page frame from remaining
   visible while component state is being unmounted.
+- Uses window blur and tab visibility as a fail-closed fallback. Undocked
+  developer tools, switching windows, or hiding the tab immediately unmounts
+  protected course/exam content; returning never extends the exam deadline.
 - Immediately unmounts the course or exam page when developer tools are
   detected, which removes rendered questions, lesson content, and component
   state from the DOM.

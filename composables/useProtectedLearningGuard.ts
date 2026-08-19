@@ -8,6 +8,7 @@ export function useProtectedLearningGuard(
 ) {
   const config = useCourseProtectionConfig();
   const isDeveloperToolsOpen = ref(false);
+  const isProtectedWindowInactive = ref(false);
   let detectionTimer: ReturnType<typeof setInterval> | null = null;
   let consecutiveClosedChecks = 0;
 
@@ -31,10 +32,11 @@ export function useProtectedLearningGuard(
     );
   };
 
-  const setDeveloperToolsState = (nextState: boolean) => {
-    if (isDeveloperToolsOpen.value === nextState) return;
+  const syncProtectedContentLock = () => {
+    const shouldBlock =
+      isDeveloperToolsOpen.value || isProtectedWindowInactive.value;
 
-    if (nextState) {
+    if (shouldBlock) {
       document.documentElement.setAttribute(
         "data-protected-content-blocked",
         "true",
@@ -49,12 +51,26 @@ export function useProtectedLearningGuard(
         "data-protected-content-blocked",
       );
     }
+  };
+
+  const setDeveloperToolsState = (nextState: boolean) => {
+    if (isDeveloperToolsOpen.value === nextState) return;
 
     isDeveloperToolsOpen.value = nextState;
+    syncProtectedContentLock();
     if (nextState) {
       clearNuxtData((key) => key.startsWith("course-details:"));
     }
     emitSecurityEvent(nextState);
+  };
+
+  const setProtectedWindowInactive = (nextState: boolean) => {
+    if (isProtectedWindowInactive.value === nextState) return;
+    isProtectedWindowInactive.value = nextState;
+    syncProtectedContentLock();
+    if (nextState) {
+      clearNuxtData((key) => key.startsWith("course-details:"));
+    }
   };
 
   const checkDeveloperTools = (immediate = false) => {
@@ -93,16 +109,28 @@ export function useProtectedLearningGuard(
   };
 
   const handleVisibilityChange = () => {
+    if (!toValue(protectionActive) || !config.blockProtectedWindowBlur) return;
+    setProtectedWindowInactive(document.hidden);
     if (!document.hidden) checkDeveloperTools(true);
   };
-  const handleWindowSignal = () => checkDeveloperTools(true);
+  const handleWindowBlur = () => {
+    if (toValue(protectionActive) && config.blockProtectedWindowBlur) {
+      setProtectedWindowInactive(true);
+    }
+  };
+  const handleWindowFocus = () => {
+    setProtectedWindowInactive(false);
+    checkDeveloperTools(true);
+  };
+  const handleWindowResize = () => checkDeveloperTools(true);
 
   if (import.meta.client) checkDeveloperTools(true);
 
   onMounted(() => {
     checkDeveloperTools(true);
-    window.addEventListener("resize", handleWindowSignal, { passive: true });
-    window.addEventListener("focus", handleWindowSignal, { passive: true });
+    window.addEventListener("resize", handleWindowResize, { passive: true });
+    window.addEventListener("blur", handleWindowBlur, { passive: true });
+    window.addEventListener("focus", handleWindowFocus, { passive: true });
     document.addEventListener("visibilitychange", handleVisibilityChange);
     PROTECTED_COPY_EVENTS.forEach((eventName) => {
       document.addEventListener(eventName, blockProtectedCopy, true);
@@ -115,12 +143,16 @@ export function useProtectedLearningGuard(
 
   watch(
     () => toValue(protectionActive),
-    () => checkDeveloperTools(true),
+    (active) => {
+      if (!active) setProtectedWindowInactive(false);
+      checkDeveloperTools(true);
+    },
   );
 
   onBeforeUnmount(() => {
-    window.removeEventListener("resize", handleWindowSignal);
-    window.removeEventListener("focus", handleWindowSignal);
+    window.removeEventListener("resize", handleWindowResize);
+    window.removeEventListener("blur", handleWindowBlur);
+    window.removeEventListener("focus", handleWindowFocus);
     document.removeEventListener("visibilitychange", handleVisibilityChange);
     PROTECTED_COPY_EVENTS.forEach((eventName) => {
       document.removeEventListener(eventName, blockProtectedCopy, true);
@@ -131,5 +163,8 @@ export function useProtectedLearningGuard(
 
   return {
     isDeveloperToolsOpen: readonly(isDeveloperToolsOpen),
+    isProtectedContentBlocked: computed(
+      () => isDeveloperToolsOpen.value || isProtectedWindowInactive.value,
+    ),
   };
 }

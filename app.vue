@@ -25,11 +25,11 @@ const isCourseExamPage = computed(() =>
 const isProtectedLearningPage = computed(() =>
   isProtectedLearningPath(route.path),
 );
-const { isDeveloperToolsOpen } = useProtectedLearningGuard(
+const { isProtectedContentBlocked: protectedRouteBlocked } = useProtectedLearningGuard(
   isProtectedLearningPage,
 );
 const isProtectedContentBlocked = computed(
-  () => isProtectedLearningPage.value && isDeveloperToolsOpen.value,
+  () => isProtectedLearningPage.value && protectedRouteBlocked.value,
 );
 const isHomeV2 = computed(
   () =>

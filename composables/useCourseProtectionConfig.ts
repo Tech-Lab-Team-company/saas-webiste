@@ -6,6 +6,7 @@ export function useCourseProtectionConfig() {
     blockDocumentShortcuts: true,
     blockMediaDrag: true,
     blockProtectedCopy: true,
+    blockProtectedWindowBlur: true,
     blockPrint: true,
     captureShield: true,
     developerToolsGuard: true,
