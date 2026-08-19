@@ -800,19 +800,7 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-hero__ambient-grid {
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgb(255 255 255 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 4%) 1px, transparent 1px);
-  background-size: 54px 54px;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    #000 32%,
-    #000 75%,
-    transparent
-  );
-  opacity: 0.55;
+  display: none;
 }
 
 .home-v2-hero__ambient-orb {
@@ -1307,11 +1295,6 @@ onBeforeUnmount(() => {
   .home-v2-hero__actions > * span {
     flex: 0 0 auto;
     font-size: 14px;
-  }
-
-  .home-v2-hero__ambient-grid {
-    background-size: 38px 38px;
-    opacity: 0.35;
   }
 
   .home-v2-hero__scroll-cue,
