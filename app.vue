@@ -54,10 +54,17 @@ const hasNavbarThemeToggle = computed(
   () =>
     isHomeV2.value ||
     route.meta.layout === undefined ||
-    route.meta.layout === "default",
+    route.meta.layout === "default" ||
+    isAuthRoute.value,
 );
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
+
+const isAuthRoute = computed(() => {
+  const path = route.path.toLowerCase();
+  return path.startsWith("/auth") || path.startsWith("/login");
+});
+const effectiveIsDark = computed(() => isDark.value && !isAuthRoute.value);
 
 const getSiteImageSource = (image: unknown): string => {
   if (typeof image === "string") return image.trim();
@@ -125,29 +132,29 @@ const themeVariables = computed<Record<string, string>>(() => ({
   "--secondary-color": secondaryColor.value,
   "--app-brand-primary": primaryColor.value,
   "--app-brand-secondary": secondaryColor.value,
-  "--app-accent": isDark.value
+  "--app-accent": effectiveIsDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 58%, #9fc2ff)`
     : primaryColor.value,
-  "--app-accent-secondary": isDark.value
+  "--app-accent-secondary": effectiveIsDark.value
     ? `color-mix(in srgb, ${secondaryColor.value} 65%, #7183b7)`
     : secondaryColor.value,
-  "--app-bg": isDark.value
+  "--app-bg": effectiveIsDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 6%, #080b12)`
     : "#fbfcff",
-  "--app-bg-muted": isDark.value
+  "--app-bg-muted": effectiveIsDark.value
     ? `color-mix(in srgb, ${secondaryColor.value} 8%, #0d111b)`
     : "#f2f6fc",
-  "--app-surface": isDark.value
+  "--app-surface": effectiveIsDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 10%, #131824)`
     : "#ffffff",
-  "--app-surface-raised": isDark.value
+  "--app-surface-raised": effectiveIsDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 13%, #19202e)`
     : "#ffffff",
-  "--app-text": isDark.value ? "#f3f6fc" : "#081b3a",
-  "--app-muted": isDark.value ? "#aab6ca" : "#4f617c",
-  "--app-line": isDark.value ? "rgb(205 220 245 / 16%)" : "rgb(8 27 58 / 14%)",
-  "--app-shadow": isDark.value ? "rgb(0 0 0 / 72%)" : "rgb(6 17 71 / 40%)",
-  "--app-footer-bg": isDark.value
+  "--app-text": effectiveIsDark.value ? "#f3f6fc" : "#081b3a",
+  "--app-muted": effectiveIsDark.value ? "#aab6ca" : "#4f617c",
+  "--app-line": effectiveIsDark.value ? "rgb(205 220 245 / 16%)" : "rgb(8 27 58 / 14%)",
+  "--app-shadow": effectiveIsDark.value ? "rgb(0 0 0 / 72%)" : "rgb(6 17 71 / 40%)",
+  "--app-footer-bg": effectiveIsDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 24%, #070a11)`
     : `color-mix(in srgb, ${primaryColor.value} 82%, #071020)`,
 }));
@@ -159,7 +166,7 @@ const themeInlineStyle = computed(() =>
 );
 
 watchEffect(() => {
-  const activeTheme = theme.value;
+  const activeTheme = isAuthRoute.value ? "light" : theme.value;
   const activeVariables = themeVariables.value;
 
   if (!import.meta.client) return;
@@ -318,7 +325,7 @@ useHead(() => ({
   htmlAttrs: {
     lang: "ar",
     dir: "rtl",
-    "data-theme": theme.value,
+    "data-theme": isAuthRoute.value ? "light" : theme.value,
     style: themeInlineStyle.value,
   },
   link: [
