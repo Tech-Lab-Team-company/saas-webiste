@@ -25,9 +25,8 @@ const isCourseExamPage = computed(() =>
 const isProtectedLearningPage = computed(() =>
   isProtectedLearningPath(route.path),
 );
-const { isProtectedContentBlocked: protectedRouteBlocked } = useProtectedLearningGuard(
-  isProtectedLearningPage,
-);
+const { isProtectedContentBlocked: protectedRouteBlocked } =
+  useProtectedLearningGuard(isProtectedLearningPage);
 const isProtectedContentBlocked = computed(
   () => isProtectedLearningPage.value && protectedRouteBlocked.value,
 );
@@ -77,7 +76,6 @@ const getSiteImageSource = (image: unknown): string => {
 const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
   "webStatus",
   async () => {
-
     console.log(useBaseUrls().baseUrl);
     try {
       const response = await $fetch<{
@@ -521,8 +519,11 @@ onMounted(() => {
   padding: 15px 20px;
   border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 18px;
-  background:
-    radial-gradient(circle at 10% 20%, rgb(72 117 255 / 25%), transparent 34%),
+  background: radial-gradient(
+      circle at 10% 20%,
+      rgb(72 117 255 / 25%),
+      transparent 34%
+    ),
     rgb(9 15 29 / 96%);
   box-shadow: 0 24px 65px rgb(0 0 0 / 34%), 0 0 0 1px rgb(7 17 38 / 20%);
   color: #fff;
@@ -553,7 +554,11 @@ onMounted(() => {
   place-items: center;
   border: 1px solid rgb(255 255 255 / 18%);
   border-radius: 14px;
-  background: linear-gradient(145deg, rgb(70 126 255 / 38%), rgb(111 79 255 / 18%));
+  background: linear-gradient(
+    145deg,
+    rgb(70 126 255 / 38%),
+    rgb(111 79 255 / 18%)
+  );
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%);
   color: #a9ceff;
   font-size: 21px;
@@ -609,8 +614,7 @@ onMounted(() => {
 
 .app-protection-notice-enter-active,
 .app-protection-notice-leave-active {
-  transition: opacity 0.24s ease,
-    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.24s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-protection-notice-enter-from,

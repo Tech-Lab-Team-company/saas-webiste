@@ -10,7 +10,7 @@ export default class RegisterParams implements Params {
   public second_phone: string | null;///
   public password: string;//// 
   public confirmPassword: string;
-  public educationType: number;
+  public educationTyp : number;
   public countryCode: string;
   public gender: number;
 
@@ -25,7 +25,7 @@ export default class RegisterParams implements Params {
     second_phone: string| null,
     password: string,
     confirmPassword: string,
-    educationType: number,
+    educationType?: number,
     countryCode: string,
     gender: number,
     

@@ -9,6 +9,10 @@ import { useBaseUrls } from "~/constant/baseUrl";
 import { useFiltersStore } from '~/stores/courses_filter';
 import { useSettingStore } from "~/stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
+import type GeneralCoursesModel from "~/features/FetchGeneralCourseSubject/Data/models/general_course_subjects_model";
+import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
+import FetchGeneralCoursesSubjectController from "~/features/FetchGeneralCourseSubject/presentation/controllers/fetch_general_course_subjects_controller.js";
+import FetchGeneralCoursesSubjectParams from "~/features/FetchGeneralCourseSubject/Core/Params/fetch_general_course_subjects_params.js";
 
 const settingStore = useSettingStore();
 
@@ -45,9 +49,9 @@ const fetchStageYears = async (stageId: number, stagetitle: string) => {
   ActiveStage.value = !ActiveStage.value;
   const response = await $fetch<{
     data: Stages[];
-    message: string;
-    status: number;
-  }>(`${baseUrl}/fetch_stage_years`, {
+    message: string;    
+    status: number; 
+  }>(`${useBaseUrls().baseUrl}  /fetch_stage_years`, {
     method: "POST",
     body: { stage_id: stageId },
     headers: {
@@ -77,7 +81,7 @@ const { data: universitiey } = await useAsyncData("universitiey", async () => {
     data: Universitiey[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_education_type`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_education_type`, {
     method: "POST",
     headers: {
       "Accept-Language": "ar",
@@ -102,7 +106,7 @@ const fetchUniversities = async (typeId: number) => {
     data: Universitiey[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_universities`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_universities`, {
     method: "POST",
     body: { type_id: typeId },
     headers: {
@@ -124,7 +128,7 @@ const fetchColleges = async (typeId: number) => {
     data: Universitiey[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_colleges`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_colleges`, {
     method: "POST",
     body: { university_id: typeId },
     headers: {
@@ -145,7 +149,7 @@ const fetchCollegeDepartment = async (typeId: number) => {
     data: Universitiey[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_college_departments`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_college_departments`, {
     method: "POST",
     body: { college_id: typeId },
     headers: {
@@ -166,7 +170,7 @@ const fetchCollegeDepartmentDivision = async (typeId: number) => {
     data: Universitiey[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_college_department_divisions`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_college_department_divisions`, {
     method: "POST",
     body: { department_id: typeId },
     headers: {
@@ -182,12 +186,25 @@ const fetchCollegeDepartmentDivision = async (typeId: number) => {
 
 const SelectedCollegeDepartmentDivision = ref(filtersStore.SelectedCollegeDepartmentDivision)
 const Subjects = ref<Universitiey[]>([]);
+const GeneralSubjects = ref<GeneralCoursesModel[]>([]);
+
+const fetchGeneralSubjects = async () => {
+  if (settingStore.setting?.has_general == 1 || GeneralSubjects.value.length) return;
+
+  const controller = FetchGeneralCoursesSubjectController.getInstance();
+  const state = await controller.fetchGeneralCoursesSubject(
+    new FetchGeneralCoursesSubjectParams(0),
+  );
+
+  if (state.value.data) GeneralSubjects.value = state.value.data;
+};
+
 const fetchSubjects = async (typeId: number) => {
   const response = await $fetch<{
     data: Universitiey[];
     message: string;
     status: number;
-  }>(`${baseUrl}/fetch_subjects`, {
+  }>(`${useBaseUrls().baseUrl}/fetch_subjects`, {
     method: "POST",
     body: { category_id: CategryId.value },
     headers: {
@@ -207,6 +224,11 @@ const SelectSubject = (typeId: number) => {
   SelectedSubject.value = typeId
   SendData();
 }
+
+const SelectGeneralSubject = (typeId: number) => {
+  CategryId.value = CategoryIdEnum.GENERAL;
+  SelectSubject(typeId);
+};
 
 const CategryId = ref((settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(1) ) ? 1: 
     (settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(2) ) ? 2 :filtersStore.CategryId)
@@ -239,7 +261,7 @@ const SendData = () => {
   });
   emit('UpdateData', {
     CategryId: CategryId.value,
-    SelectedEductionType: SelectedEducationTypeId.value,
+    SelectedEductionType: SelectedEducatiobaseUrlnTypeId.value,
     SelectedUniversity: SelectedUniversity.value,
     SelectedCollege: SelectedCollege.value,
     SelectedCollegeDepartment: SelectedCollegeDepartment.value,
@@ -254,7 +276,15 @@ const SendData = () => {
 
 onMounted(() => {
   SendData();
+  fetchGeneralSubjects();
 })
+
+watch(
+  () => settingStore.setting?.has_general,
+  (hasGeneral) => {
+    if (hasGeneral === 1) fetchGeneralSubjects();
+  },
+);
 const SelectedYearId = ref<number>()
 const ActiveStageYear = ref<boolean>(false)
 const updateStageYear = (stageYearId: number, stageYearTitle: string) => {
@@ -289,7 +319,31 @@ watch(() => props.with_text,
 </script>
 
 <template>
-  <div class="stage-container stage-container-dots" v-if="!settingStore?.setting?.has_general">
+  <div class="stage-container stage-container-dots" v-if="settingStore?.setting?.has_general === 1">
+    <div class="stages-background">
+      <LeftDots class="background-icon" />
+      <RightDots class="background-icon" />
+    </div>
+
+    <div class="stages stages-dot">
+      <StagesTitle v-if="TextShow" :maintitle="`المواد العامة`"
+        :subtitle="`اختر المادة للوصول إلى الكورسات المتاحة`" />
+
+      <div class="stages-buttons mt-4 flex flex-wrap gap-3">
+        <NuxtLink v-for="subject in GeneralSubjects" :key="`general-${subject.id}`" to="/course">
+          <button
+            class="btn btn-secondary btn-stages btn-stages-education"
+            :class="{ 'active-btn': SelectedSubject === subject.id }"
+            @click="SelectGeneralSubject(subject.id)"
+          >
+            {{ subject.title }}
+          </button>
+        </NuxtLink>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-container stage-container-dots" v-else>
     <div class="stages-background">
       <LeftDots class="background-icon" />
       <RightDots class="background-icon" />

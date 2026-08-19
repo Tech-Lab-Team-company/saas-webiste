@@ -6,7 +6,7 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 
 
-import { baseUrl } from '~/constant/baseUrl'
+import { useBaseUrls } from '~/constant/baseUrl'
 import type AboutUsInterface from '~/types/about_us_interface'
 import { SectionTypeEnum } from '~/components/Home/home/enum/section_type_enum'
 import { getWebDomain } from '~/constant/webDomain'
@@ -48,6 +48,7 @@ interface TopStudentsStage extends HomeCourseStageViewModel {
 }
 
 const webDomain = getWebDomain()
+const baseUrl = useBaseUrls().baseUrl
 const homeApi = new HomePageApi(webDomain)
 const { isDark } = useAppTheme()
 
@@ -169,7 +170,7 @@ const {
   `top-students:${webDomain}`,
   async () => {
     const response = await $fetch<TopStudent[] | ApiResponse<TopStudent>>(
-      `${baseUrl}/fetch_top_students`,
+      `${useBaseUrls().baseUrl}/fetch_top_students`,
       {
         method: 'POST',
         headers: {
@@ -281,7 +282,7 @@ const swiperOptions = {
 
 const studentSwiperOptions = computed(() => ({
   modules,
-  slidesPerView: 'auto',
+  slidesPerView: 'auto' as const,
   centeredSlides: topStudents.value.length > 5,
   centerInsufficientSlides: false,
   spaceBetween: 14,
@@ -511,7 +512,7 @@ const getStudentAlt = (student: any) => {
             <div class="students-empty__icon"><span class="pi pi-exclamation-circle" /></div>
             <h3>تعذر تحميل الطلاب المتفوقين</h3>
             <p>حدث خطأ مؤقت أثناء تحميل البيانات.</p>
-            <button type="button" @click="refreshTopStudents">إعادة المحاولة</button>
+            <button type="button" @click="() => refreshTopStudents()">إعادة المحاولة</button>
           </div>
 
           <Swiper
@@ -1215,6 +1216,7 @@ const getStudentAlt = (student: any) => {
   font-size: 13px;
   line-height: 1.9;
 
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
@@ -2428,6 +2430,7 @@ const getStudentAlt = (student: any) => {
   color: #91a0b5;
   font-size: 11px;
   line-height: 1.75;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
