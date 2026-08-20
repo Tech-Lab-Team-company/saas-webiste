@@ -34,8 +34,8 @@ export const useStudentDashboardMotion = () => {
             duration: 0.68,
           })
           .from(
-            ".profile-dashboard-topbar > *",
-            { autoAlpha: 0, y: -14, stagger: 0.09, duration: 0.48 },
+            ".profile-dashboard-topbar .profile-topbar-copy",
+            { autoAlpha: 0, duration: 0.48 },
             0.12,
           )
           .from(

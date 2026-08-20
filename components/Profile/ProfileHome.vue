@@ -9,6 +9,9 @@ import UpdateProfileParams from "~/features/UpdateProfileFeature/Core/Params/upd
 const studentCategory = ref(0);
 
 const userStore = useUserStore();
+const profileImage = computed(
+  () => userStore.image || userStore.user?.image || "/images/user.png",
+);
 
 const selectedCommerce = ref();
 const selectedCategory = ref();
@@ -34,12 +37,37 @@ const college_title = ref("");
 const university_education_type_title = ref("");
 const division_title = ref("");
 const department_title = ref("");
+
+const splitPhoneFromName = (storedName = "", storedPhone = "") => {
+  if (storedPhone.trim()) return { name: storedName, phone: storedPhone };
+
+  const match = storedName.trim().match(/^(.*?)\s+(\+?[\d\s-]{9,}\d)$/u);
+  if (!match) return { name: storedName, phone: storedPhone };
+
+  const extractedPhone = match[2].replace(/[\s-]/g, "");
+  const digitCount = extractedPhone.replace(/\D/g, "").length;
+  if (digitCount < 10 || digitCount > 15) {
+    return { name: storedName, phone: storedPhone };
+  }
+
+  return { name: match[1].trim(), phone: extractedPhone };
+};
+
 onMounted(() => {
   console.log("User store data: ", userStore);
   if (userStore.user) {
+    const normalizedIdentity = splitPhoneFromName(
+      userStore.user.name,
+      userStore.user.phone || "",
+    );
+
+    if (normalizedIdentity.name !== userStore.user.name) {
+      userStore.updateUser(normalizedIdentity);
+    }
+
     email.value = userStore?.user?.email;
-    name.value = userStore?.user?.name;
-    phone.value = userStore?.user?.phone;
+    name.value = normalizedIdentity.name;
+    phone.value = normalizedIdentity.phone;
     university_title.value = userStore?.user?.userInfo?.university_title;
     college_title.value = userStore?.user?.userInfo?.college_title;
     university_education_type_title.value =
@@ -81,8 +109,8 @@ const UpdateData = async () => {
 <template>
   <div class="profile-home">
     <aside class="profile-summary-card">
-      <div class="profile-summary-avatar" aria-hidden="true">
-        {{ name ? name.charAt(0) : 'ط' }}
+      <div class="profile-summary-avatar">
+        <img :src="profileImage" :alt="`الصورة الشخصية لـ ${name || 'الطالب'}`" />
       </div>
       <div class="profile-summary-copy">
         <span>الملف الشخصي</span>

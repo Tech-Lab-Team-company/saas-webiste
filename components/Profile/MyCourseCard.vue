@@ -57,11 +57,38 @@ const courseRoute = (course: CoursesModel) => ({
     </template>
 
     <template #empty>
-      <div class="library-empty">
-        <span class="pi pi-book" />
-        <h2>لا توجد كورسات مسجلة</h2>
-        <p>عند الاشتراك في كورس سيظهر هنا ويمكنك متابعة تقدّمك.</p>
-        <NuxtLink :to="{ name: 'course' }">استكشف الكورسات ←</NuxtLink>
+      <div class="library-empty library-empty--courses">
+        <div class="library-empty-art" aria-hidden="true">
+          <span class="library-empty-art__glow" />
+          <span class="library-empty-art__book library-empty-art__book--back" />
+          <span class="library-empty-art__book library-empty-art__book--front">
+            <i class="pi pi-play" />
+          </span>
+          <span class="library-empty-art__spark pi pi-star-fill" />
+        </div>
+
+        <div class="library-empty-content">
+          <span class="library-empty-eyebrow">
+            <i class="pi pi-sparkles" aria-hidden="true" />
+            مكتبتك جاهزة للبداية
+          </span>
+          <h2>ابدأ أول كورس في رحلتك التعليمية</h2>
+          <p>
+            لم تشترك في أي كورس حتى الآن. اختر الكورس المناسب لمرحلتك، وسيظهر هنا
+            مع الدروس ونسبة التقدم وكل ما تحتاجه للمتابعة.
+          </p>
+
+          <ul aria-label="مميزات مكتبة الطالب">
+            <li><i class="pi pi-check" /> متابعة التقدم</li>
+            <li><i class="pi pi-check" /> وصول سريع للدروس</li>
+            <li><i class="pi pi-check" /> محتوى مناسب لمرحلتك</li>
+          </ul>
+
+          <NuxtLink class="library-empty-action" :to="{ name: 'course' }">
+            تصفّح الكورسات
+            <span aria-hidden="true">←</span>
+          </NuxtLink>
+        </div>
       </div>
     </template>
 
@@ -311,6 +338,190 @@ const courseRoute = (course: CoursesModel) => ({
   text-align: center;
 }
 
+.library-empty--courses {
+  position: relative;
+  display: grid;
+  width: min(100%, 900px);
+  min-height: 380px;
+  grid-template-columns: minmax(260px, .75fr) minmax(340px, 1.25fr);
+  gap: clamp(30px, 5vw, 72px);
+  margin: 8px auto 0;
+  padding: clamp(34px, 5vw, 64px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--profile-secondary) 18%, var(--profile-border));
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 22%, color-mix(in srgb, var(--profile-secondary) 12%, transparent), transparent 35%),
+    linear-gradient(135deg, var(--profile-surface) 0%, var(--profile-surface-raised) 100%);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--profile-primary) 8%, transparent);
+  text-align: right;
+}
+/*
+.library-empty--courses::before {
+  position: absolute;
+  inset: 18px;
+  border: 1px dashed color-mix(in srgb, var(--profile-secondary) 12%, transparent);
+  border-radius: 20px;
+  content: "";
+  pointer-events: none;
+} */
+
+.library-empty-art {
+  position: relative;
+  display: grid;
+  min-height: 230px;
+  place-items: center;
+}
+
+.library-empty-art__glow {
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--profile-secondary) 12%, transparent);
+  box-shadow: 0 0 0 24px color-mix(in srgb, var(--profile-secondary) 5%, transparent);
+}
+
+.library-empty-art__book {
+  position: absolute;
+  width: 132px;
+  height: 166px;
+  border-radius: 12px 22px 22px 12px;
+  box-shadow: 0 20px 42px color-mix(in srgb, var(--profile-primary) 22%, transparent);
+}
+
+.library-empty-art__book--back {
+  border: 1px solid color-mix(in srgb, var(--profile-secondary) 28%, transparent);
+  background: color-mix(in srgb, var(--profile-secondary) 18%, var(--profile-surface));
+  transform: translate(-28px, -12px) rotate(-9deg);
+}
+
+.library-empty-art__book--front {
+  display: grid;
+  place-items: center;
+  border-right: 8px solid color-mix(in srgb, var(--profile-primary) 38%, transparent);
+  background: linear-gradient(145deg, var(--profile-secondary), color-mix(in srgb, var(--profile-primary) 72%, var(--profile-secondary)));
+  color: #fff;
+  transform: translate(18px, 9px) rotate(5deg);
+}
+
+.library-empty-art__book--front::after {
+  position: absolute;
+  right: 18px;
+  bottom: 25px;
+  left: 18px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 30%);
+  content: "";
+}
+
+.library-empty-art__book--front i {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 16%);
+  font-size: 18px;
+}
+
+.library-empty-art__spark {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  color: #f6b91a;
+  filter: drop-shadow(0 5px 9px rgb(246 185 26 / 30%));
+  font-size: 22px;
+  animation: library-spark 2.2s ease-in-out infinite;
+}
+
+.library-empty-content {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+}
+
+.library-empty-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--profile-secondary-soft);
+  color: var(--profile-secondary);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.library-empty--courses h2 {
+  max-width: 470px;
+  margin: 17px 0 9px;
+  font-size: clamp(23px, 2.4vw, 34px);
+  line-height: 1.45;
+}
+
+.library-empty--courses .library-empty-content > p {
+  max-width: 560px;
+  color: var(--profile-muted);
+  font-size: 13px;
+  line-height: 1.95;
+}
+
+.library-empty-content ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 20px 0 24px;
+  padding: 0;
+  color: var(--profile-ink);
+  font-size: 11px;
+  font-weight: 800;
+  list-style: none;
+}
+
+.library-empty-content li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.library-empty-content li i {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, #1b9c67 12%, var(--profile-surface));
+  color: #168457;
+  font-size: 9px;
+}
+
+.library-empty--courses .library-empty-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 22px;
+  border-radius: 12px;
+  background: var(--profile-secondary);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--profile-secondary) 24%, transparent);
+  color: #fff;
+  font-size: 12px;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.library-empty--courses .library-empty-action:hover {
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--profile-secondary) 32%, transparent);
+  transform: translateY(-2px);
+}
+
+.library-empty-action span { font-size: 18px; transition: transform 180ms ease; }
+.library-empty-action:hover span { transform: translateX(-4px); }
+
 .library-empty > span {
   display: grid;
   width: 58px;
@@ -335,6 +546,7 @@ const courseRoute = (course: CoursesModel) => ({
 
 @keyframes library-course-in { from { opacity: 0; transform: translateY(24px) scale(.985); } }
 @keyframes library-loading { to { background-position: -200% 0; } }
+@keyframes library-spark { 50% { opacity: .55; transform: translateY(-5px) rotate(8deg); } }
 
 @media (max-width: 1180px) {
   .library-grid { grid-template-columns: 1fr; }
@@ -345,6 +557,12 @@ const courseRoute = (course: CoursesModel) => ({
   .library-cover { min-height: 220px; }
   .library-body { padding: 19px; }
   .library-footer { align-items: flex-start; flex-direction: column; }
+  .library-empty--courses { grid-template-columns: 1fr; gap: 12px; padding: 32px 26px; text-align: center; }
+  .library-empty-art { min-height: 180px; }
+  .library-empty-art__glow { width: 155px; height: 155px; }
+  .library-empty-art__book { width: 98px; height: 126px; }
+  .library-empty-content ul { justify-content: center; }
+  .library-empty--courses .library-empty-action { width: 100%; }
 }
 
 @media (max-width: 480px) {
@@ -355,6 +573,6 @@ const courseRoute = (course: CoursesModel) => ({
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .library-course { animation: none; transition: none; }
+  .library-course, .library-empty-art__spark { animation: none; transition: none; }
 }
 </style>

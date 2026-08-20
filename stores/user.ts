@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
     },
     logout() {
       this.user = null;
-    //   this.image = null;
+      this.image = null;
       this.isAuth = false;
     },
   
