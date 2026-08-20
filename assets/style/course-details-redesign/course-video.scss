@@ -5,6 +5,14 @@
   background: #111827;
 }
 
+.course-video-loading-fallback {
+  position: relative;
+  width: 100%;
+  min-height: clamp(220px, 48vw, 620px);
+  overflow: hidden;
+  border-radius: 14px;
+}
+
 .course-video-container :deep(iframe),
 .course-video-container :deep(video),
 .course-video-container :deep(.content) {

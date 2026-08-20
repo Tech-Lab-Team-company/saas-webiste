@@ -8,6 +8,8 @@ import wifiIcon from "~/public/icons/wifiIcon.vue";
 import homeworkicon from "~/public/icons/homeworkicon.vue";
 import type CourseDetailsModel from "~/features/FetchCourseDetails/Data/models/course_details_model";
 import Loder from "../Loader/Loder.vue";
+import Toast from "primevue/toast";
+import Dialog from "primevue/dialog";
 
 const props = withDefaults(defineProps<{
   courseData?: CourseDetailsModel | null;
@@ -22,6 +24,16 @@ const emit = defineEmits<{
 
 const value = ref("0");
 const tab_value = ref("content");
+type CoursePanel = "content" | "homework" | "live" | "urls" | "exams";
+type CourseNavigation = CoursePanel | "overview" | "teacher";
+
+const activeNavigation = ref<CourseNavigation>("content");
+const tabNavigation = ref<HTMLElement | null>(null);
+const settingsStore = useSettingStore();
+const {
+  subscriptionPrompt,
+  closeCourseSubscriptionPrompt,
+} = useCourseAccessPrompt();
 const activetab = ref<number | null>(null);
 const videoLink = ref({
   sessionId: null as number | null,
@@ -36,6 +48,69 @@ const { isCaptureShielded, protectionNotice } = useCourseContentProtection(
 
 const CardData = computed(() => props.courseData);
 const refreshCourseDetails = () => emit("refresh");
+const isValidThemeColor = (color: unknown): color is string =>
+  /^(#[\da-f]{3,8}|(?:rgb|hsl)a?\([^)]*\))$/iu.test(String(color || "").trim());
+const courseAccessDialogStyle = computed<Record<string, string>>(() => {
+  const primary = settingsStore.setting?.primary_color;
+  const secondary = settingsStore.setting?.secondary_color;
+
+  return {
+    width: "min(470px, calc(100vw - 28px))",
+    "--course-dialog-primary": isValidThemeColor(primary) ? primary : "#142b67",
+    "--course-dialog-secondary": isValidThemeColor(secondary) ? secondary : "#2777e8",
+  };
+});
+
+const goToCourseEnrollment = async () => {
+  closeCourseSubscriptionPrompt();
+  await nextTick();
+  if (!import.meta.client) return;
+
+  window.requestAnimationFrame(() => {
+    const target = document.querySelector<HTMLElement>(".enroll-card");
+    if (!target) return;
+
+    const headerHeight =
+      document.querySelector<HTMLElement>(".home-v2-header")?.getBoundingClientRect().height ?? 0;
+    const targetTop = target.getBoundingClientRect().top + window.scrollY;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop - headerHeight - 22),
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  });
+};
+
+const scrollToCourseSection = (sectionId: string) => {
+  if (!import.meta.client) return;
+
+  const target = document.getElementById(sectionId);
+  if (!target) return;
+
+  const headerHeight =
+    document.querySelector<HTMLElement>(".home-v2-header")?.getBoundingClientRect().height ?? 0;
+  const navigationHeight = tabNavigation.value?.getBoundingClientRect().height ?? 0;
+  const targetTop = target.getBoundingClientRect().top + window.scrollY;
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  window.scrollTo({
+    top: Math.max(0, targetTop - headerHeight - navigationHeight - 18),
+    behavior: prefersReducedMotion ? "auto" : "smooth",
+  });
+};
+
+const navigateToCourseSection = async (
+  navigation: CourseNavigation,
+  sectionId: "course-curriculum" | "course-overview" | "course-teacher",
+  panel?: CoursePanel,
+) => {
+  activeNavigation.value = navigation;
+  if (panel) tab_value.value = panel;
+
+  await nextTick();
+  scrollToCourseSection(sectionId);
+};
 
 const Data = (data: {
   activetabvalue: number;
@@ -94,6 +169,89 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <Toast position="top-center" />
+  <Dialog
+    v-model:visible="subscriptionPrompt.visible"
+    modal
+    dismissable-mask
+    :draggable="false"
+    :show-header="false"
+    :style="courseAccessDialogStyle"
+    class="course-access-dialog"
+    :aria-label="subscriptionPrompt.isPending ? 'حالة طلب الاشتراك' : 'الاشتراك في الكورس'"
+    dir="rtl"
+  >
+    <section class="course-access-dialog__body">
+      <button
+        type="button"
+        class="course-access-dialog__close"
+        aria-label="إغلاق"
+        @click="closeCourseSubscriptionPrompt"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+
+      <div
+        class="course-access-dialog__icon"
+        :class="{ 'course-access-dialog__icon--pending': subscriptionPrompt.isPending }"
+        aria-hidden="true"
+      >
+        <i :class="subscriptionPrompt.isPending ? 'pi pi-clock' : 'pi pi-lock'"></i>
+      </div>
+
+      <span class="course-access-dialog__eyebrow">
+        {{ subscriptionPrompt.isPending ? "حالة الاشتراك" : "محتوى حصري" }}
+      </span>
+      <h2>
+        {{
+          subscriptionPrompt.isPending
+            ? "طلب اشتراكك قيد المراجعة"
+            : "هذا المحتوى للمشتركين فقط"
+        }}
+      </h2>
+      <p>
+        {{
+          subscriptionPrompt.isPending
+            ? "سيصبح محتوى الكورس متاحًا تلقائيًا فور قبول طلبك."
+            : "اشترك في الكورس لفتح جميع الدروس والملفات والامتحانات ومتابعة تقدمك."
+        }}
+      </p>
+
+      <div class="course-access-dialog__course" v-if="CardData?.title">
+        <i class="pi pi-graduation-cap" aria-hidden="true"></i>
+        <span>
+          <small>الكورس المختار</small>
+          <strong>{{ CardData.title }}</strong>
+        </span>
+        <b
+          v-if="CardData?.CoursePrice && !subscriptionPrompt.isPending"
+          dir="ltr"
+        >
+          {{ CardData.CoursePrice }} {{ CardData.currency }}
+        </b>
+      </div>
+
+      <div class="course-access-dialog__actions">
+        <button
+          v-if="!subscriptionPrompt.isPending"
+          type="button"
+          class="course-access-dialog__primary"
+          @click="goToCourseEnrollment"
+        >
+          <span>الانتقال إلى الاشتراك</span>
+          <i class="pi pi-arrow-left" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          class="course-access-dialog__secondary"
+          @click="closeCourseSubscriptionPrompt"
+        >
+          {{ subscriptionPrompt.isPending ? "حسنًا" : "لاحقًا" }}
+        </button>
+      </div>
+    </section>
+  </Dialog>
+
   <div
     class="course-details-page"
     :class="{ 'is-viewing-course-content': activetab == 0 }"
@@ -137,50 +295,86 @@ onUnmounted(() => {
 
         <section class="course-tabs">
           <div class="tabs-container">
-            <nav class="section-navigation detail-tabs" :aria-label="$t('course_sections')">
-              <a
-                class="nav-curriculum"
-                href="#course-curriculum"
-                @click="tab_value = 'content'"
+            <nav
+              ref="tabNavigation"
+              class="section-navigation detail-tabs"
+              :aria-label="$t('course_sections')"
+            >
+              <button
+                type="button"
+                class="detail-tab nav-curriculum"
+                :class="{ 'active-tab': activeNavigation === 'content' }"
+                :aria-current="activeNavigation === 'content' ? 'location' : undefined"
+                @click="navigateToCourseSection('content', 'course-curriculum', 'content')"
               >
-                {{ $t("course_curriculum") }}
-              </a>
-              <a class="nav-overview" href="#course-overview">{{ $t("about_course") }}</a>
-              <a
-                href="#course-curriculum"
+                <i class="pi pi-book" aria-hidden="true"></i>
+                <span>{{ $t("course_curriculum") }}</span>
+              </button>
+              <button
+                type="button"
+                class="detail-tab nav-overview"
+                :class="{ 'active-tab': activeNavigation === 'overview' }"
+                :aria-current="activeNavigation === 'overview' ? 'location' : undefined"
+                @click="navigateToCourseSection('overview', 'course-overview')"
+              >
+                <i class="pi pi-info-circle" aria-hidden="true"></i>
+                <span>{{ $t("about_course") }}</span>
+              </button>
+              <button
                 v-if="CardData?.homeworks?.length"
-                @click="tab_value = 'homework'"
-                :class="{ 'active-tab': tab_value === 'homework' }"
+                type="button"
+                class="detail-tab"
+                :class="{ 'active-tab': activeNavigation === 'homework' }"
+                :aria-current="activeNavigation === 'homework' ? 'location' : undefined"
+                @click="navigateToCourseSection('homework', 'course-curriculum', 'homework')"
               >
-                {{ $t("homework") }}
-              </a>
-              <a
-                href="#course-curriculum"
+                <i class="pi pi-file-edit" aria-hidden="true"></i>
+                <span>{{ $t("homework") }}</span>
+              </button>
+              <button
                 v-if="CardData?.lives?.length"
-                @click="tab_value = 'live'"
-                :class="{ 'active-tab': tab_value === 'live' }"
+                type="button"
+                class="detail-tab"
+                :class="{ 'active-tab': activeNavigation === 'live' }"
+                :aria-current="activeNavigation === 'live' ? 'location' : undefined"
+                @click="navigateToCourseSection('live', 'course-curriculum', 'live')"
               >
-                {{ $t("live_sessions") }}
-              </a>
-              <a
-                href="#course-curriculum"
+                <i class="pi pi-video" aria-hidden="true"></i>
+                <span>{{ $t("live_sessions") }}</span>
+              </button>
+              <button
                 v-if="CardData?.externalLinks?.length"
-                @click="tab_value = 'urls'"
-                :class="{ 'active-tab': tab_value === 'urls' }"
+                type="button"
+                class="detail-tab"
+                :class="{ 'active-tab': activeNavigation === 'urls' }"
+                :aria-current="activeNavigation === 'urls' ? 'location' : undefined"
+                @click="navigateToCourseSection('urls', 'course-curriculum', 'urls')"
               >
-                {{ $t("external_links") }}
-              </a>
-              <a
-                href="#course-curriculum"
+                <i class="pi pi-link" aria-hidden="true"></i>
+                <span>{{ $t("external_links") }}</span>
+              </button>
+              <button
                 v-if="CardData?.exams?.length"
-                @click="tab_value = 'exams'"
-                :class="{ 'active-tab': tab_value === 'exams' }"
+                type="button"
+                class="detail-tab"
+                :class="{ 'active-tab': activeNavigation === 'exams' }"
+                :aria-current="activeNavigation === 'exams' ? 'location' : undefined"
+                @click="navigateToCourseSection('exams', 'course-curriculum', 'exams')"
               >
-                {{ $t("exams") }}
-              </a>
-              <a class="nav-teacher" href="#course-teacher" v-if="CardData?.Teacher || platformTeacher">
-                {{ $t("course_teacher") }}
-              </a>
+                <i class="pi pi-check-square" aria-hidden="true"></i>
+                <span>{{ $t("exams") }}</span>
+              </button>
+              <button
+                v-if="CardData?.Teacher || platformTeacher"
+                type="button"
+                class="detail-tab nav-teacher"
+                :class="{ 'active-tab': activeNavigation === 'teacher' }"
+                :aria-current="activeNavigation === 'teacher' ? 'location' : undefined"
+                @click="navigateToCourseSection('teacher', 'course-teacher')"
+              >
+                <i class="pi pi-user" aria-hidden="true"></i>
+                <span>{{ $t("course_teacher") }}</span>
+              </button>
             </nav>
 
             <article class="course-overview" id="course-overview">

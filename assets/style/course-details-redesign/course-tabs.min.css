@@ -298,13 +298,89 @@
 }
 
 .course-viewer {
+  position: relative;
   width: 100%;
   margin: 28px 0 36px;
   overflow: hidden;
   border-bottom: 1px solid var(--course-border);
   background: var(--course-surface);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 
+.course-capture-shield {
+  position: absolute;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  min-height: 320px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 9px;
+  padding: 28px;
+  background: radial-gradient(circle at 50% 30%, rgba(42, 64, 120, 0.45), transparent 42%), #090f1d;
+  color: #fff;
+  text-align: center;
+}
+
+.course-capture-shield i {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  margin-bottom: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 23px;
+}
+
+.course-capture-shield strong {
+  font-size: 20px;
+}
+
+.course-capture-shield span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+}
+
+.course-protection-notice {
+  position: fixed;
+  z-index: 9999;
+  top: 100px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 17px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(9, 15, 29, 0.94);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  transform: translateX(-50%);
+}
+
+.course-protection-notice-enter-active,
+.course-protection-notice-leave-active {
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.course-protection-notice-enter-from,
+.course-protection-notice-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -10px);
+}
+
+@media print {
+  .course-viewer {
+    display: none !important;
+  }
+}
 :global(html[data-theme="dark"]) .course-details-page :deep(.course-content-panel),
 :global(html[data-theme="dark"]) .course-details-page :deep(.course-content-header),
 :global(html[data-theme="dark"]) .course-details-page :deep(.course-content-body),

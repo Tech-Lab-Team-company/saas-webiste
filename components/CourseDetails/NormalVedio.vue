@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Player, Video, DefaultUi, DefaultControls } from '@vime/vue-next';
 import '@vime/core/themes/default.css';
 
@@ -11,12 +11,50 @@ const props = defineProps<{
 const videoRef = ref<HTMLVideoElement | null>(null);
 const playerRef = ref<any>(null);
 const videoContainer = ref<HTMLElement | null>(null);
+const playerReloadKey = ref(0);
+const isPlayerLoading = ref(true);
+const isPlayerTakingLong = ref(false);
+let loadingDelayTimer: ReturnType<typeof setTimeout> | null = null;
 const watchHistory = useCourseWatchHistory(() => props.sessionId);
 const protectionConfig = useCourseProtectionConfig();
+
+function clearLoadingDelayTimer() {
+    if (!loadingDelayTimer) return;
+    clearTimeout(loadingDelayTimer);
+    loadingDelayTimer = null;
+}
+
+function startPlayerLoading() {
+    clearLoadingDelayTimer();
+    isPlayerLoading.value = true;
+    isPlayerTakingLong.value = false;
+    loadingDelayTimer = setTimeout(() => {
+        isPlayerTakingLong.value = true;
+    }, 10_000);
+}
+
+function finishPlayerLoading() {
+    clearLoadingDelayTimer();
+    isPlayerLoading.value = false;
+    isPlayerTakingLong.value = false;
+    nextTick(applyVideoProtection);
+}
+
+function markPlayerDelayed() {
+    isPlayerLoading.value = true;
+    isPlayerTakingLong.value = true;
+    clearLoadingDelayTimer();
+}
+
+function retryPlayer() {
+    playerReloadKey.value += 1;
+    startPlayerLoading();
+}
 
 watch(
     () => props.video,
     (newVal) => {
+        startPlayerLoading();
         if (videoRef.value && newVal) {
             videoRef.value.pause();
             videoRef.value.currentTime = 0;
@@ -27,7 +65,7 @@ watch(
     { immediate: false }
 );
 
-const onPlaybackReady = () => {
+const applyVideoProtection = () => {
     const nativeVideo = videoContainer.value?.querySelector('video');
     if (!nativeVideo || !protectionConfig.enabled) return;
     const controlRestrictions = [
@@ -44,20 +82,26 @@ const onPlaybackReady = () => {
     nativeVideo.disablePictureInPicture = protectionConfig.disablePictureInPicture;
 };
 
-onMounted(() => nextTick(onPlaybackReady));
+onMounted(() => {
+    startPlayerLoading();
+    nextTick(applyVideoProtection);
+});
+onBeforeUnmount(clearLoadingDelayTimer);
 </script>
 
 <template>
     <div ref="videoContainer" class="Video-container" @contextmenu.prevent>
         <Player
+            :key="playerReloadKey"
             ref="playerRef"
             playsinline
             style="width: 100%; height: 100%;"
-            @vPlaybackReady="onPlaybackReady"
+            @vmPlaybackReady="finishPlayerLoading"
             @vmDurationChange="watchHistory.updateDuration"
             @vmCurrentTimeChange="watchHistory.updateCurrentTime"
             @vmPausedChange="watchHistory.handlePausedChange"
             @vmPlaybackEnded="watchHistory.markPlaybackEnded"
+            @vmError="markPlayerDelayed"
         >
             <Video ref="videoRef" style="width: 100%; height: 100%;">
                 <source :data-src="props.video" type="video/mp4" />
@@ -69,6 +113,12 @@ onMounted(() => nextTick(onPlaybackReady));
                 <DefaultControls hideOnMouseLeave :activeDuration="2000" />
             </DefaultUi>
         </Player>
+        <CourseDetailsVideoLoadingState
+            v-if="isPlayerLoading"
+            :taking-long="isPlayerTakingLong"
+            can-retry
+            @retry="retryPlayer"
+        />
     </div>
 </template>
 

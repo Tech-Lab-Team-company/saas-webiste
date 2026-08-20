@@ -31,9 +31,9 @@ export default class UpdateProfileController extends ControllerInterface<UserMod
       if (this.isDataSuccess()) {
         DialogSelector.instance.successDialog.openDialog({
           dialogName: "dialog",
-          titleContent: "UpdateProfile Success",
+          titleContent: "تم تحديث الملف الشخصي",
           imageElement: successImage,
-          messageContent: null,
+          messageContent: "تم حفظ بياناتك الجديدة بنجاح وأصبحت معلومات حسابك محدّثة.",
         });
         const userStore = useUserStore();
         if (this.state.value.data) userStore.updateUser(this.state.value.data);

@@ -89,6 +89,11 @@ function openFullscreen() {
         :session-id="CourseVideoLink?.sessionId"
         :course-id="courseId"
       />
+      <template #fallback>
+        <div class="course-video-loading-fallback">
+          <CourseDetailsVideoLoadingState />
+        </div>
+      </template>
     </ClientOnly>
     <ClientOnly v-else-if="fileType === 'video'">
       <NormalVedio
@@ -97,6 +102,11 @@ function openFullscreen() {
         :session-id="CourseVideoLink?.sessionId"
         :course-id="courseId"
       />
+      <template #fallback>
+        <div class="course-video-loading-fallback">
+          <CourseDetailsVideoLoadingState />
+        </div>
+      </template>
     </ClientOnly>
     <div ref="pdfContainer" class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
       <iframe

@@ -76,50 +76,88 @@
 
 .detail-tabs {
   position: sticky;
-  z-index: 5;
-  top: 0;
+  z-index: 20;
+  top: 72px;
   width: 100%;
-  height: 70px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 7px;
+  margin: 18px 0 28px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--course-border) 84%, var(--course-accent));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--course-surface) 94%, transparent);
+  box-shadow: 0 14px 34px rgb(19 45 34 / 8%);
+  backdrop-filter: blur(16px);
+}
+
+.detail-tab {
+  position: relative;
+  min-width: 0;
+  min-height: 50px;
   display: flex;
   align-items: center;
-  gap: 34px;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--course-border);
-  background: var(--course-paper);
-  scrollbar-width: none;
-}
-
-.detail-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.detail-tabs a {
-  flex: 0 0 auto;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
   color: var(--course-muted);
+  cursor: pointer;
+  font-family: var(--course-body);
   font-size: 14px;
   font-weight: 800;
   white-space: nowrap;
+  transition: color 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.detail-tabs a:hover,
-.detail-tabs a:focus-visible,
-.detail-tabs a.active-tab,
-.detail-tabs .nav-curriculum {
+.detail-tab i {
+  color: color-mix(in srgb, var(--course-muted) 80%, var(--course-accent));
+  font-size: 15px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.detail-tab:hover {
+  border-color: color-mix(in srgb, var(--course-accent) 14%, transparent);
+  background: var(--course-surface-raised);
+  color: var(--course-ink);
+  transform: translateY(-1px);
+}
+
+.detail-tab:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--course-accent) 24%, transparent);
+  outline-offset: 2px;
+}
+
+.detail-tab.active-tab {
+  border-color: color-mix(in srgb, var(--course-accent) 28%, transparent);
+  background: var(--course-accent-soft);
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--course-accent) 15%, transparent);
   color: var(--course-accent);
-  outline: none;
 }
 
-.course-details-page:has(#course-overview:target) .nav-curriculum,
-.course-details-page:has(#course-teacher:target) .nav-curriculum {
-  color: var(--course-muted);
-}
-
-.course-details-page:has(#course-overview:target) .nav-overview,
-.course-details-page:has(#course-teacher:target) .nav-teacher {
+.detail-tab.active-tab i {
   color: var(--course-accent);
+  transform: scale(1.08);
+}
+
+.detail-tab.active-tab::after {
+  position: absolute;
+  right: 24%;
+  bottom: 5px;
+  left: 24%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--course-accent);
+  content: "";
+}
+
+#course-curriculum,
+#course-overview,
+#course-teacher {
+  scroll-margin-top: 170px;
 }
 
 .detail-content > article {
@@ -378,6 +416,239 @@
   transform: translate(-50%, -10px);
 }
 
+:global(.course-access-dialog.p-dialog) {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--course-dialog-primary) 24%, #dce3ef);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 30px 90px rgb(5 16 45 / 28%);
+}
+
+:global(.course-access-dialog .p-dialog-content) {
+  padding: 0;
+  border-radius: inherit;
+  background: transparent;
+}
+
+.course-access-dialog__body {
+  position: relative;
+  overflow: hidden;
+  padding: 34px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--course-dialog-primary) 14%, transparent), transparent 42%),
+    linear-gradient(145deg, #fff 30%, color-mix(in srgb, var(--course-dialog-secondary) 4%, #fff));
+  color: #142031;
+  text-align: center;
+}
+
+.course-access-dialog__body::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--course-dialog-secondary), var(--course-dialog-primary));
+  content: "";
+}
+
+.course-access-dialog__close {
+  position: absolute;
+  z-index: 1;
+  top: 15px;
+  inset-inline-end: 15px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--course-dialog-primary) 12%, #dce3ef);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 76%);
+  color: #687386;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.course-access-dialog__close:hover {
+  background: #fff;
+  color: var(--course-dialog-primary);
+  transform: rotate(4deg);
+}
+
+.course-access-dialog__close:focus-visible,
+.course-access-dialog__actions button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--course-dialog-secondary) 28%, transparent);
+  outline-offset: 2px;
+}
+
+.course-access-dialog__icon {
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  margin: 2px auto 17px;
+  border: 7px solid color-mix(in srgb, var(--course-dialog-primary) 9%, #fff);
+  border-radius: 22px;
+  background: linear-gradient(145deg, var(--course-dialog-secondary), var(--course-dialog-primary));
+  box-shadow: 0 15px 32px color-mix(in srgb, var(--course-dialog-primary) 28%, transparent);
+  color: #fff;
+  font-size: 25px;
+  transform: rotate(-3deg);
+}
+
+.course-access-dialog__icon i {
+  transform: rotate(3deg);
+}
+
+.course-access-dialog__icon--pending {
+  border-radius: 50%;
+}
+
+.course-access-dialog__eyebrow {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--course-dialog-secondary);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.course-access-dialog__body h2 {
+  margin: 0;
+  color: #121d2c;
+  font: 900 25px/1.45 var(--course-heading, "Cairo", sans-serif);
+}
+
+.course-access-dialog__body > p {
+  max-width: 365px;
+  margin: 10px auto 0;
+  color: #667184;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.course-access-dialog__course {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 23px;
+  padding: 13px 15px;
+  border: 1px solid color-mix(in srgb, var(--course-dialog-primary) 13%, #e5e9f0);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--course-dialog-primary) 4%, #fff);
+  text-align: start;
+}
+
+.course-access-dialog__course > i {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--course-dialog-primary) 11%, #fff);
+  color: var(--course-dialog-primary);
+  font-size: 17px;
+}
+
+.course-access-dialog__course > span {
+  min-width: 0;
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.course-access-dialog__course small {
+  color: #7b8595;
+  font-size: 10px;
+}
+
+.course-access-dialog__course strong {
+  overflow: hidden;
+  color: #1d2838;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-access-dialog__course b {
+  flex: 0 0 auto;
+  color: var(--course-dialog-primary);
+  font-size: 13px;
+}
+
+.course-access-dialog__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.course-access-dialog__actions button {
+  min-height: 48px;
+  padding: 11px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--course-body, "Tajawal", sans-serif);
+  font-size: 13px;
+  font-weight: 900;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.course-access-dialog__primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  background: linear-gradient(120deg, var(--course-dialog-primary), var(--course-dialog-secondary));
+  box-shadow: 0 12px 25px color-mix(in srgb, var(--course-dialog-primary) 23%, transparent);
+  color: #fff;
+}
+
+.course-access-dialog__secondary {
+  min-width: 82px;
+  border: 1px solid color-mix(in srgb, var(--course-dialog-primary) 16%, #dce3eb);
+  background: #fff;
+  color: #5f6978;
+}
+
+.course-access-dialog__actions button:hover {
+  transform: translateY(-1px);
+}
+
+.course-access-dialog__primary:hover {
+  box-shadow: 0 16px 30px color-mix(in srgb, var(--course-dialog-primary) 31%, transparent);
+}
+
+:global(html[data-theme="dark"] .course-access-dialog.p-dialog) {
+  border-color: color-mix(in srgb, var(--course-dialog-primary) 38%, #30384a);
+  background: #101521;
+}
+
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__body) {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--course-dialog-primary) 22%, transparent), transparent 43%),
+    #101521;
+  color: #f3f6fb;
+}
+
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__body h2),
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__course strong) {
+  color: #f3f6fb;
+}
+
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__body > p),
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__course small) {
+  color: #aab4c5;
+}
+
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__course),
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__secondary),
+:global(html[data-theme="dark"] .course-access-dialog .course-access-dialog__close) {
+  border-color: color-mix(in srgb, var(--course-dialog-primary) 24%, #31394a);
+  background: #171e2c;
+  color: #c8d0dc;
+}
+
 @media print {
   .course-viewer {
     display: none !important;
@@ -454,8 +725,36 @@
 }
 
 @media (max-width: 680px) {
+  .course-access-dialog__body {
+    padding: 29px 20px 22px;
+  }
+
+  .course-access-dialog__body h2 {
+    font-size: 21px;
+  }
+
+  .course-access-dialog__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .course-access-dialog__secondary {
+    min-width: 0;
+  }
+
   .detail-tabs {
-    gap: 22px;
+    top: 72px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin: 12px 0 22px;
+    padding: 6px;
+    border-radius: 13px;
+  }
+
+  .detail-tab {
+    min-height: 44px;
+    gap: 7px;
+    padding: 8px 9px;
+    font-size: 12px;
   }
 
   .detail-content > article {
@@ -497,7 +796,11 @@
 }
 
 @media (max-width: 430px) {
-  .detail-tabs a {
+  .detail-tab {
+    font-size: 11.5px;
+  }
+
+  .detail-tab i {
     font-size: 13px;
   }
 

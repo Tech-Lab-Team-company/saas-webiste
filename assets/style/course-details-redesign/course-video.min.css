@@ -18,6 +18,24 @@
   background: #fff;
 }
 
+.pdf-container {
+  position: relative;
+  overflow: hidden;
+  background: #111827;
+}
+
+.pdf-container:fullscreen {
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.pdf-container:fullscreen iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
 .btn-primary {
   margin-top: 12px;
   padding: 9px 16px;

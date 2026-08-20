@@ -29,6 +29,12 @@ export default class DialogService {
         ? 'error'
         : 'success'
 
+      if (image) {
+        image.alt = dialog.dataset.variant === 'error'
+          ? 'تعذر إتمام العملية'
+          : 'تمت العملية بنجاح'
+      }
+
       if (dialog.open) dialog.close()
       dialog.showModal()
       dialog.dispatchEvent(new CustomEvent('base-dialog-opened', {

@@ -81,6 +81,7 @@ const activeIndices = ref<number[]>([]);
 
 const selectedSessionIndex = ref<number | null>(null);
 const toast = useToast();
+const { promptCourseSubscription } = useCourseAccessPrompt();
 const isdisabled = ref(false)
 
 function handleSessionClick(index: number, sessionId: number, link: string, title: string, text: string, show: boolean) {
@@ -97,7 +98,8 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
     if (show === true) {
       if (!props.isSubscribed && props.isPaied) {
         isdisabled.value = true
-        // console.log("non")
+        promptCourseSubscription(props.CourseStatus);
+        return;
       }
       else if (props.isSubscribed && props.isPaied) {
         isdisabled.value = false

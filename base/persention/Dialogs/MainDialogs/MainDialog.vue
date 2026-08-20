@@ -52,7 +52,7 @@ defineExpose({
     @close="clearAutoClose"
     @base-dialog-opened="startAutoClose"
   >
-    <div class="dialog-container">
+    <div class="dialog-container" dir="rtl">
       <button
         type="button"
         class="dialog-dismiss"
@@ -61,17 +61,38 @@ defineExpose({
       >
         ×
       </button>
-      <span class="dialog-icon-shell" aria-hidden="true">
-        <img src="" alt="" class="dialog-icon" />
-      </span>
+
+      <div class="dialog-visual" aria-hidden="true">
+        <span class="dialog-visual-ring"></span>
+        <span class="dialog-icon-shell">
+          <img src="" alt="" class="dialog-icon" />
+        </span>
+      </div>
+
+      <div class="dialog-status" aria-hidden="true">
+        <span class="dialog-status-dot"></span>
+        <span class="dialog-status-success">تمت العملية بنجاح</span>
+        <span class="dialog-status-error">تعذر إتمام العملية</span>
+      </div>
+
       <div class="dialog-copy">
         <h4 id="base-dialog-title" class="dialog-title" dir="auto"></h4>
         <p id="base-dialog-message" class="dialog-message" dir="auto"></p>
       </div>
+
       <div class="dialog-actions">
-        <small class="dialog-auto-close-note">سيتم إغلاق الرسالة تلقائيًا</small>
-        <button type="button" class="dialog-close-btn" @click="close">حسنًا</button>
+        <button type="button" class="dialog-close-btn" @click="close">
+          <span class="dialog-close-success">تم، شكرًا</span>
+          <span class="dialog-close-error">إغلاق الرسالة</span>
+          <span class="dialog-close-btn-icon dialog-close-success" aria-hidden="true">✓</span>
+          <span class="dialog-close-btn-icon dialog-close-error" aria-hidden="true">×</span>
+        </button>
+        <small class="dialog-auto-close-note">
+          <span class="dialog-auto-close-icon" aria-hidden="true"></span>
+          ستُغلق هذه الرسالة تلقائيًا خلال لحظات
+        </small>
       </div>
+
       <span class="dialog-countdown" aria-hidden="true"><i /></span>
     </div>
   </dialog>
@@ -79,25 +100,25 @@ defineExpose({
 
 <style scoped>
 .dialog {
-  --dialog-accent: #1d9b68;
-  --dialog-accent-strong: #087b50;
-  --dialog-accent-soft: rgba(29, 155, 104, 0.11);
-  width: min(470px, calc(100vw - 32px));
+  --dialog-accent: var(--primary-color, #1d9b68);
+  --dialog-accent-strong: color-mix(in srgb, var(--dialog-accent) 82%, #062e24);
+  --dialog-accent-soft: color-mix(in srgb, var(--dialog-accent) 11%, transparent);
+  --dialog-accent-faint: color-mix(in srgb, var(--dialog-accent) 5%, transparent);
+  width: min(430px, calc(100vw - 28px));
   max-width: none;
-  max-height: calc(100dvh - 32px);
+  max-height: calc(100dvh - 28px);
   margin: auto;
   padding: 0 !important;
   overflow: visible;
   border: 0;
-  border-radius: 24px;
+  border-radius: 22px;
   background: transparent;
   color: var(--app-text, #152238);
 }
 
 .dialog[data-variant="error"] {
   --dialog-accent: #ef5260;
-  --dialog-accent-strong: #c52c40;
-  --dialog-accent-soft: rgba(239, 82, 96, 0.11);
+  --dialog-accent-strong: #bd2438;
 }
 
 .dialog[open] {
@@ -105,52 +126,58 @@ defineExpose({
 }
 
 .dialog::backdrop {
-  background: rgba(5, 10, 22, 0.64);
-  backdrop-filter: blur(7px) saturate(0.82);
+  background: rgb(6 13 28 / 68%);
+  backdrop-filter: blur(5px) saturate(0.8);
   animation: base-dialog-backdrop 0.25s ease both;
 }
 
 .dialog-container {
   position: relative;
-  display: grid !important;
+  display: flex !important;
   overflow: hidden;
-  place-items: center;
-  padding: 30px 30px 24px;
-  border: 1px solid color-mix(in srgb, var(--dialog-accent) 22%, #dfe5ec) !important;
-  border-radius: 24px;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 28px 22px;
+  border: 1px solid color-mix(in srgb, var(--dialog-accent) 18%, var(--app-line, #dfe5ec)) !important;
+  border-radius: 22px;
   background:
-    radial-gradient(circle at 50% -14%, var(--dialog-accent-soft), transparent 40%),
+    radial-gradient(circle at 50% 0%, var(--dialog-accent-soft), transparent 36%),
+    linear-gradient(180deg, var(--dialog-accent-faint), transparent 38%),
     var(--app-surface, #fff) !important;
   box-shadow:
-    0 38px 100px rgba(4, 10, 24, 0.32),
-    0 14px 35px rgba(4, 10, 24, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
+    0 30px 80px rgb(4 10 24 / 32%),
+    0 8px 24px rgb(4 10 24 / 16%),
+    inset 0 1px 0 rgb(255 255 255 / 90%) !important;
   text-align: center;
 }
 
 .dialog-container::before {
   position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, var(--dialog-accent), transparent);
+  top: 0;
+  right: 22%;
+  left: 22%;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, var(--dialog-accent), var(--secondary-color, var(--dialog-accent)));
+  box-shadow: 0 3px 14px color-mix(in srgb, var(--dialog-accent) 32%, transparent);
   content: "";
 }
 
 .dialog-dismiss {
   position: absolute;
   z-index: 2;
-  top: 14px;
-  inset-inline-end: 14px;
+  top: 16px;
+  inset-inline-end: 16px;
   display: grid;
   width: 34px;
   height: 34px;
   padding: 0;
   place-items: center;
-  border: 1px solid var(--app-line, #e2e7ed);
+  border: 1px solid color-mix(in srgb, var(--app-line, #e2e7ed) 82%, transparent);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--app-surface, #fff) 88%, transparent);
+  background: color-mix(in srgb, var(--app-surface, #fff) 92%, transparent);
   color: var(--app-muted, #687386);
-  font: 400 23px/1 Arial, sans-serif;
+  font: 300 22px/1 Arial, sans-serif;
   cursor: pointer;
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
@@ -163,80 +190,133 @@ defineExpose({
   transform: rotate(6deg);
 }
 
+.dialog-visual {
+  position: relative;
+  display: grid;
+  width: 94px;
+  height: 94px;
+  margin-top: 1px;
+  place-items: center;
+}
+
+.dialog-visual-ring {
+  position: absolute;
+  inset: 2px;
+  border: 1px dashed color-mix(in srgb, var(--dialog-accent) 30%, transparent);
+  border-radius: 50%;
+  animation: base-dialog-ring 16s linear infinite;
+}
+
 .dialog-icon-shell {
   display: grid;
-  width: 112px;
-  height: 112px;
-  margin-top: 2px;
+  width: 76px;
+  height: 76px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--dialog-accent) 18%, transparent);
-  border-radius: 32px;
-  background: var(--dialog-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--dialog-accent) 20%, transparent);
+  border-radius: 24px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--dialog-accent) 13%, #fff),
+    var(--app-surface, #fff)
+  );
   box-shadow:
-    0 14px 30px color-mix(in srgb, var(--dialog-accent) 16%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    0 12px 28px color-mix(in srgb, var(--dialog-accent) 15%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 80%);
 }
 
 .dialog-icon {
   display: block;
-  width: 90px;
-  height: 90px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
-  filter: drop-shadow(0 8px 8px rgba(7, 14, 28, 0.12));
+  filter: drop-shadow(0 6px 8px rgb(7 14 28 / 10%));
+}
+
+.dialog-status {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 5px 11px;
+  border: 1px solid color-mix(in srgb, var(--dialog-accent) 17%, transparent);
+  border-radius: 999px;
+  background: var(--dialog-accent-soft);
+  color: var(--dialog-accent-strong);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.dialog-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dialog-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dialog-accent) 14%, transparent);
+}
+
+.dialog-status-error,
+.dialog[data-variant="error"] .dialog-status-success {
+  display: none;
+}
+
+.dialog[data-variant="error"] .dialog-status-error {
+  display: inline;
 }
 
 .dialog-copy {
   display: grid;
   width: 100%;
-  gap: 9px;
-  margin-top: 20px;
+  gap: 7px;
+  margin-top: 14px;
 }
 
 .dialog-title {
   margin: 0 !important;
   color: var(--app-text, #17243a) !important;
-  font-size: clamp(19px, 2.5vw, 23px);
+  font-size: clamp(20px, 2.5vw, 23px);
   font-weight: 900 !important;
   line-height: 1.45;
+  unicode-bidi: plaintext;
 }
 
 .dialog-message {
-  width: 100%;
-  margin: 0 !important;
+  width: min(100%, 340px);
+  margin: 0 auto !important;
   overflow-wrap: anywhere;
   color: var(--app-muted, #667287) !important;
   font-size: 14px;
-  font-weight: 600;
-  line-height: 1.8;
+  font-weight: 500;
+  line-height: 1.75;
   unicode-bidi: plaintext;
+}
+
+.dialog-message:empty {
+  display: none;
 }
 
 .dialog-actions {
   display: flex;
   width: 100%;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 24px;
-  padding-top: 18px;
-  border-top: 1px solid var(--app-line, #e7eaf0);
-}
-
-.dialog-auto-close-note {
-  color: var(--app-muted, #7a8494);
-  font-size: 11px;
-  font-weight: 700;
+  gap: 10px;
+  margin-top: 22px;
 }
 
 .dialog-close-btn {
-  min-width: 112px;
-  min-height: 44px;
+  display: inline-flex;
+  width: 100%;
+  min-height: 48px;
   margin: 0 !important;
-  padding: 8px 20px !important;
+  padding: 9px 18px !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   border: 1px solid color-mix(in srgb, var(--dialog-accent) 88%, #fff) !important;
-  border-radius: 12px !important;
-  background: var(--dialog-accent) !important;
-  box-shadow: 0 9px 20px color-mix(in srgb, var(--dialog-accent) 24%, transparent);
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, var(--dialog-accent), var(--dialog-accent-strong)) !important;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--dialog-accent) 24%, transparent);
   color: #fff !important;
   font-family: inherit;
   font-size: 14px !important;
@@ -245,11 +325,64 @@ defineExpose({
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+.dialog-close-btn-icon {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 15%);
+  font-size: 12px;
+}
+
+.dialog-close-error,
+.dialog[data-variant="error"] .dialog-close-success {
+  display: none;
+}
+
+.dialog[data-variant="error"] .dialog-close-error.dialog-close-btn-icon {
+  display: grid;
+}
+
+.dialog[data-variant="error"] .dialog-close-error:not(.dialog-close-btn-icon) {
+  display: inline;
+}
+
 .dialog-close-btn:hover,
 .dialog-close-btn:focus-visible {
-  box-shadow: 0 12px 25px color-mix(in srgb, var(--dialog-accent) 34%, transparent);
+  box-shadow: 0 13px 28px color-mix(in srgb, var(--dialog-accent) 34%, transparent);
   outline: none;
   transform: translateY(-2px);
+}
+
+.dialog-auto-close-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--app-muted, #7a8494);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dialog-auto-close-icon {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.dialog-auto-close-icon::before {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 1.5px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+  content: "";
+  transform: rotate(-35deg);
+  transform-origin: bottom center;
 }
 
 .dialog-countdown {
@@ -257,7 +390,7 @@ defineExpose({
   right: 0;
   bottom: 0;
   left: 0;
-  height: 4px;
+  height: 3px;
   overflow: hidden;
   background: var(--dialog-accent-soft);
 }
@@ -266,7 +399,7 @@ defineExpose({
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, var(--dialog-accent-strong), var(--dialog-accent));
+  background: linear-gradient(90deg, var(--dialog-accent), var(--secondary-color, var(--dialog-accent)));
   transform-origin: left center;
 }
 
@@ -277,17 +410,25 @@ defineExpose({
 :global(html[data-theme="dark"]) .dialog-container {
   border-color: color-mix(in srgb, var(--dialog-accent) 28%, #26334a) !important;
   background:
-    radial-gradient(circle at 50% -14%, var(--dialog-accent-soft), transparent 42%),
+    radial-gradient(circle at 50% 0%, var(--dialog-accent-soft), transparent 38%),
+    linear-gradient(180deg, var(--dialog-accent-faint), transparent 38%),
     #111a2a !important;
   box-shadow:
-    0 40px 110px rgba(0, 0, 0, 0.62),
-    0 16px 38px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    0 40px 110px rgb(0 0 0 / 62%),
+    0 16px 38px rgb(0 0 0 / 38%),
+    inset 0 1px 0 rgb(255 255 255 / 5%) !important;
 }
 
 :global(html[data-theme="dark"]) .dialog-dismiss {
   border-color: #2a374c;
   background: #182337;
+}
+
+:global(html[data-theme="dark"]) .dialog-icon-shell {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--dialog-accent) 18%, #111a2a), #152035);
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 28%),
+    inset 0 1px 0 rgb(255 255 255 / 5%);
 }
 
 @keyframes base-dialog-enter {
@@ -305,17 +446,33 @@ defineExpose({
   to { transform: scaleX(0); }
 }
 
+@keyframes base-dialog-ring {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 520px) {
-  .dialog-container { padding: 26px 20px 20px; border-radius: 20px; }
-  .dialog-icon-shell { width: 94px; height: 94px; border-radius: 27px; }
-  .dialog-icon { width: 76px; height: 76px; }
-  .dialog-actions { align-items: stretch; flex-direction: column-reverse; gap: 10px; }
-  .dialog-close-btn { width: 100%; }
+  .dialog-container {
+    padding: 24px 18px 19px;
+    border-radius: 19px;
+  }
+
+  .dialog-dismiss {
+    top: 12px;
+    inset-inline-end: 12px;
+  }
+
+  .dialog-visual { width: 84px; height: 84px; }
+  .dialog-icon-shell { width: 68px; height: 68px; border-radius: 21px; }
+  .dialog-icon { width: 56px; height: 56px; }
+  .dialog-status { margin-top: 10px; }
+  .dialog-copy { margin-top: 12px; }
+  .dialog-actions { margin-top: 19px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .dialog[open],
   .dialog::backdrop,
+  .dialog-visual-ring,
   .dialog-countdown i {
     animation: none !important;
   }

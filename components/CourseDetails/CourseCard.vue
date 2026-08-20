@@ -43,8 +43,16 @@ const userSetting = useSettingStore();
 const router = useRouter();
 const toast = useToast();
 const emit = defineEmits(["Changestatus"]);
+const isJoining = ref(false);
+
+const updateCourseStatus = (status: number) => {
+  Status.value = status;
+  emit("Changestatus");
+};
+
 const JoinCourse = async () => {
-  // router.currentRoute.value.params.id
+  if (isJoining.value) return;
+
   const coursePaymentParams = new CoursesPaymentParams({
     CourseId: Number(router.currentRoute.value.params.id),
     PaymentMethod: 0,
@@ -53,9 +61,18 @@ const JoinCourse = async () => {
   });
   const coursesPaymentController = CoursesPaymentController.getInstance();
   if (userStore.user) {
-    const state = await coursesPaymentController.CoursesPayment(
-      coursePaymentParams
-    );
+    isJoining.value = true;
+
+    try {
+      await coursesPaymentController.CoursesPayment(coursePaymentParams);
+
+      if (coursesPaymentController.isDataSuccess()) {
+        Status.value = 1;
+        emit("Changestatus");
+      }
+    } finally {
+      isJoining.value = false;
+    }
   } else {
     toast.add({
       severity: "info",
@@ -67,9 +84,6 @@ const JoinCourse = async () => {
       path: "/loginhome",
       query: { redirect: router.currentRoute.value.fullPath },
     });
-  }
-  if (Status.value) {
-    emit("Changestatus");
   }
 };
 
@@ -201,27 +215,20 @@ const userStore = useUserStore();
                     :course-title="CardDetails?.title"
                     :price="CardDetails?.CoursePrice"
                     :currency="CardDetails?.currency"
+                    pending-label="طلب الانضمام قيد المراجعة"
                     class="payment-dialog"
                     v-if="CardDetails?.CoursePrice"
+                    @status-changed="updateCourseStatus"
                   />
 
-                  <button class="payment-btn" @click="JoinCourse" v-if="
-                    Status != 1 &&
+                  <button class="payment-btn" @click="JoinCourse" :disabled="isJoining" v-if="
+                    Status == 0 &&
                     CardDetails?.CoursePrice != 0 &&
                     !CardDetails?.is_subscribed &&
                     userSetting.setting?.join_option_status == 1
                   ">
-                    طلب الانضمام
-                  </button>
-
-                  <button v-if="
-                    Status == 1 &&
-                    userStore.user &&
-                    !CardDetails?.is_subscribed &&
-                    CardDetails?.is_paid &&
-                    userSetting?.setting?.join_option_status == 1
-                  " disabled class="btn-disabled">
-                    فى انتظار قبول الطلب
+                    <i :class="isJoining ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'" aria-hidden="true"></i>
+                    {{ isJoining ? "جاري إرسال الطلب..." : "طلب الانضمام" }}
                   </button>
                 </div>
               </div>
@@ -248,27 +255,20 @@ const userStore = useUserStore();
             :course-title="CardDetails?.title"
             :price="CardDetails?.CoursePrice"
             :currency="CardDetails?.currency"
+            pending-label="طلب الانضمام قيد المراجعة"
             class="payment-dialog"
             v-if="CardDetails?.CoursePrice"
+            @status-changed="updateCourseStatus"
           />
 
-          <button class="payment-btn" @click="JoinCourse" v-if="
-            Status != 1 &&
+          <button class="payment-btn" @click="JoinCourse" :disabled="isJoining" v-if="
+            Status == 0 &&
             CardDetails?.CoursePrice != 0 &&
             !CardDetails?.is_subscribed &&
             userSetting.setting?.join_option_status == 1
           ">
-            طلب الانضمام
-          </button>
-
-          <button v-if="
-            Status == 1 &&
-            userStore.user &&
-            !CardDetails?.is_subscribed &&
-            CardDetails?.is_paid &&
-            userSetting?.setting?.join_option_status == 1
-          " disabled class="btn-disabled">
-            فى انتظار قبول الطلب
+            <i :class="isJoining ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'" aria-hidden="true"></i>
+            {{ isJoining ? "جاري إرسال الطلب..." : "طلب الانضمام" }}
           </button>
         </div>
       </div>

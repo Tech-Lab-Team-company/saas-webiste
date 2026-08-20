@@ -6,7 +6,7 @@ import Logout from "~/public/icons/Logout.vue";
 import CoursesNote from "~/public/icons/CoursesNote.vue";
 import EditImageIcon from "~/public/icons/EditImageIcon.vue";
 import type ProfileImage from "~/types/profileimage";
-import {getWebDomain} from "~/constant/webDomain";
+import { getWebDomain } from "~/constant/webDomain";
 
 const SelectedOption = ref("");
 
@@ -54,11 +54,8 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
 <template>
   <div class="profile-sidebar-container">
     <div class="person-data">
-      <div
-        class="profile-image-container"
-       
-      >
-        <img  class="course-image" />
+      <div class="profile-image-container">
+        <img class="course-image" />
         <EditImageIcon class="edit-icon" />
       </div>
 
@@ -159,26 +156,26 @@ const { data: profileimage } = await useAsyncData("profileimage", async () => {
     }
   }
 
-  .profile-options {
-    .profile-option {
-      display: flex;
-      // justify-content: end;
-      gap: 5px;
-      align-items: center;
-      padding: 20px 10px;
-      border-bottom: 1px dashed #8c889631;
-      cursor: pointer;
+  // .profile-options {
+  //   .profile-option {
+  //     display: flex;
+  //     // justify-content: end;
+  //     gap: 5px;
+  //     align-items: center;
+  //     padding: 20px 10px;
+  //     border-bottom: 1px dashed #8c889631;
+  //     cursor: pointer;
 
-      &.active {
-        background-color: #fff6e6;
-      }
-      .profile-icon {
-        width: 20px;
-      }
+  //     &.active {
+  //       background-color: #fff6e6;
+  //     }
+  //     .profile-icon {
+  //       width: 20px;
+  //     }
 
-      p {
-      }
-    }
-  }
+  //     p {
+  //     }
+  //   }
+  // }
 }
 </style>

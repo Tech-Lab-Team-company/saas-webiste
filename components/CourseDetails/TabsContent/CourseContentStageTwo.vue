@@ -85,6 +85,7 @@ const activeIndices = ref<number[]>([]);
 const isdisabled = ref(false)
 
 const selectedSessionIndex = ref<number | null>(null);
+const { promptCourseSubscription } = useCourseAccessPrompt();
 
 function handleSessionClick(index: number, sessionId: number, link: string, title: string, text: string, show: boolean, sessionPaid: boolean) {
   if (show === false) {
@@ -108,9 +109,8 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
       }
       else if (!props.isSubscribed && props.isPaied) {
         isdisabled.value = true
-
-        toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب شراء الكورس اولا ', life: 3000 });
-        // console.log("non")
+        promptCourseSubscription(props.CourseStatus);
+        return;
       }
       else if ((props.isSubscribed && props.isPaied)) {
         isdisabled.value = false
@@ -139,7 +139,7 @@ const GotoExam = (exam: any, courseId: number) => {
     return;
   }
   if (props.isPaied && !props.isSubscribed) {
-    toast.add({ severity: 'info', summary: 'تنبيه', detail: 'يجب شراء الكورس أولًا', life: 3000 });
+    promptCourseSubscription(props.CourseStatus);
     return;
   }
   if (isExamAttemptLocked(exam)) {

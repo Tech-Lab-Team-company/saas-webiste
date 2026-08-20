@@ -42,7 +42,7 @@ export const useStudentDashboardMotion = () => {
             ".profile-options .profile-option",
             {
               autoAlpha: 0,
-              x: 18,
+              // x: 18,
               stagger: 0.045,
               duration: 0.42,
             },

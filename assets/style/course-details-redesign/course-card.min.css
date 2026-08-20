@@ -450,6 +450,14 @@
   font-weight: 800;
 }
 
+.payment-dialog :deep(.course-payment__trigger) {
+  border: 1px solid var(--course-accent);
+  border-radius: 10px;
+  background: var(--course-accent);
+  color: var(--course-action-text);
+  font-family: var(--course-heading);
+}
+
 .btns-container > .payment-btn,
 .final-cta-actions > .payment-btn {
   background: var(--course-surface-raised);
@@ -463,6 +471,13 @@
   background: var(--course-surface-raised);
   color: var(--course-muted);
   cursor: not-allowed;
+}
+
+.payment-dialog :deep(.course-payment__trigger--disabled),
+.payment-dialog :deep(.course-payment__trigger--rejected) {
+  border-color: var(--course-border);
+  background: var(--course-surface-raised);
+  color: var(--course-muted);
 }
 
 .detail-final {
@@ -514,6 +529,7 @@
 }
 
 .detail-final .payment-dialog :deep(.btns button),
+.detail-final .payment-dialog :deep(.course-payment__trigger),
 .detail-final .final-cta-actions > button {
   border-color: #fff;
   background: #fff;

@@ -16,6 +16,10 @@ const props = defineProps<{
   courseTitle?: string;
   price?: number;
   currency?: string;
+  pendingLabel?: string;
+}>();
+const emit = defineEmits<{
+  statusChanged: [status: number];
 }>();
 
 const router = useRouter();
@@ -24,6 +28,7 @@ const userStore = useUserStore();
 const paymentStore = usePaymentStore();
 const toast = useToast();
 const { buildSiteUrl } = useSiteUrl();
+const { promptCourseSubscription } = useCourseAccessPrompt();
 
 const visible = ref(false);
 const status = ref(props.status);
@@ -180,6 +185,7 @@ const submitOfflinePayment = async () => {
   if (state.value.data || state.value.message) {
     status.value = 1;
     success.value = true;
+    emit("statusChanged", 1);
     return;
   }
 
@@ -254,6 +260,10 @@ const fireLoginToast = () => {
   router.push({ path: "/loginhome", query: { redirect: route.fullPath } });
 };
 
+const showPendingRequestDetails = () => {
+  promptCourseSubscription(status.value);
+};
+
 onBeforeUnmount(clearReceipt);
 </script>
 
@@ -272,11 +282,13 @@ onBeforeUnmount(clearReceipt);
     <button
       v-else-if="status === 1 && userStore.user"
       type="button"
-      disabled
-      class="course-payment__trigger course-payment__trigger--disabled"
+      class="course-payment__trigger course-payment__trigger--pending"
+      aria-haspopup="dialog"
+      aria-label="عرض حالة طلب الاشتراك"
+      @click="showPendingRequestDetails"
     >
       <span class="pi pi-clock" aria-hidden="true" />
-      في انتظار قبول الطلب
+      {{ props.pendingLabel || "في انتظار قبول الطلب" }}
     </button>
 
     <button
@@ -542,16 +554,39 @@ onBeforeUnmount(clearReceipt);
   transform: translateY(-2px);
 }
 
-.course-payment__trigger--disabled,
 .course-payment__trigger--rejected {
-  background: var(--app-bg-muted, #e6e8ed);
-  color: var(--app-muted, #747b8b);
   cursor: not-allowed;
 }
 
+.course-payment__trigger--pending {
+  border: 1px solid color-mix(in srgb, #f59e0b 38%, transparent);
+  background: color-mix(in srgb, #f59e0b 14%, var(--app-surface, #fff));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f59e0b 6%, transparent);
+  color: #965d00;
+  cursor: pointer;
+}
+
+.course-payment__trigger--pending:hover {
+  border-color: color-mix(in srgb, #f59e0b 58%, transparent);
+  box-shadow: 0 12px 25px color-mix(in srgb, #f59e0b 18%, transparent);
+  filter: brightness(1.02);
+  transform: translateY(-1px);
+}
+
 .course-payment__trigger--rejected {
+  border: 1px solid color-mix(in srgb, #dc3545 34%, transparent);
   background: color-mix(in srgb, #dc4a4a 12%, var(--app-surface, #fff));
   color: #b83d3d;
+}
+
+:global(html[data-theme="dark"]) .course-payment__trigger--pending {
+  background: color-mix(in srgb, #f59e0b 17%, #151a24);
+  color: #fbbf24;
+}
+
+:global(html[data-theme="dark"]) .course-payment__trigger--rejected {
+  background: color-mix(in srgb, #dc3545 17%, #151a24);
+  color: #ff7b87;
 }
 
 :global(.course-payment-dialog.p-dialog) {
