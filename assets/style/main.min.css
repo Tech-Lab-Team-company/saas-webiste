@@ -7857,20 +7857,6 @@ hr {
     display: none;
   }
 }
-.login-container .login-form p {
-  color: #a3adbb;
-  width: 60%;
-  text-align: center;
-  z-index: 3;
-}
-@media (max-width: 768px) {
-  .login-container .login-form p {
-    width: 100%;
-  }
-}
-.login-container .login-form p.pass-code {
-  width: 70%;
-}
 .login-container .login-form .btns {
   gap: 10px;
   margin-top: 25px;

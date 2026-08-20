@@ -1,56 +1,22 @@
 <script lang="ts" setup>
-// import MapIcon from "../../public/icons/map.vue";
-// import city from "../../public/icons/city.vue";
-// import national from "../../public/icons/national.vue";
 import { computed, ref, watch } from "vue";
 import RegisterParams from "~/features/RegisterFeature/Core/Params/register_params";
 import RegisterController from "~/features/RegisterFeature/presentation/controllers/register_controller";
-// import FetchCountriesParams from "~/features/FetchCountriesFeature/Core/Params/fetch_countries_params";
-// import FetchCountriesController from "~/features/FetchCountriesFeature/presentation/controllers/fetch_countries_controller";
-import CountryModel from "~/features/FetchCountriesFeature/Data/models/country_model";
 import { GenderEnum } from "~/features/RegisterFeature/Core/Enums/gender_enum";
 import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 import countries from "~/data/countries.json";
-import GuestAccessLink from "~/components/AuthLayout/GuestAccessLink.vue";
 
-const UserSetting = useSettingStore();
+const settingStore = useSettingStore();
+const router = useRouter();
 
-const showTermsDialog = ref(false);
-const isTermsAccepted = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const password = ref("");
 const confirmPassword = ref("");
 const passwordError = ref("");
 const confirmPasswordError = ref("");
-const selectedCountry = ref(UserSetting?.setting?.country_code);
-
-const router = useRouter();
-
-const validatePassword = () => {
-  const passwordRegex = /^(?=.*[/*#@]).{8,}$/;
-
-  if (!password.value) {
-    passwordError.value = "كلمة المرور مطلوبة";
-  } else if (!passwordRegex.test(password.value)) {
-    passwordError.value = "";
-    // "كلمة المرور يجب أن تكون أكثر من 8 أحرف وتحتوي على رموز مثل (/*#@)";
-  } else {
-    passwordError.value = "";
-  }
-
-  if (confirmPassword.value && confirmPassword.value !== password.value) {
-    confirmPasswordError.value = "كلمة المرور غير متطابقة";
-  } else {
-    confirmPasswordError.value = "";
-  }
-};
-
-const toggleTermsDialog = (event: Event) => {
-  const checkbox = event.target as HTMLInputElement;
-  isTermsAccepted.value = checkbox.checked;
-  showTermsDialog.value = checkbox.checked; // الـ dialog يظهر فقط عند تحديد الـ checkbox
-};
+const formError = ref("");
+const isSubmitting = ref(false);
 
 const FirstName = ref("");
 const SecondName = ref("");
@@ -59,18 +25,25 @@ const StudentAddress = ref("");
 const FirstphoneNumber = ref("");
 const SecondphoneNumber = ref("");
 const studentType = ref(0);
-const license_accept = ref(0);
 const Education_Type = ref(0);
 
+type CountryOption = (typeof countries)[number];
+const selectedCountry = ref<CountryOption | string | undefined>(
+  settingStore.setting?.country_code,
+);
+const isEmailRequired = computed(() =>
+  Boolean(settingStore.setting?.email_required),
+);
+
 const educationTypeOptions = [
-  { value: CategoryIdEnum.BASIC, label: "اساسى" },
-  { value: CategoryIdEnum.UNIVERSITY, label: "جامعى" },
+  { value: CategoryIdEnum.BASIC, label: "أساسي" },
+  { value: CategoryIdEnum.UNIVERSITY, label: "جامعي" },
   { value: CategoryIdEnum.GENERAL, label: "عام" },
 ] as const;
 
 const availableEducationTypeOptions = computed(() => {
   const enabledCategoryIds = new Set(
-    (UserSetting.setting?.categories ?? []).map(Number),
+    (settingStore.setting?.categories ?? []).map(Number),
   );
 
   return educationTypeOptions.filter(({ value }) =>
@@ -88,162 +61,283 @@ watch(
   { immediate: true },
 );
 
-const PhoneCode = ref(UserSetting?.setting?.country_code);
+watch(
+  () => settingStore.setting?.country_code,
+  (countryCode) => {
+    if (!countryCode || typeof selectedCountry.value === "object") return;
+
+    selectedCountry.value =
+      countries.find(({ dial_code }) => dial_code === countryCode) || countryCode;
+  },
+  { immediate: true },
+);
+
+const selectedCountryCode = computed(() => {
+  const country = selectedCountry.value as
+    | string
+    | { dial_code?: string }
+    | null
+    | undefined;
+
+  if (country && typeof country === "object") {
+    return country.dial_code || "";
+  }
+
+  return country || settingStore.setting?.country_code || "";
+});
+
+const validatePassword = (requireConfirmation = false) => {
+  const passwordRegex = /^(?=.*[/*#@]).{8,}$/;
+
+  if (!password.value) {
+    passwordError.value = "كلمة المرور مطلوبة";
+  } else if (!passwordRegex.test(password.value)) {
+    passwordError.value =
+      "استخدم 8 أحرف على الأقل، مع رمز واحد مثل @ أو # أو *";
+  } else {
+    passwordError.value = "";
+  }
+
+  if (!confirmPassword.value && requireConfirmation) {
+    confirmPasswordError.value = "تأكيد كلمة المرور مطلوب";
+  } else if (
+    confirmPassword.value &&
+    confirmPassword.value !== password.value
+  ) {
+    confirmPasswordError.value = "كلمتا المرور غير متطابقتين";
+  } else {
+    confirmPasswordError.value = "";
+  }
+
+  return !passwordError.value && !confirmPasswordError.value;
+};
 
 const CheckData = async () => {
-  console.log(selectedCountry?.value, "code");
+  formError.value = "";
+  const passwordsAreValid = validatePassword(true);
+
+  if (!FirstName.value.trim() || !FirstphoneNumber.value.trim()) {
+    formError.value = "أكمل الاسم ورقم الموبايل للمتابعة.";
+    return;
+  }
+
+  if (settingStore.setting?.allow_parent_name && !SecondName.value.trim()) {
+    formError.value = "أدخل اسم ولي الأمر للمتابعة.";
+    return;
+  }
+
+  if (settingStore.setting?.address_required && !StudentAddress.value.trim()) {
+    formError.value = "أدخل العنوان للمتابعة.";
+    return;
+  }
+
+  if (isEmailRequired.value && !Email.value.trim()) {
+    formError.value = "أدخل البريد الإلكتروني للمتابعة.";
+    return;
+  }
+
+  if (
+    Email.value.trim() &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(Email.value.trim())
+  ) {
+    formError.value = "أدخل بريدًا إلكترونيًا صحيحًا.";
+    return;
+  }
+
+  if (!studentType.value || !Education_Type.value) {
+    formError.value = "اختر النوع والصف الدراسي للمتابعة.";
+    return;
+  }
+
+  if (
+    settingStore.setting?.country_code_required &&
+    !selectedCountryCode.value
+  ) {
+    formError.value = "اختر كود الدولة للمتابعة.";
+    return;
+  }
+
+  if (!passwordsAreValid) {
+    formError.value = "راجع بيانات كلمة المرور الموضحة أسفل الحقول.";
+    return;
+  }
+
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
+
   const registerParams = new RegisterParams(
-    FirstName.value,
-    SecondName.value || null,
-    StudentAddress.value || null,
-    Email.value || null,
-    FirstphoneNumber.value,
-    SecondphoneNumber.value || null,
+    FirstName.value.trim(),
+    SecondName.value.trim() || null,
+    StudentAddress.value.trim() || null,
+    Email.value.trim() || null,
+    FirstphoneNumber.value.trim(),
+    SecondphoneNumber.value.trim() || null,
     password.value,
     confirmPassword.value,
     Education_Type.value,
-    selectedCountry?.value,
+    selectedCountryCode.value,
     studentType.value,
   );
 
-  const registerController = RegisterController.getInstance();
-  const state = await registerController.Register(registerParams, router);
+  try {
+    const registerController = RegisterController.getInstance();
+    await registerController.Register(registerParams, router);
+  } finally {
+    isSubmitting.value = false;
+  }
 };
-
-const data = ref<CountryModel[]>([]);
-const cities = ref<CountryModel[]>([]);
-
-// const ftechData =async ()=>{
-//   const countriesparams = new FetchCountriesParams(1,0) ;
-//   const state = await FetchCountriesController.getInstance().fetchCountries(countriesparams);
-//   data.value = state.value.data ?? [];
-
-//   if (state.value.data) {
-//     cities.value.push(...state.value.data);
-//   }
-// }
-
-// onMounted(() => {
-//   ftechData();
-// });
-
-watch(
-  () => data.value,
-  (newValue) => {
-    data.value = newValue;
-  },
-);
-
-// const validatePhoneNumber = (number: Event) => {
-//   if (number.target) {
-//       const PhoneNumberMatch = /^\d{11}$/;
-//       if((number.target as HTMLInputElement).value.match(PhoneNumberMatch)){
-//         phoneNumber.value =(number.target as HTMLInputElement).value ;
-//       }
-//       else{
-//         console.log("رقم الهاتف غير صحيح");
-//       }
-//   }
-//
-// }
-
-const settingStore = useSettingStore();
 </script>
 
 <template>
   <div class="login-container auth-register-container">
-    <div class="login-form">
-      <h3>ادخل معلوماتك الشخصيه</h3>
-      <p>
-        مرحبا بك فى منصتنا ادخل معلوماتك الشخصيه التاليه و احرص على ادخال
-        البياناتك الضروريه و المحاطه باللون الازرق وعلامه مميزه *
-      </p>
+    <form class="login-form auth-register-form" novalidate @submit.prevent="CheckData">
+      <h3>إنشاء حساب</h3>
+      <p>أكمل البيانات واختر الصف الدراسي المناسب.</p>
 
-      <div class="inputs">
-        <div class="auth-field-group">
-          <label class="auth-field-label" for="register-first-name"
-            >الاسم الأول *</label
-          >
+      <div class="register-intro">
+        <div class="register-notice">
+          <span class="register-notice__icon" aria-hidden="true">i</span>
+          <span>
+            <strong>معاينة إنشاء الحساب</strong>
+            <small>لن تُرسل أو تُحفظ أي بيانات قبل الضغط على متابعة.</small>
+          </span>
+        </div>
+
+        <!-- <NuxtLink class="register-preview" to="/">
+          <span>
+            <strong>افتح معاينة مساحة الطالب</strong>
+            <small>تخطَّ النموذج وشاهد تنظيم المحتوى قبل إنشاء الحساب.</small>
+          </span>
+          <span aria-hidden="true">←</span>
+        </NuxtLink> -->
+
+        <!-- <div class="register-divider">
+          <span>أو جرّب نموذج إنشاء الحساب</span>
+        </div> -->
+      </div>
+
+      <div v-if="formError" class="register-alert" role="alert" aria-live="polite">
+        <span class="pi pi-exclamation-circle" aria-hidden="true" />
+        <span>{{ formError }}</span>
+      </div>
+
+      <div class="inputs register-fields">
+        <div class="auth-field-group register-field--wide">
+          <label class="auth-field-label" for="register-first-name">
+            الاسم بالكامل <span class="required-mark">*</span>
+          </label>
           <div class="login-input">
-            <input id="register-first-name" type="text" v-model="FirstName" />
+            <input
+              id="register-first-name"
+              v-model="FirstName"
+              type="text"
+              name="name"
+              autocomplete="name"
+              placeholder="اكتب اسم الطالب"
+              required
+            >
           </div>
         </div>
 
         <div
-          class="auth-field-group"
-          v-if="settingStore?.setting?.allow_parent_name"
+          v-if="settingStore.setting?.allow_parent_name"
+          class="auth-field-group register-field--wide"
         >
-          <label class="auth-field-label" for="register-parent-name"
-            >اسم ولي الأمر *</label
-          >
+          <label class="auth-field-label" for="register-parent-name">
+            اسم ولي الأمر <span class="required-mark">*</span>
+          </label>
           <div class="login-input">
-            <input id="register-parent-name" type="text" v-model="SecondName" />
+            <input
+              id="register-parent-name"
+              v-model="SecondName"
+              type="text"
+              name="parent-name"
+              autocomplete="off"
+              placeholder="اكتب اسم ولي الأمر"
+              required
+            >
           </div>
         </div>
 
         <div
-          class="auth-field-group"
-          v-if="settingStore?.setting?.address_required"
+          v-if="settingStore.setting?.address_required"
+          class="auth-field-group register-field--wide"
         >
-          <label class="auth-field-label" for="register-address"
-            >العنوان *</label
-          >
+          <label class="auth-field-label" for="register-address">
+            العنوان <span class="required-mark">*</span>
+          </label>
           <div class="login-input">
-            <input id="register-address" type="text" v-model="StudentAddress" />
+            <input
+              id="register-address"
+              v-model="StudentAddress"
+              type="text"
+              name="street-address"
+              autocomplete="street-address"
+              placeholder="اكتب العنوان بالتفصيل"
+              required
+            >
           </div>
         </div>
 
-        <div
-          class="auth-field-group"
-          v-if="settingStore?.setting?.email_required"
-        >
-          <label class="auth-field-label" for="register-email"
-            >البريد الإلكتروني *</label
-          >
+        <div class="auth-field-group register-field--wide">
+          <label class="auth-field-label" for="register-email">
+            البريد الإلكتروني
+            <span v-if="isEmailRequired" class="required-mark">*</span>
+            <span v-else class="optional-mark">(اختياري)</span>
+          </label>
           <div class="login-input">
-            <input id="register-email" type="email" v-model="Email" />
+            <input
+              id="register-email"
+              v-model="Email"
+              type="email"
+              name="email"
+              autocomplete="email"
+              inputmode="email"
+              placeholder="name@example.com"
+              :required="isEmailRequired"
+            >
           </div>
         </div>
 
-        <div class="auth-field-group">
-          <label class="auth-field-label" for="register-phone"
-            >رقم الهاتف</label
-          >
+        <div class="auth-field-group register-field--wide">
+          <label class="auth-field-label" for="register-phone">
+            رقم الموبايل <span class="required-mark">*</span>
+          </label>
           <div class="login-input login-input-phone-code">
             <div class="phone-number">
               <input
                 id="register-phone"
-                type="tel"
                 v-model="FirstphoneNumber"
-              />
+                type="tel"
+                name="tel"
+                autocomplete="tel"
+                inputmode="tel"
+                placeholder="اكتب رقم الموبايل"
+                required
+              >
             </div>
             <div
+              v-if="settingStore.setting?.country_code_required"
               class="phone-code"
-              v-if="settingStore?.setting?.country_code_required"
             >
               <Select
-                :defaultValue="{
-                  dial_code: `${UserSetting?.setting?.country_code}`,
-                }"
                 v-model="selectedCountry"
                 :options="countries"
                 filter
-                optionLabel="name"
-                class="w-full md:w-56"
+                option-label="name"
+                aria-label="كود الدولة"
               >
                 <template #value="slotProps">
-                  <div v-if="slotProps.value" class="flex items-center">
-                    <div>
-                      {{ slotProps.value.dial_code }} {{ slotProps.value.flag }}
-                    </div>
+                  <div v-if="slotProps.value" class="country-value">
+                    <span>{{ slotProps.value.flag }}</span>
+                    <span>{{ slotProps.value.dial_code || slotProps.value }}</span>
                   </div>
                 </template>
-
                 <template #option="slotProps">
-                  <div class="flex items-center">
+                  <div class="country-option">
                     <span>{{ slotProps.option.flag }}</span>
                     <span>{{ slotProps.option.name }}</span>
-                    <div>({{ slotProps.option.dial_code }})</div>
+                    <span>({{ slotProps.option.dial_code }})</span>
                   </div>
                 </template>
               </Select>
@@ -252,412 +346,422 @@ const settingStore = useSettingStore();
         </div>
 
         <div
-          class="auth-field-group"
-          v-if="settingStore?.setting?.allow_parent_phone"
+          v-if="settingStore.setting?.allow_parent_phone"
+          class="auth-field-group register-field--wide"
         >
-          <label class="auth-field-label" for="register-parent-phone"
-            >رقم هاتف ولي الأمر</label
-          >
+          <label class="auth-field-label" for="register-parent-phone">
+            رقم موبايل ولي الأمر
+          </label>
           <div class="login-input">
             <input
               id="register-parent-phone"
-              type="tel"
               v-model="SecondphoneNumber"
-            />
-          </div>
-        </div>
-
-        <div class="auth-field-group">
-          <label class="auth-field-label" for="register-student-type"
-            >نوع الطالب</label
-          >
-          <div class="login-input">
-            <select
-              id="register-student-type"
-              class="student-select"
-              v-model="studentType"
-              required
+              type="tel"
+              name="parent-tel"
+              autocomplete="tel"
+              inputmode="tel"
+              placeholder="رقم بديل للتواصل"
             >
-              <option :value="GenderEnum?.male">ذكر</option>
-              <option :value="GenderEnum?.female">انثى</option>
-            </select>
           </div>
         </div>
 
-        <div class="auth-field-group">
-          <label class="auth-field-label" for="register-education-type"
-            >نوع التعليم</label
-          >
-          <div class="login-input">
-            <select
-              id="register-education-type"
-              class="student-select"
-              v-model="Education_Type"
-              required
-            >
-              <option
-                v-if="availableEducationTypeOptions.length === 0"
-                :value="0"
-                disabled
+        <div class="register-fields-grid register-fields-grid--passwords">
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-password">
+              كلمة المرور <span class="required-mark">*</span>
+            </label>
+            <div class="login-input password-container">
+              <input
+                id="register-password"
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                name="new-password"
+                autocomplete="new-password"
+                placeholder="8 أحرف على الأقل"
+                :aria-invalid="Boolean(passwordError)"
+                required
+                @input="validatePassword(false)"
               >
-                لا توجد أنواع تعليم متاحة
-              </option>
-              <option
-                v-for="option in availableEducationTypeOptions"
-                :key="option.value"
-                :value="option.value"
+              <button
+                type="button"
+                class="register-password-toggle"
+                :aria-label="showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'"
+                :aria-pressed="showPassword"
+                @click="showPassword = !showPassword"
               >
-                {{ option.label }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div class="auth-field-group">
-          <label class="auth-field-label" for="register-password"
-            >كلمة المرور</label
-          >
-          <div class="login-input password-container">
-            <input
-              id="register-password"
-              :type="showPassword ? 'text' : 'password'"
-              v-model="password"
-              @input="validatePassword"
-            />
-          </div>
-          <div class="error-message" v-if="passwordError">
-            {{ passwordError }}
-          </div>
-        </div>
-
-        <div class="auth-field-group">
-          <label class="auth-field-label" for="register-confirm-password"
-            >تأكيد كلمة المرور *</label
-          >
-          <div class="login-input password-container">
-            <input
-              id="register-confirm-password"
-              :type="showConfirmPassword ? 'text' : 'password'"
-              v-model="confirmPassword"
-              @input="validatePassword"
-            />
-          </div>
-          <div class="error-message" v-if="confirmPasswordError">
-            {{ confirmPasswordError }}
-          </div>
-        </div>
-
-        <!-- <div class="login-input">
-           <label :class="{'select-placeholder': !nationality , 'hidden':nationality}">الجنسيه</label>
-            <select class="natioal-select" v-model="nationality" >
-              <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.title }}</option>
-            </select>
-          </div>
-          <div class="login-input">
-            <div class="icon-container">
-              <MapIcon />
+                <span :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true" />
+              </button>
             </div>
+            <div v-if="passwordError" class="error-message" role="alert">
+              {{ passwordError }}
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-confirm-password">
+              تأكيد كلمة المرور <span class="required-mark">*</span>
+            </label>
+            <div class="login-input password-container">
+              <input
+                id="register-confirm-password"
+                v-model="confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                name="confirm-password"
+                autocomplete="new-password"
+                placeholder="أعد كتابة كلمة المرور"
+                :aria-invalid="Boolean(confirmPasswordError)"
+                required
+                @input="validatePassword(true)"
+              >
+              <button
+                type="button"
+                class="register-password-toggle"
+                :aria-label="showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'"
+                :aria-pressed="showConfirmPassword"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                <span :class="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true" />
+              </button>
+            </div>
+            <div v-if="confirmPasswordError" class="error-message" role="alert">
+              {{ confirmPasswordError }}
+            </div>
+          </div>
+        </div>
+
+        <div class="register-fields-grid register-fields-grid--study">
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-student-type">
+              النوع <span class="required-mark">*</span>
+            </label>
             <div class="login-input">
-              <label :class="{'select-placeholder': !country , 'hidden':country}">الدوله</label>
-              <select class="city-select" v-model="country">
-                <option v-for="city in cities" :key="city.id" :value="city.id">{{ city.title }}</option> 
+              <select
+                id="register-student-type"
+                v-model="studentType"
+                class="student-select"
+                name="gender"
+                required
+              >
+                <option :value="0" disabled>اختر النوع</option>
+                <option :value="GenderEnum.male">ذكر</option>
+                <option :value="GenderEnum.female">أنثى</option>
               </select>
-              <city class="login-call-icon" />
             </div>
-          </div> -->
+          </div>
 
-        <div class="remember-mee">
-          <label for="rememberr">موافق على الشروط و الاحكام </label>
-          <input
-            id="rememberr"
-            type="checkbox"
-            @change="toggleTermsDialog"
-            v-model="license_accept"
-          />
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="register-education-type">
+              الصف الدراسي <span class="required-mark">*</span>
+            </label>
+            <div class="login-input">
+              <select
+                id="register-education-type"
+                v-model="Education_Type"
+                class="student-select"
+                name="education-type"
+                required
+              >
+                <option
+                  v-if="availableEducationTypeOptions.length === 0"
+                  :value="0"
+                  disabled
+                >
+                  لا توجد صفوف متاحة
+                </option>
+                <option
+                  v-for="option in availableEducationTypeOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
-        <!-- <NuxtLink to="/Auth/emailcode" @click="CheckData"> -->
-        <div class="btns btns-home">
+
+        <div class="btns btns-home register-actions">
           <button
             class="login-btn"
-            :disabled="availableEducationTypeOptions.length === 0"
-            @click="CheckData"
+            type="submit"
+            :disabled="isSubmitting || availableEducationTypeOptions.length === 0"
           >
-            التالى
+            <span>{{ isSubmitting ? "جارٍ إنشاء الحساب..." : "متابعة" }}</span>
+            <span v-if="!isSubmitting" aria-hidden="true">←</span>
           </button>
         </div>
-        <GuestAccessLink />
-        <!-- </NuxtLink> -->
-        <!-- <NuxtLink to="/Auth/email" ><div class="btns btns-home">
-            <button class="login-btn" > 
-                التحقق من بريدك الإلكتروني  </button>
-              </div>
-          </NuxtLink> -->
 
-        <!-- <div class="btns btns-home">
-            <button class="login-btn" >  <NuxtLink to="/Auth/email" 
-                >التحقق من بريدك الإلكتروني</NuxtLink>  </button>
-         
-        </div> -->
-      </div>
-    </div>
-
-    <Teleport to="body">
-      <div
-        v-if="showTermsDialog"
-        class="terms-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="register-terms-title"
-        @click.self="showTermsDialog = false"
-      >
-        <div class="dialog-content">
-          <button
-            class="close"
-            type="button"
-            aria-label="إغلاق"
-            @click="showTermsDialog = false"
-          >
-            &times;
-          </button>
-          <h3 id="register-terms-title">الشروط والأحكام</h3>
-          <p>
-            هنا يمكنك كتابة الشروط والأحكام الخاصة بالمنصة. على سبيل المثال:
-            يجب أن تكون جميع البيانات المدخلة صحيحة ودقيقة، ويمنع استخدام
-            المنصة لأغراض غير قانونية، ويلتزم المستخدم بحماية خصوصية حسابه.
-          </p>
-          <button type="button" @click="showTermsDialog = false">إغلاق</button>
+        <div class="register-login-link">
+          <span class="register-login-link__copy">
+            <strong>لديك حساب بالفعل؟</strong>
+            <small>سجّل دخولك وانتقل مباشرة إلى مساحة الطالب.</small>
+          </span>
+          <NuxtLink to="/loginhome">
+            <span>تسجيل الدخول</span>
+            <span aria-hidden="true">←</span>
+          </NuxtLink>
         </div>
       </div>
-    </Teleport>
+    </form>
+
   </div>
 </template>
 
 <style scoped lang="scss">
-.hidden {
-  display: none;
+.required-mark {
+  color: color-mix(in srgb, var(--app-accent) 55%, #ff6178);
+  font-weight: 900;
 }
 
-.login-input {
-  position: relative;
+.optional-mark {
+  margin-inline-start: 4px;
+  color: var(--app-muted);
+  font-size: 9px;
+  font-weight: 700;
 }
 
-.select-placeholder {
-  position: absolute;
-  top: 50%;
-  right: 7%;
-  transform: translateY(-50%);
-  color: #909dad;
-  pointer-events: none;
-  transition: 0.2s;
+.register-intro {
+  margin-bottom: 22px;
 }
 
-/*  */
-
-.remember-mee {
+.register-notice,
+.register-preview {
   display: flex;
-  align-items: center;
-}
-
-.remember-mee label {
-  text-align: end;
   width: 100%;
-  text-decoration: underline;
-  font-family: "regular";
-  font-weight: 400;
-  font-size: 14px;
-  color: #909dad;
-}
-
-.remember-mee input {
-  width: 30px;
-}
-
-.login-input {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  position: relative;
-
-  &.login-input-phone-code {
-    display: flex;
-    width: 100%;
-    gap: 20px;
-    flex-direction: row-reverse;
-
-    .phone-number {
-      display: flex;
-      align-items: center;
-      width: 100%;
-    }
-
-    .phone-code {
-      width: 130px;
-
-      select {
-        option {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          flex-direction: row-reverse;
-        }
-      }
-    }
-  }
+  padding: 15px 16px;
+  border-radius: 0;
 }
 
-.password-container {
-  position: relative;
-  width: 100%;
+.register-notice {
+  gap: 14px;
+  border: 1px solid color-mix(in srgb, var(--app-accent) 38%, var(--app-line));
+  background: color-mix(in srgb, var(--app-accent) 12%, var(--app-surface));
 }
 
-.login-call-icon,
-.login-call-aicon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.login-call-icon.lock-icon {
-  right: 10px;
-}
-
-.eye-icon {
-  left: 10px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.error-message {
-  color: #0752ac;
-  font-size: 12px;
-  text-align: right;
-  margin: 5px 0;
-  direction: rtl;
-}
-
-.icon-container {
-  background: #f8f9fa;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #f0f1f4;
-  width: 50px;
-  height: 40px;
-}
-
-.city-select {
-  color: #a3adbb;
-  text-align: right;
-  padding: 10px 30px 10px 0;
-  border-radius: 10px;
-  font-size: 14px;
-  direction: rtl;
-  background: transparent;
-  width: 320px;
-}
-
-@media (max-width: 767px) {
-  .city-select {
-    width: 200px;
-  }
-}
-
-@media (max-width: 500px) {
-  .city-select {
-    width: 120px;
-  }
-}
-
-select {
-  color: #a3adbb;
-  text-align: right;
-  padding: 10px 30px 10px 0;
-  border-radius: 10px;
-  border: 1px solid #dde1e6;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 14px;
-  direction: rtl;
-}
-
-select:focus {
-  outline: none;
-  border: 1px solid #b2bbc6;
-}
-
-input {
-  width: 100%;
-  padding: 10px 60px 10px 10px;
-  border: 1px solid #dde1e6;
-  border-radius: 10px;
-  direction: rtl;
-}
-
-input:focus {
-  outline: none;
-  border: 1px solid #b2bbc6;
-}
-
-.terms-dialog {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  background-color: rgba(5, 15, 40, 0.55);
-  z-index: 10000;
-}
-
-.dialog-content {
-  background-color: white;
-  padding: 28px;
-  border-radius: 10px;
-  width: min(500px, 100%);
-  max-height: calc(100dvh - 40px);
-  overflow-y: auto;
-  position: relative;
-  text-align: right;
-  direction: rtl;
-  box-shadow: 0 24px 70px rgba(5, 15, 40, 0.24);
-}
-
-.dialog-content h3 {
-  color: #032855;
-  margin-bottom: 10px;
-}
-
-.dialog-content p {
-  color: #333;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.dialog-content button {
-  background: #032855;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.close {
-  position: absolute;
-  top: 12px;
-  left: 12px;
+.register-notice__icon {
   display: grid;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--app-accent);
+  color: #fff;
+  font-family: Georgia, serif;
+  font-weight: 900;
+}
+
+.register-notice > span:last-child,
+.register-preview > span:first-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.register-notice strong,
+.register-preview strong {
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.register-notice small,
+.register-preview small {
+  color: var(--app-muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.register-preview {
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 16px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-secondary) 34%, transparent);
+  background: color-mix(in srgb, var(--app-accent-secondary) 28%, var(--app-bg));
+  color: var(--app-accent);
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.register-preview:hover,
+.register-preview:focus-visible {
+  border-color: var(--app-accent);
+  transform: translateY(-1px);
+}
+
+.register-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  color: var(--app-muted);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.register-divider::before,
+.register-divider::after {
+  width: 100%;
+  height: 1px;
+  background: var(--app-line);
+  content: "";
+}
+
+.register-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-bottom: 18px;
+  padding: 11px 13px;
+  border: 1px solid color-mix(in srgb, #e04f63 40%, var(--app-line));
+  background: color-mix(in srgb, #e04f63 10%, var(--app-surface));
+  color: color-mix(in srgb, #e04f63 70%, var(--app-text));
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.7;
+}
+
+.register-fields {
+  gap: 17px !important;
+}
+
+.register-fields-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.country-value,
+.country-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.country-option {
+  direction: rtl;
+}
+
+.password-container input {
+  padding-inline-end: 48px !important;
+}
+
+.register-password-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  inset-inline-end: 7px;
+  display: grid;
+  width: 34px;
+  height: 34px;
   place-items: center;
   padding: 0;
+  border: 0;
   background: transparent;
-  color: #333;
-  font-size: 22px;
-  line-height: 1;
+  color: var(--app-muted);
   cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.register-password-toggle:hover,
+.register-password-toggle:focus-visible {
+  color: var(--app-accent);
+}
+
+.register-actions {
+  margin-top: 0 !important;
+}
+
+.register-actions .login-btn {
+  border-radius: 0 !important;
+}
+
+.register-actions .login-btn:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.62;
+}
+
+.register-login-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin: 5px 0 0 !important;
+  padding: 13px 14px;
+  border: 1px solid var(--app-line);
+  background: color-mix(in srgb, var(--app-accent) 5%, var(--app-surface));
+  text-align: right;
+}
+
+.register-login-link__copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.register-login-link__copy strong {
+  color: var(--app-text);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.register-login-link__copy small {
+  color: var(--app-muted);
+  font-size: 9px;
+  line-height: 1.7;
+}
+
+.register-login-link a {
+  display: inline-flex;
+  min-width: 146px;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 9px 16px;
+  background: var(--secondary-color, #3a3e7e);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 900;
+  text-decoration: none;
+  transition: background-color 160ms ease, transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.register-login-link a:hover,
+.register-login-link a:focus-visible {
+  background: var(--primary-color, #28366c);
+  box-shadow: 0 12px 24px -16px var(--app-shadow);
+  transform: translateY(-1px);
+}
+
+.register-login-link a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--app-accent) 28%, transparent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .register-fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .register-preview,
+  .register-notice {
+    padding-inline: 13px;
+  }
+
+  .register-login-link {
+    grid-template-columns: 1fr;
+  }
+
+  .register-login-link a {
+    width: 100%;
+  }
 }
 </style>

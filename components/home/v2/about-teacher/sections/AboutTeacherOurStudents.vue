@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from "swiper/vue";
-import { Navigation, Pagination, Autoplay, FreeMode } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, EffectCards } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/css/effect-cards";
 
 import { useBaseUrls } from "~/constant/baseUrl";
 import type AboutUsInterface from "~/types/about_us_interface";
@@ -238,11 +239,30 @@ const { data: aboutusOpinions } = await useAsyncData(
   },
 );
 
-const modules = [Navigation, Pagination, Autoplay, FreeMode];
+const modules = [Navigation, Pagination, Autoplay, EffectCards];
 
 const isAllStudentsView = computed(
   () => selectedTopStudentsYearId.value === null,
 );
+
+const hasStudentCarousel = computed(() => topStudents.value.length >= 4);
+const isCompactStudentsViewport = ref(false);
+const usesStudentCardsEffect = computed(
+  () => hasStudentCarousel.value && isCompactStudentsViewport.value,
+);
+
+const updateStudentsViewport = () => {
+  isCompactStudentsViewport.value = window.innerWidth < 1024;
+};
+
+onMounted(() => {
+  updateStudentsViewport();
+  window.addEventListener("resize", updateStudentsViewport, { passive: true });
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateStudentsViewport);
+});
 
 const swiperOptions = {
   modules,
@@ -296,55 +316,63 @@ const swiperOptions = {
   },
 };
 
-const studentSwiperOptions = computed(() => ({
-  modules,
-  slidesPerView: "auto" as const,
-  centeredSlides: topStudents.value.length > 5,
-  centerInsufficientSlides: false,
-  spaceBetween: 14,
-  initialSlide: 0,
-  loop: isAllStudentsView.value
-    ? topStudents.value.length > 1
-    : topStudents.value.length > 5,
-  rewind:
-    !isAllStudentsView.value &&
-    topStudents.value.length > 1 &&
-    topStudents.value.length <= 5,
-  allowTouchMove: !isAllStudentsView.value && topStudents.value.length > 5,
-  grabCursor: !isAllStudentsView.value && topStudents.value.length > 5,
-  slideToClickedSlide: !isAllStudentsView.value && topStudents.value.length > 5,
-  navigation: !isAllStudentsView.value && topStudents.value.length > 5,
-  pagination:
-    !isAllStudentsView.value && topStudents.value.length > 5
+const studentSwiperOptions = computed(() => {
+  const isInteractive = hasStudentCarousel.value;
+  const usesCards = usesStudentCardsEffect.value;
+
+  return {
+    modules,
+    effect: usesCards ? ("cards" as const) : ("slide" as const),
+    slidesPerView: usesCards ? 1 : ("auto" as const),
+    centeredSlides: isInteractive,
+    centerInsufficientSlides: !isInteractive,
+    spaceBetween: usesCards ? 0 : 14,
+    initialSlide: 0,
+    loop: isInteractive,
+    loopAdditionalSlides: isInteractive ? 2 : 0,
+    rewind: false,
+    allowTouchMove: isInteractive,
+    grabCursor: isInteractive,
+    slideToClickedSlide: false,
+    navigation: isInteractive,
+    pagination: isInteractive
       ? { clickable: true, dynamicBullets: true }
       : false,
-  autoplay:
-    isAllStudentsView.value && topStudents.value.length > 1
+    autoplay: isInteractive
       ? {
-          delay: 0,
+          delay: 3600,
           disableOnInteraction: false,
-          pauseOnMouseEnter: false,
+          pauseOnMouseEnter: true,
         }
       : false,
-  freeMode: isAllStudentsView.value
-    ? { enabled: true, momentum: false }
-    : false,
-  speed: isAllStudentsView.value ? 6000 : 900,
-  watchOverflow: true,
-  watchSlidesProgress: true,
-  observer: true,
-  observeParents: true,
-  breakpoints: {
-    320: { spaceBetween: 10 },
-    640: { spaceBetween: 14 },
-    1024: { spaceBetween: 18 },
-  },
-}));
+    cardsEffect: {
+      perSlideOffset: 11,
+      perSlideRotate: 2,
+      rotate: true,
+      slideShadows: false,
+    },
+    speed: 650,
+    watchOverflow: true,
+    watchSlidesProgress: true,
+    observer: true,
+    observeParents: true,
+    ...(usesCards
+      ? {}
+      : {
+          breakpoints: {
+            320: { spaceBetween: 10 },
+            640: { spaceBetween: 14 },
+            1024: { spaceBetween: 18 },
+          },
+        }),
+  };
+});
 
 const topStudentsSwiperKey = computed(() =>
   [
     selectedTopStudentsStageId.value ?? "stage",
     selectedTopStudentsYearId.value ?? "all",
+    usesStudentCardsEffect.value ? "cards" : "classic",
     topStudents.value.map((student) => student.id).join("-"),
   ].join(":"),
 );
@@ -560,8 +588,20 @@ const getStudentAlt = (student: any) => {
 
         <div
           class="students-slider-container"
-          :class="{ 'students-slider-container--all': isAllStudentsView }"
+          :class="{
+            'students-slider-container--all': isAllStudentsView,
+            'students-slider-container--interactive': hasStudentCarousel,
+          }"
         >
+          <div
+            v-if="hasStudentCarousel && !topStudentsPending && !topStudentsError"
+            class="students-swipe-hint"
+            aria-hidden="true"
+          >
+            <span class="pi pi-arrows-h" />
+            اسحب البطاقات لمشاهدة المزيد
+          </div>
+
           <div
             v-if="topStudentsPending"
             class="students-loading"
@@ -594,8 +634,11 @@ const getStudentAlt = (student: any) => {
               `students-swiper--count-${Math.min(topStudents.length, 5)}`,
               {
                 'students-swiper--all': isAllStudentsView,
-                'students-swiper--few':
-                  !isAllStudentsView && topStudents.length <= 5,
+                'students-swiper--interactive': hasStudentCarousel,
+                'students-swiper--cards': usesStudentCardsEffect,
+                'students-swiper--classic':
+                  hasStudentCarousel && !usesStudentCardsEffect,
+                'students-swiper--few': !hasStudentCarousel,
               },
             ]"
           >
@@ -2198,9 +2241,37 @@ const getStudentAlt = (student: any) => {
   max-width: none;
 }
 
+.students-swipe-hint {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  margin: 24px auto -38px;
+  padding: 7px 12px;
+  border: 1px solid rgb(112 164 240 / 18%);
+  border-radius: 999px;
+  background: rgb(13 31 55 / 82%);
+  color: #9bb9e5;
+  font-size: 10px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.students-swipe-hint .pi {
+  color: #70aaff;
+  font-size: 11px;
+}
+
 .top-students-board .students-swiper {
   overflow: visible;
   padding: 60px 28px 72px;
+}
+
+.top-students-board .students-swiper--cards {
+  width: min(340px, calc(100vw - 110px));
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: 0;
 }
 
 .top-students-board .students-swiper--all {
@@ -2210,6 +2281,12 @@ const getStudentAlt = (student: any) => {
 .top-students-board .students-swiper--all :deep(.swiper-wrapper) {
   align-items: end;
   transition-timing-function: linear !important;
+}
+
+.top-students-board
+  .students-swiper--all.students-swiper--interactive
+  :deep(.swiper-wrapper) {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 .top-students-board .student-slide {
@@ -2264,6 +2341,77 @@ const getStudentAlt = (student: any) => {
 
 .top-students-board .students-swiper--all .student-podium::before {
   animation: none;
+}
+
+.top-students-board .students-swiper--cards .student-slide,
+.top-students-board
+  .students-swiper--cards
+  .student-slide.swiper-slide-visible,
+.top-students-board
+  .students-swiper--cards
+  .student-slide.swiper-slide-active {
+  width: 100%;
+  padding-inline: 0;
+  opacity: 1;
+  filter: none;
+  transform-origin: center center;
+}
+
+.top-students-board
+  .students-swiper--cards
+  .student-slide.swiper-slide-active {
+  z-index: 3;
+}
+
+.top-students-board
+  .students-swiper--cards
+  .student-podium,
+.top-students-board
+  .students-swiper--cards
+  .swiper-slide-active
+  .student-podium {
+  min-height: 440px;
+  border-color: rgb(112 170 255 / 72%);
+  box-shadow: 0 30px 62px -32px rgb(0 0 0 / 98%),
+    0 0 35px -20px rgb(84 150 247 / 78%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+.top-students-board
+  .students-swiper--all.students-swiper--classic
+  .student-slide {
+  opacity: 0.42;
+  filter: saturate(0.68);
+  transform: translateY(14px) scale(0.9);
+  transition: opacity 0.45s ease, filter 0.45s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.top-students-board
+  .students-swiper--all.students-swiper--classic
+  .student-slide.swiper-slide-visible {
+  opacity: 0.78;
+  filter: saturate(0.9);
+  transform: translateY(6px) scale(0.96);
+}
+
+.top-students-board
+  .students-swiper--all.students-swiper--classic
+  .student-slide.swiper-slide-active {
+  z-index: 3;
+  opacity: 1;
+  filter: none;
+  transform: translateY(-9px) scale(1.06);
+}
+
+.top-students-board
+  .students-swiper--all.students-swiper--classic
+  .swiper-slide-active
+  .student-podium {
+  border-color: rgb(112 170 255 / 72%);
+  box-shadow: 0 30px 62px -32px rgb(0 0 0 / 98%),
+    0 0 35px -20px rgb(84 150 247 / 78%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
 }
 
 .top-students-board .students-swiper--few :deep(.swiper-wrapper) {

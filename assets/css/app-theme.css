@@ -162,6 +162,123 @@ html[data-theme='dark'] .login-home-notice {
   background: color-mix(in srgb, var(--app-accent-secondary) 12%, var(--app-surface));
 }
 
+/* AuthUnifiedShell hosts legacy form components whose scoped light styles are
+   more specific than the shared controls above. Keep every auth step aligned
+   with the login screen's dark palette and contrast. */
+html[data-theme='dark'] .auth-unified-shell {
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] .auth-unified-shell .login-home-form-panel {
+  background-color: var(--app-bg) !important;
+  background-image: radial-gradient(
+    circle at 10% 8%,
+    color-mix(in srgb, var(--app-accent-secondary) 16%, transparent) 0 2px,
+    transparent 3px
+  ) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .login-form > h3,
+  .skills-container > h3,
+  .auth-field-label,
+  .register-section__header h4,
+  .dialog-content h3
+) {
+  color: var(--app-text) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .login-form > p,
+  .skills-container > p,
+  .register-section__header p,
+  .field-help,
+  .register-consent,
+  .register-login-link,
+  .dialog-content p
+) {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .login-home-kicker,
+  .register-eyebrow,
+  .register-consent button
+) {
+  color: var(--app-accent) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .register-section,
+  .register-consent,
+  .login-home-guest
+) {
+  border-color: var(--app-line) !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  box-shadow: none;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .login-input input,
+  .login-input select,
+  .student-select,
+  .natioal-select,
+  .city-select,
+  .phone-number input,
+  .phone-code .p-select,
+  .code-number-box
+) {
+  border-color: var(--app-line) !important;
+  background: var(--app-surface-raised) !important;
+  color: var(--app-text) !important;
+  color-scheme: dark;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .login-input input,
+  .phone-number input
+)::placeholder {
+  color: var(--app-muted) !important;
+  opacity: .86 !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .login-input input,
+  .login-input select,
+  .phone-code .p-select
+):focus,
+html[data-theme='dark'] .auth-unified-shell .phone-code .p-select.p-focus {
+  border-color: var(--app-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent) 18%, transparent) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .phone-code .p-select-label,
+  .phone-code .p-select-dropdown,
+  .register-password-toggle
+) {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell .login-home-guest small {
+  color: var(--app-muted) !important;
+}
+
+html[data-theme='dark'] .auth-unified-shell .login-home-guest > .pi-globe {
+  background: color-mix(in srgb, var(--app-accent) 14%, var(--app-surface-raised));
+  color: var(--app-accent);
+}
+
+html[data-theme='dark'] .auth-unified-shell :is(
+  .skills-section,
+  .dialog-content
+) {
+  border-color: var(--app-line) !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
 html[data-theme='dark'] :is(
   .login-home-divider::before,
   .login-home-divider::after,
