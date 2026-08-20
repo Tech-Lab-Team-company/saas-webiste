@@ -170,11 +170,9 @@ onBeforeUnmount(() => {
           >
             دخول الطالب
           </NuxtLink>
-          <NuxtLink
-            to="/Auth/register"
-            prefetch-on="interaction"
-            class="button"
-          >إنشاء حساب <span aria-hidden="true">←</span></NuxtLink>
+          <NuxtLink to="/Auth/register" prefetch-on="interaction" class="button"
+            >إنشاء حساب <span aria-hidden="true">←</span></NuxtLink
+          >
         </template>
 
         <template v-else>

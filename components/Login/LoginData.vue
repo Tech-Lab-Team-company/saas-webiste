@@ -209,10 +209,16 @@ const handleKeyPress = (event: KeyboardEvent) => {
                     </li>
                 </ul>
 
-                <p class="login-home-register">
-                    {{ $t('ليس لديك حساب؟') }}
-                    <nuxt-link :to="registerTarget">{{ $t('إنشاء حساب') }}</nuxt-link>
-                </p>
+                <div class="login-home-register">
+                    <span class="login-home-register__copy">
+                        <strong>{{ $t('ليس لديك حساب حتى الآن؟') }}</strong>
+                        <small>{{ $t('أنشئ حسابك وابدأ الوصول إلى محتوى صفك.') }}</small>
+                    </span>
+                    <nuxt-link :to="registerTarget">
+                        <span>{{ $t('إنشاء حساب') }}</span>
+                        <span aria-hidden="true">←</span>
+                    </nuxt-link>
+                </div>
             </div>
         </section>
 

@@ -54,17 +54,14 @@ const hasNavbarThemeToggle = computed(
   () =>
     isHomeV2.value ||
     route.meta.layout === undefined ||
-    route.meta.layout === "default" ||
-    isAuthRoute.value,
+    route.meta.layout === "default",
 );
-const { theme, isDark, toggleTheme } = useAppTheme();
-const SettingStore = useSettingStore();
-
-const isAuthRoute = computed(() => {
+const isAuthPage = computed(() => {
   const path = route.path.toLowerCase();
   return path.startsWith("/auth") || path.startsWith("/login");
 });
-const effectiveIsDark = computed(() => isDark.value && !isAuthRoute.value);
+const { theme, isDark, toggleTheme } = useAppTheme();
+const SettingStore = useSettingStore();
 
 const getSiteImageSource = (image: unknown): string => {
   if (typeof image === "string") return image.trim();
@@ -132,29 +129,29 @@ const themeVariables = computed<Record<string, string>>(() => ({
   "--secondary-color": secondaryColor.value,
   "--app-brand-primary": primaryColor.value,
   "--app-brand-secondary": secondaryColor.value,
-  "--app-accent": effectiveIsDark.value
+  "--app-accent": isDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 58%, #9fc2ff)`
     : primaryColor.value,
-  "--app-accent-secondary": effectiveIsDark.value
+  "--app-accent-secondary": isDark.value
     ? `color-mix(in srgb, ${secondaryColor.value} 65%, #7183b7)`
     : secondaryColor.value,
-  "--app-bg": effectiveIsDark.value
+  "--app-bg": isDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 6%, #080b12)`
     : "#fbfcff",
-  "--app-bg-muted": effectiveIsDark.value
+  "--app-bg-muted": isDark.value
     ? `color-mix(in srgb, ${secondaryColor.value} 8%, #0d111b)`
     : "#f2f6fc",
-  "--app-surface": effectiveIsDark.value
+  "--app-surface": isDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 10%, #131824)`
     : "#ffffff",
-  "--app-surface-raised": effectiveIsDark.value
+  "--app-surface-raised": isDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 13%, #19202e)`
     : "#ffffff",
-  "--app-text": effectiveIsDark.value ? "#f3f6fc" : "#081b3a",
-  "--app-muted": effectiveIsDark.value ? "#aab6ca" : "#4f617c",
-  "--app-line": effectiveIsDark.value ? "rgb(205 220 245 / 16%)" : "rgb(8 27 58 / 14%)",
-  "--app-shadow": effectiveIsDark.value ? "rgb(0 0 0 / 72%)" : "rgb(6 17 71 / 40%)",
-  "--app-footer-bg": effectiveIsDark.value
+  "--app-text": isDark.value ? "#f3f6fc" : "#081b3a",
+  "--app-muted": isDark.value ? "#aab6ca" : "#4f617c",
+  "--app-line": isDark.value ? "rgb(205 220 245 / 16%)" : "rgb(8 27 58 / 14%)",
+  "--app-shadow": isDark.value ? "rgb(0 0 0 / 72%)" : "rgb(6 17 71 / 40%)",
+  "--app-footer-bg": isDark.value
     ? `color-mix(in srgb, ${primaryColor.value} 24%, #070a11)`
     : `color-mix(in srgb, ${primaryColor.value} 82%, #071020)`,
 }));
@@ -166,7 +163,7 @@ const themeInlineStyle = computed(() =>
 );
 
 watchEffect(() => {
-  const activeTheme = isAuthRoute.value ? "light" : theme.value;
+  const activeTheme = theme.value;
   const activeVariables = themeVariables.value;
 
   if (!import.meta.client) return;
@@ -325,7 +322,7 @@ useHead(() => ({
   htmlAttrs: {
     lang: "ar",
     dir: "rtl",
-    "data-theme": isAuthRoute.value ? "light" : theme.value,
+    "data-theme": theme.value,
     style: themeInlineStyle.value,
   },
   link: [
@@ -468,8 +465,8 @@ onMounted(() => {
     <AppRouteTransition />
     <NuxtLayout>
       <LazyMobileNav v-if="!isHomeV2" />
-      <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" />
-      <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" />
+      <!-- <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" /> -->
+      <!-- <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" /> -->
       <LazyToast v-if="!isHomeV2" />
       <div
         class="app-route-view"
@@ -483,7 +480,9 @@ onMounted(() => {
   </div>
   <AppThemeToggle
     v-if="!hasNavbarThemeToggle"
+    :class="{ 'auth-route-theme-toggle': isAuthPage }"
     :is-dark="isDark"
+    :icon-only="isAuthPage"
     @toggle="toggleTheme"
   />
 </template>
@@ -509,6 +508,17 @@ onMounted(() => {
   z-index: 1000;
   position: fixed;
   cursor: pointer;
+}
+
+.auth-route-theme-toggle {
+  top: max(20px, env(safe-area-inset-top));
+  bottom: auto;
+}
+
+@media (min-width: 821px) {
+  .auth-route-theme-toggle {
+    left: calc(23.6vw - 140px);
+  }
 }
 
 .app-protection-notice {

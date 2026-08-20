@@ -467,17 +467,75 @@
 }
 
 .login-home-register {
-  margin: 26px 0 0;
-  color: #8290a5;
-  font-size: 12px;
-  text-align: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin: 28px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--app-line);
+  background: color-mix(in srgb, var(--app-accent) 5%, var(--app-surface));
+  color: var(--app-text);
+  text-align: right;
+}
+
+.login-home-register__copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.login-home-register__copy strong {
+  color: var(--app-text);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.login-home-register__copy small {
+  color: var(--app-muted);
+  font-size: 10px;
+  line-height: 1.7;
 }
 
 .login-home-register a {
-  margin-inline-start: 5px;
-  color: var(--secondary-color, #3a3e7e);
-  font-weight: 800;
+  display: inline-flex;
+  min-width: 158px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 8px;
+  background: var(--secondary-color, #3a3e7e);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
   text-decoration: none;
+  transition: background-color 160ms ease, transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.login-home-register a:hover,
+.login-home-register a:focus-visible {
+  background: var(--primary-color, #28366c);
+  box-shadow: 0 12px 24px -16px var(--app-shadow);
+  transform: translateY(-1px);
+}
+
+.login-home-register a:focus-visible {
+  outline: 3px solid
+    color-mix(in srgb, var(--app-accent) 28%, transparent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .login-home-register {
+    grid-template-columns: 1fr;
+  }
+
+  .login-home-register a {
+    width: 100%;
+  }
 }
 
 .login-home-visual {
@@ -759,6 +817,116 @@
 }
 
 /* Shared normalization for the existing auth forms inside AuthUnifiedShell. */
+.auth-unified-shell--register {
+  grid-template-columns: minmax(0, 47.2%) minmax(0, 52.8%);
+}
+
+.auth-unified-shell--register .login-home-form-panel {
+  padding: 52px clamp(28px, 5vw, 86px) 34px;
+}
+
+.auth-unified-shell--register .login-home-form-wrap {
+  width: min(100%, 560px);
+}
+
+.auth-unified-shell--register .login-home-kicker {
+  color: var(--app-accent);
+  font-size: 12px;
+}
+
+.auth-unified-shell--register .login-home-visual-copy {
+  width: min(100%, 620px);
+}
+
+.auth-unified-shell--register .login-home-visual-copy > span {
+  color: var(--login-visual-accent);
+}
+
+.auth-unified-shell--register .login-home-visual-copy h2 {
+  font-size: clamp(58px, 5.2vw, 86px);
+}
+
+.login-home-register-steps {
+  display: grid;
+  max-width: 520px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 46px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.login-home-register-steps li {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  padding-inline: 18px;
+  border-inline-start: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.login-home-register-steps li:first-child {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+}
+
+.login-home-register-steps strong {
+  color: var(--login-visual-accent);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.login-home-register-steps span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-form > h3) {
+  font-size: clamp(34px, 3vw, 42px) !important;
+}
+
+.auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-form > p) {
+  margin: 14px 0 30px !important;
+}
+
+@media (max-width: 1100px) {
+  .auth-unified-shell--register {
+    grid-template-columns: minmax(0, 56%) minmax(0, 44%);
+  }
+
+  .auth-unified-shell--register .login-home-form-panel {
+    padding-inline: 44px;
+  }
+
+  .auth-unified-shell--register .login-home-visual-copy h2 {
+    font-size: 52px;
+  }
+}
+
+@media (max-width: 820px) {
+  .auth-unified-shell--register {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-unified-shell--register .login-home-form-panel {
+    padding: 44px 20px 36px;
+  }
+
+  .login-home-register-steps {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .auth-unified-shell--register .login-home-form-panel {
+    padding-inline: 16px;
+  }
+}
+
 .auth-unified-content :deep(.login-container) {
   display: block !important;
   width: 100% !important;
@@ -879,6 +1047,23 @@
     color-mix(in srgb, var(--secondary-color, #3a3e7e) 13%, transparent) !important;
 }
 
+.auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-input input),
+.auth-unified-shell--register
+  .auth-unified-content
+  :deep(.login-input select),
+.auth-unified-shell--register
+  .auth-unified-content
+  :deep(.phone-code .p-select) {
+  border-radius: 0 !important;
+}
+
+.auth-unified-content :deep(.login-input input::placeholder) {
+  color: #8a98ad !important;
+  opacity: 1 !important;
+}
+
 .auth-unified-content :deep(.login-call-icon) {
   display: none !important;
 }
@@ -938,7 +1123,14 @@
   height: 50px !important;
   border-color: #cdd8e8 !important;
   border-radius: 0 !important;
+  background: #fff !important;
+  color: var(--primary-color, #28366c) !important;
   box-shadow: none !important;
+}
+
+.auth-unified-content :deep(.phone-code .p-select-label),
+.auth-unified-content :deep(.phone-code .p-select-dropdown) {
+  color: inherit !important;
 }
 
 .auth-unified-content :deep(.btns),
@@ -1036,146 +1228,6 @@
 .auth-unified-content :deep(.resend-code .not-send) {
   color: var(--secondary-color, #3a3e7e) !important;
   font-weight: 800 !important;
-}
-
-/* Keep the legacy education form readable when the application theme is dark. */
-:global(html[data-theme="dark"]) .auth-unified-shell {
-  --auth-dark-surface: #111a2e;
-  --auth-dark-field: #19243b;
-  --auth-dark-border: #33415e;
-  --auth-dark-text: #f4f7fc;
-  --auth-dark-muted: #aebbd0;
-  --auth-dark-accent: #66a9ff;
-}
-
-:global(html[data-theme="dark"]) .auth-unified-shell .login-home-form-panel {
-  background-color: var(--auth-dark-surface) !important;
-  background-image: radial-gradient(
-    circle at 10% 8%,
-    rgb(102 169 255 / 14%) 0 2px,
-    transparent 3px
-  ) !important;
-}
-
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.login-form > h3),
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.skills-container > h3) {
-  color: var(--auth-dark-text) !important;
-}
-
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.login-form > p),
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.skills-container > p) {
-  color: var(--auth-dark-muted) !important;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.auth-field-label) {
-  color: #dce6f6 !important;
-}
-
-:global(html[data-theme="dark"]) .auth-unified-shell--register {
-  color-scheme: light;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .login-home-form-panel {
-  background: #f8faff !important;
-  background-image: none !important;
-  color: #0b1d3b !important;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.login-form > h3),
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.auth-field-label) {
-  color: #28366c !important;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.login-form > p) {
-  color: #71809a !important;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.login-input input),
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.login-input select),
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.student-select),
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.natioal-select),
-:global(html[data-theme="dark"])
-  .auth-unified-shell--register
-  .auth-unified-content
-  :deep(.city-select) {
-  border-color: #cdd8e8 !important;
-  background: #fff !important;
-  color: #28366c !important;
-  color-scheme: light;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.login-input input),
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.login-input select),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.student-select),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.natioal-select),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.city-select),
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.phone-number input),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.code-number-box) {
-  border-color: var(--auth-dark-border) !important;
-  background: var(--auth-dark-field) !important;
-  color: var(--auth-dark-text) !important;
-  color-scheme: dark;
-}
-
-:global(html[data-theme="dark"]) .auth-unified-content :deep(select:disabled) {
-  border-color: #2a354d !important;
-  background: #141e32 !important;
-  color: #8795ac !important;
-  opacity: 1 !important;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.login-input input:focus),
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.login-input select:focus) {
-  border-color: var(--auth-dark-accent) !important;
-  box-shadow: 0 0 0 3px rgb(102 169 255 / 18%) !important;
-}
-
-:global(html[data-theme="dark"])
-  .auth-unified-content
-  :deep(.select-placeholder),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.remember-mee),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.remember-me),
-:global(html[data-theme="dark"]) .auth-unified-content :deep(.resend-code) {
-  color: var(--auth-dark-muted) !important;
 }
 
 .auth-unified-content :deep(.skills-container) {

@@ -90,9 +90,9 @@ function updateNavVisibility() {
   border-radius: 10px 10px 0 0;
   box-shadow: -1px -10px 0 0 var(--primary-color);
 
-  @media (max-width: 768px) {
-    display: flex;
-  }
+  // @media (max-width: 768px) {
+  //   display: flex;
+  // }
 }
 
 .nav-visable {

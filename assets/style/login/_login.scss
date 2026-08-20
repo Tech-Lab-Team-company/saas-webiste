@@ -140,21 +140,21 @@
       }
     }
 
-    p {
-      color: #a3adbb;
-      width: 60%;
-      text-align: center;
-      z-index: 3;
+    // p {
+    //   color: #a3adbb;
+    //   width: 60%;
+    //   text-align: center;
+    //   z-index: 3;
 
-      @media (max-width:768px) {
-        width: 100%;
+    //   @media (max-width:768px) {
+    //     width: 100%;
         
-      }
+    //   }
 
-      &.pass-code {
-        width: 70%;
-      }
-    }
+    //   &.pass-code {
+    //     width: 70%;
+    //   }
+    // }
 
     .btns {
       gap: 10px;
