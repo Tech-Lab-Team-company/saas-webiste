@@ -3,7 +3,7 @@ import HomeV2 from '~/components/home/v2/HomeV2.vue'
 import { useHomePage } from '~/features/HomePageFeature/composables/useHomePage'
 import { normalizeSeoText, resolveHomepageSeo } from '~/utils/seoText'
 
-const { home, pending, loadCoursesByYear } = await useHomePage()
+const { home, pending, loadCoursesByYear, loadGeneralCourses } = await useHomePage()
 
 definePageMeta({
   layout: 'home-v2',
@@ -71,5 +71,10 @@ useHead({
 </script>
 
 <template>
-  <HomeV2 :home="home" :pending="pending" :load-courses-by-year="loadCoursesByYear" />
+  <HomeV2
+    :home="home"
+    :pending="pending"
+    :load-courses-by-year="loadCoursesByYear"
+    :load-general-courses="loadGeneralCourses"
+  />
 </template>

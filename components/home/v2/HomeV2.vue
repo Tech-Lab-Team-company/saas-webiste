@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {
-  HomeCourseViewModel,
+  HomeCoursePageViewModel,
   HomePageViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
@@ -13,7 +13,11 @@ const props = defineProps<{
   loadCoursesByYear: (
     stageId: number,
     yearId: number
-  ) => Promise<HomeSectionState<HomeCourseViewModel[]>>;
+  ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
+  loadGeneralCourses: (
+    page?: number,
+    perPage?: number,
+  ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
 const homeRoot = ref<HTMLElement | null>(null);
@@ -50,6 +54,7 @@ const themeStyles = computed(() => {
       <LazyHomeV2SectionsHomeCoursesSection
         :courses="props.home.courses"
         :load-courses-by-year="props.loadCoursesByYear"
+        :load-general-courses="props.loadGeneralCourses"
         :hydrate-on-visible="{ rootMargin: '50px' }"
       />
       <LazyHomeV2SectionsHomeBooksSection

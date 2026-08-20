@@ -62,6 +62,7 @@ const isAuthPage = computed(() => {
 });
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
+const webDomain = getWebDomain();
 
 const getSiteImageSource = (image: unknown): string => {
   if (typeof image === "string") return image.trim();
@@ -78,7 +79,7 @@ const getSiteImageSource = (image: unknown): string => {
 };
 
 const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
-  "webStatus",
+  `web-status:${webDomain || "default"}`,
   async () => {
     console.log(useBaseUrls().baseUrl);
     try {
@@ -89,7 +90,7 @@ const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
       }>(`${useBaseUrls().baseUrl}/fetch_web_status`, {
         method: "GET",
         headers: {
-          "web-domain": getWebDomain(),
+          "web-domain": webDomain,
         },
       });
       return response.data || null;
@@ -179,6 +180,7 @@ watch(
   webStatus,
   (value) => {
     if (value) SettingStore.setSetting(value);
+    else SettingStore.clearSetting();
   },
   {
     immediate: true,

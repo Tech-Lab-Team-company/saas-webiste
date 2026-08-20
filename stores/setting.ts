@@ -8,8 +8,12 @@ export const useSettingStore = defineStore("setting", () => {
     function setSetting(data: WebStatus) {
         setting.value = data;
     }
+    function clearSetting() {
+        setting.value = null;
+    }
     return {
         setting,
         setSetting,
+        clearSetting,
     };
 }, { persist: true });

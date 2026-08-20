@@ -290,6 +290,17 @@ export const mapHomeCourseList = (value: unknown): HomeCourseViewModel[] => {
   return [...courses.values()]
 }
 
+const createEmptyCoursePage = (): HomeCoursePageViewModel => ({
+  courses: [],
+  pagination: {
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 9,
+    total: 0,
+    serverDriven: false,
+  },
+})
+
 export const mapHomeCoursePage = (
   value: unknown,
   requestedPage = 1,
@@ -429,11 +440,15 @@ export const mapHomeCourseYears = (
 }
 
 const createEmptyCourses = (): HomeCoursesViewModel => ({
+  mode: 'education',
   stages: [],
   tabs: [],
   taxonomyStatus: 'loading',
   taxonomyError: null,
   unassignedCourses: [],
+  generalCatalog: createEmptyCoursePage(),
+  generalCatalogStatus: 'loading',
+  generalCatalogError: null,
 })
 
 const mapCourses = (sections: HomeWebsiteSectionApiDto[]): HomeCoursesViewModel => {
@@ -453,11 +468,15 @@ const mapCourses = (sections: HomeWebsiteSectionApiDto[]): HomeCoursesViewModel 
     })
 
   return {
+    mode: 'education',
     stages: [],
     tabs: [],
     taxonomyStatus: 'loading',
     taxonomyError: null,
     unassignedCourses: [...uniqueCourses.values()],
+    generalCatalog: createEmptyCoursePage(),
+    generalCatalogStatus: 'loading',
+    generalCatalogError: null,
   }
 }
 
@@ -925,6 +944,8 @@ const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeS
 })
 
 const createEmptySite = (): HomeSiteViewModel => ({
+  isGeneral: false,
+  categoryIds: [],
   brandName: null,
   description: null,
   metaTitle: null,
@@ -958,6 +979,10 @@ export const mapHomeSite = (settings: unknown): HomeSiteViewModel => {
   }
 
   return {
+    isGeneral: toNullableNumber(settings.has_general) === 1,
+    categoryIds: toArray(settings.categories)
+      .map(toNullableNumber)
+      .filter((id): id is number => id !== null),
     brandName: toNullableString(settings.name),
     description: toNullableString(settings.description),
     metaTitle: toNullableString(settings.meta_title),

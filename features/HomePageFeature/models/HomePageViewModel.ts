@@ -69,11 +69,15 @@ export interface HomeCourseTabViewModel {
 }
 
 export interface HomeCoursesViewModel {
+  mode: 'education' | 'general'
   stages: HomeCourseStageViewModel[]
   tabs: HomeCourseTabViewModel[]
   taxonomyStatus: 'loading' | 'success' | 'empty' | 'error'
   taxonomyError: string | null
   unassignedCourses: HomeCourseViewModel[]
+  generalCatalog: HomeCoursePageViewModel
+  generalCatalogStatus: 'loading' | 'success' | 'empty' | 'error'
+  generalCatalogError: string | null
 }
 
 export interface HomeBlogViewModel {
@@ -240,6 +244,8 @@ export interface HomeCtaViewModel {
 }
 
 export interface HomeSiteViewModel {
+  isGeneral: boolean
+  categoryIds: number[]
   brandName: string | null
   description: string | null
   metaTitle: string | null

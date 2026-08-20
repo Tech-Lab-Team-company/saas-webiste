@@ -17,6 +17,10 @@ const props = defineProps<{
     page?: number,
     perPage?: number,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
+  loadGeneralCourses: (
+    page?: number,
+    perPage?: number,
+  ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
 const route = useRoute();
@@ -35,6 +39,22 @@ const sectionHasEntered = ref(false);
 let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
 const MAX_PREVIEW_COURSES = 6;
 const CATALOG_COURSES_PER_PAGE = 9;
+const isGeneralMode = computed(() => props.courses.data.mode === "general");
+const generalCatalogState = ref<HomeSectionState<HomeCoursePageViewModel>>({
+  data: props.courses.data.generalCatalog,
+  status: props.courses.data.generalCatalogStatus === "loading"
+    ? "empty"
+    : props.courses.data.generalCatalogStatus,
+  ...(props.courses.data.generalCatalogError
+    ? {
+        error: {
+          type: "unknown" as const,
+          message: props.courses.data.generalCatalogError,
+        },
+      }
+    : {}),
+});
+const generalCatalogLoading = ref(false);
 
 const shouldReduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -110,13 +130,19 @@ const selectedCourses = computed<HomeSectionState<HomeCoursePageViewModel> | nul
 });
 
 const visibleCourses = computed(() =>
-  props.catalog
+  isGeneralMode.value
+    ? props.catalog
+      ? generalCatalogState.value.data.courses
+      : generalCatalogState.value.data.courses.slice(0, MAX_PREVIEW_COURSES)
+    : props.catalog
     ? selectedCourses.value?.data.courses ?? []
     : selectedCourses.value?.data.courses.slice(0, MAX_PREVIEW_COURSES) ?? [],
 );
 
 const coursePagination = computed(
-  () => selectedCourses.value?.data.pagination ?? null,
+  () => isGeneralMode.value
+    ? generalCatalogState.value.data.pagination
+    : selectedCourses.value?.data.pagination ?? null,
 );
 
 const paginationPages = computed(() => {
@@ -138,6 +164,44 @@ const paginationPages = computed(() => {
 const normalizePage = (value: unknown) => {
   const page = Number(value);
   return Number.isInteger(page) && page > 0 ? page : 1;
+};
+
+watch(
+  () => [
+    props.courses.data.generalCatalog,
+    props.courses.data.generalCatalogStatus,
+    props.courses.data.generalCatalogError,
+  ] as const,
+  ([catalog, status, error]) => {
+    if (!isGeneralMode.value || generalCatalogLoading.value) return;
+
+    generalCatalogState.value = {
+      data: catalog,
+      status: status === "loading" ? "empty" : status,
+      ...(error
+        ? { error: { type: "unknown" as const, message: error } }
+        : {}),
+    };
+  },
+  { immediate: true },
+);
+
+const loadGeneralPage = async (requestedPage = 1) => {
+  if (!isGeneralMode.value || generalCatalogLoading.value) return;
+
+  const page = normalizePage(requestedPage);
+  generalCatalogLoading.value = true;
+
+  if (props.catalog && normalizePage(route.query.page) !== page) {
+    const { stage_id: _stageId, year_id: _yearId, ...query } = route.query;
+    await router.replace({ query: { ...query, page: String(page) } });
+  }
+
+  generalCatalogState.value = await props.loadGeneralCourses(
+    page,
+    CATALOG_COURSES_PER_PAGE,
+  );
+  generalCatalogLoading.value = false;
 };
 
 const selectStage = async (stageId: number) => {
@@ -258,7 +322,17 @@ const selectCatalogYearFromRoute = () => {
   if (tab) void selectTab(tab.key, undefined, normalizePage(route.query.page));
 };
 
-onMounted(selectCatalogYearFromRoute);
+onMounted(() => {
+  if (isGeneralMode.value) {
+    const requestedPage = normalizePage(route.query.page);
+    if (props.catalog && requestedPage !== coursePagination.value?.currentPage) {
+      void loadGeneralPage(requestedPage);
+    }
+    return;
+  }
+
+  selectCatalogYearFromRoute();
+});
 
 watch(
   () => [
@@ -269,6 +343,16 @@ watch(
   ],
   () => {
     if (!props.catalog) return;
+    if (isGeneralMode.value) {
+      const requestedPage = normalizePage(route.query.page);
+      if (
+        requestedPage !== generalCatalogState.value.data.pagination.currentPage &&
+        !generalCatalogLoading.value
+      ) {
+        void loadGeneralPage(requestedPage);
+      }
+      return;
+    }
     const requestedYearId = Number(route.query.year_id);
     const requestedStageId = Number(route.query.stage_id);
     const requestedPage = normalizePage(route.query.page);
@@ -291,8 +375,22 @@ watch(
 );
 
 const changePage = async (page: number) => {
-  const tab = selectedTab.value;
   const pagination = coursePagination.value;
+  if (isGeneralMode.value) {
+    if (!props.catalog || !pagination || generalCatalogLoading.value) return;
+
+    const nextPage = Math.min(pagination.lastPage, Math.max(1, page));
+    if (nextPage === pagination.currentPage) return;
+    await loadGeneralPage(nextPage);
+    await nextTick();
+    courseResults.value?.scrollIntoView({
+      behavior: shouldReduceMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+    return;
+  }
+
+  const tab = selectedTab.value;
   if (
     !props.catalog ||
     !tab ||
@@ -512,18 +610,27 @@ onBeforeUnmount(() => {
     <div class="container">
       <div class="section-heading split-heading">
         <div>
-          <span class="section-tag">اختار نقطة البداية</span>
-          <h2 id="home-v2-courses-title">
+          <span class="section-tag">
+            {{ isGeneralMode ? "اختار من خبرات متنوعة" : "اختار نقطة البداية" }}
+          </span>
+          <h2 v-if="isGeneralMode" id="home-v2-courses-title">
+            مدرسون مختلفون.<br />ومحتوى <em>يناسب هدفك.</em>
+          </h2>
+          <h2 v-else id="home-v2-courses-title">
             ابدأ من مرحلتك.<br />وكمل <em>بخطة واضحة.</em>
           </h2>
         </div>
-        <p>
+        <p v-if="isGeneralMode">
+          تصفّح كل الكورسات المتاحة على المنصة، واعرف مدرس كل كورس قبل ما تبدأ
+          من غير الحاجة لاختيار مرحلة أو سنة دراسية.
+        </p>
+        <p v-else>
           كل مرحلة لها سنواتها ومساراتها. اختار مرحلتك وسنتك علشان تشوف
           الكورسات المناسبة ليك فقط.
         </p>
       </div>
 
-      <div class="home-course-picker">
+      <div v-if="!isGeneralMode" class="home-course-picker">
         <div>
           <span>خطوتك الأولى</span>
           <h3 id="home-v2-stage-title">اختار مرحلتك التعليمية</h3>
@@ -573,7 +680,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div v-if="selectedStage" class="home-course-picker home-course-year-picker">
+      <div v-if="!isGeneralMode && selectedStage" class="home-course-picker home-course-year-picker">
         <div>
           <span>خطوتك الثانية</span>
           <h3 id="home-v2-year-title">اختار السنة الدراسية</h3>
@@ -612,10 +719,113 @@ onBeforeUnmount(() => {
         id="home-v2-course-results"
         ref="courseResults"
         class="home-course-result"
-        :class="{ 'is-empty': !selectedTab }"
+        :class="{ 'is-empty': !isGeneralMode && !selectedTab }"
         aria-live="polite"
       >
-        <div v-if="!selectedTab" class="home-course-empty">
+        <template v-if="isGeneralMode">
+          <div class="home-course-result-head">
+            <div>
+              <span>كل محتوى المنصة</span>
+              <h3>كورسات المدرسين</h3>
+            </div>
+            <b v-if="coursePagination">{{ coursePagination.total }} كورس</b>
+          </div>
+
+          <div
+            v-if="generalCatalogLoading || courses.data.generalCatalogStatus === 'loading'"
+            class="home-course-message"
+            role="status"
+          >
+            <span>جاري التحميل</span>
+            <h3>بنجهز لك كورسات المنصة</h3>
+            <p>ثواني ونظهر لك المحتوى المتاح من كل المدرسين.</p>
+          </div>
+
+          <div
+            v-else-if="generalCatalogState.status === 'error'"
+            class="home-course-message"
+            role="alert"
+          >
+            <span>تعذر التحميل</span>
+            <h3>لم نتمكن من عرض الكورسات الآن</h3>
+            <p>{{ generalCatalogState.error?.message }}</p>
+            <button type="button" @click="loadGeneralPage(coursePagination?.currentPage ?? 1)">
+              حاول مرة أخرى
+            </button>
+          </div>
+
+          <div
+            v-else-if="generalCatalogState.status === 'empty' || visibleCourses.length === 0"
+            class="home-course-message"
+            role="status"
+          >
+            <span>لا توجد كورسات</span>
+            <h3>لم يضف المدرسون كورسات متاحة حتى الآن</h3>
+            <p>ستظهر كورسات المدرسين هنا فور نشرها على المنصة.</p>
+          </div>
+
+          <template v-else>
+            <div class="course-grid">
+              <HomeCourseCard
+                v-for="(course, index) in visibleCourses"
+                :key="course.id"
+                :course="course"
+                level-label="كورس عام"
+                :index="index"
+                :animate="false"
+                :interactive="false"
+                @pointermove="tiltCourseCard"
+                @pointerleave="resetCourseCard"
+              />
+            </div>
+
+            <nav
+              v-if="catalog && coursePagination && coursePagination.lastPage > 1"
+              class="home-course-pagination"
+              aria-label="صفحات الكورسات"
+            >
+              <button
+                type="button"
+                class="home-course-pagination__arrow"
+                :disabled="coursePagination.currentPage === 1 || generalCatalogLoading"
+                aria-label="الصفحة السابقة"
+                @click="changePage(coursePagination.currentPage - 1)"
+              >
+                <span aria-hidden="true">→</span>
+              </button>
+
+              <button
+                v-for="page in paginationPages"
+                :key="page"
+                type="button"
+                :class="{ active: page === coursePagination.currentPage }"
+                :aria-current="page === coursePagination.currentPage ? 'page' : undefined"
+                :aria-label="`الصفحة ${page}`"
+                :disabled="generalCatalogLoading"
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
+
+              <button
+                type="button"
+                class="home-course-pagination__arrow"
+                :disabled="coursePagination.currentPage === coursePagination.lastPage || generalCatalogLoading"
+                aria-label="الصفحة التالية"
+                @click="changePage(coursePagination.currentPage + 1)"
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+            </nav>
+
+            <p v-if="catalog && coursePagination" class="home-course-pagination__summary">
+              صفحة {{ coursePagination.currentPage }} من {{ coursePagination.lastPage }}
+              · إجمالي {{ coursePagination.total }} كورس
+            </p>
+          </template>
+        </template>
+
+        <div v-else-if="!selectedTab" class="home-course-empty">
           <span class="home-course-empty-step" aria-hidden="true">
             {{ selectedStage ? "02" : "01" }}
           </span>
@@ -743,10 +953,10 @@ onBeforeUnmount(() => {
 
       <NuxtLink
         v-if="!catalog"
-        :to="selectedTab ? `/course?stage_id=${selectedTab.stageId}&year_id=${selectedTab.yearId}` : '/course'"
+        :to="!isGeneralMode && selectedTab ? `/course?stage_id=${selectedTab.stageId}&year_id=${selectedTab.yearId}` : '/course'"
         class="all-courses"
       >
-        {{ selectedTab ? `كل كورسات ${selectedTab.label}` : "صفحة كل الكورسات" }}
+        {{ !isGeneralMode && selectedTab ? `كل كورسات ${selectedTab.label}` : "صفحة كل الكورسات" }}
         <span aria-hidden="true">←</span>
       </NuxtLink>
     </div>

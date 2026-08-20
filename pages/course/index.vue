@@ -2,17 +2,19 @@
 import HomeCoursesSection from "~/components/home/v2/sections/HomeCoursesSection.vue";
 import { useHomePage } from "~/features/HomePageFeature/composables/useHomePage";
 
-const { home, pending, loadCoursesByYear } = await useHomePage();
+const { home, pending, loadCoursesByYear, loadGeneralCourses } = await useHomePage();
 
 definePageMeta({ layout: "home-v2" });
 
 const seoTitle = computed(() =>
-  `اختار مرحلتك وابدأ كورسك${
+  `${home.value.site.isGeneral ? "اكتشف كورسات المنصة" : "اختار مرحلتك وابدأ كورسك"}${
     home.value.site.brandName ? ` | ${home.value.site.brandName}` : ""
   }`,
 );
 const seoDescription = computed(() =>
-  `اختار مرحلتك وابدأ كورسك. حدّد السنة الدراسية واكتشف الكورسات المناسبة لك على ${home.value.site.brandName || "المنصة"}.`,
+  home.value.site.isGeneral
+    ? `تصفّح كورسات المدرسين المتاحة على ${home.value.site.brandName || "المنصة"} واختر المحتوى المناسب لك.`
+    : `اختار مرحلتك وابدأ كورسك. حدّد السنة الدراسية واكتشف الكورسات المناسبة لك على ${home.value.site.brandName || "المنصة"}.`,
 );
 
 useSeoMeta({
@@ -52,12 +54,19 @@ useHead({
         <span class="course-page__hero-word" aria-hidden="true">COURSES</span>
         <div class="container course-page__hero-grid">
           <div class="course-page__hero-title">
-            <span>كل المراحل والسنوات في مكان واحد</span>
-            <h1>اختار مرحلتك.<br /><em>وابدأ كورسك.</em></h1>
+            <span>{{ home.site.isGeneral ? "مدرسون وكورسات في مكان واحد" : "كل المراحل والسنوات في مكان واحد" }}</span>
+            <h1 v-if="home.site.isGeneral">اختار مدرسك.<br /><em>وابدأ كورسك.</em></h1>
+            <h1 v-else>اختار مرحلتك.<br /><em>وابدأ كورسك.</em></h1>
           </div>
           <p>
-            اختار مرحلتك وابدأ كورسك. حدّد السنة الدراسية، واكتشف الكورسات
-            المناسبة لمسارك على {{ home.site.brandName || "المنصة" }}.
+            <template v-if="home.site.isGeneral">
+              تصفّح كورسات المدرسين واختر المحتوى المناسب لك على
+              {{ home.site.brandName || "المنصة" }}.
+            </template>
+            <template v-else>
+              اختار مرحلتك وابدأ كورسك. حدّد السنة الدراسية، واكتشف الكورسات
+              المناسبة لمسارك على {{ home.site.brandName || "المنصة" }}.
+            </template>
           </p>
         </div>
       </header>
@@ -65,6 +74,7 @@ useHead({
       <HomeCoursesSection
         :courses="home.courses"
         :load-courses-by-year="loadCoursesByYear"
+        :load-general-courses="loadGeneralCourses"
         catalog
       />
     </main>

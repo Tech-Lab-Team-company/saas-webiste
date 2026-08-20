@@ -73,7 +73,9 @@ const resetCard = (event: PointerEvent) => {
     </div>
 
     <div class="course-content">
-      <span class="teacher">{{ course.sourceSubject?.title || levelLabel }}</span>
+      <span class="teacher">
+        {{ course.teacher?.name || course.sourceSubject?.title || levelLabel }}
+      </span>
       <h3>{{ course.title }}</h3>
       <p>{{ course.description || "شرح منظم ومراجعة مركزة تساعدك تفهم وتطبق بثقة." }}</p>
 
