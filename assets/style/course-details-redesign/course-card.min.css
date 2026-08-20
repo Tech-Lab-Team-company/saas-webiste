@@ -460,24 +460,46 @@
 
 .btns-container > .payment-btn,
 .final-cta-actions > .payment-btn {
-  background: var(--course-surface-raised);
+  border-color: color-mix(in srgb, var(--course-accent) 46%, var(--course-border));
+  background: color-mix(in srgb, var(--course-accent) 7%, var(--course-surface));
   color: var(--course-accent);
+}
+
+.btns-container > .payment-btn:hover,
+.final-cta-actions > .payment-btn:hover {
+  background: color-mix(in srgb, var(--course-accent) 13%, var(--course-surface));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--course-accent) 13%, transparent);
 }
 
 .btns-container > .btn-disabled,
 .final-cta-actions > .btn-disabled,
 .payment-dialog :deep(.btn-disabled) {
-  border-color: var(--course-border);
-  background: var(--course-surface-raised);
-  color: var(--course-muted);
+  border-color: color-mix(in srgb, #f59e0b 38%, var(--course-border));
+  background: color-mix(in srgb, #f59e0b 13%, var(--course-surface));
+  color: color-mix(in srgb, #9a5f00 88%, var(--course-ink));
   cursor: not-allowed;
 }
 
-.payment-dialog :deep(.course-payment__trigger--disabled),
+.payment-dialog :deep(.course-payment__trigger--pending) {
+  border-color: color-mix(in srgb, #f59e0b 40%, var(--course-border));
+  background: color-mix(in srgb, #f59e0b 14%, var(--course-surface));
+  color: color-mix(in srgb, #9a5f00 88%, var(--course-ink));
+}
+
 .payment-dialog :deep(.course-payment__trigger--rejected) {
-  border-color: var(--course-border);
-  background: var(--course-surface-raised);
-  color: var(--course-muted);
+  border-color: color-mix(in srgb, #dc3545 38%, var(--course-border));
+  background: color-mix(in srgb, #dc3545 12%, var(--course-surface));
+  color: color-mix(in srgb, #c72f3e 88%, var(--course-ink));
+}
+
+:global(html[data-theme="dark"]) .payment-dialog :deep(.course-payment__trigger--pending),
+:global(html[data-theme="dark"]) .btns-container > .btn-disabled,
+:global(html[data-theme="dark"]) .final-cta-actions > .btn-disabled {
+  color: #fbbf24;
+}
+
+:global(html[data-theme="dark"]) .payment-dialog :deep(.course-payment__trigger--rejected) {
+  color: #ff7b87;
 }
 
 .detail-final {

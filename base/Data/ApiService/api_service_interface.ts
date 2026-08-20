@@ -21,6 +21,7 @@ import {
   GatewayTimeoutException,
   UnKnownException,
 } from "~/base/core/Constance/exception_constants";
+import { useUserStore } from "~/stores/user";
 
 enum CrudType {
   FormData = "formData",
@@ -88,6 +89,21 @@ export default abstract class ServicesInterface {
             throw new BadRequestException(message);
           case 401:
             console.error(`UnAuthorizedException >> ${message}`);
+            if (auth && import.meta.client) {
+              const redirect = `${window.location.pathname}${window.location.search}`;
+              const userStore = useUserStore();
+
+              localStorage.removeItem("auth");
+              localStorage.removeItem("user");
+              userStore.logout();
+
+              if (window.location.pathname !== "/loginhome") {
+                await navigateTo(
+                  { path: "/loginhome", query: { redirect } },
+                  { replace: true },
+                );
+              }
+            }
             throw new UnAuthorizedException(message);
           case 403:
             console.error(`ForbiddenException >> ${statusCode}`);
