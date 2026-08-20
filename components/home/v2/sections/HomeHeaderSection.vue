@@ -542,33 +542,28 @@ onBeforeUnmount(() => {
     display: flex;
     width: 100%;
     align-items: center;
-    /* Keep the row centered when it fits, but anchor it to the safe edge on
-       narrow screens so the first/last links remain reachable by scrolling. */
-    justify-content: safe center;
-    gap: 5px;
-    overflow-x: auto;
-    padding: 6px max(15px, calc((100vw - 1180px) / 2));
+    justify-content: stretch;
+    gap: 3px;
+    overflow: hidden;
+    padding: 6px max(8px, calc((100vw - 1180px) / 2));
     border-top: 1px solid var(--home-v2-line);
     background: color-mix(in srgb, var(--home-v2-surface) 94%, transparent);
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .home-v2-header__mobile-nav::-webkit-scrollbar {
-    display: none;
   }
 
   .home-v2-header__mobile-nav a {
     display: flex;
     min-height: 44px;
-    flex: 0 0 auto;
+    min-width: 0;
+    flex: 1 1 0;
     align-items: center;
     justify-content: center;
-    padding: 7px 13px;
+    padding: 5px 3px;
     border-radius: 999px;
     color: var(--home-v2-blue);
-    font-size: 12px;
+    font-size: clamp(11px, 2.9vw, 14px);
     font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
   }
 
   .home-v2-header__mobile-nav a:hover,
@@ -584,8 +579,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 590px) {
   .home-v2-header__content {
-    min-height: 76px;
-    gap: 12px;
+    min-height: 68px;
+    gap: 8px;
   }
 
   .home-v2-header__brand {
@@ -593,9 +588,9 @@ onBeforeUnmount(() => {
   }
 
   .home-v2-header__logo {
-    width: 48px;
-    height: 48px;
-    flex-basis: 48px;
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
   }
 
   .home-v2-header__brand > span:last-child {
@@ -606,20 +601,36 @@ onBeforeUnmount(() => {
     font-size: 15px;
   }
 
-  .home-v2-header__brand small,
-  .home-v2-header__login {
+  .home-v2-header__brand small {
     display: none;
   }
 
   .home-v2-header__actions {
+    gap: 5px;
     margin-inline-start: auto;
   }
 
+  .home-v2-header__login {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 8px;
+    border: 1px solid var(--home-v2-blue);
+    border-radius: 8px;
+    color: var(--home-v2-blue);
+    font-size: 10px;
+  }
+
+  .home-v2-header__login::after {
+    display: none;
+  }
+
   .home-v2-header .button {
-    min-height: 42px;
-    padding-inline: 14px;
-    border-radius: 10px;
-    font-size: 12px;
+    min-height: 34px;
+    padding-inline: 9px;
+    border-radius: 8px;
+    font-size: 10px;
   }
 
   .home-v2-header__actions--student {
@@ -633,6 +644,12 @@ onBeforeUnmount(() => {
   .home-v2-header__logout {
     padding-inline: 9px;
     font-size: 10px;
+  }
+}
+
+@media (max-width: 470px) {
+  .home-v2-header__brand > span:last-child {
+    display: none;
   }
 }
 
