@@ -298,9 +298,10 @@ const Stages = ref<TitleModel[]>([]);
 const FetchSubjects = async () => {
   if (!selectedStage.value) return;
 
-  // Reset dependents
+  const previousSubjectId = selectedBasicSubject.value;
+
+  // Reset the options while loading without losing a still-valid selection.
   BasicSubjects.value = [];
-  selectedBasicSubject.value = null;
 
   const educationBasicSubjectsParams = new EducationBasicSubjectsParams(
     userStore.user?.category_id,
@@ -315,6 +316,13 @@ const FetchSubjects = async () => {
     );
   if (state.value.data) {
     BasicSubjects.value = state.value.data;
+    const previousSubjectStillExists = BasicSubjects.value.some(
+      (subject) => Number(subject.id) === Number(previousSubjectId),
+    );
+
+    selectedBasicSubject.value = previousSubjectStillExists
+      ? previousSubjectId
+      : (BasicSubjects.value[0]?.id ?? null);
   }
 };
 
