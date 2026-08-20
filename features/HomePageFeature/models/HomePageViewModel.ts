@@ -39,6 +39,20 @@ export interface HomeCourseViewModel {
   recordingsCount: number | null
 }
 
+export interface HomeTeacherViewModel {
+  id: number
+  name: string
+  image: HomeImageViewModel | null
+  intro: string | null
+  shortDescription: string | null
+  description: string | null
+  address: string | null
+  email: string | null
+  phone: string | null
+  coursesCount: number
+  revisionsCount: number
+}
+
 export interface HomeCoursePaginationViewModel {
   currentPage: number
   lastPage: number
@@ -277,6 +291,7 @@ export interface HomePageViewModel {
   site: HomeSiteViewModel
   hero: HomeSectionState<HomeHeroViewModel | null>
   courses: HomeSectionState<HomeCoursesViewModel>
+  teachers: HomeSectionState<HomeTeacherViewModel[]>
   blogs: HomeSectionState<HomeBlogViewModel[]>
   books: HomeSectionState<HomeBooksViewModel>
   learningJourney: HomeSectionState<HomeLearningJourneyViewModel>

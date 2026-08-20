@@ -156,6 +156,10 @@ export class HomePageApi {
     );
   }
 
+  async fetchTeachers(): Promise<unknown> {
+    return this.get(ApiNames.Instance.FetchGenralTeachers);
+  }
+
   async fetchStages(): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_stages, {});
   }
@@ -290,6 +294,20 @@ export class HomePageApi {
         "web-domain": this.webDomain,
       },
       query: queryParams,
+    });
+
+    return readEnvelopeData(response);
+  }
+
+  private async get(url: string): Promise<unknown> {
+    const response = await $fetch<unknown>(url, {
+      baseURL: ApiNames.Instance.baseUrl,
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Accept-Language": "ar",
+        "web-domain": this.webDomain,
+      },
     });
 
     return readEnvelopeData(response);

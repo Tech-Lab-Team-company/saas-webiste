@@ -257,9 +257,10 @@ onBeforeUnmount(() => {
       <nav class="home-v2-footer__links" aria-label="روابط المنصة">
         <b>استكشف</b>
         <NuxtLink to="/course">الكورسات</NuxtLink>
+        <NuxtLink v-if="site.isGeneral" to="/teachers">المدرسون</NuxtLink>
         <NuxtLink to="/books">الكتب</NuxtLink>
         <NuxtLink to="/blogs">المدونة</NuxtLink>
-        <NuxtLink to="/about-teacher">عن المدرس</NuxtLink>
+        <NuxtLink to="/about-teacher">{{ site.isGeneral ? "عن المنصة" : "عن المدرس" }}</NuxtLink>
         <NuxtLink to="/#app-status">التطبيق</NuxtLink>
       </nav>
 

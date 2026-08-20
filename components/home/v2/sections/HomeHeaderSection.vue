@@ -48,9 +48,16 @@ const headerDescription = computed(() => {
 const navItems = computed(() => [
   ...(route.path === "/" ? [] : [{ label: "الرئيسية", to: "/" }]),
   { label: "الكورسات", to: "/course" },
+  ...(props.site.isGeneral ? [{ label: "المدرسون", to: "/teachers" }] : []),
   { label: "الكتب", to: "/books" },
   {
-    label: props.site.brandName ? `عن ${props.site.brandName}` : "عن المنصة",
+    label: props.site.isGeneral
+      ? props.site.brandName
+        ? `عن ${props.site.brandName}`
+        : "عن المنصة"
+      : props.site.brandName
+        ? `عن ${props.site.brandName}`
+        : "عن المدرس",
     to: "/about-teacher",
   },
   { label: "المدونة", to: "/blogs" },

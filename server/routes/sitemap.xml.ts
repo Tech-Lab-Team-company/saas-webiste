@@ -3,6 +3,7 @@ import {
   mapBlogsPage,
   mapBooksPage,
   mapHomeCoursePage,
+  mapHomeTeachers,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import { collectPublicCoursePages } from "~/utils/courseCatalog";
 import { resolveSiteOrigin } from "~/utils/siteUrl";
@@ -86,13 +87,26 @@ export default defineEventHandler(async (event) => {
     });
   }
   const api = new HomePageApi(webDomain);
-  const [blogsResult, booksResult, coursesResult] = await Promise.allSettled([
-    api.fetchBlogs(),
-    api.fetchBooks(1),
-    fetchAllPublicCourses(api),
-  ]);
+  const [blogsResult, booksResult, coursesResult, teachersResult] =
+    await Promise.allSettled([
+      api.fetchBlogs(),
+      api.fetchBooks(1),
+      fetchAllPublicCourses(api),
+      api.fetchTeachers(),
+    ]);
 
   const dynamicEntries: SitemapEntry[] = [];
+
+  if (
+    teachersResult.status === "fulfilled" &&
+    mapHomeTeachers(teachersResult.value).length > 0
+  ) {
+    dynamicEntries.push({
+      path: "/teachers",
+      changefreq: "weekly",
+      priority: 0.8,
+    });
+  }
 
   if (blogsResult.status === "fulfilled") {
     for (const blog of mapBlogsPage(blogsResult.value)) {

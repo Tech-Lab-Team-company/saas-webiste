@@ -36,6 +36,7 @@ const isHomeV2 = computed(
       "/",
       "/aboutus",
       "/about-teacher",
+      "/teachers",
       "/books",
       "/blogs",
       "/course",

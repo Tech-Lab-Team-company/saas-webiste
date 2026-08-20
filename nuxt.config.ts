@@ -72,6 +72,7 @@ export default defineNuxtConfig({
     },
     '/': { swr: 300 },
     '/about-teacher': { swr: 3600 },
+    '/teachers': { swr: 300 },
     '/books': { swr: 300 },
     '/books/**': { swr: 600 },
     '/blogs': { swr: 300 },

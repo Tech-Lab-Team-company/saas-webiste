@@ -161,7 +161,7 @@ class ApiNames {
   public chatbotmessages = this.baseUrl + "chat";
 
   public FetchGenralSubjects = this.baseUrl + "fetch_general_subjects";
-  public FetchGenralTeachers = this.baseUrl + "fetch_teachers ";
+  public FetchGenralTeachers = this.baseUrl + "fetch_teachers";
   public CreateOnlinePayment = this.baseUrl + "create_payment_session";
   public CreateVerifyPayment = this.baseUrl + "verify_payment";
 

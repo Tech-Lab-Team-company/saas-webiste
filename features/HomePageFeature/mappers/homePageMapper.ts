@@ -29,6 +29,7 @@ import type {
   HomePageViewModel,
   HomeSiteViewModel,
   HomeSubjectViewModel,
+  HomeTeacherViewModel,
   HomeWebsiteSectionBookViewModel,
 } from '../models/HomePageViewModel'
 import { BookPriceTypeEnum, BookTypeEnum } from '../models/HomePageViewModel'
@@ -59,6 +60,31 @@ const toNullableBoolean = (value: unknown): boolean | null =>
   typeof value === 'boolean' ? value : null
 
 const toArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
+
+export const mapHomeTeachers = (value: unknown): HomeTeacherViewModel[] =>
+  toArray(value)
+    .map((item): HomeTeacherViewModel | null => {
+      if (!isRecord(item)) return null
+
+      const id = toNullableNumber(item.id)
+      const name = toNullableString(item.name)
+      if (id === null || !name) return null
+
+      return {
+        id,
+        name,
+        image: mapImage(mapFlexibleImageApiDto(item.image, name)),
+        intro: toNullableString(item.intro),
+        shortDescription: toNullableString(item.mini_description),
+        description: toNullableString(item.description),
+        address: toNullableString(item.address),
+        email: toNullableString(item.email),
+        phone: toNullableString(item.phone),
+        coursesCount: toNullableNumber(item.number_of_courses) ?? 0,
+        revisionsCount: toNullableNumber(item.number_of_revisions) ?? 0,
+      }
+    })
+    .filter((teacher): teacher is HomeTeacherViewModel => teacher !== null)
 
 const mapImageApiDto = (value: unknown): HomeImageApiDto | null => {
   if (!isRecord(value)) {
@@ -1023,6 +1049,10 @@ export const createEmptyHomePageViewModel = (): HomePageViewModel => ({
     data: createEmptyCourses(),
     status: 'empty',
   },
+  teachers: {
+    data: [],
+    status: 'empty',
+  },
   blogs: {
     data: [],
     status: 'empty',
@@ -1177,6 +1207,10 @@ export const mapHomePage = (sources: HomePageApiSources, settings: unknown): Hom
     site,
     hero,
     courses,
+    teachers: {
+      data: [],
+      status: 'empty',
+    },
     blogs,
     books,
     learningJourney,

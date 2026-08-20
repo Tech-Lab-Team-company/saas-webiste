@@ -17,6 +17,7 @@ import type {
   HomePageViewModel,
 } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
+import { useTeacherDirectory } from './useTeacherDirectory'
 
 export const useHomePage = async () => {
   const settingsStore = useSettingStore()
@@ -26,6 +27,7 @@ export const useHomePage = async () => {
   const tenantMode = Number(setting.value?.has_general) === 1
     ? 'general'
     : 'education'
+  const teacherDirectoryRequest = useTeacherDirectory()
 
   const homeRequest = useAsyncData<HomePageViewModel>(
     `home-v2-data:dynamic-v5:${webDomain}:${tenantMode}`,
@@ -83,11 +85,13 @@ export const useHomePage = async () => {
     },
   )
 
-  const [homeResult, taxonomyResult, generalCatalogResult] = await Promise.all([
-    homeRequest,
-    taxonomyRequest,
-    generalCatalogRequest,
-  ])
+  const [homeResult, taxonomyResult, generalCatalogResult, teacherDirectory] =
+    await Promise.all([
+      homeRequest,
+      taxonomyRequest,
+      generalCatalogRequest,
+      teacherDirectoryRequest,
+    ])
   const {
     data,
     pending: homePending,
@@ -134,6 +138,7 @@ export const useHomePage = async () => {
     return {
       ...currentHome,
       site,
+      teachers: teacherDirectory.teachers.value,
       courses: {
         ...currentHome.courses,
         data: {
@@ -229,7 +234,9 @@ export const useHomePage = async () => {
     pending: computed(() =>
       homePending.value ||
       (tenantMode === 'education' && courseTaxonomyPending.value) ||
-      (tenantMode === 'general' && generalCatalogPending.value),
+      (tenantMode === 'general' && (
+        generalCatalogPending.value || teacherDirectory.pending.value
+      )),
     ),
     error: normalizedError,
     refresh,
