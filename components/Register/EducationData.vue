@@ -472,7 +472,7 @@ const SendBasicData = async () => {
         v-if="userStore.user?.category_id == 2"
       >
         <button class="login-btn">
-          اختر فئاتك المفضله
+          حفظ والانتقال إلى الموقع
           <LeftArrowIcon class="left-icon" />
         </button>
       </div>
@@ -482,7 +482,7 @@ const SendBasicData = async () => {
         v-if="userStore.user?.category_id == 3"
       >
         <button class="login-btn">
-          اختر فئاتك المفضله
+          حفظ والانتقال إلى الموقع
           <LeftArrowIcon class="left-icon" />
         </button>
       </div>
@@ -492,7 +492,7 @@ const SendBasicData = async () => {
         v-if="userStore.user?.category_id == 1"
       >
         <button class="login-btn">
-          اختر فئاتك المفضله
+          حفظ والانتقال إلى الموقع
           <LeftArrowIcon class="left-icon" />
         </button>
       </div>
