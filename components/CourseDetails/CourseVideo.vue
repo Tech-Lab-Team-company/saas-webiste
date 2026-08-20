@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import Youtube from "~/components/CourseDetails/Youtube.vue";
 import AudioPlayer from "./TabsContent/AudioPlayer.vue";
-import NormalVedio from "./NormalVedio.vue";
+
+const Youtube = defineAsyncComponent(
+  () => import("~/components/CourseDetails/Youtube.vue"),
+);
+const NormalVedio = defineAsyncComponent(
+  () => import("~/components/CourseDetails/NormalVedio.vue"),
+);
 
 interface CourseVideoSelection {
   sessionId: number | null;
@@ -77,20 +82,22 @@ function openFullscreen() {
 <template>
 
   <div class="course-video-container">
-    <Youtube
-      v-if="fileType === 'youtube'"
-      :key="`youtube-${CourseVideoLink?.sessionId}`"
-      :video="embedVideoLink"
-      :session-id="CourseVideoLink?.sessionId"
-      :course-id="courseId"
-    />
-    <NormalVedio
-      v-else-if="fileType === 'video'"
-      :key="`video-${CourseVideoLink?.sessionId}`"
-      :video="embedVideoLink"
-      :session-id="CourseVideoLink?.sessionId"
-      :course-id="courseId"
-    />
+    <ClientOnly v-if="fileType === 'youtube'">
+      <Youtube
+        :key="`youtube-${CourseVideoLink?.sessionId}`"
+        :video="embedVideoLink"
+        :session-id="CourseVideoLink?.sessionId"
+        :course-id="courseId"
+      />
+    </ClientOnly>
+    <ClientOnly v-else-if="fileType === 'video'">
+      <NormalVedio
+        :key="`video-${CourseVideoLink?.sessionId}`"
+        :video="embedVideoLink"
+        :session-id="CourseVideoLink?.sessionId"
+        :course-id="courseId"
+      />
+    </ClientOnly>
     <div ref="pdfContainer" class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
       <iframe
         ref="pdfIframe"
