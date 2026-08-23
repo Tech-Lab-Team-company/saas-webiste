@@ -149,28 +149,44 @@ test("optional home sections stay hidden when their API content is empty", async
   assert.match(home, /props\.home\.aboutTeacher\.status === 'success'/u);
   assert.match(home, /class="home-v2__closing-sections"/u);
   const coursesPosition = home.indexOf("<LazyHomeV2SectionsHomeCoursesSection");
-  const teachersPosition = home.indexOf("<LazyHomeV2SectionsHomeTeachersSection");
   const booksPosition = home.indexOf("<LazyHomeV2SectionsHomeBooksSection");
-  const appPosition = home.indexOf("<LazyHomeV2SectionsHomeAppSection");
   const blogPosition = home.indexOf("<LazyHomeV2SectionsHomeBlogSection");
   const journeyPosition = home.indexOf(
     "<LazyHomeV2SectionsHomeLearningJourneySection",
   );
+  const teachersPosition = home.indexOf("<LazyHomeV2SectionsHomeTeachersSection");
+  const aboutTeacherPosition = home.indexOf(
+    "<LazyHomeV2SectionsHomeAboutTeacherSection",
+  );
+  const appPosition = home.indexOf("<LazyHomeV2SectionsHomeAppSection");
   const faqPosition = home.indexOf("<LazyHomeV2SectionsHomeFaqSection");
   const ctaPosition = home.indexOf("<LazyHomeV2SectionsHomeCtaSection");
   assert.ok(
-    coursesPosition < teachersPosition &&
-      teachersPosition < booksPosition &&
-      booksPosition < appPosition &&
-      appPosition < blogPosition &&
+    coursesPosition < booksPosition &&
+      booksPosition < blogPosition &&
       blogPosition < journeyPosition &&
-      journeyPosition < faqPosition &&
+      journeyPosition < teachersPosition &&
+      teachersPosition < aboutTeacherPosition &&
+      aboutTeacherPosition < appPosition &&
+      appPosition < faqPosition &&
       faqPosition < ctaPosition,
-    "home sections should follow their content priority",
+    "home sections should keep their original order",
   );
   assert.match(
     home,
     /\.home-v2__closing-sections \{[\s\S]*display: flex;[\s\S]*gap:[\s\S]*padding-block:/u,
+  );
+  assert.match(
+    home,
+    /--home-v2-closing-surface-start:[\s\S]*var\(--home-v2-paper\)/u,
+  );
+  assert.match(
+    home,
+    /:deep\(\.home-v2-app\) \+ \.home-v2__closing-sections/u,
+  );
+  assert.match(
+    home,
+    /\.home-v2__closing-sections :deep\(\.home-v2-faq\),[\s\S]*background: transparent;/u,
   );
   assert.match(home, /:not\(:has\(> section\)\)/u);
   assert.match(home, /:deep\(\.home-v2-faq\)/u);
@@ -186,6 +202,10 @@ test("optional home sections stay hidden when their API content is empty", async
   assert.match(teachers, /catalog \|\| teachers\.status === 'success'/u);
   assert.match(aboutTeacher, /v-if="hasAboutContent"/u);
   assert.match(faq, /v-if="hasFaqContent"/u);
+  assert.match(
+    faq,
+    /\.home-v2-faq \{[\s\S]*var\(--home-v2-paper\)[\s\S]*var\(--home-v2-cream\)/u,
+  );
   assert.match(studyMethod, /v-if="hasStudyProcessContent"/u);
   assert.match(topStudents, /v-if="hasAnyTopStudents"/u);
   assert.match(topStudents, /all-top-students:/u);

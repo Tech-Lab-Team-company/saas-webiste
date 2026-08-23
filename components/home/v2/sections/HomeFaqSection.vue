@@ -240,7 +240,11 @@ onBeforeUnmount(() => {
 .home-v2-faq {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #fff 0%, #f4f7fc 100%);
+  background: linear-gradient(
+    180deg,
+    var(--home-v2-paper),
+    var(--home-v2-cream)
+  );
 }
 
 .home-v2-faq__grid {
