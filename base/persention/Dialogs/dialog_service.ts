@@ -13,14 +13,15 @@ export default class DialogService {
     autoCloseMs?: number
   }) {
     const dialog: HTMLDialogElement | null = document.querySelector(`.${dialogName}`)
-    const title: HTMLElement | null = document.querySelector(`.dialog-title`)
-    const message: HTMLElement | null = document.querySelector(`.dialog-message`)
-    const image: HTMLImageElement | null = document.querySelector(`.dialog-icon`)
+    const title: HTMLElement | null = dialog?.querySelector(`.dialog-title`) ?? null
+    const message: HTMLElement | null = dialog?.querySelector(`.dialog-message`) ?? null
+    const image: HTMLImageElement | null = dialog?.querySelector(`.dialog-icon`) ?? null
+    const visual: HTMLElement | null = dialog?.querySelector(`.dialog-visual`) ?? null
     if (dialog) {
-      if (image)
-        if (typeof imageElement === 'string') {
-          image.src = imageElement
-        }
+      const hasImage = typeof imageElement === 'string' && imageElement.trim().length > 0
+      if (image && hasImage) image.src = imageElement
+      if (image && !hasImage) image.removeAttribute('src')
+      if (visual) visual.hidden = !hasImage
       if (message) message.textContent = messageContent
       if (title) title.textContent = titleContent
 

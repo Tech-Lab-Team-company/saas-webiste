@@ -388,6 +388,53 @@
   font-size: 12px;
 }
 
+.course-owned-status {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 11px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #16a34a 35%, var(--course-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, #16a34a 10%, var(--course-surface));
+  color: color-mix(in srgb, #15803d 88%, var(--course-ink));
+}
+
+.course-owned-status__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  grid-row: 1 / 3;
+  place-items: center;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 8px 20px color-mix(in srgb, #16a34a 25%, transparent);
+}
+
+.course-owned-status strong {
+  color: inherit;
+  font-family: var(--course-heading);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.course-owned-status small {
+  color: color-mix(in srgb, #15803d 70%, var(--course-muted));
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+:global(html[data-theme="dark"]) .course-owned-status {
+  color: #86efac;
+}
+
+:global(html[data-theme="dark"]) .course-owned-status small {
+  color: #bbf7d0;
+}
+
 .summary-meta {
   margin: 0;
 }

@@ -168,6 +168,7 @@ class ApiNames {
 
   //Courses
   public fetch_courses = "fetch_my_courses";
+  public fetch_my_purchased = "fetch_my_purchased";
 
   public generalSubjects = "fetch_general_subjects ";
 }

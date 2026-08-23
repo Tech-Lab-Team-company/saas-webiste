@@ -21,6 +21,8 @@
   "video": "Video",
   "free": "Free",
   "buying_course_done": "Course purchased",
+  "course_already_owned": "You already own this course",
+  "course_access_ready": "You can access the course content now",
   "paid_course": "Paid course",
   "course_details": "Course details",
   "about_course": "About this course",

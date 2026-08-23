@@ -41,6 +41,7 @@ const videoLink = ref({
   title: "",
   description: "",
 });
+const isCourseVideoPlaying = ref(false);
 const isViewingCourseContent = computed(() => activetab.value === 0);
 const { isCaptureShielded, protectionNotice } = useCourseContentProtection(
   isViewingCourseContent,
@@ -125,6 +126,11 @@ const Data = (data: {
   videoLink.value.title = data.title;
   videoLink.value.description = data.description;
   videoLink.value.sessionId = data.sessionId;
+  isCourseVideoPlaying.value = false;
+};
+
+const handleCourseVideoPlaybackState = (isPlaying: boolean) => {
+  isCourseVideoPlaying.value = isPlaying;
 };
 
 let timer: any = null;
@@ -278,13 +284,17 @@ onUnmounted(() => {
       <template #main="{ platformTeacher }">
         <div
           class="course-viewer"
-          :class="{ 'is-capture-shielded': isCaptureShielded }"
+          :class="{
+            'is-capture-shielded': isCaptureShielded,
+            'is-playing': isCourseVideoPlaying,
+          }"
           v-if="activetab == 0"
         >
           <CourseDetailsCourseVideo
             :CourseData="CardData"
             :CourseVideoLink="videoLink"
             :course-id="CardData?.id"
+            @playback-state-change="handleCourseVideoPlaybackState"
           />
           <div v-if="isCaptureShielded" class="course-capture-shield">
             <i class="pi pi-lock" aria-hidden="true"></i>

@@ -24,11 +24,11 @@ const yearLabel = computed(() => {
                 <header class="profile-page-heading">
                     <span>{{ yearLabel }}</span>
                     <h1>مشترياتي</h1>
-                    <p>الكورسات التي اشتريتها أو اشتركت بها، مع متابعة محتواها وتقدمك فيها.</p>
+                    <p>كل الكورسات والكتب وبنوك الأسئلة والباقات التي اشتريتها، مع حالة الوصول والفواتير في مكان واحد.</p>
                 </header>
 
-                <section class="courses-container profile-courses-library">
-                    <ProfileMyCourseCard />
+                <section class="purchases-container profile-purchases-library" aria-label="مكتبة المشتريات">
+                    <ProfileMyPurchasesLibrary />
                 </section>
             </main>
         </div>
@@ -54,7 +54,7 @@ const yearLabel = computed(() => {
         flex-direction: column-reverse;
     }
 
-    .courses-container{
+    .purchases-container{
         grid-column: span 5;
         padding: 0;
         border: 0;

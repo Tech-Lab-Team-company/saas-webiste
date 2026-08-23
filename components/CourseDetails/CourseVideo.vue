@@ -25,6 +25,9 @@ const props = defineProps({
     default: null,
   },
 });
+const emit = defineEmits<{
+  playbackStateChange: [isPlaying: boolean];
+}>();
 
 const CourseVideoLink = computed(() => props.CourseVideoLink);
 const protectionConfig = useCourseProtectionConfig();
@@ -64,6 +67,17 @@ const protectedPdfLink = computed(() => {
   return `${embedVideoLink.value}${separator}toolbar=0&navpanes=0`;
 });
 
+const reportPlaybackState = (isPlaying: boolean) => {
+  emit('playbackStateChange', isPlaying);
+};
+
+watch(
+  () => [CourseVideoLink.value?.sessionId, CourseVideoLink.value?.videoLink],
+  () => reportPlaybackState(false),
+);
+
+onBeforeUnmount(() => reportPlaybackState(false));
+
 function openFullscreen() {
   const container = pdfContainer.value;
   if (container) {
@@ -88,6 +102,7 @@ function openFullscreen() {
         :video="embedVideoLink"
         :session-id="CourseVideoLink?.sessionId"
         :course-id="courseId"
+        @playback-state-change="reportPlaybackState"
       />
       <template #fallback>
         <div class="course-video-loading-fallback">
@@ -101,6 +116,7 @@ function openFullscreen() {
         :video="embedVideoLink"
         :session-id="CourseVideoLink?.sessionId"
         :course-id="courseId"
+        @playback-state-change="reportPlaybackState"
       />
       <template #fallback>
         <div class="course-video-loading-fallback">

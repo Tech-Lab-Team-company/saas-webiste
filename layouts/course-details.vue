@@ -9,6 +9,32 @@ import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
 const site = computed(() => mapHomeSite(setting.value));
+const courseHeader = ref<{ $el: Element } | null>(null);
+const courseHeaderOffset = ref(80);
+let courseHeaderResizeObserver: ResizeObserver | null = null;
+
+const syncCourseHeaderOffset = () => {
+  const headerElement = courseHeader.value?.$el;
+  if (!(headerElement instanceof HTMLElement)) return;
+
+  courseHeaderOffset.value = Math.ceil(headerElement.getBoundingClientRect().height) + 8;
+};
+
+onMounted(async () => {
+  await nextTick();
+  syncCourseHeaderOffset();
+
+  if (typeof ResizeObserver !== "undefined") {
+    courseHeaderResizeObserver = new ResizeObserver(syncCourseHeaderOffset);
+    const headerElement = courseHeader.value?.$el;
+    if (headerElement) courseHeaderResizeObserver.observe(headerElement);
+  }
+});
+
+onBeforeUnmount(() => {
+  courseHeaderResizeObserver?.disconnect();
+  courseHeaderResizeObserver = null;
+});
 </script>
 
 <template>
@@ -19,9 +45,10 @@ const site = computed(() => mapHomeSite(setting.value));
       '--home-v2-blue': site.colors.primary || '#28366c',
       '--home-v2-deep': site.colors.secondary || '#3a3e7e',
       '--home-v2-blue-light': `color-mix(in srgb, ${site.colors.primary || '#28366c'} 14%, white)`,
+      '--course-header-offset': `${courseHeaderOffset}px`,
     }"
   >
-    <HomeHeaderSection :site="site" />
+    <HomeHeaderSection ref="courseHeader" :site="site" />
     <main class="course-details-layout__content">
       <slot />
     </main>

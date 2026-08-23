@@ -23,6 +23,9 @@ const props = defineProps<{
   sessionId?: number | null;
   courseId?: number | null;
 }>();
+const emit = defineEmits<{
+  playbackStateChange: [isPlaying: boolean];
+}>();
 
 // State
 const isPiP = ref(false);
@@ -95,7 +98,18 @@ const VideoBlurScreen = ref(true)
 
 const onPausedChange = (event: CustomEvent<boolean>) => {
   VideoBlurScreen.value = event.detail;
+  emit('playbackStateChange', !event.detail);
   watchHistory.handlePausedChange(event);
+};
+
+const handlePlaybackStarted = () => {
+  VideoBlurScreen.value = false;
+  emit('playbackStateChange', true);
+};
+
+const handlePlaybackEnded = () => {
+  emit('playbackStateChange', false);
+  watchHistory.markPlaybackEnded();
 };
 
 function handlePlayerClick() {
@@ -113,11 +127,15 @@ watch(() => props.video, (newVal) => {
   videoId.value = getYoutubeVideoId(newVal)
   playerReloadKey.value += 1;
   VideoBlurScreen.value = true;
+  emit('playbackStateChange', false);
   startPlayerLoading();
 })
 
 onMounted(startPlayerLoading);
-onBeforeUnmount(clearLoadingDelayTimer);
+onBeforeUnmount(() => {
+  clearLoadingDelayTimer();
+  emit('playbackStateChange', false);
+});
 
 </script>
 
@@ -126,12 +144,12 @@ onBeforeUnmount(clearLoadingDelayTimer);
   <div :class="isPiP ? 'video-player-pip' : 'video-player'" @contextmenu.prevent>
     <Player theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
       @click="handlePlayerClick"
-      @vmPlay="VideoBlurScreen = false"
+      @vmPlay="handlePlaybackStarted"
       @vmPausedChange="onPausedChange"
       @vmDurationChange="watchHistory.updateDuration"
       @vmCurrentTimeChange="watchHistory.updateCurrentTime"
       @vmPlaybackReady="finishPlayerLoading"
-      @vmPlaybackEnded="watchHistory.markPlaybackEnded"
+      @vmPlaybackEnded="handlePlaybackEnded"
       @vmError="markPlayerDelayed"
       :paused="VideoBlurScreen">
       <div @click="VideoBlurScreen = false" v-if="VideoBlurScreen && !isPlayerLoading" class="overlay">

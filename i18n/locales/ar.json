@@ -52,6 +52,8 @@
   "audio_file": "ملف صوتي",
   "free": "مجانى",
   "buying_course_done": "تم شراء الكورس",
+  "course_already_owned": "أنت مشترك في هذا الكورس بالفعل",
+  "course_access_ready": "يمكنك مشاهدة محتوى الكورس الآن",
   "paid_course": "كورس مدفوع",
   "course_details": "تفاصيل الكورس",
   "about_course": "عن الكورس",

@@ -1,26 +1,50 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 import { useUserStore } from "~/stores/user";
 import EditImageIcon from "~/public/icons/EditImageIcon.vue";
 import type { ProfileImage } from "~/types/profileimage";
 import UpdateProfileImageParams from "~/features/UpdateProfileImageFeature/Core/Params/update_profile_image_params";
 import UpdateProfileImageController from "~/features/UpdateProfileImageFeature/presentation/controllers/update_profile_image_controller";
+import { resolveStudentIdentity } from "~/utils/studentIdentity";
 const selectedImage = ref<File | null>(null);
 const imagePreview = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
 const profileimage = ref<ProfileImage | null>(null);
 const userStore = useUserStore();
 const router = useRouter();
+const route = useRoute();
+const isMobileNavigationOpen = ref(false);
+
+const profileSectionLabels: Record<string, string> = {
+  "student-dashboard": "الرئيسية",
+  profilecourse: "مشترياتي",
+  profileexams: "اختباراتي",
+  profileavailablecourses: "الكورسات",
+  profilesubjectinfo: "المعلومات الدراسية",
+  profile: "الملف الشخصي",
+  passwordupdate: "تغيير كلمة المرور",
+};
 
 const displayedImage = computed(() =>
   imagePreview.value || userStore.image || userStore.user?.image || "/images/user.png",
 );
+const studentIdentity = computed(() => resolveStudentIdentity(userStore.user));
 const educationLabel = computed(() => {
   const info = userStore.user?.userInfo;
   return info?.year_title || info?.stage_title || info?.university_title || "طالب";
 });
+const currentSectionLabel = computed(
+  () => profileSectionLabels[String(route.name || "")] || "مساحة الطالب",
+);
+
+watch(
+  () => route.fullPath,
+  () => {
+    isMobileNavigationOpen.value = false;
+  },
+);
 
 const handleLogout = () => {
   localStorage.removeItem("auth");
@@ -69,10 +93,18 @@ const uploadImage = async () => {
 <template>
   <div class="profile-sidebar-container">
     <div class="profile-sidebar-brand">
-      <span class="profile-brand-mark">ES</span>
+      <span class="profile-brand-mark" aria-hidden="true">
+        <span v-if="studentIdentity.initial">{{ studentIdentity.initial }}</span>
+        <i v-else class="pi pi-user" />
+      </span>
       <div>
-        <strong>مساحة الطالب</strong>
-        <small>منصتك التعليمية</small>
+        <strong v-if="studentIdentity.firstName">
+          مرحبًا، {{ studentIdentity.firstName }}
+        </strong>
+        <strong v-else>مساحة الطالب</strong>
+        <small>
+          {{ studentIdentity.firstName ? "مساحة الطالب" : "منصتك التعليمية" }}
+        </small>
       </div>
     </div>
 
@@ -94,13 +126,39 @@ const uploadImage = async () => {
           style="display: none"
         />
       </div>
-      <p class="person-name">{{ userStore.user?.name || "الطالب" }}</p>
+      <p class="person-name">{{ studentIdentity.fullName || "الطالب" }}</p>
       <p class="person-stage">{{ educationLabel }}</p>
       <span class="person-account-state">الحساب نشط</span>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
 
-    <ul class="profile-options">
+    <div class="profile-mobile-navigation">
+      <div class="profile-mobile-current">
+        <small>أنت الآن في</small>
+        <strong>{{ currentSectionLabel }}</strong>
+      </div>
+      <button
+        type="button"
+        class="profile-mobile-navigation-toggle"
+        :aria-expanded="isMobileNavigationOpen"
+        aria-controls="profile-navigation-links"
+        @click="isMobileNavigationOpen = !isMobileNavigationOpen"
+      >
+        <i class="pi pi-th-large" aria-hidden="true" />
+        <span>قائمة الحساب</span>
+        <i
+          class="pi pi-chevron-down profile-mobile-navigation-chevron"
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+
+    <nav
+      id="profile-navigation-links"
+      class="profile-options"
+      :class="{ 'is-mobile-open': isMobileNavigationOpen }"
+      aria-label="تنقل حساب الطالب"
+    >
       <NuxtLink
         :to="{ name: 'student-dashboard' }"
         exact-active-class="active"
@@ -112,7 +170,7 @@ const uploadImage = async () => {
         <p>الرئيسية</p>
       </NuxtLink>
 
-            <NuxtLink
+      <NuxtLink
         :to="{ name: 'profilecourse' }"
         exact-active-class="active"
         class="profile-option"
@@ -122,7 +180,7 @@ const uploadImage = async () => {
         </span>
         <p>مشترياتي</p>
       </NuxtLink>
-        <NuxtLink
+      <NuxtLink
         :to="{ name: 'profileexams' }"
         exact-active-class="active"
         class="profile-option"
@@ -142,7 +200,7 @@ const uploadImage = async () => {
         </span>
         <p>الكورسات</p>
       </NuxtLink>
-            <NuxtLink
+      <NuxtLink
         :to="{ name: 'profilesubjectinfo' }"
         exact-active-class="active"
         class="profile-option"
@@ -150,7 +208,7 @@ const uploadImage = async () => {
         <span class="profile-icon profile-option-icon" aria-hidden="true">
           <i class="pi pi-graduation-cap" />
         </span>
-        <p>المعلومات الدراسيه</p>
+        <p>المعلومات الدراسية</p>
       </NuxtLink>
 
       <NuxtLink
@@ -163,9 +221,6 @@ const uploadImage = async () => {
         </span>
         <p>الملف الشخصي</p>
       </NuxtLink>
-
-
-    
       <!-- <NuxtLink
         to="/questions"
         exact-active-class="active"
@@ -210,7 +265,7 @@ const uploadImage = async () => {
         </span>
         <p>تسجيل الخروج</p>
       </button>
-    </ul>
+    </nav>
 
     <div class="profile-sidebar-help">
       <span>?</span>

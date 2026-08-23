@@ -84,6 +84,9 @@ export default class CourseDetailsModel {
 
 
   static fromMap(map: { [key: string]: any }): CourseDetailsModel {
+    const toBoolean = (value: unknown): boolean =>
+      value === true || value === 1 || value === "1" || String(value).toLowerCase() === "true";
+
     return new CourseDetailsModel(
       map["id"],
       map["title"],
@@ -100,14 +103,15 @@ export default class CourseDetailsModel {
       map["sessions"],
       map["lessons"],
       map["units"],
-      map["allow_status"],
+      Number.isFinite(Number(map["allow_status"]))
+        ? Number(map["allow_status"])
+        : 0,
       map["currency"],
       map["course_docs"],
       map["course_records"],
       map["course_videos"],
-      map["is_paid"],
-      map["is_subscribed"],
+      toBoolean(map["is_paid"]),
+      toBoolean(map["is_subscribed"]),
     );
   }
 }
-

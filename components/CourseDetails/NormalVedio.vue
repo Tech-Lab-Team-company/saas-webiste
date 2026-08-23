@@ -8,6 +8,9 @@ const props = defineProps<{
     sessionId?: number | null;
     courseId?: number | null;
 }>();
+const emit = defineEmits<{
+    playbackStateChange: [isPlaying: boolean];
+}>();
 const videoRef = ref<HTMLVideoElement | null>(null);
 const playerRef = ref<any>(null);
 const videoContainer = ref<HTMLElement | null>(null);
@@ -51,9 +54,20 @@ function retryPlayer() {
     startPlayerLoading();
 }
 
+function handlePausedChange(event: CustomEvent<boolean>) {
+    emit('playbackStateChange', !event.detail);
+    watchHistory.handlePausedChange(event);
+}
+
+function handlePlaybackEnded() {
+    emit('playbackStateChange', false);
+    watchHistory.markPlaybackEnded();
+}
+
 watch(
     () => props.video,
     (newVal) => {
+        emit('playbackStateChange', false);
         startPlayerLoading();
         if (videoRef.value && newVal) {
             videoRef.value.pause();
@@ -86,7 +100,10 @@ onMounted(() => {
     startPlayerLoading();
     nextTick(applyVideoProtection);
 });
-onBeforeUnmount(clearLoadingDelayTimer);
+onBeforeUnmount(() => {
+    clearLoadingDelayTimer();
+    emit('playbackStateChange', false);
+});
 </script>
 
 <template>
@@ -97,10 +114,11 @@ onBeforeUnmount(clearLoadingDelayTimer);
             playsinline
             style="width: 100%; height: 100%;"
             @vmPlaybackReady="finishPlayerLoading"
+            @vmPlay="emit('playbackStateChange', true)"
             @vmDurationChange="watchHistory.updateDuration"
             @vmCurrentTimeChange="watchHistory.updateCurrentTime"
-            @vmPausedChange="watchHistory.handlePausedChange"
-            @vmPlaybackEnded="watchHistory.markPlaybackEnded"
+            @vmPausedChange="handlePausedChange"
+            @vmPlaybackEnded="handlePlaybackEnded"
             @vmError="markPlayerDelayed"
         >
             <Video ref="videoRef" style="width: 100%; height: 100%;">

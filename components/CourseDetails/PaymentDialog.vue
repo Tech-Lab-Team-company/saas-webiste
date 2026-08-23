@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import Dialog from "primevue/dialog";
 
-import CoursesPaymentParams from "~/features/CoursePayment/Core/Params/courses_payment_params";
-import CoursesPaymentController from "~/features/CoursePayment/presentation/controllers/courses_payment_controller";
+import NetworkService from "~/base/core/networkStructure/networking/network_service";
+import { ApiNames } from "~/base/core/networkStructure/apiNames";
+import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import FetchPaymentMethodsParams from "~/features/fetch_payment_methods/Core/Params/fetch_payment_methods_params";
 import type PaymentMethodModel from "~/features/fetch_payment_methods/Data/models/fetch_payment_method_model";
 import FetchPaymentMethodController from "~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
 import OnlinePaymentParams from "~/features/OnlinePayment/Core/Params/online_payment_params";
 import OnlinePaymentController from "~/features/OnlinePayment/presentation/controllers/online_payment_controller";
+import errorImage from "~/public/images/error.png";
+import successImage from "~/public/images/success-dialog.png";
 import { useSiteUrl } from "~/utils/siteUrl";
 import { PaymentTypes } from "./Enum/payment_types_enum";
 
 const props = defineProps<{
+  courseId: number;
   status: number;
   courseTitle?: string;
   price?: number;
@@ -31,7 +35,11 @@ const { buildSiteUrl } = useSiteUrl();
 const { promptCourseSubscription } = useCourseAccessPrompt();
 
 const visible = ref(false);
-const status = ref(props.status);
+const normalizeStatus = (value: unknown): number => {
+  const parsedStatus = Number(value);
+  return Number.isFinite(parsedStatus) ? parsedStatus : 0;
+};
+const status = ref(normalizeStatus(props.status));
 const selectedPaymentMethodId = ref<number | null>(null);
 const transferredAccount = ref("");
 const receiptFile = ref<File | null>(null);
@@ -41,7 +49,6 @@ const receiptInputId = useId();
 const loadingMethods = ref(false);
 const paymentMethodsLoaded = ref(false);
 const submitting = ref(false);
-const success = ref(false);
 const methodsError = ref("");
 const errorMessage = ref("");
 const fieldErrors = ref<Record<string, string>>({});
@@ -69,7 +76,7 @@ const receiptSize = computed(() =>
 watch(
   () => props.status,
   (newValue) => {
-    status.value = newValue;
+    status.value = normalizeStatus(newValue);
   },
 );
 
@@ -96,7 +103,6 @@ const resetForm = () => {
   selectedPaymentMethodId.value = null;
   transferredAccount.value = "";
   clearReceipt();
-  success.value = false;
   errorMessage.value = "";
   methodsError.value = "";
   fieldErrors.value = {};
@@ -109,7 +115,7 @@ const loadPaymentMethods = async () => {
   methodsError.value = "";
   try {
     const state = await FetchPaymentMethodController.getInstance().FetchPaymentMthod(
-      new FetchPaymentMethodsParams(1),
+      new FetchPaymentMethodsParams(),
     );
 
     if (state.value.data?.length) {
@@ -160,6 +166,9 @@ const validatePayment = () => {
   if (!selectedMethod.value) {
     errors.paymentMethod = "اختر وسيلة الدفع المناسبة أولًا.";
   }
+  if (selectedMethod.value && !isOnlinePayment.value && !isOfflinePayment.value) {
+    errors.paymentMethod = "وسيلة الدفع المختارة غير مدعومة حاليًا.";
+  }
   if (isOfflinePayment.value && transferredAccount.value.trim().length < 6) {
     errors.transferredAccount = "أدخل رقم الحساب أو الهاتف الذي تم التحويل منه.";
   }
@@ -171,36 +180,121 @@ const validatePayment = () => {
   return Object.keys(errors).length === 0;
 };
 
+const apiResponseMessage = (response: any) =>
+  response?.data?.message || response?.data?.data?.message;
+
+const ensureSuccessfulBuyProductResponse = (response: any) => {
+  const httpStatus = Number(response?.status);
+  const apiStatus = response?.data?.status;
+  const apiSuccess = response?.data?.success;
+  const failedValues = ["0", "false", "error", "failed", "fail"];
+  const hasFailedApiStatus =
+    apiStatus === false
+    || apiStatus === 0
+    || failedValues.includes(String(apiStatus ?? "").toLowerCase())
+    || apiSuccess === false
+    || apiSuccess === 0
+    || failedValues.includes(String(apiSuccess ?? "").toLowerCase());
+
+  if (
+    !response
+    || !Number.isFinite(httpStatus)
+    || httpStatus < 200
+    || httpStatus >= 300
+    || hasFailedApiStatus
+  ) {
+    throw new Error(apiResponseMessage(response) || "تعذر إتمام طلب شراء الكورس.");
+  }
+};
+
+const requestErrorMessage = (error: any): string => {
+  const response = error?.response;
+  const responseMessage = apiResponseMessage(response);
+  const validationErrors = response?.data?.errors;
+
+  if (responseMessage) return String(responseMessage);
+  if (validationErrors && typeof validationErrors === "object") {
+    const message = Object.values(validationErrors).flat().filter(Boolean).join(" ");
+    if (message) return message;
+  }
+  if (!response && (error?.code === "ERR_NETWORK" || error?.request)) {
+    return "تعذر الاتصال بالخادم. تحقق من الإنترنت ثم حاول مرة أخرى.";
+  }
+
+  const responseStatus = Number(response?.status);
+  if (responseStatus === 401) return "انتهت جلسة تسجيل الدخول. سجّل الدخول ثم أعد المحاولة.";
+  if (responseStatus === 403) return "لا يمكنك إرسال طلب الشراء حاليًا.";
+  if (responseStatus === 404) return "خدمة شراء الكورس غير متاحة حاليًا.";
+  if (responseStatus === 422) return "بعض بيانات الدفع غير صحيحة. راجعها ثم حاول مرة أخرى.";
+  if (responseStatus === 429) return "تم إرسال محاولات كثيرة. انتظر قليلًا ثم حاول مجددًا.";
+  if (responseStatus >= 500) return "حدث خطأ بالخادم أثناء إرسال الطلب. حاول لاحقًا.";
+
+  return error?.message || "تعذر إرسال طلب شراء الكورس. راجع البيانات وحاول مرة أخرى.";
+};
+
+const showPurchaseResultDialog = async (
+  type: "success" | "error",
+  titleContent: string,
+  messageContent: string,
+) => {
+  visible.value = false;
+  await nextTick();
+  const dialog = type === "success"
+    ? DialogSelector.instance.successDialog
+    : DialogSelector.instance.errorDialog;
+
+  dialog.openDialog({
+    dialogName: "dialog",
+    titleContent,
+    imageElement: type === "success" ? successImage : errorImage,
+    messageContent,
+    autoCloseMs: 6500,
+  });
+};
+
 const submitOfflinePayment = async () => {
   if (!selectedMethod.value) return;
 
-  const params = new CoursesPaymentParams({
-    CourseId: Number(route.params.id),
-    PaymentMethod: selectedMethod.value.id,
-    Account: transferredAccount.value.trim(),
-    Receipt: receiptFile.value,
-  });
-  const state = await CoursesPaymentController.getInstance().CoursesPayment(params);
-
-  if (state.value.data || state.value.message) {
-    status.value = 1;
-    success.value = true;
-    emit("statusChanged", 1);
-    return;
+  if (!Number.isInteger(props.courseId) || props.courseId <= 0) {
+    throw new Error("معرّف الكورس غير صالح. أعد تحميل الصفحة وحاول مرة أخرى.");
   }
 
-  errorMessage.value =
-    state.value.error?.title || "تعذر إرسال بيانات التحويل. راجع البيانات وحاول مرة أخرى.";
+  const response = await NetworkService.instance.postFormData({
+    url: ApiNames.Instance.buy_product,
+    isAuth: true,
+    data: {
+      course_id: props.courseId,
+      subscription_type: 1,
+      payment_method_id: selectedMethod.value.id,
+      transferred_account: transferredAccount.value.trim(),
+      receipt: receiptFile.value,
+    },
+  });
+
+  ensureSuccessfulBuyProductResponse(response);
+  status.value = 1;
+  emit("statusChanged", 1);
+  await showPurchaseResultDialog(
+    "success",
+    "تم إرسال طلب شراء الكورس بنجاح",
+    String(
+      apiResponseMessage(response)
+      || "سنراجع بيانات الدفع، وسيتم تفعيل الكورس على حسابك فور اعتماد الطلب.",
+    ),
+  );
 };
 
 const submitOnlinePayment = async () => {
   if (!selectedMethod.value) return;
+  if (!Number.isInteger(props.courseId) || props.courseId <= 0) {
+    throw new Error("معرّف الكورس غير صالح. أعد تحميل الصفحة وحاول مرة أخرى.");
+  }
 
   const callbackUrl = buildSiteUrl(
-    `/paymentverify/${selectedMethod.value.id}?source=course&courseId=${route.params.id}`,
+    `/paymentverify/${selectedMethod.value.id}?source=course&courseId=${props.courseId}`,
   );
   const params = new OnlinePaymentParams(
-    String(route.params.id),
+    String(props.courseId),
     String(selectedMethod.value.id),
     null,
     callbackUrl,
@@ -214,15 +308,15 @@ const submitOnlinePayment = async () => {
   const paymentId = Number(state.value.data?.id);
 
   if (!gatewayUrl || !Number.isFinite(paymentId) || paymentId <= 0) {
-    errorMessage.value =
-      state.value.error?.title || "تعذر فتح بوابة الدفع. حاول مرة أخرى.";
-    return;
+    throw new Error(
+      state.value.error?.title || "تعذر فتح بوابة الدفع. حاول مرة أخرى.",
+    );
   }
 
   window.localStorage.setItem("onlinePaymentId", String(paymentId));
   window.localStorage.setItem("onlinePaymentContext", JSON.stringify({
     source: "course",
-    courseId: Number(route.params.id),
+    courseId: props.courseId,
     title: props.courseTitle,
     returnUrl: route.fullPath,
   }));
@@ -241,10 +335,12 @@ const submitPayment = async () => {
       await submitOfflinePayment();
     }
   } catch (error: any) {
-    errorMessage.value =
-      error?.response?.data?.message ||
-      error?.message ||
-      "حدث خطأ أثناء إتمام عملية الشراء. حاول مرة أخرى.";
+    errorMessage.value = requestErrorMessage(error);
+    await showPurchaseResultDialog(
+      "error",
+      "لم يتم إرسال طلب شراء الكورس",
+      errorMessage.value,
+    );
   } finally {
     submitting.value = false;
   }
@@ -331,14 +427,7 @@ onBeforeUnmount(clearReceipt);
         </div>
       </template>
 
-      <div v-if="success" class="course-payment-dialog__success" role="status">
-        <span class="pi pi-check" aria-hidden="true" />
-        <h3>تم إرسال طلبك بنجاح</h3>
-        <p>سنراجع بيانات التحويل، وسيتم تفعيل الكورس على حسابك فور اعتماد الطلب.</p>
-        <button type="button" @click="visible = false">تم</button>
-      </div>
-
-      <form v-else class="course-payment-dialog__form" @submit.prevent="submitPayment">
+      <form class="course-payment-dialog__form" @submit.prevent="submitPayment">
         <div v-if="courseTitle || formattedPrice" class="course-payment-dialog__summary">
           <span class="course-payment-dialog__summary-icon pi pi-graduation-cap" aria-hidden="true" />
           <div>

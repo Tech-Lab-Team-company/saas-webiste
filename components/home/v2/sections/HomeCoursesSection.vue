@@ -1801,7 +1801,7 @@ onBeforeUnmount(() => {
 .home-course-audiences {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 8px;
 }
 
