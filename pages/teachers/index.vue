@@ -3,7 +3,9 @@ import HomeTeachersSection from "~/components/home/v2/sections/HomeTeachersSecti
 import { useTeacherDirectory } from "~/features/HomePageFeature/composables/useTeacherDirectory";
 import { mapHomeSite } from "~/features/HomePageFeature/mappers/homePageMapper";
 
-definePageMeta({ layout: "home-v2" });
+definePageMeta({
+  layout: "home-v2",
+});
 
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));

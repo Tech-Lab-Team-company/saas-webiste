@@ -80,7 +80,7 @@ test("centers load a branded teacher directory from fetch_teachers", async () =>
     readSource(
       "features/HomePageFeature/composables/useTeacherDirectory.ts",
     ),
-    readSource("pages/teachers.vue"),
+    readSource("pages/teachers/index.vue"),
     readSource("components/home/v2/sections/HomeHeaderSection.vue"),
     readSource("server/routes/sitemap.xml.ts"),
   ]);
@@ -97,11 +97,12 @@ test("centers load a branded teacher directory from fetch_teachers", async () =>
 });
 
 test("teacher cards open API-backed teacher detail pages", async () => {
-  const [api, mapper, cards, detailsPage] = await Promise.all([
+  const [api, mapper, cards, detailsPage, layout] = await Promise.all([
     readSource("features/HomePageFeature/api/homePageApi.ts"),
     readSource("features/HomePageFeature/mappers/homePageMapper.ts"),
     readSource("components/home/v2/sections/HomeTeachersSection.vue"),
     readSource("pages/teachers/[id].vue"),
+    readSource("layouts/home-v2.vue"),
   ]);
 
   assert.match(api, /async fetchTeacherDetails\(teacherId: number\)/u);
@@ -110,4 +111,7 @@ test("teacher cards open API-backed teacher detail pages", async () => {
   assert.match(cards, /:to="`\/teachers\/\$\{teacher\.id\}`"/u);
   assert.match(detailsPage, /api\.fetchTeacherDetails\(teacherId\)/u);
   assert.match(detailsPage, /mapHomeTeacher/u);
+  await assert.rejects(readSource("pages/teachers.vue"), /ENOENT/u);
+  assert.match(layout, /<HomeFooterSection :site="site" \/>/u);
+  assert.doesNotMatch(layout, /hydrate-on-visible/u);
 });
