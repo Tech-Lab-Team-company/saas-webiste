@@ -10,9 +10,6 @@ export default defineNuxtConfig({
     inlineStyles: true,
   },
   experimental: {
-    // Use the browser's snapshot-based page transitions when available.
-    // Nuxt automatically respects prefers-reduced-motion for this value.
-    viewTransition: true,
     defaults: {
       nuxtLink: {
         // Route code is fetched when a visitor shows intent instead of downloading

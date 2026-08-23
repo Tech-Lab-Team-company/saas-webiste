@@ -24,6 +24,20 @@ test("web status cache is isolated by tenant domain", async () => {
   assert.match(mapper, /value\.replace\(\/\\r\\n\?\/gu, '\\n'\)\.trim\(\)/u);
 });
 
+test("route transitions do not depend on the browser DOM update timeout", async () => {
+  const [config, transition, theme] = await Promise.all([
+    readSource("nuxt.config.ts"),
+    readSource("components/Global/AppRouteTransition.vue"),
+    readSource("assets/css/app-theme.css"),
+  ]);
+
+  assert.doesNotMatch(config, /viewTransition:\s*true/u);
+  assert.doesNotMatch(transition, /startViewTransition|supportsNativeViewTransition/u);
+  assert.doesNotMatch(theme, /view-transition-name/u);
+  assert.match(transition, /nuxtApp\.hook\("page:start", revealTransition\)/u);
+  assert.match(transition, /nuxtApp\.hook\("page:finish", hideTransition\)/u);
+});
+
 test("web-status teacher types expose the correct center capabilities", () => {
   assert.equal(resolveTeacherType(1), TeacherTypeEnum.CENTER);
   assert.equal(resolveTeacherType("2"), TeacherTypeEnum.TEACHER);

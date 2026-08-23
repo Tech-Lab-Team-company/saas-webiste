@@ -11,7 +11,6 @@ const isVisible = ref(false);
 let transitionStartedAt = 0;
 let finishTimer: ReturnType<typeof setTimeout> | null = null;
 let prefersReducedMotion = false;
-let supportsNativeViewTransition = false;
 
 const MINIMUM_VISIBLE_DURATION = 420;
 
@@ -104,22 +103,20 @@ const hideTransition = () => {
       )
       .to(root, { autoAlpha: 0, duration: 0.18, ease: "power1.out" }, "<");
 
-    if (!supportsNativeViewTransition) {
-      const routeView = document.querySelector<HTMLElement>(".app-route-view");
-      if (routeView) {
-        gsap.fromTo(
-          routeView,
-          { y: 22, autoAlpha: 0, filter: "blur(8px)" },
-          {
-            y: 0,
-            autoAlpha: 1,
-            filter: "blur(0px)",
-            duration: 0.58,
-            ease: "power3.out",
-            clearProps: "transform,opacity,visibility,filter",
-          },
-        );
-      }
+    const routeView = document.querySelector<HTMLElement>(".app-route-view");
+    if (routeView) {
+      gsap.fromTo(
+        routeView,
+        { y: 22, autoAlpha: 0, filter: "blur(8px)" },
+        {
+          y: 0,
+          autoAlpha: 1,
+          filter: "blur(0px)",
+          duration: 0.58,
+          ease: "power3.out",
+          clearProps: "transform,opacity,visibility,filter",
+        },
+      );
     }
   }, remainingDuration);
 };
@@ -132,7 +129,6 @@ onMounted(() => {
   prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
-  supportsNativeViewTransition = "startViewTransition" in document;
 
   removePageStartHook = nuxtApp.hook("page:start", revealTransition);
   removePageFinishHook = nuxtApp.hook("page:finish", hideTransition);
