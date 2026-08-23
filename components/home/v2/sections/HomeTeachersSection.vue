@@ -148,6 +148,14 @@ const markImageAsFailed = (teacherId: number) => {
                 تواصل مع المدرس
               </a>
             </div>
+
+            <NuxtLink
+              class="home-teacher-card__details"
+              :to="`/teachers/${teacher.id}`"
+              prefetch-on="interaction"
+            >
+              عرض ملف المدرس <span aria-hidden="true">←</span>
+            </NuxtLink>
           </div>
         </article>
       </div>
@@ -388,6 +396,7 @@ const markImageAsFailed = (teacherId: number) => {
 }
 
 .home-teacher-card__meta a,
+.home-teacher-card__details,
 .home-teachers__footer a,
 .home-teachers__state button {
   flex: 0 0 auto;
@@ -403,6 +412,24 @@ const markImageAsFailed = (teacherId: number) => {
 .home-teacher-card__meta a {
   padding: 9px 13px;
   font-size: 11px;
+}
+
+.home-teacher-card__details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 12px 16px;
+  font-size: 13px;
+}
+
+.home-teacher-card__details span {
+  transition: transform 180ms ease;
+}
+
+.home-teacher-card__details:hover span {
+  transform: translateX(-4px);
 }
 
 .home-teachers__footer {

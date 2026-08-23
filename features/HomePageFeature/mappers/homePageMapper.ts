@@ -68,29 +68,31 @@ const toBooleanFlag = (value: unknown): boolean =>
 
 const toArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
 
+export const mapHomeTeacher = (value: unknown): HomeTeacherViewModel | null => {
+  if (!isRecord(value)) return null
+
+  const id = toNullableNumber(value.id)
+  const name = toNullableString(value.name)
+  if (id === null || !name) return null
+
+  return {
+    id,
+    name,
+    image: mapImage(mapFlexibleImageApiDto(value.image, name)),
+    intro: toNullableString(value.intro),
+    shortDescription: toNullableString(value.mini_description),
+    description: toNullableString(value.description),
+    address: toNullableString(value.address),
+    email: toNullableString(value.email),
+    phone: toNullableString(value.phone),
+    coursesCount: toNullableNumber(value.number_of_courses) ?? 0,
+    revisionsCount: toNullableNumber(value.number_of_revisions) ?? 0,
+  }
+}
+
 export const mapHomeTeachers = (value: unknown): HomeTeacherViewModel[] =>
   toArray(value)
-    .map((item): HomeTeacherViewModel | null => {
-      if (!isRecord(item)) return null
-
-      const id = toNullableNumber(item.id)
-      const name = toNullableString(item.name)
-      if (id === null || !name) return null
-
-      return {
-        id,
-        name,
-        image: mapImage(mapFlexibleImageApiDto(item.image, name)),
-        intro: toNullableString(item.intro),
-        shortDescription: toNullableString(item.mini_description),
-        description: toNullableString(item.description),
-        address: toNullableString(item.address),
-        email: toNullableString(item.email),
-        phone: toNullableString(item.phone),
-        coursesCount: toNullableNumber(item.number_of_courses) ?? 0,
-        revisionsCount: toNullableNumber(item.number_of_revisions) ?? 0,
-      }
-    })
+    .map(mapHomeTeacher)
     .filter((teacher): teacher is HomeTeacherViewModel => teacher !== null)
 
 const mapImageApiDto = (value: unknown): HomeImageApiDto | null => {

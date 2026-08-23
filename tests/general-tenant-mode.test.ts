@@ -72,4 +72,21 @@ test("centers load a branded teacher directory from fetch_teachers", async () =>
   assert.match(page, /var\(--home-v2-blue\)/u);
   assert.match(header, /label: "المدرسون", to: "\/teachers"/u);
   assert.match(sitemap, /path: "\/teachers"/u);
+  assert.match(sitemap, /path: `\/teachers\/\$\{teacher\.id\}`/u);
+});
+
+test("teacher cards open API-backed teacher detail pages", async () => {
+  const [api, mapper, cards, detailsPage] = await Promise.all([
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+    readSource("features/HomePageFeature/mappers/homePageMapper.ts"),
+    readSource("components/home/v2/sections/HomeTeachersSection.vue"),
+    readSource("pages/teachers/[id].vue"),
+  ]);
+
+  assert.match(api, /async fetchTeacherDetails\(teacherId: number\)/u);
+  assert.match(api, /teacher_id: teacherId/u);
+  assert.match(mapper, /export const mapHomeTeacher =/u);
+  assert.match(cards, /:to="`\/teachers\/\$\{teacher\.id\}`"/u);
+  assert.match(detailsPage, /api\.fetchTeacherDetails\(teacherId\)/u);
+  assert.match(detailsPage, /mapHomeTeacher/u);
 });

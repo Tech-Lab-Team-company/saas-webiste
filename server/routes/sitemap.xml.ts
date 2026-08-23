@@ -97,15 +97,24 @@ export default defineEventHandler(async (event) => {
 
   const dynamicEntries: SitemapEntry[] = [];
 
-  if (
-    teachersResult.status === "fulfilled" &&
-    mapHomeTeachers(teachersResult.value).length > 0
-  ) {
-    dynamicEntries.push({
-      path: "/teachers",
-      changefreq: "weekly",
-      priority: 0.8,
-    });
+  if (teachersResult.status === "fulfilled") {
+    const teachers = mapHomeTeachers(teachersResult.value);
+
+    if (teachers.length > 0) {
+      dynamicEntries.push({
+        path: "/teachers",
+        changefreq: "weekly",
+        priority: 0.8,
+      });
+    }
+
+    for (const teacher of teachers) {
+      dynamicEntries.push({
+        path: `/teachers/${teacher.id}`,
+        changefreq: "monthly",
+        priority: 0.7,
+      });
+    }
   }
 
   if (blogsResult.status === "fulfilled") {

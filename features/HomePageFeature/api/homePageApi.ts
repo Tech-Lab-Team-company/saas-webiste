@@ -160,6 +160,12 @@ export class HomePageApi {
     return this.get(ApiNames.Instance.FetchGenralTeachers);
   }
 
+  async fetchTeacherDetails(teacherId: number): Promise<unknown> {
+    return this.post(ApiNames.Instance.FetchTeacherDetails, {
+      teacher_id: teacherId,
+    });
+  }
+
   async fetchStages(): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_stages, {});
   }
