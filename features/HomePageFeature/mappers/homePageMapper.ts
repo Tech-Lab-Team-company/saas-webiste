@@ -8,6 +8,7 @@ import type {
   HomeSectionState,
 } from '../types/homePage.types'
 import { HeroSectionTypeEnum } from '../types/homePage.types'
+import { resolveTeacherType, supportsTeacherDirectory } from '../types/teacherType'
 import type {
   HomeBlogViewModel,
   HomeBookDetailsResourceViewModel,
@@ -976,7 +977,8 @@ const mapSectionError = <T>(data: T, error: HomeSectionState<T>['error']): HomeS
 })
 
 const createEmptySite = (): HomeSiteViewModel => ({
-  isGeneral: false,
+  teacherType: null,
+  hasTeacherDirectory: false,
   categoryIds: [],
   brandName: null,
   description: null,
@@ -1012,7 +1014,8 @@ export const mapHomeSite = (settings: unknown): HomeSiteViewModel => {
   }
 
   return {
-    isGeneral: toNullableNumber(settings.has_general) === 1,
+    teacherType: resolveTeacherType(settings.type),
+    hasTeacherDirectory: supportsTeacherDirectory(settings.type),
     categoryIds: toArray(settings.categories)
       .map(toNullableNumber)
       .filter((id): id is number => id !== null),

@@ -50,7 +50,7 @@ const markImageAsFailed = (teacherId: number) => {
 
 <template>
   <section
-    v-if="site.isGeneral"
+    v-if="site.hasTeacherDirectory"
     id="teachers"
     class="home-teachers"
     :class="{ 'home-teachers--catalog': catalog }"

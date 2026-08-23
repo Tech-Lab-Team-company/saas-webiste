@@ -7,9 +7,9 @@ definePageMeta({ layout: "home-v2" });
 
 const settingsStore = useSettingStore();
 const site = computed(() => mapHomeSite(settingsStore.setting));
-const { isGeneral, teachers, pending, refresh } = await useTeacherDirectory();
+const { hasTeacherDirectory, teachers, pending, refresh } = await useTeacherDirectory();
 
-if (!isGeneral) {
+if (!hasTeacherDirectory) {
   await navigateTo("/about-teacher", { redirectCode: 302 });
 }
 

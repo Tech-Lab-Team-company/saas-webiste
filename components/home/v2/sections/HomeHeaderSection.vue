@@ -48,10 +48,10 @@ const headerDescription = computed(() => {
 const navItems = computed(() => [
   ...(route.path === "/" ? [] : [{ label: "الرئيسية", to: "/" }]),
   { label: "الكورسات", to: "/course" },
-  ...(props.site.isGeneral ? [{ label: "المدرسون", to: "/teachers" }] : []),
+  ...(props.site.hasTeacherDirectory ? [{ label: "المدرسون", to: "/teachers" }] : []),
   { label: "الكتب", to: "/books" },
   {
-    label: props.site.isGeneral
+    label: props.site.hasTeacherDirectory
       ? props.site.brandName
         ? `عن ${props.site.brandName}`
         : "عن المنصة"

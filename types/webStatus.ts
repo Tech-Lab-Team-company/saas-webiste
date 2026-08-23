@@ -6,6 +6,7 @@ export interface WebStatusImage {
 }
 
 export default interface WebStatus {
+    type: number;
     name: string;
     status: number;
     website: string;

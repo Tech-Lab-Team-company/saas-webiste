@@ -70,7 +70,7 @@ const themeStyles = computed(() => {
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeTeachersSection
-        v-if="props.home.site.isGeneral"
+        v-if="props.home.site.hasTeacherDirectory"
         :teachers="props.home.teachers"
         :site="props.home.site"
         :pending="props.pending && props.home.teachers.status === 'empty'"

@@ -17,6 +17,7 @@ import type {
   HomePageViewModel,
 } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
+import { supportsTeacherDirectory } from '../types/teacherType'
 import { useTeacherDirectory } from './useTeacherDirectory'
 
 export const useHomePage = async () => {
@@ -24,7 +25,7 @@ export const useHomePage = async () => {
   const { setting } = storeToRefs(settingsStore)
   const webDomain = getWebDomain()
   const api = new HomePageApi(webDomain)
-  const tenantMode = Number(setting.value?.has_general) === 1
+  const tenantMode = supportsTeacherDirectory(setting.value?.type)
     ? 'general'
     : 'education'
   const teacherDirectoryRequest = useTeacherDirectory()
@@ -44,8 +45,6 @@ export const useHomePage = async () => {
   }>(
     `course-taxonomy:dynamic-v2:${webDomain}:${tenantMode}`,
     async () => {
-      if (tenantMode === 'general') return { stages: [], tabs: [] }
-
       const stages = mapHomeCourseStages(await api.fetchStages())
       const yearResults = await Promise.allSettled(
         stages.map(async (stage) => ({
@@ -114,9 +113,7 @@ export const useHomePage = async () => {
     const site = mapHomeSite(setting.value)
 
     const taxonomy = courseTaxonomy.value ?? { stages: [], tabs: [] }
-    const taxonomyStatus = tenantMode === 'general'
-      ? 'empty'
-      : courseTaxonomyPending.value
+    const taxonomyStatus = courseTaxonomyPending.value
       ? 'loading'
       : courseTaxonomyError.value
         ? 'error'
@@ -233,7 +230,7 @@ export const useHomePage = async () => {
     home,
     pending: computed(() =>
       homePending.value ||
-      (tenantMode === 'education' && courseTaxonomyPending.value) ||
+      courseTaxonomyPending.value ||
       (tenantMode === 'general' && (
         generalCatalogPending.value || teacherDirectory.pending.value
       )),

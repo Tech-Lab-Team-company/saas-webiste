@@ -20,6 +20,7 @@ import type {
   HomeCourseStageViewModel,
   HomeCourseTabViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
+import { usesGeneralCourseCatalog } from "~/features/HomePageFeature/types/teacherType";
 
 interface ApiResponse<T> {
   data: T[];
@@ -52,7 +53,7 @@ const baseUrl = useBaseUrls().baseUrl;
 const homeApi = new HomePageApi(webDomain);
 const settingStore = useSettingStore();
 const isGeneralMode = computed(
-  () => Number(settingStore.setting?.has_general) === 1,
+  () => usesGeneralCourseCatalog(settingStore.setting?.categories),
 );
 const { isDark } = useAppTheme();
 

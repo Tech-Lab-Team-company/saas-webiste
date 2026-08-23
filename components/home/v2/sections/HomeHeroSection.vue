@@ -694,9 +694,9 @@ onBeforeUnmount(() => {
           >
           <NuxtLink
             class="home-v2-hero__secondary"
-            :to="site.isGeneral ? '/teachers' : '/about-teacher'"
+            :to="site.hasTeacherDirectory ? '/teachers' : '/about-teacher'"
             prefetch-on="interaction"
-            >{{ site.isGeneral ? "تعرّف على المدرسين" : "تعرّف على المنصة" }} <span aria-hidden="true">↗</span></NuxtLink
+            >{{ site.hasTeacherDirectory ? "تعرّف على المدرسين" : "تعرّف على المنصة" }} <span aria-hidden="true">↗</span></NuxtLink
           >
         </div>
       </div>

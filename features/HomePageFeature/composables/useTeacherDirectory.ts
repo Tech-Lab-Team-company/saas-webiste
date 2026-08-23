@@ -4,19 +4,20 @@ import { HomePageApi, normalizeHomeDataError } from "../api/homePageApi";
 import { mapHomeTeachers } from "../mappers/homePageMapper";
 import type { HomeTeacherViewModel } from "../models/HomePageViewModel";
 import type { HomeSectionState } from "../types/homePage.types";
+import { supportsTeacherDirectory } from "../types/teacherType";
 
 export const useTeacherDirectory = async () => {
   const settingsStore = useSettingStore();
   const { setting } = storeToRefs(settingsStore);
   const webDomain = getWebDomain();
-  const isGeneral = Number(setting.value?.has_general) === 1;
+  const hasTeacherDirectory = supportsTeacherDirectory(setting.value?.type);
   const api = new HomePageApi(webDomain);
 
   const { data, pending, error, refresh } = await useAsyncData<
     HomeTeacherViewModel[]
   >(
-    `teacher-directory:dynamic-v1:${webDomain}:${isGeneral ? "general" : "education"}`,
-    async () => (isGeneral ? mapHomeTeachers(await api.fetchTeachers()) : []),
+    `teacher-directory:dynamic-v2:${webDomain}:${hasTeacherDirectory ? "center" : "teacher"}`,
+    async () => (hasTeacherDirectory ? mapHomeTeachers(await api.fetchTeachers()) : []),
     {
       default: () => [],
       dedupe: "defer",
@@ -26,7 +27,7 @@ export const useTeacherDirectory = async () => {
   const teachers = computed<HomeSectionState<HomeTeacherViewModel[]>>(() => {
     const items = data.value ?? [];
 
-    if (!isGeneral) return { data: [], status: "empty" };
+    if (!hasTeacherDirectory) return { data: [], status: "empty" };
     if (error.value) {
       return {
         data: [],
@@ -42,7 +43,7 @@ export const useTeacherDirectory = async () => {
   });
 
   return {
-    isGeneral,
+    hasTeacherDirectory,
     teachers,
     pending,
     refresh,

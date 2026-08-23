@@ -39,7 +39,11 @@ const sectionHasEntered = ref(false);
 let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
 const MAX_PREVIEW_COURSES = 6;
 const CATALOG_COURSES_PER_PAGE = 9;
-const isGeneralMode = computed(() => props.courses.data.mode === "general");
+const isGeneralMode = computed(
+  () =>
+    props.courses.data.mode === "general" &&
+    props.courses.data.taxonomyStatus !== "success",
+);
 const generalCatalogState = ref<HomeSectionState<HomeCoursePageViewModel>>({
   data: props.courses.data.generalCatalog,
   status: props.courses.data.generalCatalogStatus === "loading"

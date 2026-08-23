@@ -1,4 +1,5 @@
 import type { HomeSectionState } from '../types/homePage.types'
+import type { TeacherTypeEnum } from '../types/teacherType'
 
 export interface HomeImageViewModel {
   src: string
@@ -258,7 +259,8 @@ export interface HomeCtaViewModel {
 }
 
 export interface HomeSiteViewModel {
-  isGeneral: boolean
+  teacherType: TeacherTypeEnum | null
+  hasTeacherDirectory: boolean
   categoryIds: number[]
   brandName: string | null
   description: string | null

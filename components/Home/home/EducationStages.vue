@@ -10,9 +10,12 @@ import { useFiltersStore } from '~/stores/courses_filter';
 import { useSettingStore } from "~/stores/setting";
 import { getWebDomain } from "~/constant/webDomain";
 import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
+import { usesGeneralCourseCatalog } from "~/features/HomePageFeature/types/teacherType";
 
 const settingStore = useSettingStore();
-const isGeneralMode = computed(() => Number(settingStore.setting?.has_general) === 1);
+const isGeneralMode = computed(() =>
+  usesGeneralCourseCatalog(settingStore.setting?.categories),
+);
 
 const filtersStore = useFiltersStore();
 const showStages = ref(false);
@@ -284,9 +287,9 @@ onMounted(() => {
 })
 
 watch(
-  () => settingStore.setting?.has_general,
-  (hasGeneral) => {
-    if (Number(hasGeneral) === 1) {
+  () => settingStore.setting?.categories,
+  (categories) => {
+    if (usesGeneralCourseCatalog(categories)) {
       CategryId.value = CategoryIdEnum.GENERAL;
       fetchGeneralSubjects();
     }
