@@ -7,8 +7,12 @@ const requestedTeacherId = Number(route.query.teacher_id);
 const initialTeacherId = Number.isInteger(requestedTeacherId) && requestedTeacherId > 0
   ? requestedTeacherId
   : null;
+const initialWord = typeof route.query.word === "string"
+  ? route.query.word.trim().slice(0, 100)
+  : "";
 const { home, pending, loadCoursesByYear, loadGeneralCourses } = await useHomePage({
   initialTeacherId,
+  initialWord,
 });
 
 definePageMeta({ layout: "home-v2" });
@@ -83,6 +87,7 @@ useHead({
         :teachers="home.teachers"
         :teacher-filter-enabled="home.site.hasTeacherDirectory"
         :initial-teacher-id="initialTeacherId"
+        :initial-word="initialWord"
         :load-courses-by-year="loadCoursesByYear"
         :load-general-courses="loadGeneralCourses"
         catalog

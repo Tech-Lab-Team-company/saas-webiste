@@ -16,11 +16,13 @@ const props = defineProps<{
     page?: number,
     perPage?: number,
     teacherId?: number | null,
+    word?: string,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
   loadGeneralCourses: (
     page?: number,
     perPage?: number,
     teacherId?: number | null,
+    word?: string,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
@@ -63,26 +65,35 @@ const themeStyles = computed(() => {
         :hydrate-on-visible="{ rootMargin: '50px' }"
       />
       <LazyHomeV2SectionsHomeBooksSection
+        v-if="props.home.books.status === 'success'"
         :books="props.home.books"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeBlogSection
+        v-if="props.home.blogs.status === 'success'"
         :blogs="props.home.blogs"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeLearningJourneySection
+        v-if="props.home.learningJourney.status === 'success'"
         :journey="props.home.learningJourney"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeTeachersSection
-        v-if="props.home.site.hasTeacherDirectory"
+        v-if="
+          props.home.site.hasTeacherDirectory &&
+          props.home.teachers.status === 'success'
+        "
         :teachers="props.home.teachers"
         :site="props.home.site"
         :pending="props.pending && props.home.teachers.status === 'empty'"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeAboutTeacherSection
-        v-else
+        v-else-if="
+          !props.home.site.hasTeacherDirectory &&
+          props.home.aboutTeacher.status === 'success'
+        "
         :about="props.home.aboutTeacher"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
@@ -95,6 +106,7 @@ const themeStyles = computed(() => {
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeCtaSection
+        v-if="props.home.cta.status === 'success'"
         :cta="props.home.cta"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />

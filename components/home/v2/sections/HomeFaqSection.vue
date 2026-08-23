@@ -33,6 +33,9 @@ const { data: faqs, pending, error } = await useAsyncData(
 const faqSection = ref<HTMLElement | null>(null)
 const faqHasEntered = ref(false)
 let faqAnimationContext: ReturnType<typeof gsap.context> | null = null
+const hasFaqContent = computed(
+  () => !pending.value && !error.value && faqs.value.length > 0,
+)
 
 const shouldReduceMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -185,6 +188,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section
+    v-if="hasFaqContent"
     ref="faqSection"
     :class="['section home-v2-faq', { 'home-v2-faq--entered': faqHasEntered }]"
     aria-labelledby="home-v2-faq-title"
@@ -197,6 +201,7 @@ onBeforeUnmount(() => {
         <span class="home-v2-faq__intro-mark" aria-hidden="true">FAQ</span>
       </div>
       <div class="home-v2-faq__list">
+        <!-- Backup empty state: includes FAQ loading and error placeholders.
         <p v-if="pending" class="home-v2-faq__status">جاري تحميل الأسئلة الشائعة...</p>
         <p v-else-if="error" class="home-v2-faq__status home-v2-faq__status--error">
           تعذر تحميل الأسئلة الشائعة في الوقت الحالي.
@@ -204,7 +209,8 @@ onBeforeUnmount(() => {
         <p v-else-if="faqs.length === 0" class="home-v2-faq__status">
           لا توجد أسئلة شائعة حاليًا.
         </p>
-        <template v-else>
+        -->
+        <template>
           <details
             v-for="(faq, index) in faqs"
             :key="faq.id"

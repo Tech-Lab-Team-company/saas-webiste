@@ -48,6 +48,7 @@ const isHomeV2 = computed(
     route.path.startsWith("/books/") ||
     route.path.startsWith("/blogs/") ||
     route.path.startsWith("/blog-v2/") ||
+    route.path.startsWith("/teachers/") ||
     isCourseDetailsPage.value ||
     isCourseExamPage.value,
 );

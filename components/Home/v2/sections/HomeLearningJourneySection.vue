@@ -172,11 +172,13 @@ onBeforeUnmount(() => {
 
 <template>
   <section
+    v-if="hasJourneyContent"
     ref="journeySection"
     class="section home-v2-learning-journey"
     :data-background-text="journey.data.textBackground"
     aria-labelledby="home-v2-learning-journey-title"
   >
+    <!-- Backup empty state: uncomment if empty sections should be visible again.
     <div v-if="!hasJourneyContent" class="container home-v2-learning-journey__empty">
       <HomeSectionEmptyState
         tone="dark"
@@ -185,8 +187,9 @@ onBeforeUnmount(() => {
         :description="emptyStateDescription"
       />
     </div>
+    -->
 
-    <div v-else class="container home-v2-learning-journey__grid">
+    <div class="container home-v2-learning-journey__grid">
       <div class="home-v2-learning-journey__intro">
         <div class="home-v2-learning-journey__eyebrow">
           <!-- <img

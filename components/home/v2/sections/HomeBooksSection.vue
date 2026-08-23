@@ -283,6 +283,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section
+    v-if="books.status === 'success' && featuredBook"
     id="books"
     ref="booksSection"
     class="section home-v2-books"
@@ -377,6 +378,7 @@ onBeforeUnmount(() => {
         </div>
       </article>
 
+      <!-- Backup empty state: uncomment if empty sections should be visible again.
       <HomeSectionEmptyState
         v-else
         label="قسم الكتب"
@@ -387,6 +389,7 @@ onBeforeUnmount(() => {
             : 'أضف أول كتاب من لوحة التحكم ليظهر هذا القسم هنا.'
         "
       />
+      -->
     </div>
   </section>
 </template>

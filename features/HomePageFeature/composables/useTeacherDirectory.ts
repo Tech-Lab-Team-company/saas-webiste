@@ -12,17 +12,29 @@ export const useTeacherDirectory = async () => {
   const webDomain = getWebDomain();
   const hasTeacherDirectory = supportsTeacherDirectory(setting.value?.type);
   const api = new HomePageApi(webDomain);
+  const searchWord = ref("");
 
   const { data, pending, error, refresh } = await useAsyncData<
     HomeTeacherViewModel[]
   >(
     `teacher-directory:dynamic-v2:${webDomain}:${hasTeacherDirectory ? "center" : "teacher"}`,
-    async () => (hasTeacherDirectory ? mapHomeTeachers(await api.fetchTeachers()) : []),
+    async () =>
+      hasTeacherDirectory
+        ? mapHomeTeachers(await api.fetchTeachers(searchWord.value))
+        : [],
     {
       default: () => [],
       dedupe: "defer",
     },
   );
+
+  const searchTeachers = async (value: string) => {
+    const normalizedValue = value.trim();
+    if (normalizedValue === searchWord.value) return;
+
+    searchWord.value = normalizedValue;
+    await refresh({ dedupe: "cancel" });
+  };
 
   const teachers = computed<HomeSectionState<HomeTeacherViewModel[]>>(() => {
     const items = data.value ?? [];
@@ -47,5 +59,7 @@ export const useTeacherDirectory = async () => {
     teachers,
     pending,
     refresh,
+    searchWord: readonly(searchWord),
+    searchTeachers,
   };
 };

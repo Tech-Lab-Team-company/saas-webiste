@@ -15,17 +15,20 @@ const props = defineProps<{
   teacherFilterEnabled?: boolean;
   catalog?: boolean;
   initialTeacherId?: number | null;
+  initialWord?: string;
   loadCoursesByYear: (
     stageId: number,
     yearId: number,
     page?: number,
     perPage?: number,
     teacherId?: number | null,
+    word?: string,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
   loadGeneralCourses: (
     page?: number,
     perPage?: number,
     teacherId?: number | null,
+    word?: string,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
@@ -65,10 +68,24 @@ const generalCatalogState = ref<HomeSectionState<HomeCoursePageViewModel>>({
     : {}),
 });
 const generalCatalogLoading = ref(false);
+let generalCatalogRequestId = 0;
+const courseSearchLoading = computed(() =>
+  isGeneralMode.value
+    ? generalCatalogLoading.value
+    : loadingTabKey.value !== null,
+);
 const selectedTeacherId = ref<number | null>(
   props.teacherFilterEnabled ? props.initialTeacherId ?? null : null,
 );
 const loadedGeneralTeacherId = ref<number | null>(selectedTeacherId.value);
+const normalizeWord = (value: unknown) =>
+  typeof value === "string" ? value.trim().slice(0, 100) : "";
+const searchWord = ref(
+  props.catalog ? normalizeWord(route.query.word ?? props.initialWord) : "",
+);
+const loadedGeneralWord = ref(searchWord.value);
+const loadedWordByTab = ref<Partial<Record<HomeCourseTabKey, string>>>({});
+let courseSearchTimer: ReturnType<typeof setTimeout> | null = null;
 const failedTeacherImages = ref<Set<number>>(new Set());
 
 const selectedTeacher = computed(
@@ -229,23 +246,29 @@ watch(
 const loadGeneralPage = async (
   requestedPage = 1,
   teacherId = selectedTeacherId.value,
+  word = searchWord.value,
 ) => {
-  if (!isGeneralMode.value || generalCatalogLoading.value) return;
+  if (!isGeneralMode.value) return;
 
   const page = normalizePage(requestedPage);
+  const normalizedWord = normalizeWord(word);
+  const requestId = ++generalCatalogRequestId;
   selectedTeacherId.value = teacherId;
+  searchWord.value = normalizedWord;
   generalCatalogLoading.value = true;
 
   try {
     if (
       props.catalog &&
       (normalizePage(route.query.page) !== page ||
-        normalizeTeacherId(route.query.teacher_id) !== teacherId)
+        normalizeTeacherId(route.query.teacher_id) !== teacherId ||
+        normalizeWord(route.query.word) !== normalizedWord)
     ) {
       const {
         stage_id: _stageId,
         year_id: _yearId,
         teacher_id: _teacherId,
+        word: _word,
         page: _page,
         ...query
       } = route.query;
@@ -253,19 +276,28 @@ const loadGeneralPage = async (
         query: {
           ...query,
           ...(teacherId ? { teacher_id: String(teacherId) } : {}),
+          ...(normalizedWord ? { word: normalizedWord } : {}),
           ...(page > 1 ? { page: String(page) } : {}),
         },
       });
     }
 
-    generalCatalogState.value = await props.loadGeneralCourses(
+    const result = await props.loadGeneralCourses(
       page,
       CATALOG_COURSES_PER_PAGE,
       teacherId,
+      normalizedWord,
     );
+
+    if (requestId !== generalCatalogRequestId) return;
+
+    generalCatalogState.value = result;
     loadedGeneralTeacherId.value = teacherId;
+    loadedGeneralWord.value = normalizedWord;
   } finally {
-    generalCatalogLoading.value = false;
+    if (requestId === generalCatalogRequestId) {
+      generalCatalogLoading.value = false;
+    }
   }
 };
 
@@ -278,7 +310,7 @@ const selectTeacher = async (teacherId: number | null) => {
   }
 
   if (isGeneralMode.value) {
-    await loadGeneralPage(1, teacherId);
+    await loadGeneralPage(1, teacherId, searchWord.value);
     await animateCourseResults();
     return;
   }
@@ -286,6 +318,7 @@ const selectTeacher = async (teacherId: number | null) => {
   const currentTab = selectedTab.value;
   selectedTeacherId.value = teacherId;
   coursesByTab.value = {};
+  loadedWordByTab.value = {};
 
   if (props.catalog) {
     const { teacher_id: _teacherId, page: _page, ...query } = route.query;
@@ -310,18 +343,10 @@ const selectStage = async (stageId: number) => {
   selectedTabKey.value = null;
 
   if (props.catalog) {
-    const firstYear = props.courses.data.tabs.find(
-      (tab) => tab.stageId === stageId,
-    );
-
-    if (firstYear) {
-      await selectTab(firstYear.key, undefined, 1);
-    } else {
-      const { year_id: _yearId, page: _page, ...query } = route.query;
-      await router.replace({
-        query: { ...query, stage_id: String(stageId) },
-      });
-    }
+    const { year_id: _yearId, page: _page, ...query } = route.query;
+    await router.replace({
+      query: { ...query, stage_id: String(stageId) },
+    });
   }
 };
 
@@ -340,7 +365,8 @@ const selectTab = async (
   if (
     selectedTabKey.value === tab.key &&
     coursesByTab.value[tab.key]?.status !== "error" &&
-    coursesByTab.value[tab.key]?.data.pagination.currentPage === page
+    coursesByTab.value[tab.key]?.data.pagination.currentPage === page &&
+    loadedWordByTab.value[tab.key] === searchWord.value
   ) {
     return;
   }
@@ -365,14 +391,17 @@ const selectTab = async (
     props.catalog &&
     (String(route.query.stage_id ?? "") !== String(tab.stageId) ||
       String(route.query.year_id ?? "") !== String(tab.yearId) ||
-      normalizePage(route.query.page) !== page)
+      normalizePage(route.query.page) !== page ||
+      normalizeWord(route.query.word) !== searchWord.value)
   ) {
+    const { word: _word, ...query } = route.query;
     await router.replace({
       query: {
-        ...route.query,
+        ...query,
         stage_id: String(tab.stageId),
         year_id: String(tab.yearId),
         page: String(page),
+        ...(searchWord.value ? { word: searchWord.value } : {}),
       },
     });
   }
@@ -383,6 +412,7 @@ const selectTab = async (
     page,
     CATALOG_COURSES_PER_PAGE,
     selectedTeacherId.value,
+    searchWord.value,
   );
 
   if (requestIds.value[tab.key] !== requestId) {
@@ -390,15 +420,18 @@ const selectTab = async (
   }
 
   coursesByTab.value[tab.key] = result;
+  loadedWordByTab.value[tab.key] = searchWord.value;
 
   const resolvedPage = result.data.pagination.currentPage;
   if (props.catalog && resolvedPage !== page) {
+    const { word: _word, ...query } = route.query;
     await router.replace({
       query: {
-        ...route.query,
+        ...query,
         stage_id: String(tab.stageId),
         year_id: String(tab.yearId),
         page: String(resolvedPage),
+        ...(searchWord.value ? { word: searchWord.value } : {}),
       },
     });
   }
@@ -415,11 +448,18 @@ const selectCatalogYearFromRoute = () => {
   const requestedStageId = Number(route.query.stage_id);
   const tab = props.courses.data.tabs.find(
     (item) => item.yearId === requestedYearId,
-  ) ?? props.courses.data.tabs.find(
-    (item) => item.stageId === requestedStageId,
-  ) ?? props.courses.data.tabs[0];
+  );
 
-  if (tab) void selectTab(tab.key, undefined, normalizePage(route.query.page));
+  if (tab) {
+    void selectTab(tab.key, undefined, normalizePage(route.query.page));
+    return;
+  }
+
+  const stage = props.courses.data.stages.find(
+    (item) => item.id === requestedStageId,
+  );
+  selectedStageId.value = stage?.id ?? null;
+  selectedTabKey.value = null;
 };
 
 onMounted(() => {
@@ -428,12 +468,14 @@ onMounted(() => {
     const requestedTeacherId = props.teacherFilterEnabled
       ? normalizeTeacherId(route.query.teacher_id)
       : null;
+    const requestedWord = normalizeWord(route.query.word);
     if (
       props.catalog &&
       (requestedPage !== coursePagination.value?.currentPage ||
-        requestedTeacherId !== loadedGeneralTeacherId.value)
+        requestedTeacherId !== loadedGeneralTeacherId.value ||
+        requestedWord !== loadedGeneralWord.value)
     ) {
-      void loadGeneralPage(requestedPage, requestedTeacherId);
+      void loadGeneralPage(requestedPage, requestedTeacherId, requestedWord);
     }
     return;
   }
@@ -446,6 +488,7 @@ watch(
     route.query.stage_id,
     route.query.year_id,
     route.query.teacher_id,
+    route.query.word,
     route.query.page,
     props.courses.data.tabs.map((tab) => tab.key).join(","),
   ],
@@ -456,12 +499,14 @@ watch(
       const requestedTeacherId = props.teacherFilterEnabled
         ? normalizeTeacherId(route.query.teacher_id)
         : null;
+      const requestedWord = normalizeWord(route.query.word);
       if (
         (requestedPage !== generalCatalogState.value.data.pagination.currentPage ||
-          requestedTeacherId !== loadedGeneralTeacherId.value) &&
+          requestedTeacherId !== loadedGeneralTeacherId.value ||
+          requestedWord !== loadedGeneralWord.value) &&
         !generalCatalogLoading.value
       ) {
-        void loadGeneralPage(requestedPage, requestedTeacherId);
+        void loadGeneralPage(requestedPage, requestedTeacherId, requestedWord);
       }
       return;
     }
@@ -471,25 +516,38 @@ watch(
     if (requestedTeacherId !== selectedTeacherId.value) {
       selectedTeacherId.value = requestedTeacherId;
       coursesByTab.value = {};
+      loadedWordByTab.value = {};
+    }
+    const requestedWord = normalizeWord(route.query.word);
+    if (requestedWord !== searchWord.value) {
+      searchWord.value = requestedWord;
+      coursesByTab.value = {};
+      loadedWordByTab.value = {};
     }
     const requestedYearId = Number(route.query.year_id);
     const requestedStageId = Number(route.query.stage_id);
     const requestedPage = normalizePage(route.query.page);
     const tab = props.courses.data.tabs.find(
       (item) => item.yearId === requestedYearId,
-    ) ?? props.courses.data.tabs.find(
-      (item) => item.stageId === requestedStageId,
     );
     const loadedPage = tab
       ? coursesByTab.value[tab.key]?.data.pagination.currentPage
       : null;
     if (
       tab &&
-      (tab.key !== selectedTabKey.value || loadedPage !== requestedPage)
+      (tab.key !== selectedTabKey.value ||
+        loadedPage !== requestedPage ||
+        loadedWordByTab.value[tab.key] !== requestedWord)
     ) {
       void selectTab(tab.key, undefined, requestedPage);
     }
-    else if (!selectedTabKey.value) selectCatalogYearFromRoute();
+    else if (!tab) {
+      const stage = props.courses.data.stages.find(
+        (item) => item.id === requestedStageId,
+      );
+      selectedStageId.value = stage?.id ?? null;
+      selectedTabKey.value = null;
+    }
   },
 );
 
@@ -569,6 +627,51 @@ const animateCourseResults = async () => {
   );
 };
 
+const applyCourseSearch = async () => {
+  if (courseSearchTimer) {
+    clearTimeout(courseSearchTimer);
+    courseSearchTimer = null;
+  }
+
+  const normalizedWord = normalizeWord(searchWord.value);
+  searchWord.value = normalizedWord;
+
+  if (isGeneralMode.value) {
+    await loadGeneralPage(1, selectedTeacherId.value, normalizedWord);
+  } else {
+    coursesByTab.value = {};
+    loadedWordByTab.value = {};
+
+    if (selectedTab.value) {
+      await selectTab(selectedTab.value.key, undefined, 1);
+    } else if (props.catalog) {
+      const { word: _word, page: _page, ...query } = route.query;
+      await router.replace({
+        query: {
+          ...query,
+          ...(normalizedWord ? { word: normalizedWord } : {}),
+        },
+      });
+    }
+  }
+
+  await animateCourseResults();
+};
+
+const requestCourseSearch = () => {
+  if (courseSearchTimer) clearTimeout(courseSearchTimer);
+  courseSearchTimer = setTimeout(() => {
+    courseSearchTimer = null;
+    void applyCourseSearch();
+  }, 450);
+};
+
+const clearCourseSearch = () => {
+  if (!searchWord.value) return;
+  searchWord.value = "";
+  void applyCourseSearch();
+};
+
 const revealCoursesSection = () => {
   const section = coursesSection.value;
   if (!section || sectionHasEntered.value) return;
@@ -597,7 +700,7 @@ const revealCoursesSection = () => {
       );
 
     const filterPanels = section.querySelectorAll(
-      ".home-course-teacher-filter, .home-course-picker",
+      ".home-course-search, .home-course-teacher-filter, .home-course-picker",
     );
     const filterOptions = section.querySelectorAll(
       ".home-course-teacher-option, .home-course-audiences button",
@@ -723,6 +826,7 @@ useScrollTriggeredReveal(coursesSection, revealCoursesSection, {
 });
 
 onBeforeUnmount(() => {
+  if (courseSearchTimer) clearTimeout(courseSearchTimer);
   coursesAnimationContext?.revert();
   cardResetCalls.forEach((call) => call.kill());
   cardResetCalls.clear();
@@ -931,6 +1035,61 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
+      <Transition name="home-course-search-reveal">
+        <section
+          v-if="catalog && (isGeneralMode || selectedTab)"
+          class="home-course-search"
+          aria-labelledby="home-v2-course-search-title"
+        >
+          <div class="home-course-search__copy">
+            <span>{{ isGeneralMode ? "ابحث في كل الكورسات" : "آخر خطوة" }}</span>
+            <h3 id="home-v2-course-search-title">ابحث باسم الكورس</h3>
+            <p v-if="!isGeneralMode && selectedTab">
+              البحث داخل كورسات {{ selectedTab.label }} فقط.
+            </p>
+          </div>
+
+          <div class="home-course-search__controls">
+            <label class="home-course-search__field">
+              <span class="home-course-search__label">اسم الكورس</span>
+              <span class="home-course-search__input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="11" cy="11" r="6.5" />
+                  <path d="m16 16 4 4" />
+                </svg>
+                <input
+                  v-model="searchWord"
+                  type="search"
+                  inputmode="search"
+                  autocomplete="off"
+                  maxlength="100"
+                  placeholder="اكتب اسم الكورس..."
+                  aria-controls="home-v2-course-results"
+                  :aria-busy="courseSearchLoading"
+                  :disabled="courseSearchLoading"
+                  @input="requestCourseSearch"
+                  @keydown.enter.prevent="applyCourseSearch"
+                />
+                <span
+                  v-if="courseSearchLoading"
+                  class="home-course-search__loader"
+                  aria-hidden="true"
+                />
+              </span>
+            </label>
+            <button
+              v-if="searchWord"
+              type="button"
+              class="home-course-search__clear"
+              :disabled="courseSearchLoading"
+              @click="clearCourseSearch"
+            >
+              مسح البحث
+            </button>
+          </div>
+        </section>
+      </Transition>
+
       <div
         id="home-v2-course-results"
         ref="courseResults"
@@ -941,9 +1100,9 @@ onBeforeUnmount(() => {
         <template v-if="isGeneralMode">
           <div class="home-course-result-head">
             <div>
-              <span>{{ selectedTeacher ? "المدرس المختار" : "كل محتوى المنصة" }}</span>
+              <span>{{ searchWord ? "نتائج البحث" : selectedTeacher ? "المدرس المختار" : "كل محتوى المنصة" }}</span>
               <h3>
-                {{ selectedTeacher ? `كورسات ${selectedTeacher.name}` : "كورسات المدرسين" }}
+                {{ searchWord ? `نتائج «${searchWord}»` : selectedTeacher ? `كورسات ${selectedTeacher.name}` : "كورسات المدرسين" }}
               </h3>
             </div>
             <b v-if="coursePagination">{{ coursePagination.total }} كورس</b>
@@ -956,7 +1115,7 @@ onBeforeUnmount(() => {
           >
             <span>جاري التحميل</span>
             <h3>
-              {{ selectedTeacher ? `بنجهز كورسات ${selectedTeacher.name}` : "بنجهز لك كورسات المنصة" }}
+              {{ searchWord ? `بنبحث عن «${searchWord}»` : selectedTeacher ? `بنجهز كورسات ${selectedTeacher.name}` : "بنجهز لك كورسات المنصة" }}
             </h3>
             <p>
               {{ selectedTeacher ? "ثواني ونظهر لك كورسات المدرس المختار فقط." : "ثواني ونظهر لك المحتوى المتاح من كل المدرسين." }}
@@ -983,13 +1142,20 @@ onBeforeUnmount(() => {
           >
             <span>لا توجد كورسات</span>
             <h3>
-              {{ selectedTeacher ? `لا توجد كورسات متاحة لـ ${selectedTeacher.name}` : "لم يضف المدرسون كورسات متاحة حتى الآن" }}
+              {{ searchWord ? `لا توجد نتائج لـ «${searchWord}»` : selectedTeacher ? `لا توجد كورسات متاحة لـ ${selectedTeacher.name}` : "لم يضف المدرسون كورسات متاحة حتى الآن" }}
             </h3>
             <p>
-              {{ selectedTeacher ? "جرّب مدرسًا آخر أو اعرض كل كورسات المنصة." : "ستظهر كورسات المدرسين هنا فور نشرها على المنصة." }}
+              {{ searchWord ? "جرّب كلمة أقصر أو امسح البحث لعرض كل الكورسات." : selectedTeacher ? "جرّب مدرسًا آخر أو اعرض كل كورسات المنصة." : "ستظهر كورسات المدرسين هنا فور نشرها على المنصة." }}
             </p>
             <button
-              v-if="selectedTeacher"
+              v-if="searchWord"
+              type="button"
+              @click="clearCourseSearch"
+            >
+              مسح البحث
+            </button>
+            <button
+              v-else-if="selectedTeacher"
               type="button"
               @click="selectTeacher(null)"
             >
@@ -1077,9 +1243,9 @@ onBeforeUnmount(() => {
         <template v-else>
           <div class="home-course-result-head">
             <div>
-              <span>المسار المختار</span>
+              <span>{{ searchWord ? "نتائج البحث" : "المسار المختار" }}</span>
               <h3>
-                كورسات {{ selectedTab.label }}
+                {{ searchWord ? `نتائج «${searchWord}» في ${selectedTab.label}` : `كورسات ${selectedTab.label}` }}
                 <template v-if="selectedTeacher">مع {{ selectedTeacher.name }}</template>
               </h3>
             </div>
@@ -1119,13 +1285,16 @@ onBeforeUnmount(() => {
           >
             <span>لا توجد كورسات</span>
             <h3>
-              لا توجد كورسات متاحة لـ {{ selectedTab.label }}
+              {{ searchWord ? `لا توجد نتائج لـ «${searchWord}» في ${selectedTab.label}` : `لا توجد كورسات متاحة لـ ${selectedTab.label}` }}
               <template v-if="selectedTeacher">مع {{ selectedTeacher.name }}</template>
               حاليًا
             </h3>
             <p>
-              {{ selectedTeacher ? "جرّب مدرسًا آخر أو امسح فلتر المدرس." : "ستظهر الكورسات والمراجعات هنا فور إتاحتها." }}
+              {{ searchWord ? "جرّب كلمة أقصر أو امسح البحث لعرض كل الكورسات." : selectedTeacher ? "جرّب مدرسًا آخر أو امسح فلتر المدرس." : "ستظهر الكورسات والمراجعات هنا فور إتاحتها." }}
             </p>
+            <button v-if="searchWord" type="button" @click="clearCourseSearch">
+              مسح البحث
+            </button>
           </div>
 
           <template v-else-if="selectedCourses">
@@ -1276,6 +1445,7 @@ onBeforeUnmount(() => {
 }
 
 .split-heading > p,
+.home-course-search p,
 .home-course-teacher-filter p,
 .home-course-picker p,
 .home-course-empty p,
@@ -1285,9 +1455,160 @@ onBeforeUnmount(() => {
   line-height: 1.9;
 }
 
+.home-course-search {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.55fr) minmax(320px, 1.45fr);
+  align-items: center;
+  gap: clamp(20px, 3vw, 36px);
+  margin: 30px 0 34px;
+  padding: 16px 20px;
+  border: 1px solid color-mix(in srgb, var(--teal) 24%, var(--line));
+  background:
+    radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--coral) 9%, transparent), transparent 32%),
+    linear-gradient(135deg, color-mix(in srgb, var(--teal) 9%, var(--paper)), var(--paper));
+  box-shadow: 0 22px 50px -45px color-mix(in srgb, var(--deep) 60%, transparent);
+}
+
+.home-course-search__copy > span {
+  color: var(--coral);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.home-course-search__copy h3 {
+  margin: 3px 0 1px;
+  color: var(--ink);
+  font: 900 clamp(18px, 2vw, 22px)/1.35 var(--heading);
+}
+
+.home-course-search__copy p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.home-course-search__controls {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  min-width: 0;
+}
+
+.home-course-search__field {
+  display: grid;
+  flex: 1;
+  gap: 7px;
+  min-width: 0;
+}
+
+.home-course-search__label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.home-course-search__input-wrap {
+  position: relative;
+  display: block;
+}
+
+.home-course-search__input-wrap > svg {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  inset-inline-start: 17px;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--teal);
+  stroke-linecap: round;
+  stroke-width: 1.8;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.home-course-search input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 50px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  outline: 0;
+  background: var(--home-v2-surface);
+  color: var(--ink);
+  font: 800 14px var(--heading);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.home-course-search input::placeholder {
+  color: color-mix(in srgb, var(--home-v2-muted) 72%, transparent);
+}
+
+.home-course-search input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 14%, transparent);
+}
+
+.home-course-search input:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.home-course-search__loader {
+  position: absolute;
+  top: calc(50% - 8px);
+  inset-inline-end: 16px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, var(--teal) 22%, transparent);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: home-course-search-spin 0.7s linear infinite;
+}
+
+.home-course-search__clear {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--deep);
+  background: var(--deep);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.home-course-search__clear:hover:not(:disabled) {
+  border-color: var(--teal);
+  background: var(--teal);
+  transform: translateY(-2px);
+}
+
+.home-course-search__clear:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--coral) 55%, transparent);
+  outline-offset: 3px;
+}
+
+.home-course-search__clear:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.home-course-search-reveal-enter-active,
+.home-course-search-reveal-leave-active {
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+.home-course-search-reveal-enter-from,
+.home-course-search-reveal-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 .home-course-teacher-filter {
-  margin-bottom: 32px;
-  padding: clamp(22px, 3vw, 30px);
+  margin-bottom: 18px;
+  padding: 17px 20px 19px;
   border: 1px solid var(--line);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--teal) 8%, var(--paper)), var(--paper));
@@ -1297,8 +1618,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 18px;
+  margin-bottom: 12px;
 }
 
 .home-course-teacher-filter__head > div > span {
@@ -1308,9 +1629,9 @@ onBeforeUnmount(() => {
 }
 
 .home-course-teacher-filter__head h3 {
-  margin: 4px 0 2px;
+  margin: 3px 0 1px;
   color: var(--ink);
-  font: 900 24px/1.35 var(--heading);
+  font: 900 19px/1.35 var(--heading);
 }
 
 .home-course-teacher-filter__clear {
@@ -1324,25 +1645,32 @@ onBeforeUnmount(() => {
 }
 
 .home-course-teacher-filter__options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  display: flex;
+  overflow-x: auto;
   gap: 10px;
+  padding: 2px 2px 8px;
+  scroll-padding-inline: 2px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--teal) 35%, transparent) transparent;
 }
 
 .home-course-teacher-option {
   display: grid;
-  min-width: 0;
-  min-height: 78px;
-  grid-template-columns: 54px minmax(0, 1fr);
+  width: 218px;
+  min-width: 218px;
+  min-height: 64px;
+  grid-template-columns: 42px minmax(0, 1fr);
   grid-template-rows: 1fr auto;
   align-items: center;
-  gap: 2px 12px;
-  padding: 11px;
+  gap: 1px 10px;
+  padding: 9px;
   border: 1px solid var(--line);
   background: var(--home-v2-surface);
   color: var(--ink);
   cursor: pointer;
   text-align: start;
+  scroll-snap-align: start;
   transition: border-color 0.2s ease, box-shadow 0.2s ease,
     transform 0.2s ease, background-color 0.2s ease;
 }
@@ -1374,8 +1702,8 @@ onBeforeUnmount(() => {
 
 .home-course-teacher-option > span:first-child {
   display: grid;
-  width: 54px;
-  height: 54px;
+  width: 42px;
+  height: 42px;
   grid-row: 1 / 3;
   place-items: center;
   overflow: hidden;
@@ -1428,23 +1756,23 @@ onBeforeUnmount(() => {
 }
 
 .home-course-picker {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
   align-items: center;
-  gap: 32px;
-  margin-bottom: 32px;
-  padding: 24px 28px;
+  gap: clamp(18px, 3vw, 30px);
+  margin-bottom: 16px;
+  padding: 16px 20px;
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--teal) 6%, var(--paper));
 }
 
 .home-course-year-picker {
-  margin-top: -18px;
+  margin-top: 0;
   background: color-mix(in srgb, var(--deep) 5%, var(--paper));
 }
 
 .home-course-picker > div:first-child {
-  min-width: 270px;
+  min-width: 0;
 }
 
 .home-course-picker > div:first-child > span,
@@ -1458,20 +1786,22 @@ onBeforeUnmount(() => {
 }
 
 .home-course-picker h3 {
-  margin: 5px 0 3px;
+  margin: 3px 0 1px;
   color: var(--ink);
-  font: 900 20px/1.4 var(--heading);
+  font: 900 18px/1.4 var(--heading);
 }
 
 .home-course-picker > div:first-child > p {
   color: var(--home-v2-muted);
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1.6;
 }
 
 .home-course-audiences {
   display: grid;
-  width: min(100%, 720px);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
   gap: 8px;
 }
 
@@ -1506,11 +1836,11 @@ onBeforeUnmount(() => {
 .home-course-audiences button {
   display: grid;
   min-width: 0;
-  min-height: 82px;
-  grid-template-columns: 48px minmax(0, 1fr);
+  min-height: 60px;
+  grid-template-columns: 36px minmax(0, 1fr);
   grid-template-rows: 1fr auto;
   align-items: center;
-  gap: 2px 12px;
+  gap: 1px 9px;
   overflow: hidden;
   padding: 7px;
   border: 1px solid #12313929;
@@ -1545,8 +1875,8 @@ onBeforeUnmount(() => {
 
 .stage-option-index {
   display: grid;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   grid-row: 1 / 3;
   place-items: center;
   border: 1px solid var(--line);
@@ -1567,11 +1897,11 @@ onBeforeUnmount(() => {
   display: -webkit-box;
   overflow: hidden;
   color: inherit;
-  font: 800 14px/1.45 var(--heading);
+  font: 800 13px/1.4 var(--heading);
   overflow-wrap: anywhere;
   white-space: normal;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
 }
 
 .home-course-audiences small {
@@ -1982,15 +2312,28 @@ onBeforeUnmount(() => {
   }
 }
 
+@keyframes home-course-search-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 820px) {
   .split-heading {
     grid-template-columns: 1fr;
     gap: 24px;
   }
 
-  .home-course-picker {
+  .home-course-search {
+    grid-template-columns: 1fr;
     align-items: stretch;
-    flex-direction: column;
+    gap: 18px;
+  }
+
+  .home-course-picker {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 12px;
   }
 
   .home-course-picker > div:first-child,
@@ -2014,6 +2357,19 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 620px) {
+  .home-course-search {
+    padding: 20px;
+  }
+
+  .home-course-search__controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .home-course-search__clear {
+    width: 100%;
+  }
+
   .home-course-teacher-filter {
     padding: 20px;
   }
@@ -2044,7 +2400,7 @@ onBeforeUnmount(() => {
   }
 
   .home-course-picker {
-    padding: 20px;
+    padding: 16px;
   }
 
   .home-course-audiences {

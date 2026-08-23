@@ -182,11 +182,13 @@ onBeforeUnmount(() => {
 
 <template>
   <section
+    v-if="hasAboutContent"
     id="about"
     ref="aboutSection"
     class="section home-v2-about-teacher"
     aria-labelledby="home-v2-about-teacher-title"
   >
+    <!-- Backup empty state: uncomment if the empty teacher section should be visible again.
     <div v-if="!hasAboutContent" class="container home-v2-about-teacher__empty">
       <HomeSectionEmptyState
         label="قسم عن المدرس"
@@ -194,8 +196,9 @@ onBeforeUnmount(() => {
         :description="emptyStateDescription"
       />
     </div>
+    -->
 
-    <div v-else class="container home-v2-about-teacher__grid">
+    <div class="container home-v2-about-teacher__grid">
       <div
         v-if="
           about.data.description ||

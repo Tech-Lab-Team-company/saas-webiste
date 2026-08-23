@@ -138,8 +138,9 @@ const heroLead = computed(() => {
   if (!heading) return body;
   if (!body) return heading;
   if (normalizeText(body).includes(normalizeText(heading))) return body;
+  return `${body}`;
 
-  return `${heading} — ${body}`;
+  // return `${heading} — ${body}`;
 });
 
 const heroImageAlt = computed(() => {

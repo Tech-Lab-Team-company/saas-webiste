@@ -22,6 +22,7 @@ import { useTeacherDirectory } from './useTeacherDirectory'
 
 interface UseHomePageOptions {
   initialTeacherId?: number | null
+  initialWord?: string
 }
 
 const filterCoursePageByTeacher = (
@@ -59,6 +60,7 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
   const webDomain = getWebDomain()
   const api = new HomePageApi(webDomain)
   const initialTeacherId = options.initialTeacherId ?? null
+  const initialWord = options.initialWord?.trim().slice(0, 100) ?? ''
   const tenantMode = supportsTeacherDirectory(setting.value?.type)
     ? 'general'
     : 'education'
@@ -108,11 +110,11 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
   )
 
   const generalCatalogRequest = useAsyncData<HomeCoursePageViewModel>(
-    `general-course-catalog:dynamic-v2:${webDomain}:${tenantMode}:teacher-${initialTeacherId ?? 'all'}`,
+    `general-course-catalog:dynamic-v2:${webDomain}:${tenantMode}:teacher-${initialTeacherId ?? 'all'}:word-${encodeURIComponent(initialWord)}`,
     async () => tenantMode === 'general'
       ? filterCoursePageByTeacher(
           mapHomeCoursePage(
-            await api.fetchPublicCourseCatalog(1, 9, initialTeacherId),
+            await api.fetchPublicCourseCatalog(1, 9, initialTeacherId, initialWord),
             1,
             9,
           ),
@@ -208,10 +210,11 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
     page = 1,
     perPage = 9,
     teacherId: number | null = null,
+    word = '',
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
       const [coursesResponse, subjectsResponse] = await Promise.all([
-        api.fetchCoursesByYear(stageId, yearId, page, perPage, teacherId),
+        api.fetchCoursesByYear(stageId, yearId, page, perPage, teacherId, word),
         api.fetchSubjectsByYear(yearId),
       ])
       const allowedSubjectIds = mapHomeCourseSubjectIds(subjectsResponse)
@@ -251,11 +254,12 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
     page = 1,
     perPage = 9,
     teacherId: number | null = null,
+    word = '',
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
       const coursePage = filterCoursePageByTeacher(
         mapHomeCoursePage(
-          await api.fetchPublicCourseCatalog(page, perPage, teacherId),
+          await api.fetchPublicCourseCatalog(page, perPage, teacherId, word),
           page,
           perPage,
         ),

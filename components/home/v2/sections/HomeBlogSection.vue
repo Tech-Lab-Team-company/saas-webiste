@@ -212,6 +212,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section
+    v-if="blogs.status === 'success' && visibleBlogs.length"
     id="blog-preview"
     ref="blogSection"
     class="section home-v2-blog"
@@ -268,12 +269,14 @@ onBeforeUnmount(() => {
         </article>
       </div>
 
+      <!-- Backup empty state: uncomment if empty sections should be visible again.
       <HomeSectionEmptyState
         v-else
         label="قسم المدونة"
         :title="emptyStateTitle"
         :description="emptyStateDescription"
       />
+      -->
     </div>
   </section>
 </template>

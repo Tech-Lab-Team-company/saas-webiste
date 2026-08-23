@@ -181,6 +181,28 @@ const getStudentYearLabel = (student: TopStudent) =>
   topStudentsYearLabels.value.get(student.year_id) ||
   `المستوى ${student.year_id}`;
 
+const fetchTopStudents = async (yearId: number | null = null) => {
+  const response = await $fetch<TopStudent[] | ApiResponse<TopStudent>>(
+    `${baseUrl}/fetch_top_students`,
+    {
+      method: "POST",
+      headers: {
+        "Accept-Language": "ar",
+        "web-domain": webDomain,
+      },
+      body: yearId ? { year_id: yearId } : {},
+    },
+  );
+
+  return Array.isArray(response) ? response : response?.data ?? [];
+};
+
+const { data: allTopStudentsResponse } = await useAsyncData<TopStudent[]>(
+  `all-top-students:${webDomain}`,
+  () => fetchTopStudents(),
+  { default: () => [], dedupe: "defer" },
+);
+
 const {
   data: topStudentsResponse,
   pending: topStudentsPending,
@@ -188,24 +210,7 @@ const {
   refresh: refreshTopStudents,
 } = await useAsyncData<TopStudent[]>(
   `top-students:${webDomain}`,
-  async () => {
-    const response = await $fetch<TopStudent[] | ApiResponse<TopStudent>>(
-      `${useBaseUrls().baseUrl}/fetch_top_students`,
-      {
-        method: "POST",
-        headers: {
-          "Accept-Language": "ar",
-          "web-domain": webDomain,
-        },
-        body: selectedTopStudentsYearId.value
-          ? { year_id: selectedTopStudentsYearId.value }
-          : {},
-      },
-    );
-
-    const students = Array.isArray(response) ? response : response?.data ?? [];
-    return students;
-  },
+  () => fetchTopStudents(selectedTopStudentsYearId.value),
   {
     default: () => [],
     watch: [selectedTopStudentsYearId],
@@ -217,6 +222,10 @@ const topStudents = computed(() =>
     const orderDifference = Number(first.order) - Number(second.order);
     return orderDifference || first.id - second.id;
   }),
+);
+
+const hasAnyTopStudents = computed(
+  () => allTopStudentsResponse.value.length > 0 || topStudents.value.length > 0,
 );
 
 const { data: aboutusOpinions } = await useAsyncData(
@@ -404,6 +413,7 @@ const getStudentAlt = (student: any) => {
 <template>
   <div :class="['home-sections', { 'home-sections--dark': isDark }]">
     <section
+      v-if="hasAnyTopStudents"
       class="top-students-section"
       dir="rtl"
       aria-labelledby="top-students-title"
@@ -711,6 +721,16 @@ const getStudentAlt = (student: any) => {
         </div>
       </div>
     </section>
+
+    <!-- Backup empty state: about-teacher top students section.
+    <section v-else class="top-students-section" dir="rtl">
+      <div class="students-empty">
+        <div class="students-empty__icon"><span class="pi pi-users" /></div>
+        <h3>لا توجد بيانات حالياً</h3>
+        <p>سيتم عرض الطلاب المتميزين هنا قريبًا.</p>
+      </div>
+    </section>
+    -->
 
     <section v-if="aboutusOpinions" class="opinions-section" dir="rtl">
       <div class="section-container">

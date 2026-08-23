@@ -91,19 +91,22 @@ onBeforeUnmount(() => {
 
 <template>
   <section
+    v-if="hasCtaContent"
     ref="ctaSection"
     class="home-v2-cta"
     aria-labelledby="home-v2-cta-title"
   >
     <div class="container">
+      <!-- Backup empty state: uncomment if empty sections should be visible again.
       <HomeSectionEmptyState
         v-if="!hasCtaContent"
         label="قسم الدعوة لاتخاذ إجراء"
         :title="emptyStateTitle"
         :description="emptyStateDescription"
       />
+      -->
 
-      <div v-else class="home-v2-cta__panel">
+      <div class="home-v2-cta__panel">
         <span class="home-v2-cta__pulse" aria-hidden="true" />
         <span v-if="props.cta.data.eyebrow">{{ props.cta.data.eyebrow }}</span>
         <h2 v-if="props.cta.data.title" id="home-v2-cta-title">

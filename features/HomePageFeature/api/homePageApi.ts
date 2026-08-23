@@ -108,6 +108,7 @@ export class HomePageApi {
     page = 1,
     perPage = 9,
     teacherId: number | null = null,
+    word = "",
   ): Promise<unknown> {
     return this.post(
       ApiNames.Instance.filter_courses,
@@ -124,6 +125,7 @@ export class HomePageApi {
         division_id: null,
         university_subject_id: null,
         teacher_id: teacherId,
+        word,
         page,
         per_page: perPage,
       },
@@ -134,6 +136,7 @@ export class HomePageApi {
     page = 1,
     perPage = 100,
     teacherId: number | null = null,
+    word = "",
   ): Promise<unknown> {
     // The anonymous filter endpoint is the source of truth for courses that
     // are publicly listable for this tenant. Keep tenant identity in headers;
@@ -153,6 +156,7 @@ export class HomePageApi {
         division_id: null,
         university_subject_id: null,
         teacher_id: teacherId,
+        word,
         page,
         per_page: perPage,
       },
@@ -160,8 +164,11 @@ export class HomePageApi {
     );
   }
 
-  async fetchTeachers(): Promise<unknown> {
-    return this.get(ApiNames.Instance.FetchGenralTeachers);
+  async fetchTeachers(searchWord = ""): Promise<unknown> {
+    return this.get(
+      ApiNames.Instance.FetchGenralTeachers,
+      searchWord ? { word: searchWord } : undefined,
+    );
   }
 
   async fetchTeacherDetails(teacherId: number): Promise<unknown> {
@@ -316,7 +323,10 @@ export class HomePageApi {
     return readEnvelopeData(response);
   }
 
-  private async get(url: string): Promise<unknown> {
+  private async get(
+    url: string,
+    query?: Record<string, number | string>,
+  ): Promise<unknown> {
     const response = await $fetch<unknown>(url, {
       baseURL: ApiNames.Instance.baseUrl,
       method: "GET",
@@ -325,6 +335,7 @@ export class HomePageApi {
         "Accept-Language": "ar",
         "web-domain": this.webDomain,
       },
+      query,
     });
 
     return readEnvelopeData(response);

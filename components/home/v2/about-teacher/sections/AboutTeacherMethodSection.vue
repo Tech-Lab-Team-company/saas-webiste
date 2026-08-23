@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
 import { getWebDomain } from "~/constant/webDomain";
-import HomeSectionEmptyState from "~/components/home/v2/ui/HomeSectionEmptyState.vue";
 
 interface StudyProcessStep {
   id: number | string;
@@ -108,36 +107,24 @@ const { data: studyProcess, pending, error } = await useAsyncData(
     dedupe: "defer",
   },
 );
+
+const hasStudyProcessContent = computed(
+  () =>
+    !pending.value &&
+    !error.value &&
+    Boolean(studyProcess.value.title) &&
+    studyProcess.value.steps.length > 0,
+);
 </script>
 
 <template>
   <section
+    v-if="hasStudyProcessContent"
     id="study-method"
     class="about-teacher-section about-teacher-method"
     aria-labelledby="study-method-title"
-    :aria-busy="pending ? 'true' : 'false'"
-    :data-api-error="error ? 'true' : 'false'"
   >
-    <div v-if="pending" class="container about-teacher-method__state" role="status">
-      جاري تحميل نظام الدراسة...
-    </div>
-
-    <div
-      v-else-if="error || !studyProcess.title || studyProcess.steps.length === 0"
-      class="container"
-    >
-      <HomeSectionEmptyState
-        label="قسم نظام الدراسة"
-        :title="error ? 'تعذّر تحميل نظام الدراسة' : 'أضف نظام الدراسة'"
-        :description="
-          error
-            ? 'تعذر جلب خطوات نظام الدراسة في الوقت الحالي.'
-            : 'أضف عنوان القسم وخطوات الدراسة من لوحة التحكم لتظهر هنا.'
-        "
-      />
-    </div>
-
-    <div v-else class="container">
+    <div class="container">
       <header class="about-teacher-section__head" data-about-reveal>
         <div>
           <span>نظام الدراسة</span>
@@ -155,4 +142,17 @@ const { data: studyProcess, pending, error } = await useAsyncData(
       </div>
     </div>
   </section>
+
+  <!-- Backup empty state: about-teacher study method section.
+  <section
+    v-else
+    id="study-method"
+    class="about-teacher-section about-teacher-method"
+    aria-labelledby="study-method-title"
+  >
+    <div class="container about-teacher-method__state" role="status">
+      لا توجد بيانات لنظام الدراسة حالياً.
+    </div>
+  </section>
+  -->
 </template>

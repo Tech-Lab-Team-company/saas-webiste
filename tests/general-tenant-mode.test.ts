@@ -57,7 +57,7 @@ test("center mode loads both education taxonomy and the public catalog fallback"
   assert.match(homePage, /supportsTeacherDirectory\(setting\.value\?\.type\)/u);
   assert.doesNotMatch(homePage, /has_general/u);
   assert.match(homePage, /api\.fetchStages\(\)/u);
-  assert.match(homePage, /api\.fetchPublicCourseCatalog\(1, 9, initialTeacherId\)/u);
+  assert.match(homePage, /api\.fetchPublicCourseCatalog\(1, 9, initialTeacherId, initialWord\)/u);
   assert.match(mapper, /teacherType: resolveTeacherType\(settings\.type\)/u);
   assert.match(mapper, /hasTeacherDirectory: supportsTeacherDirectory\(settings\.type\)/u);
 });
@@ -85,8 +85,8 @@ test("course catalog filters by teacher through the API and shareable URL", asyn
 
   assert.match(api, /fetchPublicCourseCatalog\([\s\S]*teacherId: number \| null = null/u);
   assert.match(api, /teacher_id: teacherId/u);
-  assert.match(homePage, /api\.fetchCoursesByYear\(stageId, yearId, page, perPage, teacherId\)/u);
-  assert.match(homePage, /api\.fetchPublicCourseCatalog\(page, perPage, teacherId\)/u);
+  assert.match(homePage, /api\.fetchCoursesByYear\(stageId, yearId, page, perPage, teacherId, word\)/u);
+  assert.match(homePage, /api\.fetchPublicCourseCatalog\(page, perPage, teacherId, word\)/u);
   assert.match(homePage, /course\.teacher\?\.id === teacherId/u);
   assert.match(section, /route\.query\.teacher_id/u);
   assert.match(section, /@click="selectTeacher\(teacher\.id\)"/u);
@@ -95,23 +95,111 @@ test("course catalog filters by teacher through the API and shareable URL", asyn
   assert.match(teacherPage, /query: \{ teacher_id: String\(teacher\.id\) \}/u);
 });
 
-test("centers load a branded teacher directory from fetch_teachers", async () => {
-  const [api, directory, page, header, sitemap] = await Promise.all([
+test("course catalog sends its search word to filter_courses and keeps it in the URL", async () => {
+  const [api, section, coursePage] = await Promise.all([
     readSource("features/HomePageFeature/api/homePageApi.ts"),
-    readSource(
-      "features/HomePageFeature/composables/useTeacherDirectory.ts",
-    ),
-    readSource("pages/teachers/index.vue"),
-    readSource("components/home/v2/sections/HomeHeaderSection.vue"),
-    readSource("server/routes/sitemap.xml.ts"),
+    readSource("components/home/v2/sections/HomeCoursesSection.vue"),
+    readSource("pages/course/index.vue"),
   ]);
 
-  assert.match(api, /async fetchTeachers\(\): Promise<unknown>/u);
+  assert.match(api, /ApiNames\.Instance\.filter_courses[\s\S]*word,[\s\S]*page/u);
+  assert.match(section, /v-model="searchWord"/u);
+  assert.match(section, /v-if="catalog && \(isGeneralMode \|\| selectedTab\)"/u);
+  assert.doesNotMatch(section, /props\.courses\.data\.tabs\[0\]/u);
+  assert.match(section, /route\.query\.word/u);
+  assert.match(section, /loadGeneralCourses\([\s\S]*normalizedWord/u);
+  assert.match(section, /loadCoursesByYear\([\s\S]*searchWord\.value/u);
+  assert.match(coursePage, /initialWord/u);
+});
+
+test("optional home sections stay hidden when their API content is empty", async () => {
+  const [
+    home,
+    books,
+    blogs,
+    journey,
+    cta,
+    teachers,
+    aboutTeacher,
+    faq,
+    studyMethod,
+    topStudents,
+  ] = await Promise.all([
+    readSource("components/home/v2/HomeV2.vue"),
+    readSource("components/home/v2/sections/HomeBooksSection.vue"),
+    readSource("components/home/v2/sections/HomeBlogSection.vue"),
+    readSource("components/Home/v2/sections/HomeLearningJourneySection.vue"),
+    readSource("components/home/v2/sections/HomeCtaSection.vue"),
+    readSource("components/home/v2/sections/HomeTeachersSection.vue"),
+    readSource("components/Home/v2/sections/HomeAboutTeacherSection.vue"),
+    readSource("components/home/v2/sections/HomeFaqSection.vue"),
+    readSource(
+      "components/home/v2/about-teacher/sections/AboutTeacherMethodSection.vue",
+    ),
+    readSource(
+      "components/home/v2/about-teacher/sections/AboutTeacherOurStudents.vue",
+    ),
+  ]);
+
+  assert.match(home, /props\.home\.books\.status === 'success'/u);
+  assert.match(home, /props\.home\.blogs\.status === 'success'/u);
+  assert.match(home, /props\.home\.learningJourney\.status === 'success'/u);
+  assert.match(home, /props\.home\.cta\.status === 'success'/u);
+  assert.match(home, /props\.home\.teachers\.status === 'success'/u);
+  assert.match(home, /props\.home\.aboutTeacher\.status === 'success'/u);
+  assert.match(books, /v-if="books\.status === 'success' && featuredBook"/u);
+  assert.match(blogs, /v-if="blogs\.status === 'success' && visibleBlogs\.length"/u);
+  assert.match(journey, /v-if="hasJourneyContent"/u);
+  assert.match(cta, /v-if="hasCtaContent"/u);
+  assert.match(teachers, /catalog \|\| teachers\.status === 'success'/u);
+  assert.match(aboutTeacher, /v-if="hasAboutContent"/u);
+  assert.match(faq, /v-if="hasFaqContent"/u);
+  assert.match(studyMethod, /v-if="hasStudyProcessContent"/u);
+  assert.match(topStudents, /v-if="hasAnyTopStudents"/u);
+  assert.match(topStudents, /all-top-students:/u);
+  for (const source of [
+    books,
+    blogs,
+    journey,
+    cta,
+    teachers,
+    aboutTeacher,
+    faq,
+    studyMethod,
+    topStudents,
+  ]) {
+    assert.match(source, /Backup empty state:/u);
+  }
+});
+
+test("centers load a branded teacher directory from fetch_teachers", async () => {
+  const [api, directory, page, teacherSection, header, sitemap] =
+    await Promise.all([
+      readSource("features/HomePageFeature/api/homePageApi.ts"),
+      readSource(
+        "features/HomePageFeature/composables/useTeacherDirectory.ts",
+      ),
+      readSource("pages/teachers/index.vue"),
+      readSource("components/home/v2/sections/HomeTeachersSection.vue"),
+      readSource("components/home/v2/sections/HomeHeaderSection.vue"),
+      readSource("server/routes/sitemap.xml.ts"),
+    ]);
+
+  assert.match(api, /async fetchTeachers\(searchWord = ""\): Promise<unknown>/u);
   assert.match(api, /method: "GET"/u);
+  assert.match(api, /\{ word: searchWord \}/u);
   assert.match(directory, /supportsTeacherDirectory\(setting\.value\?\.type\)/u);
-  assert.match(directory, /hasTeacherDirectory \? mapHomeTeachers\(await api\.fetchTeachers\(\)\) : \[\]/u);
-  assert.match(page, /مدرسونا/u);
-  assert.match(page, /var\(--home-v2-blue\)/u);
+  assert.match(
+    directory,
+    /mapHomeTeachers\(await api\.fetchTeachers\(searchWord\.value\)\)/u,
+  );
+  assert.match(directory, /refresh\(\{ dedupe: "cancel" \}\)/u);
+  assert.match(page, /<HomeTeachersSection/u);
+  assert.match(teacherSection, /مدرسينا/u);
+  assert.match(teacherSection, /var\(--home-v2-blue\)/u);
+  assert.match(teacherSection, /v-model="searchQuery"/u);
+  assert.match(teacherSection, /emit\("search", searchQuery\.value\.trim\(\)\)/u);
+  assert.doesNotMatch(teacherSection, /sortBy/u);
   assert.match(header, /label: "المدرسون", to: "\/teachers"/u);
   assert.match(sitemap, /path: "\/teachers"/u);
   assert.match(sitemap, /path: `\/teachers\/\$\{teacher\.id\}`/u);
@@ -132,7 +220,9 @@ test("teacher cards open API-backed teacher detail pages", async () => {
   assert.match(cards, /:to="`\/teachers\/\$\{teacher\.id\}`"/u);
   assert.match(detailsPage, /api\.fetchTeacherDetails\(teacherId\)/u);
   assert.match(detailsPage, /mapHomeTeacher/u);
-  await assert.rejects(readSource("pages/teachers.vue"), /ENOENT/u);
   assert.match(layout, /<HomeFooterSection :site="site" \/>/u);
+  const app = await readSource("app.vue");
+  assert.match(app, /route\.path\.startsWith\("\/teachers\/"\)/u);
+  await assert.rejects(readSource("pages/teachers.vue"), /ENOENT/u);
   assert.doesNotMatch(layout, /hydrate-on-visible/u);
 });
