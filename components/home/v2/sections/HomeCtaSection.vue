@@ -124,7 +124,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .home-v2-cta {
-  padding: 0 0 96px;
+  padding: 0;
   background: var(--home-v2-cream);
 }
 

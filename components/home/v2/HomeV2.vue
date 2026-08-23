@@ -64,21 +64,6 @@ const themeStyles = computed(() => {
         :load-general-courses="props.loadGeneralCourses"
         :hydrate-on-visible="{ rootMargin: '50px' }"
       />
-      <LazyHomeV2SectionsHomeBooksSection
-        v-if="props.home.books.status === 'success'"
-        :books="props.home.books"
-        :hydrate-on-visible="{ rootMargin: '250px' }"
-      />
-      <LazyHomeV2SectionsHomeBlogSection
-        v-if="props.home.blogs.status === 'success'"
-        :blogs="props.home.blogs"
-        :hydrate-on-visible="{ rootMargin: '250px' }"
-      />
-      <LazyHomeV2SectionsHomeLearningJourneySection
-        v-if="props.home.learningJourney.status === 'success'"
-        :journey="props.home.learningJourney"
-        :hydrate-on-visible="{ rootMargin: '250px' }"
-      />
       <LazyHomeV2SectionsHomeTeachersSection
         v-if="
           props.home.site.hasTeacherDirectory &&
@@ -97,24 +82,60 @@ const themeStyles = computed(() => {
         :about="props.home.aboutTeacher"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
+      <LazyHomeV2SectionsHomeBooksSection
+        v-if="props.home.books.status === 'success'"
+        :books="props.home.books"
+        :hydrate-on-visible="{ rootMargin: '250px' }"
+      />
       <LazyHomeV2SectionsHomeAppSection
         v-if="props.home.site.app.enabled"
         :site="props.home.site"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
-      <LazyHomeV2SectionsHomeFaqSection
+      <LazyHomeV2SectionsHomeBlogSection
+        v-if="props.home.blogs.status === 'success'"
+        :blogs="props.home.blogs"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
-      <LazyHomeV2SectionsHomeCtaSection
-        v-if="props.home.cta.status === 'success'"
-        :cta="props.home.cta"
+      <LazyHomeV2SectionsHomeLearningJourneySection
+        v-if="props.home.learningJourney.status === 'success'"
+        :journey="props.home.learningJourney"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
+      <div class="home-v2__closing-sections">
+        <LazyHomeV2SectionsHomeFaqSection
+          :hydrate-on-visible="{ rootMargin: '250px' }"
+        />
+        <LazyHomeV2SectionsHomeCtaSection
+          v-if="props.home.cta.status === 'success'"
+          :cta="props.home.cta"
+          :hydrate-on-visible="{ rootMargin: '250px' }"
+        />
+      </div>
     </main>
   </div>
 </template>
 
 <style scoped>
+.home-v2__closing-sections {
+  --home-v2-closing-space: clamp(56px, 7vw, 96px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--home-v2-closing-space);
+  padding-block: var(--home-v2-closing-space);
+  background: var(--home-v2-cream);
+}
+
+.home-v2__closing-sections:not(:has(> section)) {
+  display: none;
+  padding: 0;
+}
+
+.home-v2__closing-sections :deep(.home-v2-faq),
+.home-v2__closing-sections :deep(.home-v2-cta) {
+  padding: 0;
+}
+
 .home-v2-motion-trail {
   position: fixed;
   z-index: 9000;

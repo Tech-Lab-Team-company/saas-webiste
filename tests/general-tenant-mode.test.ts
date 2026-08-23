@@ -147,10 +147,42 @@ test("optional home sections stay hidden when their API content is empty", async
   assert.match(home, /props\.home\.cta\.status === 'success'/u);
   assert.match(home, /props\.home\.teachers\.status === 'success'/u);
   assert.match(home, /props\.home\.aboutTeacher\.status === 'success'/u);
+  assert.match(home, /class="home-v2__closing-sections"/u);
+  const coursesPosition = home.indexOf("<LazyHomeV2SectionsHomeCoursesSection");
+  const teachersPosition = home.indexOf("<LazyHomeV2SectionsHomeTeachersSection");
+  const booksPosition = home.indexOf("<LazyHomeV2SectionsHomeBooksSection");
+  const appPosition = home.indexOf("<LazyHomeV2SectionsHomeAppSection");
+  const blogPosition = home.indexOf("<LazyHomeV2SectionsHomeBlogSection");
+  const journeyPosition = home.indexOf(
+    "<LazyHomeV2SectionsHomeLearningJourneySection",
+  );
+  const faqPosition = home.indexOf("<LazyHomeV2SectionsHomeFaqSection");
+  const ctaPosition = home.indexOf("<LazyHomeV2SectionsHomeCtaSection");
+  assert.ok(
+    coursesPosition < teachersPosition &&
+      teachersPosition < booksPosition &&
+      booksPosition < appPosition &&
+      appPosition < blogPosition &&
+      blogPosition < journeyPosition &&
+      journeyPosition < faqPosition &&
+      faqPosition < ctaPosition,
+    "home sections should follow their content priority",
+  );
+  assert.match(
+    home,
+    /\.home-v2__closing-sections \{[\s\S]*display: flex;[\s\S]*gap:[\s\S]*padding-block:/u,
+  );
+  assert.match(home, /:not\(:has\(> section\)\)/u);
+  assert.match(home, /:deep\(\.home-v2-faq\)/u);
   assert.match(books, /v-if="books\.status === 'success' && featuredBook"/u);
   assert.match(blogs, /v-if="blogs\.status === 'success' && visibleBlogs\.length"/u);
   assert.match(journey, /v-if="hasJourneyContent"/u);
+  assert.match(journey, /--journey-accent-source: var\(/u);
+  assert.match(journey, /--home-v2-deep,/u);
+  assert.doesNotMatch(journey, /#1682ff/u);
   assert.match(cta, /v-if="hasCtaContent"/u);
+  assert.match(cta, /\.home-v2-cta \{[\s\S]*padding: 0;/u);
+  assert.doesNotMatch(cta, /:global\(\.home-v2-faq\)/u);
   assert.match(teachers, /catalog \|\| teachers\.status === 'success'/u);
   assert.match(aboutTeacher, /v-if="hasAboutContent"/u);
   assert.match(faq, /v-if="hasFaqContent"/u);

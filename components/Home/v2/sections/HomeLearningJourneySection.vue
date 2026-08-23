@@ -258,9 +258,26 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .home-v2-learning-journey {
-  --journey-accent: #1682ff;
-  --journey-gold: #ffc84a;
-  --journey-background: var(--home-v2-blue);
+  --journey-background: var(--home-v2-blue, var(--primary-color, #28366c));
+  --journey-accent-source: var(
+    --home-v2-deep,
+    var(--secondary-color, #3a3e7e)
+  );
+  --journey-accent: color-mix(
+    in srgb,
+    var(--journey-accent-source) 76%,
+    white
+  );
+  --journey-accent-strong: color-mix(
+    in srgb,
+    var(--journey-accent-source) 82%,
+    black
+  );
+  --journey-highlight: color-mix(
+    in srgb,
+    var(--journey-accent-source) 52%,
+    white
+  );
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -309,7 +326,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  color: var(--journey-gold);
+  color: var(--journey-highlight);
 }
 
 .home-v2-learning-journey__eyebrow {
@@ -370,7 +387,7 @@ onBeforeUnmount(() => {
   gap: 28px;
   margin-top: 40px;
   padding: 12px 24px;
-  background: var(--journey-accent);
+  background: var(--journey-accent-strong);
   color: #fff;
   font-weight: 800;
   transition: gap 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
@@ -406,7 +423,7 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(var(--journey-gold), var(--journey-accent));
+  background: linear-gradient(var(--journey-highlight), var(--journey-accent));
   box-shadow: 0 0 12px
     color-mix(in srgb, var(--journey-accent) 65%, transparent);
   transform-origin: top center;
@@ -433,7 +450,7 @@ onBeforeUnmount(() => {
 .home-v2-learning-journey__index {
   align-self: center;
   padding-top: 4px;
-  color: var(--journey-gold);
+  color: var(--journey-highlight);
   font: 900 12px var(--home-v2-heading);
 }
 
@@ -473,7 +490,7 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-learning-journey__steps article:hover h3 {
-  color: var(--journey-gold);
+  color: var(--journey-highlight);
   transform: translateX(-4px);
 }
 
