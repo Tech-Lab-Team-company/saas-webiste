@@ -2,7 +2,14 @@
 import HomeCoursesSection from "~/components/home/v2/sections/HomeCoursesSection.vue";
 import { useHomePage } from "~/features/HomePageFeature/composables/useHomePage";
 
-const { home, pending, loadCoursesByYear, loadGeneralCourses } = await useHomePage();
+const route = useRoute();
+const requestedTeacherId = Number(route.query.teacher_id);
+const initialTeacherId = Number.isInteger(requestedTeacherId) && requestedTeacherId > 0
+  ? requestedTeacherId
+  : null;
+const { home, pending, loadCoursesByYear, loadGeneralCourses } = await useHomePage({
+  initialTeacherId,
+});
 
 definePageMeta({ layout: "home-v2" });
 
@@ -73,6 +80,9 @@ useHead({
 
       <HomeCoursesSection
         :courses="home.courses"
+        :teachers="home.teachers"
+        :teacher-filter-enabled="home.site.hasTeacherDirectory"
+        :initial-teacher-id="initialTeacherId"
         :load-courses-by-year="loadCoursesByYear"
         :load-general-courses="loadGeneralCourses"
         catalog

@@ -159,7 +159,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             {{ teacher.email }}
           </a>
           <a v-if="phoneHref" :href="phoneHref">{{ teacher.phone }}</a>
-          <NuxtLink to="/course">استعرض الكورسات <span aria-hidden="true">←</span></NuxtLink>
+          <NuxtLink
+            :to="{ path: '/course', query: { teacher_id: String(teacher.id) } }"
+          >
+            استعرض كورسات المدرس <span aria-hidden="true">←</span>
+          </NuxtLink>
         </aside>
       </section>
     </template>

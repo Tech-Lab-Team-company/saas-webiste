@@ -20,11 +20,45 @@ import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
 import { supportsTeacherDirectory } from '../types/teacherType'
 import { useTeacherDirectory } from './useTeacherDirectory'
 
-export const useHomePage = async () => {
+interface UseHomePageOptions {
+  initialTeacherId?: number | null
+}
+
+const filterCoursePageByTeacher = (
+  coursePage: HomeCoursePageViewModel,
+  teacherId: number | null,
+): HomeCoursePageViewModel => {
+  if (teacherId === null) return coursePage
+
+  const courses = coursePage.courses.filter(
+    (course) => course.teacher?.id === teacherId,
+  )
+  const responseContainsOtherTeachers = coursePage.courses.some(
+    (course) => course.teacher?.id !== teacherId,
+  )
+
+  if (!responseContainsOtherTeachers) {
+    return { ...coursePage, courses }
+  }
+
+  return {
+    courses,
+    pagination: {
+      currentPage: 1,
+      lastPage: 1,
+      perPage: coursePage.pagination.perPage,
+      total: courses.length,
+      serverDriven: false,
+    },
+  }
+}
+
+export const useHomePage = async (options: UseHomePageOptions = {}) => {
   const settingsStore = useSettingStore()
   const { setting } = storeToRefs(settingsStore)
   const webDomain = getWebDomain()
   const api = new HomePageApi(webDomain)
+  const initialTeacherId = options.initialTeacherId ?? null
   const tenantMode = supportsTeacherDirectory(setting.value?.type)
     ? 'general'
     : 'education'
@@ -74,9 +108,16 @@ export const useHomePage = async () => {
   )
 
   const generalCatalogRequest = useAsyncData<HomeCoursePageViewModel>(
-    `general-course-catalog:dynamic-v1:${webDomain}:${tenantMode}`,
+    `general-course-catalog:dynamic-v2:${webDomain}:${tenantMode}:teacher-${initialTeacherId ?? 'all'}`,
     async () => tenantMode === 'general'
-      ? mapHomeCoursePage(await api.fetchPublicCourseCatalog(1, 9), 1, 9)
+      ? filterCoursePageByTeacher(
+          mapHomeCoursePage(
+            await api.fetchPublicCourseCatalog(1, 9, initialTeacherId),
+            1,
+            9,
+          ),
+          initialTeacherId,
+        )
       : mapHomeCoursePage(null),
     {
       default: () => mapHomeCoursePage(null),
@@ -166,18 +207,22 @@ export const useHomePage = async () => {
     yearId: number,
     page = 1,
     perPage = 9,
+    teacherId: number | null = null,
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
       const [coursesResponse, subjectsResponse] = await Promise.all([
-        api.fetchCoursesByYear(stageId, yearId, page, perPage),
+        api.fetchCoursesByYear(stageId, yearId, page, perPage, teacherId),
         api.fetchSubjectsByYear(yearId),
       ])
       const allowedSubjectIds = mapHomeCourseSubjectIds(subjectsResponse)
-      const coursePage = mapHomeCoursePage(
-        coursesResponse,
-        page,
-        perPage,
-        allowedSubjectIds,
+      const coursePage = filterCoursePageByTeacher(
+        mapHomeCoursePage(
+          coursesResponse,
+          page,
+          perPage,
+          allowedSubjectIds,
+        ),
+        teacherId,
       )
 
       return {
@@ -205,12 +250,16 @@ export const useHomePage = async () => {
   const loadGeneralCourses = async (
     page = 1,
     perPage = 9,
+    teacherId: number | null = null,
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
-      const coursePage = mapHomeCoursePage(
-        await api.fetchPublicCourseCatalog(page, perPage),
-        page,
-        perPage,
+      const coursePage = filterCoursePageByTeacher(
+        mapHomeCoursePage(
+          await api.fetchPublicCourseCatalog(page, perPage, teacherId),
+          page,
+          perPage,
+        ),
+        teacherId,
       )
 
       return {

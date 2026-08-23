@@ -5,21 +5,27 @@ import type {
   HomeCoursePageViewModel,
   HomeCourseTabKey,
   HomeCoursesViewModel,
+  HomeTeacherViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
 import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage.types";
 
 const props = defineProps<{
   courses: HomeSectionState<HomeCoursesViewModel>;
+  teachers: HomeSectionState<HomeTeacherViewModel[]>;
+  teacherFilterEnabled?: boolean;
   catalog?: boolean;
+  initialTeacherId?: number | null;
   loadCoursesByYear: (
     stageId: number,
     yearId: number,
     page?: number,
     perPage?: number,
+    teacherId?: number | null,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
   loadGeneralCourses: (
     page?: number,
     perPage?: number,
+    teacherId?: number | null,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
@@ -59,6 +65,31 @@ const generalCatalogState = ref<HomeSectionState<HomeCoursePageViewModel>>({
     : {}),
 });
 const generalCatalogLoading = ref(false);
+const selectedTeacherId = ref<number | null>(
+  props.teacherFilterEnabled ? props.initialTeacherId ?? null : null,
+);
+const loadedGeneralTeacherId = ref<number | null>(selectedTeacherId.value);
+const failedTeacherImages = ref<Set<number>>(new Set());
+
+const selectedTeacher = computed(
+  () =>
+    props.teachers.data.find(
+      (teacher) => teacher.id === selectedTeacherId.value,
+    ) ?? null,
+);
+
+const teacherInitials = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/u)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
+
+const markTeacherImageAsFailed = (teacherId: number) => {
+  failedTeacherImages.value = new Set(failedTeacherImages.value).add(teacherId);
+};
 
 const shouldReduceMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -170,6 +201,11 @@ const normalizePage = (value: unknown) => {
   return Number.isInteger(page) && page > 0 ? page : 1;
 };
 
+const normalizeTeacherId = (value: unknown) => {
+  const teacherId = Number(value);
+  return Number.isInteger(teacherId) && teacherId > 0 ? teacherId : null;
+};
+
 watch(
   () => [
     props.courses.data.generalCatalog,
@@ -190,22 +226,81 @@ watch(
   { immediate: true },
 );
 
-const loadGeneralPage = async (requestedPage = 1) => {
+const loadGeneralPage = async (
+  requestedPage = 1,
+  teacherId = selectedTeacherId.value,
+) => {
   if (!isGeneralMode.value || generalCatalogLoading.value) return;
 
   const page = normalizePage(requestedPage);
+  selectedTeacherId.value = teacherId;
   generalCatalogLoading.value = true;
 
-  if (props.catalog && normalizePage(route.query.page) !== page) {
-    const { stage_id: _stageId, year_id: _yearId, ...query } = route.query;
-    await router.replace({ query: { ...query, page: String(page) } });
+  try {
+    if (
+      props.catalog &&
+      (normalizePage(route.query.page) !== page ||
+        normalizeTeacherId(route.query.teacher_id) !== teacherId)
+    ) {
+      const {
+        stage_id: _stageId,
+        year_id: _yearId,
+        teacher_id: _teacherId,
+        page: _page,
+        ...query
+      } = route.query;
+      await router.replace({
+        query: {
+          ...query,
+          ...(teacherId ? { teacher_id: String(teacherId) } : {}),
+          ...(page > 1 ? { page: String(page) } : {}),
+        },
+      });
+    }
+
+    generalCatalogState.value = await props.loadGeneralCourses(
+      page,
+      CATALOG_COURSES_PER_PAGE,
+      teacherId,
+    );
+    loadedGeneralTeacherId.value = teacherId;
+  } finally {
+    generalCatalogLoading.value = false;
+  }
+};
+
+const selectTeacher = async (teacherId: number | null) => {
+  if (
+    teacherId === selectedTeacherId.value &&
+    generalCatalogState.value.status !== "error"
+  ) {
+    return;
   }
 
-  generalCatalogState.value = await props.loadGeneralCourses(
-    page,
-    CATALOG_COURSES_PER_PAGE,
-  );
-  generalCatalogLoading.value = false;
+  if (isGeneralMode.value) {
+    await loadGeneralPage(1, teacherId);
+    await animateCourseResults();
+    return;
+  }
+
+  const currentTab = selectedTab.value;
+  selectedTeacherId.value = teacherId;
+  coursesByTab.value = {};
+
+  if (props.catalog) {
+    const { teacher_id: _teacherId, page: _page, ...query } = route.query;
+    await router.replace({
+      query: {
+        ...query,
+        ...(teacherId ? { teacher_id: String(teacherId) } : {}),
+      },
+    });
+  }
+
+  if (currentTab) {
+    await selectTab(currentTab.key, undefined, 1);
+  }
+  await animateCourseResults();
 };
 
 const selectStage = async (stageId: number) => {
@@ -287,6 +382,7 @@ const selectTab = async (
     tab.yearId,
     page,
     CATALOG_COURSES_PER_PAGE,
+    selectedTeacherId.value,
   );
 
   if (requestIds.value[tab.key] !== requestId) {
@@ -329,8 +425,15 @@ const selectCatalogYearFromRoute = () => {
 onMounted(() => {
   if (isGeneralMode.value) {
     const requestedPage = normalizePage(route.query.page);
-    if (props.catalog && requestedPage !== coursePagination.value?.currentPage) {
-      void loadGeneralPage(requestedPage);
+    const requestedTeacherId = props.teacherFilterEnabled
+      ? normalizeTeacherId(route.query.teacher_id)
+      : null;
+    if (
+      props.catalog &&
+      (requestedPage !== coursePagination.value?.currentPage ||
+        requestedTeacherId !== loadedGeneralTeacherId.value)
+    ) {
+      void loadGeneralPage(requestedPage, requestedTeacherId);
     }
     return;
   }
@@ -342,6 +445,7 @@ watch(
   () => [
     route.query.stage_id,
     route.query.year_id,
+    route.query.teacher_id,
     route.query.page,
     props.courses.data.tabs.map((tab) => tab.key).join(","),
   ],
@@ -349,13 +453,24 @@ watch(
     if (!props.catalog) return;
     if (isGeneralMode.value) {
       const requestedPage = normalizePage(route.query.page);
+      const requestedTeacherId = props.teacherFilterEnabled
+        ? normalizeTeacherId(route.query.teacher_id)
+        : null;
       if (
-        requestedPage !== generalCatalogState.value.data.pagination.currentPage &&
+        (requestedPage !== generalCatalogState.value.data.pagination.currentPage ||
+          requestedTeacherId !== loadedGeneralTeacherId.value) &&
         !generalCatalogLoading.value
       ) {
-        void loadGeneralPage(requestedPage);
+        void loadGeneralPage(requestedPage, requestedTeacherId);
       }
       return;
+    }
+    const requestedTeacherId = props.teacherFilterEnabled
+      ? normalizeTeacherId(route.query.teacher_id)
+      : null;
+    if (requestedTeacherId !== selectedTeacherId.value) {
+      selectedTeacherId.value = requestedTeacherId;
+      coursesByTab.value = {};
     }
     const requestedYearId = Number(route.query.year_id);
     const requestedStageId = Number(route.query.stage_id);
@@ -479,9 +594,19 @@ const revealCoursesSection = () => {
         ".split-heading > p",
         { autoAlpha: 0, y: 24, duration: 0.82 },
         0.38,
-      )
-      .from(
-        ".home-course-picker",
+      );
+
+    const filterPanels = section.querySelectorAll(
+      ".home-course-teacher-filter, .home-course-picker",
+    );
+    const filterOptions = section.querySelectorAll(
+      ".home-course-teacher-option, .home-course-audiences button",
+    );
+    const allCoursesLink = section.querySelector(".all-courses");
+
+    if (filterPanels.length) {
+      timeline.from(
+        filterPanels,
         {
           autoAlpha: 0,
           clipPath: "inset(0 50% 0 50%)",
@@ -490,9 +615,12 @@ const revealCoursesSection = () => {
           ease: "power3.inOut",
         },
         0.58,
-      )
-      .from(
-        ".home-course-audiences button",
+      );
+    }
+
+    if (filterOptions.length) {
+      timeline.from(
+        filterOptions,
         {
           autoAlpha: 0,
           y: 16,
@@ -501,17 +629,22 @@ const revealCoursesSection = () => {
           stagger: 0.11,
         },
         0.92,
-      )
-      .from(
-        ".home-course-result > *",
-        { autoAlpha: 0, y: 28, duration: 0.82 },
-        1.16,
-      )
-      .from(
-        ".all-courses",
+      );
+    }
+
+    timeline.from(
+      ".home-course-result > *",
+      { autoAlpha: 0, y: 28, duration: 0.82 },
+      1.16,
+    );
+
+    if (allCoursesLink) {
+      timeline.from(
+        allCoursesLink,
         { autoAlpha: 0, y: 14, duration: 0.66 },
         1.38,
       );
+    }
 
     gsap.to(".home-course-motion-orb--one", {
       x: 30,
@@ -634,6 +767,85 @@ onBeforeUnmount(() => {
         </p>
       </div>
 
+      <section
+        v-if="catalog && teacherFilterEnabled"
+        class="home-course-teacher-filter"
+        aria-labelledby="home-v2-teacher-filter-title"
+      >
+        <div class="home-course-teacher-filter__head">
+          <div>
+            <span>فلترة سريعة</span>
+            <h3 id="home-v2-teacher-filter-title">اختار المدرس</h3>
+            <p>اعرض كورسات مدرس واحد، أو ارجع لكل كورسات المنصة.</p>
+          </div>
+          <button
+            v-if="selectedTeacherId"
+            type="button"
+            class="home-course-teacher-filter__clear"
+            :disabled="generalCatalogLoading"
+            @click="selectTeacher(null)"
+          >
+            مسح الاختيار
+          </button>
+        </div>
+
+        <div
+          class="home-course-teacher-filter__options"
+          role="group"
+          aria-labelledby="home-v2-teacher-filter-title"
+        >
+          <button
+            type="button"
+            class="home-course-teacher-option home-course-teacher-option--all"
+            :class="{ active: selectedTeacherId === null }"
+            :aria-pressed="selectedTeacherId === null"
+            :disabled="generalCatalogLoading"
+            aria-controls="home-v2-course-results"
+            @click="selectTeacher(null)"
+          >
+            <span aria-hidden="true">الكل</span>
+            <strong>كل المدرسين</strong>
+            <small>كل الكورسات المتاحة</small>
+          </button>
+
+          <button
+            v-for="teacher in teachers.data"
+            :key="teacher.id"
+            type="button"
+            class="home-course-teacher-option"
+            :class="{ active: selectedTeacherId === teacher.id }"
+            :aria-pressed="selectedTeacherId === teacher.id"
+            :disabled="generalCatalogLoading"
+            aria-controls="home-v2-course-results"
+            @click="selectTeacher(teacher.id)"
+          >
+            <span class="home-course-teacher-option__avatar" aria-hidden="true">
+              <img
+                v-if="teacher.image && !failedTeacherImages.has(teacher.id)"
+                :src="teacher.image.src"
+                :alt="teacher.image.alt || ''"
+                width="54"
+                height="54"
+                loading="lazy"
+                @error="markTeacherImageAsFailed(teacher.id)"
+              />
+              <b v-else>{{ teacherInitials(teacher.name) }}</b>
+            </span>
+            <strong>{{ teacher.name }}</strong>
+            <small>
+              {{ teacher.coursesCount > 0 ? `${teacher.coursesCount} كورس` : "عرض الكورسات" }}
+            </small>
+          </button>
+        </div>
+
+        <p
+          v-if="teachers.status === 'empty'"
+          class="home-course-teacher-filter__empty"
+        >
+          لا توجد ملفات مدرسين متاحة للفلترة حاليًا؛ يمكنك تصفح كل الكورسات.
+        </p>
+      </section>
+
       <div v-if="!isGeneralMode" class="home-course-picker">
         <div>
           <span>خطوتك الأولى</span>
@@ -729,8 +941,10 @@ onBeforeUnmount(() => {
         <template v-if="isGeneralMode">
           <div class="home-course-result-head">
             <div>
-              <span>كل محتوى المنصة</span>
-              <h3>كورسات المدرسين</h3>
+              <span>{{ selectedTeacher ? "المدرس المختار" : "كل محتوى المنصة" }}</span>
+              <h3>
+                {{ selectedTeacher ? `كورسات ${selectedTeacher.name}` : "كورسات المدرسين" }}
+              </h3>
             </div>
             <b v-if="coursePagination">{{ coursePagination.total }} كورس</b>
           </div>
@@ -741,8 +955,12 @@ onBeforeUnmount(() => {
             role="status"
           >
             <span>جاري التحميل</span>
-            <h3>بنجهز لك كورسات المنصة</h3>
-            <p>ثواني ونظهر لك المحتوى المتاح من كل المدرسين.</p>
+            <h3>
+              {{ selectedTeacher ? `بنجهز كورسات ${selectedTeacher.name}` : "بنجهز لك كورسات المنصة" }}
+            </h3>
+            <p>
+              {{ selectedTeacher ? "ثواني ونظهر لك كورسات المدرس المختار فقط." : "ثواني ونظهر لك المحتوى المتاح من كل المدرسين." }}
+            </p>
           </div>
 
           <div
@@ -764,8 +982,19 @@ onBeforeUnmount(() => {
             role="status"
           >
             <span>لا توجد كورسات</span>
-            <h3>لم يضف المدرسون كورسات متاحة حتى الآن</h3>
-            <p>ستظهر كورسات المدرسين هنا فور نشرها على المنصة.</p>
+            <h3>
+              {{ selectedTeacher ? `لا توجد كورسات متاحة لـ ${selectedTeacher.name}` : "لم يضف المدرسون كورسات متاحة حتى الآن" }}
+            </h3>
+            <p>
+              {{ selectedTeacher ? "جرّب مدرسًا آخر أو اعرض كل كورسات المنصة." : "ستظهر كورسات المدرسين هنا فور نشرها على المنصة." }}
+            </p>
+            <button
+              v-if="selectedTeacher"
+              type="button"
+              @click="selectTeacher(null)"
+            >
+              عرض كل الكورسات
+            </button>
           </div>
 
           <template v-else>
@@ -849,7 +1078,10 @@ onBeforeUnmount(() => {
           <div class="home-course-result-head">
             <div>
               <span>المسار المختار</span>
-              <h3>كورسات {{ selectedTab.label }}</h3>
+              <h3>
+                كورسات {{ selectedTab.label }}
+                <template v-if="selectedTeacher">مع {{ selectedTeacher.name }}</template>
+              </h3>
             </div>
             <b v-if="coursePagination">{{ coursePagination.total }} كورس</b>
           </div>
@@ -886,8 +1118,14 @@ onBeforeUnmount(() => {
             role="status"
           >
             <span>لا توجد كورسات</span>
-            <h3>لا توجد كورسات متاحة لـ {{ selectedTab.label }} حاليًا</h3>
-            <p>ستظهر الكورسات والمراجعات هنا فور إتاحتها.</p>
+            <h3>
+              لا توجد كورسات متاحة لـ {{ selectedTab.label }}
+              <template v-if="selectedTeacher">مع {{ selectedTeacher.name }}</template>
+              حاليًا
+            </h3>
+            <p>
+              {{ selectedTeacher ? "جرّب مدرسًا آخر أو امسح فلتر المدرس." : "ستظهر الكورسات والمراجعات هنا فور إتاحتها." }}
+            </p>
           </div>
 
           <template v-else-if="selectedCourses">
@@ -1038,12 +1276,155 @@ onBeforeUnmount(() => {
 }
 
 .split-heading > p,
+.home-course-teacher-filter p,
 .home-course-picker p,
 .home-course-empty p,
 .home-course-message p {
   margin: 0;
   color: var(--home-v2-muted);
   line-height: 1.9;
+}
+
+.home-course-teacher-filter {
+  margin-bottom: 32px;
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--teal) 8%, var(--paper)), var(--paper));
+}
+
+.home-course-teacher-filter__head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.home-course-teacher-filter__head > div > span {
+  color: var(--coral);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.home-course-teacher-filter__head h3 {
+  margin: 4px 0 2px;
+  color: var(--ink);
+  font: 900 24px/1.35 var(--heading);
+}
+
+.home-course-teacher-filter__clear {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  background: var(--home-v2-surface);
+  color: var(--teal);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.home-course-teacher-filter__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 10px;
+}
+
+.home-course-teacher-option {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  background: var(--home-v2-surface);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: start;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease, background-color 0.2s ease;
+}
+
+.home-course-teacher-option:hover:not(:disabled) {
+  border-color: var(--teal);
+  box-shadow: 0 18px 30px -26px color-mix(in srgb, var(--deep) 55%, transparent);
+  transform: translateY(-2px);
+}
+
+.home-course-teacher-option:focus-visible,
+.home-course-teacher-filter__clear:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--coral) 55%, transparent);
+  outline-offset: 3px;
+}
+
+.home-course-teacher-option:disabled,
+.home-course-teacher-filter__clear:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.home-course-teacher-option.active {
+  border-color: var(--deep);
+  background: var(--deep);
+  color: #fff;
+  box-shadow: inset 0 -3px var(--coral);
+}
+
+.home-course-teacher-option > span:first-child {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  grid-row: 1 / 3;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--teal) 30%, var(--line));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--teal) 10%, var(--paper));
+  color: var(--teal);
+  font: 900 11px var(--heading);
+}
+
+.home-course-teacher-option__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-course-teacher-option__avatar b {
+  font: 900 14px var(--heading);
+}
+
+.home-course-teacher-option strong {
+  min-width: 0;
+  overflow: hidden;
+  font: 900 13px/1.35 var(--heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-course-teacher-option small {
+  color: var(--home-v2-muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.home-course-teacher-option.active > span:first-child {
+  border-color: rgb(255 255 255 / 25%);
+  background: rgb(255 255 255 / 13%);
+  color: #fff;
+}
+
+.home-course-teacher-option.active small {
+  color: rgb(255 255 255 / 70%);
+}
+
+.home-course-teacher-filter__empty {
+  margin-top: 14px !important;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px;
 }
 
 .home-course-picker {
@@ -1633,6 +2014,35 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 620px) {
+  .home-course-teacher-filter {
+    padding: 20px;
+  }
+
+  .home-course-teacher-filter__head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .home-course-teacher-filter__clear {
+    width: 100%;
+  }
+
+  .home-course-teacher-filter__options {
+    display: flex;
+    overflow-x: auto;
+    margin-inline: -20px;
+    padding: 2px 20px 10px;
+    scroll-padding-inline: 20px;
+    scroll-snap-type: x proximity;
+  }
+
+  .home-course-teacher-option {
+    width: min(78vw, 245px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
   .home-course-picker {
     padding: 20px;
   }
@@ -1704,7 +2114,8 @@ onBeforeUnmount(() => {
   .course-cover :deep(img),
   .course-mark,
   .course-arrow,
-  .home-course-audiences button {
+  .home-course-audiences button,
+  .home-course-teacher-option {
     transition: none;
   }
 

@@ -12,11 +12,15 @@ const props = defineProps<{
   pending: boolean;
   loadCoursesByYear: (
     stageId: number,
-    yearId: number
+    yearId: number,
+    page?: number,
+    perPage?: number,
+    teacherId?: number | null,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
   loadGeneralCourses: (
     page?: number,
     perPage?: number,
+    teacherId?: number | null,
   ) => Promise<HomeSectionState<HomeCoursePageViewModel>>;
 }>();
 
@@ -53,6 +57,7 @@ const themeStyles = computed(() => {
       <HomeHeroSection :hero="props.home.hero" :site="props.home.site" />
       <LazyHomeV2SectionsHomeCoursesSection
         :courses="props.home.courses"
+        :teachers="props.home.teachers"
         :load-courses-by-year="props.loadCoursesByYear"
         :load-general-courses="props.loadGeneralCourses"
         :hydrate-on-visible="{ rootMargin: '50px' }"

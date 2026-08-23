@@ -107,6 +107,7 @@ export class HomePageApi {
     yearId: number,
     page = 1,
     perPage = 9,
+    teacherId: number | null = null,
   ): Promise<unknown> {
     return this.post(
       ApiNames.Instance.filter_courses,
@@ -122,6 +123,7 @@ export class HomePageApi {
         department_id: null,
         division_id: null,
         university_subject_id: null,
+        teacher_id: teacherId,
         page,
         per_page: perPage,
       },
@@ -131,6 +133,7 @@ export class HomePageApi {
   async fetchPublicCourseCatalog(
     page = 1,
     perPage = 100,
+    teacherId: number | null = null,
   ): Promise<unknown> {
     // The anonymous filter endpoint is the source of truth for courses that
     // are publicly listable for this tenant. Keep tenant identity in headers;
@@ -149,6 +152,7 @@ export class HomePageApi {
         department_id: null,
         division_id: null,
         university_subject_id: null,
+        teacher_id: teacherId,
         page,
         per_page: perPage,
       },

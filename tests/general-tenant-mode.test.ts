@@ -57,7 +57,7 @@ test("center mode loads both education taxonomy and the public catalog fallback"
   assert.match(homePage, /supportsTeacherDirectory\(setting\.value\?\.type\)/u);
   assert.doesNotMatch(homePage, /has_general/u);
   assert.match(homePage, /api\.fetchStages\(\)/u);
-  assert.match(homePage, /api\.fetchPublicCourseCatalog\(1, 9\)/u);
+  assert.match(homePage, /api\.fetchPublicCourseCatalog\(1, 9, initialTeacherId\)/u);
   assert.match(mapper, /teacherType: resolveTeacherType\(settings\.type\)/u);
   assert.match(mapper, /hasTeacherDirectory: supportsTeacherDirectory\(settings\.type\)/u);
 });
@@ -72,6 +72,27 @@ test("center course UI prefers stages and falls back to the public catalog", asy
   assert.match(section, /props\.courses\.data\.taxonomyStatus !== "success"/u);
   assert.match(section, /كورسات المدرسين/u);
   assert.match(card, /course\.teacher\?\.name \|\| course\.sourceSubject/u);
+});
+
+test("course catalog filters by teacher through the API and shareable URL", async () => {
+  const [api, homePage, section, coursePage, teacherPage] = await Promise.all([
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+    readSource("features/HomePageFeature/composables/useHomePage.ts"),
+    readSource("components/home/v2/sections/HomeCoursesSection.vue"),
+    readSource("pages/course/index.vue"),
+    readSource("pages/teachers/[id].vue"),
+  ]);
+
+  assert.match(api, /fetchPublicCourseCatalog\([\s\S]*teacherId: number \| null = null/u);
+  assert.match(api, /teacher_id: teacherId/u);
+  assert.match(homePage, /api\.fetchCoursesByYear\(stageId, yearId, page, perPage, teacherId\)/u);
+  assert.match(homePage, /api\.fetchPublicCourseCatalog\(page, perPage, teacherId\)/u);
+  assert.match(homePage, /course\.teacher\?\.id === teacherId/u);
+  assert.match(section, /route\.query\.teacher_id/u);
+  assert.match(section, /@click="selectTeacher\(teacher\.id\)"/u);
+  assert.match(section, /selectedTeacherId\.value/u);
+  assert.match(coursePage, /initialTeacherId/u);
+  assert.match(teacherPage, /query: \{ teacher_id: String\(teacher\.id\) \}/u);
 });
 
 test("centers load a branded teacher directory from fetch_teachers", async () => {
