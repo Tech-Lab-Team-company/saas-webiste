@@ -594,7 +594,7 @@
 
 .login-home-brand img {
   width: 52px;
-  height: 52px;
+  /* height: 52px; */
   flex: 0 0 52px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 10px;

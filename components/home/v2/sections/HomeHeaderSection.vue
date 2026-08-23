@@ -354,7 +354,7 @@ onBeforeUnmount(() => {
 .home-v2-header__logo {
   display: grid;
   width: 52px;
-  height: 52px;
+  /* height: 52px; */
   flex: 0 0 52px;
   place-items: center;
   overflow: hidden;
