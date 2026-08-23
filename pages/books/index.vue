@@ -500,7 +500,10 @@ useHead({
         </div>
       </section>
 
-      <section v-if="site.app.androidUrl || site.app.iosUrl" class="books-page__app-note">
+      <section
+        v-if="site.app.enabled"
+        class="books-page__app-note"
+      >
         <div class="container">
           <div class="books-page__app-icon" aria-hidden="true">
             <img v-if="site.logo?.src" :src="site.logo.src" alt="" />

@@ -53,6 +53,7 @@ export default interface WebStatus {
     country_code_required:boolean;
     teachers_slider:boolean;
     general_subjects_slider:boolean;
+    have_mobile_app:boolean | number;
     have_desktop:boolean;
     desktop_app:string;
     buy_option_status:number;

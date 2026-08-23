@@ -82,6 +82,7 @@ const themeStyles = computed(() => {
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <LazyHomeV2SectionsHomeAppSection
+        v-if="props.home.site.app.enabled"
         :site="props.home.site"
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />

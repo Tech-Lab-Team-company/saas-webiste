@@ -42,6 +42,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
 <template>
   <div
+    v-if="site.app.enabled"
     class="home-v2 app-page"
     dir="rtl"
     :style="{

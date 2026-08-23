@@ -61,7 +61,7 @@ const navItems = computed(() => [
     to: "/about-teacher",
   },
   { label: "المدونة", to: "/blogs" },
-  { label: "التطبيق", to: "/app" },
+  ...(props.site.app.enabled ? [{ label: "التطبيق", to: "/app" }] : []),
 ]);
 
 const isScrolled = ref(false);

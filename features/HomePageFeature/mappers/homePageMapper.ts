@@ -59,6 +59,12 @@ const toNullableNumber = (value: unknown): number | null =>
 const toNullableBoolean = (value: unknown): boolean | null =>
   typeof value === 'boolean' ? value : null
 
+const toBooleanFlag = (value: unknown): boolean =>
+  value === true ||
+  value === 1 ||
+  value === '1' ||
+  (typeof value === 'string' && value.trim().toLowerCase() === 'true')
+
 const toArray = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
 
 export const mapHomeTeachers = (value: unknown): HomeTeacherViewModel[] =>
@@ -989,6 +995,7 @@ const createEmptySite = (): HomeSiteViewModel => ({
     youtube: null,
   },
   app: {
+    enabled: false,
     image: null,
     androidUrl: null,
     iosUrl: null,
@@ -1026,6 +1033,7 @@ export const mapHomeSite = (settings: unknown): HomeSiteViewModel => {
       youtube: toNullableString(settings.youtube),
     },
     app: {
+      enabled: toBooleanFlag(settings.have_mobile_app),
       image:
         mapImage(mapImageApiDto(settings.app_image)) ??
         mapImage(mapImageApiDto(settings.appImage)),

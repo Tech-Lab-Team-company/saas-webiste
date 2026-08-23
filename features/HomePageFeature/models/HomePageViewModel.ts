@@ -277,6 +277,7 @@ export interface HomeSiteViewModel {
     youtube: string | null
   }
   app: {
+    enabled: boolean
     image: HomeImageViewModel | null
     androidUrl: string | null
     iosUrl: string | null
