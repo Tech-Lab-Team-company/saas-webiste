@@ -132,7 +132,7 @@ const themeStyles = computed(() => {
   display: flex;
   flex-direction: column;
   gap: var(--home-v2-closing-space);
-  padding-block: var(--home-v2-closing-space);
+  padding-block: calc(var(--home-v2-closing-space) + 20px);
   background: linear-gradient(
     180deg,
     var(--home-v2-closing-surface-start),
