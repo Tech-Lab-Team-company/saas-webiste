@@ -11,10 +11,17 @@ const readSource = (path: string) =>
   readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("web status cache is isolated by tenant domain", async () => {
-  const app = await readSource("app.vue");
+  const [app, settingStore, mapper] = await Promise.all([
+    readSource("app.vue"),
+    readSource("stores/setting.ts"),
+    readSource("features/HomePageFeature/mappers/homePageMapper.ts"),
+  ]);
 
   assert.match(app, /`web-status:\$\{webDomain \|\| "default"\}`/u);
+  assert.match(app, /if \(webStatus\.value\) SettingStore\.setSetting\(webStatus\.value\)/u);
   assert.match(app, /else SettingStore\.clearSetting\(\)/u);
+  assert.doesNotMatch(settingStore, /persist:\s*true/u);
+  assert.match(mapper, /value\.replace\(\/\\r\\n\?\/gu, '\\n'\)\.trim\(\)/u);
 });
 
 test("web-status teacher types expose the correct center capabilities", () => {

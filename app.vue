@@ -82,7 +82,6 @@ const getSiteImageSource = (image: unknown): string => {
 const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
   `web-status:${webDomain || "default"}`,
   async () => {
-    console.log(useBaseUrls().baseUrl);
     try {
       const response = await $fetch<{
         data: WebStatus;
@@ -112,6 +111,9 @@ const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
     dedupe: "defer",
   },
 );
+
+if (webStatus.value) SettingStore.setSetting(webStatus.value);
+else SettingStore.clearSetting();
 
 const normalizeThemeColor = (
   value: string | null | undefined,
@@ -176,17 +178,6 @@ watchEffect(() => {
     documentRoot.style.setProperty(property, value);
   });
 });
-
-watch(
-  webStatus,
-  (value) => {
-    if (value) SettingStore.setSetting(value);
-    else SettingStore.clearSetting();
-  },
-  {
-    immediate: true,
-  },
-);
 
 const siteOrigin = computed(() =>
   resolveSiteOrigin(

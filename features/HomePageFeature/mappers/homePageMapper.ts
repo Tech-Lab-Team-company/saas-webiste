@@ -45,7 +45,7 @@ const toNullableString = (value: unknown): string | null => {
     return null
   }
 
-  const normalizedValue = value.trim()
+  const normalizedValue = value.replace(/\r\n?/gu, '\n').trim()
   return normalizedValue.length > 0 ? normalizedValue : null
 }
 
