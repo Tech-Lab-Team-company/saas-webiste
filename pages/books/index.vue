@@ -91,12 +91,16 @@ const booksRequest = useAsyncData(
   `books-page:${webDomain}`,
   async () =>
     mapBooksPage(
-      await api.fetchBooks(currentPage.value, currentSubjectId.value),
+      await api.fetchBooks(
+        currentPage.value,
+        currentSubjectId.value,
+        currentYearId.value,
+      ),
     ),
   {
     default: createEmptyBooks,
     dedupe: "defer",
-    watch: [currentPage, currentSubjectId],
+    watch: [currentPage, currentSubjectId, currentYearId],
   },
 );
 const [
@@ -105,7 +109,7 @@ const [
   { data: books, pending, error },
 ] = await Promise.all([yearsRequest, subjectsRequest, booksRequest]);
 
-watch([currentPage, currentSubjectId], () => {
+watch([currentPage, currentSubjectId, currentYearId], () => {
   if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -354,14 +358,14 @@ useHead({
               <div v-if="currentYearId" class="books-page__taxonomy-group">
                 <b>المادة</b>
                 <div class="books-page__taxonomy-tabs" role="group" aria-label="تصفية الكتب حسب المادة">
-                  <button
+                  <!-- <button
                     type="button"
                     :class="{ 'is-active': currentSubjectId === null }"
                     :aria-pressed="currentSubjectId === null"
                     @click="selectSubject(null)"
                   >
                     كل المواد
-                  </button>
+                  </button> -->
                   <button
                     v-for="subject in subjects"
                     :key="subject.id"

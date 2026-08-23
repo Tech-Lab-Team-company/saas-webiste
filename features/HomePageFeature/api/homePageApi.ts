@@ -177,10 +177,17 @@ export class HomePageApi {
     });
   }
 
-  async fetchBooks(page = 1, subjectId: number | null = null): Promise<unknown> {
+  async fetchBooks(
+    page = 1,
+    subjectId: number | null = null,
+    yearId: number | null = null,
+  ): Promise<unknown> {
     return this.post(
       ApiNames.Instance.fetch_books,
-      { subject_id: subjectId },
+      {
+        subject_id: subjectId,
+        year_id: yearId,
+      },
       { page },
     );
   }
