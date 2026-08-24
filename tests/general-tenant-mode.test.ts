@@ -61,6 +61,11 @@ test("homepage hero always exposes the course and about actions", async () => {
   assert.match(hero, /اختار صفك/u);
   assert.match(hero, /class="home-v2-hero__secondary"[\s\S]*to="\/about-teacher"/u);
   assert.match(hero, /const heroAboutLabel = computed/u);
+  assert.match(
+    hero,
+    /\.home-v2-hero__primary\s*\{[\s\S]*background: var\(--home-v2-deep\)/u,
+  );
+  assert.doesNotMatch(hero, /background:\s*#0867d4/u);
   assert.doesNotMatch(
     hero,
     /v-if="heroContent\.link" class="home-v2-hero__actions"/u,

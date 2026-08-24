@@ -1105,8 +1105,8 @@ onBeforeUnmount(() => {
 
 .home-v2-hero__primary {
   min-width: 154px;
-  border-color: color-mix(in srgb, #1682ff 82%, white);
-  background: #0867d4;
+  border-color: color-mix(in srgb, var(--home-v2-deep) 82%, white);
+  background: var(--home-v2-deep);
   color: #fff;
 }
 
@@ -1135,7 +1135,7 @@ onBeforeUnmount(() => {
 .home-v2-hero__primary:hover,
 .home-v2-hero__primary:focus-visible {
   border-color: #fff;
-  background: #0b5fc2;
+  background: color-mix(in srgb, var(--home-v2-deep) 86%, black);
   box-shadow: 0 14px 30px rgb(1 9 40 / 24%);
   transform: translateY(-3px);
 }
