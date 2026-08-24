@@ -160,6 +160,13 @@ const heroKicker = computed(() =>
     : truncateText(props.site.brandName || "", 42)
 );
 
+const heroAboutLabel = computed(() => {
+  const brandName = truncateText(props.site.brandName || "", 32);
+
+  if (brandName) return `عن ${brandName}`;
+  return props.site.hasTeacherDirectory ? "عن المنصة" : "عن المدرس";
+});
+
 const hasHeroContent = computed(() =>
   Boolean(
     props.hero.status !== "error" &&
@@ -689,16 +696,21 @@ onBeforeUnmount(() => {
           </em>
         </h1>
         <p v-if="heroLead">{{ heroLead }}</p>
-        <div v-if="heroContent.link" class="home-v2-hero__actions">
-          <a class="button" :href="heroContent.link"
-            >استكشف الكورسات <span aria-hidden="true">←</span></a
+        <div class="home-v2-hero__actions" aria-label="روابط البداية السريعة">
+          <NuxtLink
+            class="home-v2-hero__primary"
+            to="/#courses"
+            prefetch-on="interaction"
           >
+            اختار صفك <span aria-hidden="true">←</span>
+          </NuxtLink>
           <NuxtLink
             class="home-v2-hero__secondary"
-            :to="site.hasTeacherDirectory ? '/teachers' : '/about-teacher'"
+            to="/about-teacher"
             prefetch-on="interaction"
-            >{{ site.hasTeacherDirectory ? "تعرّف على المدرسين" : "تعرّف على المنصة" }} <span aria-hidden="true">↗</span></NuxtLink
           >
+            {{ heroAboutLabel }} <span aria-hidden="true">↗</span>
+          </NuxtLink>
         </div>
       </div>
 
@@ -1068,34 +1080,68 @@ onBeforeUnmount(() => {
 .home-v2-hero__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: start;
   gap: 14px;
   margin-top: 34px;
 }
 
+.home-v2-hero__primary,
 .home-v2-hero__secondary {
   display: inline-flex;
   min-height: 54px;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 22px;
   padding: 0 24px;
-  border: 1px solid #ffffff4f;
-  border-radius: 5px;
-  background: color-mix(in srgb, var(--home-v2-deep) 34%, transparent);
-  color: #fff;
-  font-weight: 800;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: 800 14px/1 var(--home-v2-body);
+  text-decoration: none;
+  white-space: nowrap;
   transition: background-color 0.22s ease, border-color 0.22s ease,
     color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
+.home-v2-hero__primary {
+  min-width: 154px;
+  border-color: color-mix(in srgb, #1682ff 82%, white);
+  background: #0867d4;
+  color: #fff;
+}
+
+.home-v2-hero__secondary {
+  min-width: 176px;
+  border-color: #ffffff4f;
+  background: color-mix(in srgb, var(--home-v2-deep) 34%, transparent);
+  color: #fff;
+}
+
+.home-v2-hero__primary span,
 .home-v2-hero__secondary span {
-  color: #ffd45c;
   font-size: 17px;
   transition: color 0.22s ease, transform 0.22s ease;
 }
 
-.home-v2-hero__secondary:hover {
+.home-v2-hero__primary span {
+  color: #fff;
+  font-size: 19px;
+}
+
+.home-v2-hero__secondary span {
+  color: #ffd45c;
+}
+
+.home-v2-hero__primary:hover,
+.home-v2-hero__primary:focus-visible {
+  border-color: #fff;
+  background: #0b5fc2;
+  box-shadow: 0 14px 30px rgb(1 9 40 / 24%);
+  transform: translateY(-3px);
+}
+
+.home-v2-hero__secondary:hover,
+.home-v2-hero__secondary:focus-visible {
   border-color: #fff;
   background: #fff;
   color: var(--home-v2-deep);
@@ -1103,9 +1149,16 @@ onBeforeUnmount(() => {
   transform: translateY(-3px);
 }
 
-.home-v2-hero__secondary:hover span {
-  color: var(--home-v2-coral);
+.home-v2-hero__primary:hover span,
+.home-v2-hero__primary:focus-visible span,
+.home-v2-hero__secondary:hover span,
+.home-v2-hero__secondary:focus-visible span {
   transform: translateX(-3px);
+}
+
+.home-v2-hero__secondary:hover span,
+.home-v2-hero__secondary:focus-visible span {
+  color: var(--home-v2-coral);
 }
 
 .home-v2-hero__visual {
@@ -1122,34 +1175,6 @@ onBeforeUnmount(() => {
     color-mix(in srgb, var(--home-v2-blue) 10%, transparent);
   transform-style: preserve-3d;
   will-change: transform;
-}
-
-.home-v2-hero .button {
-  min-height: 54px;
-  padding-inline: 24px;
-  border: 1px solid color-mix(in srgb, #1682ff 82%, white);
-  border-radius: 5px;
-  background: color-mix(in srgb, var(--home-v2-blue) 28%, #1682ff);
-  box-shadow: 0 12px 30px color-mix(in srgb, #1682ff 25%, transparent);
-  color: #fff;
-  transition: background-color 0.22s ease, border-color 0.22s ease,
-    transform 0.22s ease, box-shadow 0.22s ease;
-}
-
-.home-v2-hero .button span {
-  font-size: 17px;
-  transition: transform 0.22s ease;
-}
-
-.home-v2-hero .button:hover {
-  border-color: #fff;
-  background: color-mix(in srgb, var(--home-v2-blue) 18%, #2990ff);
-  box-shadow: 0 16px 34px color-mix(in srgb, #1682ff 34%, transparent);
-  transform: translateY(-3px);
-}
-
-.home-v2-hero .button:hover span {
-  transform: translateX(-3px);
 }
 
 .home-v2-hero__image {
@@ -1329,6 +1354,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 360px) {
   .home-v2-hero__actions {
+    grid-template-columns: 1fr;
     gap: 7px;
   }
 

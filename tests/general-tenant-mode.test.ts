@@ -52,6 +52,21 @@ test("Cairo headings and Tajawal body copy are self-hosted", async () => {
   assert.equal(cairo.subarray(0, 4).toString("ascii"), "wOF2");
 });
 
+test("homepage hero always exposes the course and about actions", async () => {
+  const hero = await readSource(
+    "components/home/v2/sections/HomeHeroSection.vue",
+  );
+
+  assert.match(hero, /class="home-v2-hero__primary"[\s\S]*to="\/#courses"/u);
+  assert.match(hero, /اختار صفك/u);
+  assert.match(hero, /class="home-v2-hero__secondary"[\s\S]*to="\/about-teacher"/u);
+  assert.match(hero, /const heroAboutLabel = computed/u);
+  assert.doesNotMatch(
+    hero,
+    /v-if="heroContent\.link" class="home-v2-hero__actions"/u,
+  );
+});
+
 test("web status cache is isolated by tenant domain", async () => {
   const [app, settingStore, mapper] = await Promise.all([
     readSource("app.vue"),
