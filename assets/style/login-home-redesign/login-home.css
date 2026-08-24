@@ -175,6 +175,11 @@
   gap: 10px;
 }
 
+.login-home-phone > .login-home-input {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
 .login-home-input {
   position: relative;
   width: 100%;
@@ -792,12 +797,13 @@
   }
 
   .login-home-phone {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 8px;
   }
 
   .login-home-country {
-    flex-basis: auto;
-    width: 100%;
+    width: 112px;
+    flex: 0 0 112px;
   }
 
   .login-home-options {

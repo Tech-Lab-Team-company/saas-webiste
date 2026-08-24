@@ -1139,7 +1139,7 @@ onBeforeUnmount(() => {
   .teacher-directory__summary { align-items: flex-start; flex-direction: column; gap: 3px; margin-top: 20px; }
   .teacher-directory__grid { grid-template-columns: 1fr; }
   .teacher-directory-card { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: 12px; padding: 14px; }
-  .teacher-directory-card::before { height: 100%; width: 108px; inset-inline-end: auto; }
+  .teacher-directory-card::before { display: none; }
   .teacher-directory-card__status { top: 10px; inset-inline-end: 10px; }
   .teacher-directory-card__portrait { width: 78px; height: 78px; margin: 0; }
   .teacher-directory-card__portrait > span { font-size: 23px; }

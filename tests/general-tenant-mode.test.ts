@@ -443,6 +443,10 @@ test("teacher cards open API-backed teacher detail pages", async () => {
   assert.match(api, /teacher_id: teacherId/u);
   assert.match(mapper, /export const mapHomeTeacher =/u);
   assert.match(cards, /:to="`\/teachers\/\$\{teacher\.id\}`"/u);
+  assert.match(
+    cards,
+    /@media \(max-width: 640px\) \{[\s\S]*?\.teacher-directory-card::before \{ display: none; \}/u,
+  );
   assert.match(detailsPage, /api\.fetchTeacherDetails\(teacherId\)/u);
   assert.match(detailsPage, /mapHomeTeacher/u);
   assert.match(layout, /<HomeFooterSection :site="site" \/>/u);
