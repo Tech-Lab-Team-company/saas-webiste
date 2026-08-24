@@ -10,8 +10,8 @@ import {
 const readSource = (path: string) =>
   readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Tajawal is self-hosted and used across the V2 UI", async () => {
-  const [config, fonts, theme, home, regular, black] = await Promise.all([
+test("Cairo headings and Tajawal body copy are self-hosted", async () => {
+  const [config, fonts, theme, home, regular, black, cairo] = await Promise.all([
     readSource("nuxt.config.ts"),
     readSource("assets/css/fonts.css"),
     readSource("assets/css/app-theme.css"),
@@ -28,18 +28,28 @@ test("Tajawal is self-hosted and used across the V2 UI", async () => {
         import.meta.url,
       ),
     ),
+    readFile(
+      new URL(
+        "../assets/fonts/cairo/Cairo-Display-arabic.woff2",
+        import.meta.url,
+      ),
+    ),
   ]);
 
   assert.match(config, /"@\/assets\/css\/fonts\.css"/u);
   assert.match(fonts, /font-family: "Tajawal"/u);
+  assert.match(fonts, /font-family: "Cairo"/u);
+  assert.match(fonts, /font-weight: 700 900/u);
   assert.match(fonts, /font-weight: 800/u);
   assert.match(fonts, /font-weight: 900/u);
   assert.match(fonts, /font-display: swap/u);
   assert.doesNotMatch(fonts, /https?:\/\//u);
   assert.match(theme, /font-family: "Tajawal", Tahoma, Arial, sans-serif/u);
-  assert.match(home, /--home-v2-heading: "Tajawal"/u);
+  assert.match(home, /--home-v2-heading: "Cairo", "Tajawal"/u);
+  assert.match(home, /--home-v2-body: "Tajawal"/u);
   assert.equal(regular.subarray(0, 4).toString("ascii"), "wOF2");
   assert.equal(black.subarray(0, 4).toString("ascii"), "wOF2");
+  assert.equal(cairo.subarray(0, 4).toString("ascii"), "wOF2");
 });
 
 test("web status cache is isolated by tenant domain", async () => {
