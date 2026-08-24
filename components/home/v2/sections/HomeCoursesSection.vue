@@ -46,6 +46,7 @@ const coursesSection = ref<HTMLElement | null>(null);
 const courseResults = ref<HTMLElement | null>(null);
 const sectionHasEntered = ref(false);
 let coursesAnimationContext: ReturnType<typeof gsap.context> | null = null;
+let homepageAutoSelectionRunId = 0;
 const MAX_PREVIEW_COURSES = 6;
 const CATALOG_COURSES_PER_PAGE = 9;
 const isGeneralMode = computed(
@@ -106,6 +107,10 @@ const teacherInitials = (name: string) =>
 
 const markTeacherImageAsFailed = (teacherId: number) => {
   failedTeacherImages.value = new Set(failedTeacherImages.value).add(teacherId);
+};
+
+const cancelHomepageAutoSelection = () => {
+  homepageAutoSelectionRunId += 1;
 };
 
 const shouldReduceMotion = () =>
@@ -339,6 +344,10 @@ const selectTeacher = async (teacherId: number | null) => {
 const selectStage = async (stageId: number) => {
   if (selectedStageId.value === stageId) return;
 
+  if (!props.catalog) {
+    cancelHomepageAutoSelection();
+  }
+
   selectedStageId.value = stageId;
   selectedTabKey.value = null;
 
@@ -354,7 +363,12 @@ const selectTab = async (
   tabKey: HomeCourseTabKey,
   event?: Event,
   requestedPage = 1,
+  isHomepageAutoSelection = false,
 ) => {
+  if (!props.catalog && !isHomepageAutoSelection) {
+    cancelHomepageAutoSelection();
+  }
+
   const tab = props.courses.data.tabs.find((item) => item.key === tabKey);
   const page = normalizePage(requestedPage);
 
@@ -441,6 +455,45 @@ const selectTab = async (
   }
 };
 
+const autoSelectHomepageCourseTab = async () => {
+  if (
+    props.catalog ||
+    isGeneralMode.value ||
+    selectedTabKey.value !== null ||
+    props.courses.data.tabs.length === 0
+  ) {
+    return;
+  }
+
+  const runId = ++homepageAutoSelectionRunId;
+  const [fallbackTab] = props.courses.data.tabs;
+
+  for (const tab of props.courses.data.tabs) {
+    if (runId !== homepageAutoSelectionRunId) return;
+
+    try {
+      await selectTab(tab.key, undefined, 1, true);
+    } catch {
+      if (loadingTabKey.value === tab.key) {
+        loadingTabKey.value = null;
+      }
+    }
+
+    if (runId !== homepageAutoSelectionRunId) return;
+
+    const result = coursesByTab.value[tab.key];
+    if (result?.data.courses.length) {
+      await animateCourseResults();
+      return;
+    }
+  }
+
+  if (fallbackTab && runId === homepageAutoSelectionRunId) {
+    selectedStageId.value = fallbackTab.stageId;
+    selectedTabKey.value = fallbackTab.key;
+  }
+};
+
 const selectCatalogYearFromRoute = () => {
   if (!props.catalog || props.courses.data.tabs.length === 0) return;
 
@@ -480,8 +533,23 @@ onMounted(() => {
     return;
   }
 
+  if (!props.catalog) {
+    void autoSelectHomepageCourseTab();
+    return;
+  }
+
   selectCatalogYearFromRoute();
 });
+
+watch(
+  () => props.courses.data.tabs.map((tab) => tab.key).join(","),
+  () => {
+    if (!props.catalog && selectedTabKey.value === null) {
+      void autoSelectHomepageCourseTab();
+    }
+  },
+  { flush: "post" },
+);
 
 watch(
   () => [
@@ -825,6 +893,7 @@ useScrollTriggeredReveal(coursesSection, revealCoursesSection, {
 });
 
 onBeforeUnmount(() => {
+  cancelHomepageAutoSelection();
   if (courseSearchTimer) clearTimeout(courseSearchTimer);
   coursesAnimationContext?.revert();
   cardResetCalls.forEach((call) => call.kill());

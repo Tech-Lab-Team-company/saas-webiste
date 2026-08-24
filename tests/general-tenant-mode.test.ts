@@ -74,6 +74,22 @@ test("center course UI prefers stages and falls back to the public catalog", asy
   assert.match(card, /course\.teacher\?\.name \|\| course\.sourceSubject/u);
 });
 
+test("homepage automatically opens the first education year that has courses", async () => {
+  const section = await readSource(
+    "components/home/v2/sections/HomeCoursesSection.vue",
+  );
+
+  assert.match(section, /const autoSelectHomepageCourseTab = async \(\) =>/u);
+  assert.match(
+    section,
+    /props\.catalog \|\|[\s\S]*isGeneralMode\.value[\s\S]*selectedTabKey\.value !== null/u,
+  );
+  assert.match(section, /for \(const tab of props\.courses\.data\.tabs\)/u);
+  assert.match(section, /await selectTab\(tab\.key, undefined, 1, true\)/u);
+  assert.match(section, /if \(result\?\.data\.courses\.length\)/u);
+  assert.match(section, /if \(!props\.catalog\) \{[\s\S]*void autoSelectHomepageCourseTab\(\)/u);
+});
+
 test("course catalog filters by teacher through the API and shareable URL", async () => {
   const [api, homePage, section, coursePage, teacherPage] = await Promise.all([
     readSource("features/HomePageFeature/api/homePageApi.ts"),
