@@ -1124,17 +1124,17 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
-  .home-teachers { padding: 68px 0; }
-  .home-teachers__header { gap: 20px; margin-bottom: 30px; }
-  .home-teachers__header h2 { font-size: 39px; }
+  .home-teachers { padding: 56px 0; }
+  .home-teachers__header { gap: 12px; margin-bottom: 24px; }
+  .home-teachers__header h2 { font-size: clamp(30px, 8.5vw, 36px); }
   .home-teachers__grid { grid-template-columns: 1fr; }
   .home-teacher-card__visual,
-  .home-teacher-card__visual img { min-height: 280px; height: 280px; }
+  .home-teacher-card__visual img { min-height: 220px; height: 220px; }
   .home-teachers__footer { align-items: stretch; flex-direction: column; }
   .home-teachers__footer a { text-align: center; }
   .home-teachers--catalog { padding: 34px 0 68px; }
   .teacher-directory__header { margin-bottom: 26px; }
-  .teacher-directory__header h1 { font-size: 38px; }
+  .teacher-directory__header h1 { font-size: 34px; }
   .teacher-directory__filters { grid-template-columns: 1fr; padding: 10px; }
   .teacher-directory__summary { align-items: flex-start; flex-direction: column; gap: 3px; margin-top: 20px; }
   .teacher-directory__grid { grid-template-columns: 1fr; }

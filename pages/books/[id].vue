@@ -1757,17 +1757,54 @@ useHead(() => ({
 }
 
 @media (max-width: 560px) {
+  .book-details-page__main {
+    padding-top: 47px;
+  }
+
   .book-details-page__hero {
-    padding: 36px 0 52px;
+    padding: 30px 0 42px;
   }
 
   .book-details-page__cover {
-    height: 390px;
-    padding: 28px;
+    height: 290px;
+    padding: 22px;
+    box-shadow: 10px 12px color-mix(in srgb, var(--home-v2-deep) 11%, transparent);
   }
 
   .book-details-page__cover > strong {
-    font-size: 29px;
+    font-size: 25px;
+  }
+
+  .book-details-page__copy {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .book-details-page h1 {
+    font-size: clamp(30px, 8.5vw, 36px);
+    line-height: 1.3;
+  }
+
+  .book-details-page__copy h2,
+  .book-details-page__copy > p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .book-details-page__badges,
+  .book-details-page__price,
+  .book-details-page__actions {
+    margin-top: 16px;
+  }
+
+  .book-details-page__actions {
+    width: 100%;
+  }
+
+  .book-details-page__actions > a,
+  .book-details-page__unavailable {
+    min-height: 46px;
+    padding-inline: 16px;
   }
 
   .book-details-page__author {
@@ -1775,7 +1812,23 @@ useHead(() => ({
   }
 
   .book-details-page__information {
-    padding: 50px 0 70px;
+    padding: 44px 0 58px;
+  }
+
+  .book-details-page__content > article {
+    margin-bottom: 34px;
+    padding-bottom: 34px;
+  }
+
+  .book-details-page__content h2,
+  .book-details-page__section-head h2 {
+    font-size: 23px;
+  }
+
+  .book-details-page__content > article > p,
+  .book-details-page__steps-heading p {
+    font-size: 13px;
+    line-height: 1.8;
   }
 
   .book-details-page__feature-grid {
@@ -1799,7 +1852,10 @@ useHead(() => ({
     gap: 6px;
   }
 
-  .book-details-page__metrics,
+  .book-details-page__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .book-details-page__gallery-grid,
   .book-details-page__media-links {
     grid-template-columns: 1fr;

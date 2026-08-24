@@ -114,5 +114,18 @@ const resetCard = (event: PointerEvent) => {
 .course-footer { display:grid; grid-template-columns:1fr auto 38px; align-items:center; gap:12px; margin-top:auto; padding-top:18px; border-top:1px solid var(--card-line); font-size:12px; font-weight:800; }.course-footer>b { color:var(--card-accent); font:900 13px var(--card-heading); }
 .course-arrow { display:grid; width:38px; height:38px; place-items:center; background:var(--card-deep); color:#fff; font-size:18px; transition:background-color .2s ease,transform .2s ease; }.course-card:hover .course-arrow { background:var(--card-accent); transform:translateX(-2px); }
 @keyframes course-card-enter { from { opacity:0; transform:translateY(34px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media (max-width:620px) {
+  .course-cover { height:210px; padding:16px; }
+  .course-index { top:14px; left:15px; }
+  .course-mark { right:20px; font-size:112px; }
+  .level-pill { right:15px; bottom:14px; padding:6px 9px; }
+  .course-content { min-height:0; padding:17px; }
+  .teacher { font-size:11px; }
+  .course-content h3 { margin:5px 0 7px; font-size:18px; line-height:1.4; }
+  .course-content p { min-height:0; font-size:12.5px; line-height:1.7; -webkit-line-clamp:2; }
+  .course-footer { grid-template-columns:1fr auto 34px; gap:8px; padding-top:14px; font-size:11px; }
+  .course-footer > b { font-size:12px; }
+  .course-arrow { width:34px; height:34px; font-size:16px; }
+}
 @media (prefers-reduced-motion:reduce) { .course-card { animation:none; transition:none; }.course-cover img,.course-arrow { transition:none; } }
 </style>

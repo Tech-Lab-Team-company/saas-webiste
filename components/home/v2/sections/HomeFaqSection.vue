@@ -455,11 +455,31 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 520px) {
+  .home-v2-faq__grid {
+    gap: 22px;
+  }
+
+  .home-v2-faq__intro {
+    min-height: 235px;
+    padding: 26px 22px;
+    border-radius: 18px 18px 48px 18px;
+  }
+
+  .home-v2-faq h2 {
+    margin: 16px 0 12px;
+    font-size: 32px;
+  }
+
+  .home-v2-faq__intro > p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
   .home-v2-faq summary {
-    min-height: 72px;
+    min-height: 64px;
     grid-template-columns: 34px minmax(0, 1fr) 32px;
     gap: 11px;
-    padding: 15px 13px;
+    padding: 11px 12px;
   }
 
   .home-v2-faq__number,
@@ -474,12 +494,14 @@ onBeforeUnmount(() => {
   }
 
   .home-v2-faq__question {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .home-v2-faq details p {
-    margin-inline: 58px 16px;
-    font-size: 14px;
+    margin-inline: 56px 14px;
+    padding-bottom: 18px;
+    font-size: 13px;
+    line-height: 1.75;
   }
 }
 

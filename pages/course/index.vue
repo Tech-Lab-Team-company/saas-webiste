@@ -194,13 +194,14 @@ useHead({
 }
 
 @media (max-width: 700px) {
-  .course-page__main { padding-top: 86px; }
-  .course-page__hero, .course-page__hero-grid { min-height: 440px; }
-  .course-page__hero-grid { grid-template-columns: 1fr; align-content: center; gap: 24px; padding-block: 55px; }
+  .course-page__main { padding-top: 47px; }
+  .course-page__hero, .course-page__hero-grid { min-height: 280px; }
+  .course-page__hero-grid { grid-template-columns: 1fr; align-content: center; gap: 10px; padding-block: 24px; }
   .course-page__hero-title { justify-self: stretch; }
-  .course-page__hero h1 { font-size: clamp(43px, 13vw, 60px); }
-  .course-page__hero p { margin: 0; }
-  .course-page__hero-word { font-size: 68px; }
+  .course-page__hero-title > span { font-size: 10px; }
+  .course-page__hero h1 { margin-top: 10px; font-size: clamp(30px, 8.5vw, 35px); line-height: 1.2; }
+  .course-page__hero p { max-width: 330px; margin: 0; font-size: 12.5px; line-height: 1.7; }
+  .course-page__hero-word { font-size: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

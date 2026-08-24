@@ -579,14 +579,43 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 560px) {
+  .home-v2-about-teacher {
+    padding-block: 56px;
+  }
+
+  .home-v2-about-teacher__grid {
+    gap: 36px;
+  }
+
   .home-v2-about-teacher__quote {
-    min-height: 500px;
-    padding: 76px 28px 76px;
+    min-height: 340px;
+    padding: 62px 24px 42px;
   }
 
   .home-v2-about-teacher__quote-mark {
-    top: 28px;
-    inset-inline-start: 28px;
+    top: 22px;
+    inset-inline-start: 24px;
+    font-size: 58px;
+  }
+
+  .home-v2-about-teacher__quote > p {
+    font-size: 27px;
+    line-height: 1.45;
+  }
+
+  .home-v2-about-teacher h2 {
+    margin: 16px 0 14px;
+    font-size: clamp(30px, 8.5vw, 36px);
+    line-height: 1.25;
+  }
+
+  .home-v2-about-teacher__content > p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .home-v2-about-teacher ul {
+    margin-block: 24px 20px;
   }
 }
 

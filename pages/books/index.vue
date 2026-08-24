@@ -1308,6 +1308,7 @@ useHead({
 @media (max-width: 760px) {
   .books-page__hero-layout {
     grid-template-columns: 1fr;
+    gap: 0;
   }
 
   .books-page__hero-books {
@@ -1322,6 +1323,13 @@ useHead({
 
   .books-page__heading {
     flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .books-page__heading h2 {
+    font-size: clamp(29px, 8vw, 34px);
+    line-height: 1.3;
   }
 
   .books-page__legend {
@@ -1331,7 +1339,28 @@ useHead({
 
   .books-page__filter-panel {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .books-page__filter-panel h3 {
+    font-size: 20px;
+  }
+
+  .books-page__filter-panel p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .books-page__taxonomy {
+    gap: 14px;
+  }
+
+  .books-page__taxonomy-tabs button,
+  .books-page__format-tabs button {
+    min-height: 44px;
+    padding: 8px 11px;
+    font-size: 13px;
   }
 
   .books-page__results-bar {
@@ -1341,30 +1370,94 @@ useHead({
 
   .books-page__format-tabs {
     grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .books-page__grid {
+    gap: 16px;
+  }
+
+  .books-page__cover {
+    height: 220px;
+    margin: 14px 22px 0;
+    padding: 18px;
+  }
+
+  .books-page__cover > b {
+    font-size: 21px;
+  }
+
+  .books-page__card-body {
+    padding: 17px;
+  }
+
+  .books-page__card h3 {
+    font-size: 18px;
+    line-height: 1.45;
+  }
+
+  .books-page__card p {
+    min-height: 0;
+    font-size: 12.5px;
+    line-height: 1.7;
+    -webkit-line-clamp: 2;
+  }
+
+  .books-page__formats {
+    margin-block: 13px;
+  }
+
+  .books-page__formats > div {
+    padding: 9px;
   }
 }
 
 @media (max-width: 480px) {
   .books-page__hero {
-    padding: 130px 0 62px;
+    padding: 72px 0 48px;
+  }
+
+  .books-page__hero-copy > span {
+    font-size: 11px;
+  }
+
+  .books-page__hero h1 {
+    margin: 10px 0 12px;
+    font-size: clamp(32px, 9vw, 38px);
+    line-height: 1.25;
+  }
+
+  .books-page__hero p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.8;
   }
 
   .books-page__catalog {
-    padding: 62px 0 75px;
+    padding: 48px 0 60px;
   }
 
   .books-page__cover {
-    height: 260px;
-    margin-inline: 28px;
+    height: 210px;
+    margin-inline: 20px;
   }
 
   .books-page__filter-panel {
-    padding: 20px 16px;
+    padding: 16px 14px;
   }
 
-  .books-page__taxonomy-tabs,
-  .books-page__format-tabs {
-    grid-template-columns: 1fr;
+  .books-page__taxonomy-tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 7px;
+    padding-bottom: 5px;
+    scroll-snap-type: x proximity;
+  }
+
+  .books-page__taxonomy-tabs button {
+    min-width: min(44vw, 150px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
   }
 }
 </style>

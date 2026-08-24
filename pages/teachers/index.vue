@@ -73,6 +73,6 @@ useHead({
 }
 
 @media (max-width: 760px) {
-  .teachers-page { padding-top: 118px; }
+  .teachers-page { padding-top: 98px; }
 }
 </style>

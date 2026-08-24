@@ -545,7 +545,7 @@ html[data-theme='dark'] .home-v2 .home-v2-app__phone {
 
 @media (max-width: 520px) {
   .information-page__main {
-    padding-top: 82px;
+    padding-top: 47px;
   }
 
   .information-page__navigation {
@@ -560,5 +560,55 @@ html[data-theme='dark'] .home-v2 .home-v2-app__phone {
 
   .information-page__navigation a:first-of-type {
     border-top: 0;
+  }
+}
+
+/* Compact, readable mobile rhythm shared by all V2 student-facing pages. */
+@media (max-width: 700px) {
+  .home-v2 {
+    --home-v2-mobile-gutter: 14px;
+    --home-v2-mobile-section-space: 56px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .home-v2 .container {
+    width: calc(100% - (var(--home-v2-mobile-gutter) * 2));
+  }
+
+  .home-v2 .section {
+    padding-block: var(--home-v2-mobile-section-space);
+  }
+
+  .home-v2 section[id] {
+    scroll-margin-top: 104px;
+  }
+
+  .home-v2 .section-tag {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .home-v2 .section-tag::before {
+    width: 22px;
+  }
+
+  .home-v2 .button {
+    min-height: 46px;
+    gap: 8px;
+    padding-inline: 16px;
+    font-size: 13px;
+  }
+
+  .information-page__hero {
+    padding-block: 48px 38px;
+  }
+
+  .information-page__hero h1 {
+    font-size: clamp(31px, 9vw, 38px);
+  }
+
+  .information-page__panel {
+    padding: 22px 16px;
   }
 }

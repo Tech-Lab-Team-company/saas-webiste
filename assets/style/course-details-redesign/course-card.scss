@@ -638,7 +638,7 @@
 
 @media (max-width: 680px) {
   .public-detail-hero {
-    padding: 38px 0 52px;
+    padding: 30px 0 42px;
   }
 
   .detail-hero-grid,
@@ -648,31 +648,46 @@
   }
 
   .detail-breadcrumb {
-    margin-bottom: 26px;
+    gap: 6px;
+    margin-bottom: 18px;
+    font-size: 11px;
   }
 
   .card-text-title h1 {
-    font-size: 38px;
+    margin-top: 10px;
+    font-size: clamp(30px, 8.5vw, 36px);
+    line-height: 1.25;
+  }
+
+  .card-text-title h2 {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .hero-description {
+    font-size: 13px;
+    line-height: 1.75;
   }
 
   .detail-teacher {
     flex-wrap: wrap;
+    margin-top: 18px;
   }
 
   .enroll-card {
-    padding-inline: 16px;
+    padding: 12px 14px 17px;
   }
 
   .enroll-cover {
-    height: 190px;
+    height: 160px;
   }
 
   .detail-final {
-    padding-block: 58px;
+    padding-block: 46px;
   }
 
   .detail-final h2 {
-    font-size: 29px;
+    font-size: 25px;
   }
 }
 
@@ -684,7 +699,7 @@
   }
 
   .card-text-title h1 {
-    font-size: 34px;
+    font-size: 30px;
   }
 
   .detail-teacher > i {

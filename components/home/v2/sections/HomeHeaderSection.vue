@@ -584,8 +584,12 @@ onBeforeUnmount(() => {
 
 @media (max-width: 590px) {
   .home-v2-header__content {
-    min-height: 68px;
-    gap: 8px;
+    min-height: 56px;
+    gap: 6px;
+  }
+
+  .home-v2-header--scrolled .home-v2-header__content {
+    min-height: 56px;
   }
 
   .home-v2-header__brand {
@@ -593,9 +597,9 @@ onBeforeUnmount(() => {
   }
 
   .home-v2-header__logo {
-    width: 42px;
-    height: 42px;
-    flex-basis: 42px;
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
   }
 
   .home-v2-header__brand > span:last-child {
@@ -603,7 +607,7 @@ onBeforeUnmount(() => {
   }
 
   .home-v2-header__brand b {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .home-v2-header__brand small {
@@ -611,8 +615,21 @@ onBeforeUnmount(() => {
   }
 
   .home-v2-header__actions {
-    gap: 5px;
+    gap: 4px;
     margin-inline-start: auto;
+  }
+
+  .home-v2-header__actions :deep(.app-theme-toggle--icon-only) {
+    width: 36px;
+    min-height: 36px;
+    padding: 2px;
+    border-radius: 9px;
+  }
+
+  .home-v2-header__actions :deep(.app-theme-toggle--inline .app-theme-toggle__icon) {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
   }
 
   .home-v2-header__login {
@@ -620,7 +637,7 @@ onBeforeUnmount(() => {
     min-height: 34px;
     align-items: center;
     justify-content: center;
-    padding-inline: 8px;
+    padding-inline: 7px;
     border: 1px solid var(--home-v2-blue);
     border-radius: 8px;
     color: var(--home-v2-blue);
@@ -633,9 +650,21 @@ onBeforeUnmount(() => {
 
   .home-v2-header .button {
     min-height: 34px;
-    padding-inline: 9px;
+    padding-inline: 8px;
     border-radius: 8px;
     font-size: 10px;
+  }
+
+  .home-v2-header__mobile-nav {
+    gap: 1px;
+    padding-block: 3px;
+  }
+
+  .home-v2-header__mobile-nav a {
+    min-height: 34px;
+    padding-block: 3px;
+    font-size: clamp(9.5px, 2.65vw, 11.5px);
+    line-height: 1.15;
   }
 
   .home-v2-header__actions--student {

@@ -209,4 +209,11 @@ const themeStyles = computed(() => {
     display: none;
   }
 }
+
+@media (max-width: 700px) {
+  .home-v2__closing-sections {
+    --home-v2-closing-space: 44px;
+    padding-block: 56px;
+  }
+}
 </style>

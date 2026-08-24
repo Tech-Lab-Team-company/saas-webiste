@@ -254,9 +254,6 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 20px;
   margin-top: 24px;
-  @media (max-width: 760px) {
-    justify-content: centerrefact ;
-  }
 }
 
 .home-v2-app__actions a {
@@ -395,11 +392,36 @@ onBeforeUnmount(() => {
 @media (max-width: 760px) {
   .home-v2-app__grid {
     grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .home-v2-app h2 {
+    margin-block: 10px;
+    font-size: clamp(30px, 8.5vw, 36px);
+    line-height: 1.3;
+  }
+
+  .home-v2-app p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .home-v2-app__actions {
+    gap: 12px;
+    justify-content: flex-start;
+    margin-top: 18px;
+  }
+
+  .home-v2-app__actions a {
+    min-height: 44px;
+    padding: 9px 12px;
+    font-size: 13px;
   }
 
   .home-v2-app__phone {
-    width: min(100%, 330px);
+    width: min(78%, 270px);
     margin-top: 10px;
+    border-radius: 32px 32px 42px 42px;
   }
 }
 

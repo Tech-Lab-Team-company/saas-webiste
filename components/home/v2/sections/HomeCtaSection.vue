@@ -236,6 +236,33 @@ onBeforeUnmount(() => {
   color: #ffdb8b;
 }
 
+@media (max-width: 620px) {
+  .home-v2-cta__panel {
+    padding: 38px 18px;
+    border-radius: 12px;
+  }
+
+  .home-v2-cta h2 {
+    margin-block: 9px;
+    font-size: clamp(29px, 8.5vw, 35px);
+    line-height: 1.3;
+  }
+
+  .home-v2-cta p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .home-v2-cta__actions {
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .home-v2-cta__actions > a:last-child {
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-v2-cta__pulse {
     opacity: 0.78;

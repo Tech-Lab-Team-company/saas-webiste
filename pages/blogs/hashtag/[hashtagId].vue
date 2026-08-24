@@ -263,6 +263,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   .hashtag-page__aside nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 650px) {
+  .hashtag-page__main { padding-top: 47px; }
   .hashtag-page__hero { padding: 48px 0; }
   .hashtag-page__content { padding: 50px 0 65px; }
   .hashtag-page__heading { display: block; }

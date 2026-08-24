@@ -822,33 +822,119 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
 @media (max-width: 560px) {
   .blog-listing__page {
-    padding-top: 76px;
+    padding-top: 47px;
   }
 
   .blog-listing__hero-grid {
     min-height: 0;
-    padding-block: 52px;
+    gap: 18px;
+    padding-block: 28px;
+  }
+
+  .blog-listing__hero-empty {
+    min-height: 280px;
+    padding-block: 32px;
   }
 
   .blog-listing__hero-copy h1 {
-    font-size: 42px;
+    margin: 10px 0 12px;
+    font-size: clamp(32px, 9vw, 36px);
+    line-height: 1.25;
   }
 
   .blog-listing__hero-copy > p {
-    font-size: 15px;
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.7;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .blog-listing__hero-meta {
+    gap: 8px 16px;
+    margin-top: 14px;
+  }
+
+  .blog-listing__hero-meta span {
+    min-height: 32px;
+    font-size: 11px;
+  }
+
+  .blog-listing__hero-meta b {
+    font-size: 16px;
+  }
+
+  .blog-listing__hero-visual {
+    min-height: 150px;
+    box-shadow: 8px 8px
+      color-mix(in srgb, var(--home-v2-blue) 32%, transparent);
   }
 
   .blog-listing__main {
-    padding-block: 66px 76px;
+    padding-block: 54px 64px;
+  }
+
+  .blog-listing__grid {
+    gap: 14px;
+  }
+
+  .blog-listing__card-link,
+  .blog-listing__card--featured .blog-listing__card-link {
+    min-height: 0;
+    grid-template-rows: 140px auto;
+  }
+
+  .blog-listing__visual {
+    min-height: 140px;
+    padding: 16px;
+  }
+
+  .blog-listing__visual > strong {
+    right: 16px;
+    bottom: 14px;
+    font-size: 46px;
+  }
+
+  .blog-listing__visual > small {
+    top: 15px;
+    left: 16px;
   }
 
   .blog-listing__card-body,
   .blog-listing__card--featured .blog-listing__card-body {
-    padding: 24px;
+    padding: 17px;
+  }
+
+  .blog-listing__card-meta {
+    gap: 6px 12px;
+    font-size: 11px;
   }
 
   .blog-listing__card-body h2 {
-    font-size: 23px;
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 8px 0 6px;
+    font-size: 18px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .blog-listing__card-body p {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 12.5px;
+    line-height: 1.7;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .blog-listing__read {
+    min-height: 38px;
+    gap: 12px;
+    padding-top: 10px;
+    font-size: 13px;
   }
 }
 

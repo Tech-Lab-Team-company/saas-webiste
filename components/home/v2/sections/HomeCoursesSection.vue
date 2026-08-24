@@ -726,10 +726,9 @@ const revealCoursesSection = () => {
         filterOptions,
         {
           autoAlpha: 0,
-          y: 16,
-          scale: 0.96,
           duration: 0.68,
           stagger: 0.11,
+          clearProps: "opacity,visibility",
         },
         0.92,
       );
@@ -2357,8 +2356,26 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 620px) {
+  .split-heading {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .home-course-showcase h2 {
+    margin-top: 9px;
+    font-size: clamp(30px, 8.5vw, 36px);
+    line-height: 1.28;
+  }
+
+  .split-heading > p {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
   .home-course-search {
-    padding: 20px;
+    gap: 12px;
+    margin: 20px 0 22px;
+    padding: 14px;
   }
 
   .home-course-search__controls {
@@ -2368,16 +2385,17 @@ onBeforeUnmount(() => {
 
   .home-course-search__clear {
     width: 100%;
+    min-height: 44px;
   }
 
   .home-course-teacher-filter {
-    padding: 20px;
+    padding: 14px;
   }
 
   .home-course-teacher-filter__head {
     align-items: stretch;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
   }
 
   .home-course-teacher-filter__clear {
@@ -2387,29 +2405,37 @@ onBeforeUnmount(() => {
   .home-course-teacher-filter__options {
     display: flex;
     overflow-x: auto;
-    margin-inline: -20px;
-    padding: 2px 20px 10px;
-    scroll-padding-inline: 20px;
+    margin-inline: -14px;
+    padding: 2px 14px 8px;
+    scroll-padding-inline: 14px;
     scroll-snap-type: x proximity;
   }
 
   .home-course-teacher-option {
-    width: min(78vw, 245px);
+    width: min(72vw, 220px);
     flex: 0 0 auto;
     scroll-snap-align: start;
   }
 
   .home-course-picker {
-    padding: 16px;
+    margin-bottom: 12px;
+    padding: 14px;
+  }
+
+  .home-course-picker h3,
+  .home-course-search__copy h3,
+  .home-course-teacher-filter__head h3 {
+    font-size: 17px;
   }
 
   .home-course-audiences {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
   }
 
   .home-course-audiences button {
     display: flex;
-    min-height: 58px;
+    min-height: 50px;
     justify-content: center;
     padding: 8px;
     text-align: center;
@@ -2433,11 +2459,18 @@ onBeforeUnmount(() => {
   .home-course-result-head {
     align-items: start;
     flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .home-course-result-head h3 {
+    font-size: 24px;
   }
 
   .home-course-empty {
     grid-template-columns: 1fr;
-    padding: 26px;
+    min-height: 150px;
+    padding: 20px;
   }
 
   .home-course-empty-step {
@@ -2447,7 +2480,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 430px) {
   .home-course-audiences {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .home-course-pagination {

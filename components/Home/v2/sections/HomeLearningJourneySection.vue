@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
         <p v-if="journey.data.description">{{ journey.data.description }}</p>
         <NuxtLink
           v-if="journey.data.link"
-          :to="journey.data.link"
+          to="/profile"
           class="home-v2-learning-journey__link"
         >
           {{ journey.data.linkLabel }}
@@ -517,11 +517,48 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 560px) {
+  .home-v2-learning-journey__grid {
+    gap: 34px;
+  }
+
+  .home-v2-learning-journey__icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .home-v2-learning-journey h2 {
+    margin: 18px 0 14px;
+    font-size: clamp(31px, 9vw, 38px);
+    line-height: 1.18;
+  }
+
+  .home-v2-learning-journey__intro > p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .home-v2-learning-journey__link {
+    min-width: 0;
+    min-height: 46px;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
   .home-v2-learning-journey__steps article {
     min-height: 0;
     grid-template-columns: 38px minmax(0, 1fr) 20px;
     gap: 14px;
-    padding: 24px 0;
+    padding: 18px 0;
+  }
+
+  .home-v2-learning-journey h3 {
+    font-size: 20px;
+  }
+
+  .home-v2-learning-journey__steps p {
+    margin-top: 7px;
+    font-size: 13px;
+    line-height: 1.7;
   }
 
   .home-v2-learning-journey__link {
