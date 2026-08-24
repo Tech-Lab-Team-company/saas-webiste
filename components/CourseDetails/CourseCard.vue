@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Dialog from "primevue/dialog";
 import CourseDetailsModel from "~/features/FetchCourseDetails/Data/models/course_details_model";
 import Dashedicon from "~/public/icons/dashedicon.vue";
 import PaymentDialog from "./PaymentDialog.vue";
@@ -51,6 +52,58 @@ const router = useRouter();
 const toast = useToast();
 const emit = defineEmits(["Changestatus"]);
 const isJoining = ref(false);
+const introDialogVisible = ref(false);
+const introVideo = ref<HTMLVideoElement | null>(null);
+
+const introUrl = computed(() => {
+  const value = CardDetails.value?.intro;
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+});
+
+const youtubeEmbedUrl = computed(() => {
+  if (!introUrl.value) return null;
+
+  try {
+    const url = new URL(introUrl.value);
+    const hostname = url.hostname.replace(/^www\./u, "").toLowerCase();
+    let videoId: string | null = null;
+
+    if (hostname === "youtu.be") {
+      videoId = url.pathname.split("/").filter(Boolean)[0] || null;
+    } else if (hostname === "youtube.com" || hostname.endsWith(".youtube.com")) {
+      videoId =
+        url.searchParams.get("v")
+        || url.pathname.match(/^\/(?:embed|shorts)\/([^/?#]+)/u)?.[1]
+        || null;
+    }
+
+    return videoId
+      ? `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0`
+      : null;
+  } catch {
+    return null;
+  }
+});
+
+const openIntroDialog = () => {
+  if (introUrl.value) introDialogVisible.value = true;
+};
+
+const stopIntroVideo = () => {
+  if (!introVideo.value) return;
+  introVideo.value.pause();
+  introVideo.value.currentTime = 0;
+};
+
+watch(introUrl, (value) => {
+  if (!value) introDialogVisible.value = false;
+});
+
+watch(introDialogVisible, (visible) => {
+  if (!visible) stopIntroVideo();
+});
+
+onBeforeUnmount(stopIntroVideo);
 
 const updateCourseStatus = (status: number) => {
   Status.value = status;
@@ -218,7 +271,15 @@ const userStore = useUserStore();
                   :src="CardDetails?.Image?.img || userSetting.setting?.image?.img"
                   :alt="CardDetails?.title || CardDetails?.Image?.image"
                 />
-                <span aria-hidden="true"><i class="pi pi-play-circle"></i></span>
+                <button
+                  v-if="introUrl"
+                  type="button"
+                  class="enroll-cover__play"
+                  :aria-label="`تشغيل الفيديو التعريفي لكورس ${CardDetails?.title || ''}`"
+                  @click="openIntroDialog"
+                >
+                  <i class="pi pi-play-circle" aria-hidden="true"></i>
+                </button>
                 <small v-if="CardDetails?.Subject?.title">{{ CardDetails?.Subject?.title }}</small>
               </div>
 
@@ -327,6 +388,50 @@ const userStore = useUserStore();
         </div>
       </div>
     </section>
+
+    <Dialog
+      v-model:visible="introDialogVisible"
+      modal
+      dismissable-mask
+      :draggable="false"
+      :style="{ width: 'min(900px, calc(100vw - 24px))' }"
+      class="course-intro-dialog"
+      dir="rtl"
+      @hide="stopIntroVideo"
+    >
+      <template #header>
+        <div class="course-intro-dialog__header">
+          <span class="pi pi-play-circle" aria-hidden="true"></span>
+          <div>
+            <strong>الفيديو التعريفي</strong>
+            <small>{{ CardDetails?.title }}</small>
+          </div>
+        </div>
+      </template>
+
+      <div v-if="introDialogVisible && introUrl" class="course-intro-dialog__media">
+        <iframe
+          v-if="youtubeEmbedUrl"
+          :src="youtubeEmbedUrl"
+          :title="`الفيديو التعريفي لكورس ${CardDetails?.title || ''}`"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
+        <video
+          v-else
+          ref="introVideo"
+          :src="introUrl"
+          :poster="CardDetails?.Image?.img || userSetting.setting?.image?.img"
+          controls
+          autoplay
+          playsinline
+          preload="metadata"
+        >
+          متصفحك لا يدعم تشغيل الفيديو.
+        </video>
+      </div>
+    </Dialog>
   </div>
 </template>
 

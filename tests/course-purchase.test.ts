@@ -71,3 +71,22 @@ test("purchased courses show a clear green ownership state instead of purchase a
   assert.match(arabic, /أنت مشترك في هذا الكورس بالفعل/u);
   assert.match(english, /You already own this course/u);
 });
+
+test("course intro only shows a play action when a video exists and opens it in a dialog", async () => {
+  const [card, model, styles] = await Promise.all([
+    readSource("components/CourseDetails/CourseCard.vue"),
+    readSource("features/FetchCourseDetails/Data/models/course_details_model.ts"),
+    readSource("assets/style/course-details-redesign/course-card.scss"),
+  ]);
+
+  assert.match(model, /public intro: string \| null/u);
+  assert.match(model, /typeof map\["intro"\] === "string" && map\["intro"\]\.trim\(\)/u);
+  assert.match(card, /const introUrl = computed/u);
+  assert.match(card, /v-if="introUrl"[\s\S]*?class="enroll-cover__play"/u);
+  assert.match(card, /v-model:visible="introDialogVisible"/u);
+  assert.match(card, /v-if="introDialogVisible && introUrl"/u);
+  assert.match(card, /<video[\s\S]*?:src="introUrl"[\s\S]*?controls/u);
+  assert.doesNotMatch(card, /<span aria-hidden="true"><i class="pi pi-play-circle"><\/i><\/span>/u);
+  assert.match(styles, /\.enroll-cover__play \{/u);
+  assert.match(styles, /\.course-intro-dialog__media \{/u);
+});

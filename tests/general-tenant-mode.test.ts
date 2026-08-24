@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   TeacherTypeEnum,
+  isCenterTeacherType,
   resolveTeacherType,
   supportsTeacherDirectory,
 } from "../features/HomePageFeature/types/teacherType.ts";
@@ -92,6 +93,18 @@ test("mobile critical images use responsive WebP delivery and stable dimensions"
   assert.doesNotMatch(speedDial, /primeicons\/primeicons\.css/u);
 });
 
+test("blog details prefer the API main image and fall back to attachments", async () => {
+  const details = await readSource("pages/blogs/[slug].vue");
+
+  const mainImagePosition = details.indexOf("blog.value?.mail_image");
+  const attachmentsPosition = details.indexOf("blog.value?.attachments || []");
+
+  assert.ok(mainImagePosition >= 0);
+  assert.ok(attachmentsPosition > mainImagePosition);
+  assert.match(details, /@error="handleArticleImageError"/u);
+  assert.match(details, /articleImageIndex\.value \+= 1/u);
+});
+
 test("web status cache is isolated by tenant domain", async () => {
   const [app, settingStore, mapper] = await Promise.all([
     readSource("app.vue"),
@@ -134,9 +147,31 @@ test("web-status teacher types expose the correct center capabilities", () => {
   assert.equal(resolveTeacherType("2"), TeacherTypeEnum.TEACHER);
   assert.equal(resolveTeacherType(3), TeacherTypeEnum.CENTER_TEACHER);
   assert.equal(resolveTeacherType(9), null);
+  assert.equal(isCenterTeacherType(TeacherTypeEnum.CENTER), true);
+  assert.equal(isCenterTeacherType(TeacherTypeEnum.CENTER_TEACHER), true);
+  assert.equal(isCenterTeacherType(TeacherTypeEnum.TEACHER), false);
   assert.equal(supportsTeacherDirectory(TeacherTypeEnum.CENTER), true);
   assert.equal(supportsTeacherDirectory(TeacherTypeEnum.TEACHER), false);
   assert.equal(supportsTeacherDirectory(TeacherTypeEnum.CENTER_TEACHER), true);
+});
+
+test("center student profile loads the full catalog without stage data", async () => {
+  const profileCourses = await readSource(
+    "components/Profile/ProfileAvailableCourses.vue",
+  );
+
+  assert.match(profileCourses, /isCenterTeacherType\(settingStore\.setting\?\.type\)/u);
+  assert.match(profileCourses, /if \(isCenter\.value\) return fetchAllCenterCourses\(\)/u);
+  assert.match(profileCourses, /requestKey\.value,\s*async/u);
+  assert.match(profileCourses, /watch: \[isCenter, stageId, yearId\]/u);
+  assert.match(profileCourses, /api\.fetchPublicCourseCatalog\(1, perPage\)/u);
+  assert.match(profileCourses, /firstPage\.pagination\.lastPage - 1/u);
+  assert.match(profileCourses, /if \(!uniqueCourses\.has\(course\.id\)\)/u);
+  assert.match(profileCourses, /بيانات المرحلة الدراسية غير مكتملة/u);
+  assert.ok(
+    profileCourses.indexOf("if (isCenter.value) return fetchAllCenterCourses()") <
+      profileCourses.indexOf("بيانات المرحلة الدراسية غير مكتملة"),
+  );
 });
 
 test("center mode loads both education taxonomy and the public catalog fallback", async () => {
@@ -163,6 +198,9 @@ test("center course UI prefers stages and falls back to the public catalog", asy
   assert.match(section, /props\.courses\.data\.taxonomyStatus !== "success"/u);
   assert.match(section, /كورسات المدرسين/u);
   assert.match(card, /course\.teacher\?\.name \|\| course\.sourceSubject/u);
+  assert.match(card, /htmlToSeoText\(props\.course\.description\)/u);
+  assert.match(card, /<p>\{\{ courseDescription \}\}<\/p>/u);
+  assert.doesNotMatch(card, /<p>\{\{ course\.description/u);
 });
 
 test("homepage automatically opens the first education year that has courses", async () => {

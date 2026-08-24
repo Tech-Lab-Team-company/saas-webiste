@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HomeCourseViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { getDescriptiveImageAlt } from "~/utils/imageAlt";
+import { htmlToSeoText } from "~/utils/seoText";
 
 const props = withDefaults(defineProps<{
   course: HomeCourseViewModel;
@@ -19,6 +20,10 @@ const props = withDefaults(defineProps<{
 
 const tone = computed(() => ["mint", "violet", "sky", "deep"][props.index % 4]);
 const safeProgress = computed(() => Math.min(100, Math.max(0, props.progress ?? 0)));
+const courseDescription = computed(() =>
+  htmlToSeoText(props.course.description)
+  || "شرح منظم ومراجعة مركزة تساعدك تفهم وتطبق بثقة.",
+);
 const imageFailed = ref(false);
 
 watch(() => props.course.image?.src, () => {
@@ -77,7 +82,7 @@ const resetCard = (event: PointerEvent) => {
         {{ course.teacher?.name || course.sourceSubject?.title || levelLabel }}
       </span>
       <h3>{{ course.title }}</h3>
-      <p>{{ course.description || "شرح منظم ومراجعة مركزة تساعدك تفهم وتطبق بثقة." }}</p>
+      <p>{{ courseDescription }}</p>
 
       <div v-if="progress !== null" class="course-progress" :aria-label="`نسبة التقدم ${safeProgress}%`">
         <span><i :style="{ width: `${safeProgress}%` }" /></span>

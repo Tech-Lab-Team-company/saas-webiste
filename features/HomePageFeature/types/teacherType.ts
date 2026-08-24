@@ -17,9 +17,13 @@ export const resolveTeacherType = (value: unknown): TeacherTypeEnum | null => {
     : null;
 };
 
-export const supportsTeacherDirectory = (value: unknown): boolean => {
+export const isCenterTeacherType = (value: unknown): boolean => {
   const type = resolveTeacherType(value);
   return type === TeacherTypeEnum.CENTER || type === TeacherTypeEnum.CENTER_TEACHER;
+};
+
+export const supportsTeacherDirectory = (value: unknown): boolean => {
+  return isCenterTeacherType(value);
 };
 
 export const usesGeneralCourseCatalog = (value: unknown): boolean => {

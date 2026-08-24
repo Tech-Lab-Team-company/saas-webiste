@@ -79,24 +79,42 @@ const readRemember = computed(() =>
     (item): item is string => typeof item === "string" && Boolean(item.trim()),
   ),
 );
-const articleImage = computed(() => {
-  const attachment = blog.value?.attachments?.find((item) => item.file);
+const articleImageIndex = ref(0);
+const articleImages = computed(() => {
+  const candidates = [
+    ...(blog.value?.mail_image
+      ? [
+          {
+            src: blog.value.mail_image,
+            alt: blog.value.title || "صورة المقال",
+          },
+        ]
+      : []),
+    ...(blog.value?.attachments || [])
+      .filter((item) => Boolean(item.file?.trim()))
+      .map((item) => ({
+        src: item.file!.trim(),
+        alt: item.alt || blog.value?.title || "صورة المقال",
+      })),
+  ];
+  const seenSources = new Set<string>();
 
-  if (attachment?.file) {
-    return {
-      src: attachment.file,
-      alt: attachment.alt || blog.value?.title || "صورة المقال",
-    };
-  }
+  return candidates.filter((candidate) => {
+    const source = candidate.src.trim();
+    if (!source || seenSources.has(source)) return false;
+    seenSources.add(source);
+    return true;
+  });
+});
+const articleImage = computed(
+  () => articleImages.value[articleImageIndex.value] || null,
+);
+const handleArticleImageError = () => {
+  articleImageIndex.value += 1;
+};
 
-  if (blog.value?.mail_image) {
-    return {
-      src: blog.value.mail_image,
-      alt: blog.value.title || "صورة المقال",
-    };
-  }
-
-  return null;
+watch(slug, () => {
+  articleImageIndex.value = 0;
 });
 const summaryContent = computed(() => {
   const summary = blog.value?.summary;
@@ -288,6 +306,9 @@ useHead(() => ({
               <img
                 :src="articleImage.src"
                 :alt="articleImage.alt"
+                loading="eager"
+                decoding="async"
+                @error="handleArticleImageError"
               />
             </div>
 

@@ -9,7 +9,8 @@ import type HomeWorkModel from "./homework_model";
 export default class CourseDetailsModel {
   public id: number;
   public title: string; // Use 'string' instead of 'String'
-  public description: string; 
+  public description: string;
+  public intro: string | null;
   public Image: ImageModel; 
   public CoursePrice: number; 
   public Subject:TitleModel;
@@ -36,6 +37,7 @@ export default class CourseDetailsModel {
     id: number,
     title: string,
     description: string,
+    intro: string | null,
     Image: ImageModel,
     CoursePrice: number,
     Subject: TitleModel,
@@ -60,6 +62,7 @@ export default class CourseDetailsModel {
     this.id = id;
     this.title = title;
     this.description = description;
+    this.intro = intro;
     this.Image = Image;
     this.CoursePrice = CoursePrice;
     this.Subject = Subject;
@@ -91,6 +94,9 @@ export default class CourseDetailsModel {
       map["id"],
       map["title"],
       map["description"],
+      typeof map["intro"] === "string" && map["intro"].trim()
+        ? map["intro"].trim()
+        : null,
       map["image"],
       map["course_price"],
       map["subject"],
