@@ -909,7 +909,10 @@ onBeforeUnmount(() => {
     id="courses"
     ref="coursesSection"
     class="section courses home-course-showcase"
-    :class="{ 'is-entered': sectionHasEntered }"
+    :class="{
+      'is-entered': sectionHasEntered,
+      'is-home-preview': !catalog,
+    }"
     aria-labelledby="home-v2-courses-title"
   >
     <div class="home-course-motion" aria-hidden="true">
@@ -2383,6 +2386,34 @@ onBeforeUnmount(() => {
 @keyframes home-course-search-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 992px) {
+  .home-course-showcase.is-home-preview .home-course-audiences {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: 12px;
+  }
+
+  .home-course-showcase.is-home-preview .home-course-audiences button {
+    min-height: 86px;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 2px 12px;
+    padding: 10px;
+  }
+
+  .home-course-showcase.is-home-preview .stage-option-index {
+    width: 46px;
+    height: 46px;
+    font-size: 14px;
+  }
+
+  .home-course-showcase.is-home-preview .stage-option-label {
+    font-size: 15px;
+  }
+
+  .home-course-showcase.is-home-preview .home-course-audiences small {
+    font-size: 11px;
   }
 }
 
