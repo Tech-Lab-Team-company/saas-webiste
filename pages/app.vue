@@ -57,10 +57,44 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
           <span v-if="site.brandName">{{ site.brandName }} على الموبايل</span>
           <h1>التطبيق على Android وiPhone</h1>
           <p>
-            التطبيق على Android وiPhone يتيح لك متابعة
-            {{ site.brandName || "المنصة" }} من موبايلك أو مباشرة من الويب.
+            تابع كورساتك ومذكراتك من موبايلك، وكمّل من المكان اللي وقفت
+            عنده على {{ site.brandName || "المنصة" }}.
           </p>
         </header>
+
+        <nav
+          v-if="androidUrl || iosUrl"
+          class="app-page__downloads"
+          aria-label="تحميل التطبيق"
+        >
+          <a
+            v-if="androidUrl"
+            class="app-page__store-button"
+            :href="androidUrl"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span class="app-page__store-icon" aria-hidden="true">▶</span>
+            <span><small>حمّل الآن من</small><b>Google Play</b></span>
+          </a>
+          <a
+            v-if="iosUrl"
+            class="app-page__store-button"
+            :href="iosUrl"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span
+              class="app-page__store-icon app-page__store-icon--apple"
+              aria-hidden="true"
+              >●</span
+            >
+            <span><small>حمّل الآن من</small><b>App Store</b></span>
+          </a>
+        </nav>
+        <p v-if="androidUrl || iosUrl" class="app-page__hint">
+          اختار نظام موبايلك وابدأ من الرابط المناسب.
+        </p>
 
         <section class="app-page__card" aria-labelledby="app-options-title">
           <div class="app-page__phone">
@@ -99,21 +133,12 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
           </div>
         </section>
 
-        <nav class="app-page__links" aria-label="روابط التطبيق والمنصة">
-          <a v-if="androidUrl" class="app-page__store-button" :href="androidUrl" target="_blank" rel="noreferrer">
-            <span class="app-page__store-icon" aria-hidden="true">▶</span>
-            <span><small>حمّل الآن من</small><b>Google Play</b></span>
-          </a>
-          <a v-if="iosUrl" class="app-page__store-button" :href="iosUrl" target="_blank" rel="noreferrer">
-            <span class="app-page__store-icon app-page__store-icon--apple" aria-hidden="true">●</span>
-            <span><small>حمّل الآن من</small><b>App Store</b></span>
-          </a>
+        <nav class="app-page__links" aria-label="روابط سريعة للمنصة">
           <NuxtLink to="/course">تصفّح الكورسات</NuxtLink>
           <NuxtLink to="/books">افتح المذكرات</NuxtLink>
           <NuxtLink to="/profile">افتح مساحة الطالب</NuxtLink>
           <NuxtLink to="/">العودة للرئيسية</NuxtLink>
         </nav>
-        <p class="app-page__hint">اختار نظام موبايلك وابدأ من الرابط المناسب.</p>
       </div>
     </main>
 
@@ -155,36 +180,52 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .app-page__steps li:nth-child(3) { animation-delay: .62s; }
 .app-page__steps span { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; color: var(--home-v2-blue); background: var(--home-v2-blue-light); font-weight: 900; }
 
+.app-page__downloads { display: grid; width: min(100%, 560px); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 0 auto 10px; animation: app-fade-up .65s .18s both; }
 .app-page__links { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 10px; margin-top: 18px; animation: app-fade-up .65s .55s both; }
-.app-page__links a, .app-page__link-disabled { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 11px 17px; border: 1px solid color-mix(in srgb, var(--home-v2-blue) 30%, var(--home-v2-line)); background: var(--home-v2-surface); color: var(--home-v2-ink); font-size: 14px; font-weight: 900; box-shadow: 0 8px 22px rgb(12 35 68 / 6%); transition: transform .22s ease, color .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease; }
-.app-page__links a:hover { border-color: var(--home-v2-blue); background: var(--home-v2-blue); color: #fff; box-shadow: 0 13px 28px color-mix(in srgb, var(--home-v2-blue) 28%, transparent); transform: translateY(-3px); }
-.app-page__links .app-page__store-button { min-width: 176px; justify-content: flex-start; gap: 11px; border-color: var(--home-v2-blue); background: linear-gradient(135deg, var(--home-v2-blue), var(--home-v2-deep)); color: #fff; }
+.app-page__downloads a, .app-page__links a, .app-page__link-disabled { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; padding: 11px 17px; border: 1px solid color-mix(in srgb, var(--home-v2-blue) 30%, var(--home-v2-line)); background: var(--home-v2-surface); color: var(--home-v2-ink); font-size: 14px; font-weight: 900; box-shadow: 0 8px 22px rgb(12 35 68 / 6%); transition: transform .22s ease, color .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease; }
+.app-page__downloads a:hover, .app-page__links a:hover { border-color: var(--home-v2-blue); background: var(--home-v2-blue); color: #fff; box-shadow: 0 13px 28px color-mix(in srgb, var(--home-v2-blue) 28%, transparent); transform: translateY(-3px); }
+.app-page__downloads .app-page__store-button { min-width: 176px; justify-content: flex-start; gap: 11px; border-color: var(--home-v2-blue); background: linear-gradient(135deg, var(--home-v2-blue), var(--home-v2-deep)); color: #fff; }
+:global(html[data-theme="dark"]) .app-page__downloads a:hover,
 :global(html[data-theme="dark"]) .app-page__links a:hover { color: #07101f; }
-:global(html[data-theme="dark"]) .app-page__links .app-page__store-button { color: #fff; }
+:global(html[data-theme="dark"]) .app-page__downloads .app-page__store-button { color: #fff; }
 .app-page__store-button > span:last-child { display: grid; text-align: right; line-height: 1.1; }
 .app-page__store-button small { color: rgb(255 255 255 / 72%); font-size: 10px; font-weight: 700; }
 .app-page__store-button b { margin-top: 3px; font: 900 16px/1 var(--home-v2-heading); }
 .app-page__store-icon { display: grid; width: 27px; height: 27px; flex: 0 0 27px; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 16%); font-size: 12px; }
 .app-page__store-icon--apple { font-size: 17px; }
 .app-page__link-disabled { cursor: not-allowed; opacity: .52; }
-.app-page__hint { max-width: 660px; margin: 22px auto 0; color: var(--home-v2-muted); text-align: center; font-size: 13px; line-height: 1.8; }
+.app-page__hint { max-width: 660px; margin: 0 auto 20px; color: var(--home-v2-muted); text-align: center; font-size: 12px; line-height: 1.7; }
 
 @keyframes app-fade-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes app-card-in { from { opacity: 0; transform: translateY(28px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 @media (max-width: 650px) {
-  .app-page__main { padding: 126px 0 70px; }
+  .app-page__main { min-height: 0; padding: 112px 0 52px; }
   .app-page__wrap { width: min(900px, calc(100% - 28px)); }
+  .app-page__intro { margin-bottom: 18px; text-align: start; }
+  .app-page__intro > span { font-size: 11.5px; }
+  .app-page__intro h1 { margin: 6px 0 7px; font-size: clamp(27px, 8vw, 32px); line-height: 1.28; letter-spacing: -.02em; }
+  .app-page__intro p { font-size: 13.5px; line-height: 1.7; }
+  .app-page__downloads { grid-template-columns: 1fr; margin-bottom: 8px; }
+  .app-page__downloads a { min-height: 50px; }
+  .app-page__hint { margin-bottom: 14px; font-size: 11px; text-align: start; }
   .app-page__card { grid-template-columns: 1fr; }
-  .app-page__phone { min-height: 190px; max-height: 240px; }
-  .app-page__phone :deep(img) { width: 135px; height: auto; align-self: flex-start; object-fit: cover; object-position: top; }
-  .app-page__content { padding: 27px 21px; }
+  .app-page__phone { min-height: 150px; max-height: 180px; }
+  .app-page__phone :deep(img) { width: 112px; height: auto; align-self: flex-start; object-fit: cover; object-position: top; }
+  .app-page__content { padding: 22px 18px; }
+  .app-page__kind { padding: 5px 8px; font-size: 11px; }
+  .app-page__content h2 { margin: 9px 0 6px; font-size: 21px; line-height: 1.4; }
+  .app-page__content > p { font-size: 13px; line-height: 1.7; }
+  .app-page__steps { gap: 8px; margin-top: 16px; padding-top: 14px; }
+  .app-page__steps li { grid-template-columns: 23px 1fr; gap: 8px; font-size: 12.5px; line-height: 1.65; }
+  .app-page__steps span { width: 23px; height: 23px; }
+  .app-page__links { gap: 8px; margin-top: 14px; }
   .app-page__links a, .app-page__link-disabled { flex: 1 1 calc(50% - 10px); }
-  .app-page__links .app-page__store-button { flex-basis: calc(50% - 10px); min-width: 0; }
+  .app-page__links a { min-height: 44px; padding: 9px 10px; font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-page__intro, .app-page__card, .app-page__links, .app-page__steps li { animation: none; }
-  .app-page__links a { transition: none; }
+  .app-page__intro, .app-page__card, .app-page__downloads, .app-page__links, .app-page__steps li { animation: none; }
+  .app-page__downloads a, .app-page__links a { transition: none; }
 }
 </style>
