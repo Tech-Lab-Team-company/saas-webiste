@@ -139,6 +139,7 @@ onMounted(() => {
   if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return;
   }
+  const deferArticleReveal = window.matchMedia("(min-width: 721px)").matches;
 
   blogAnimationContext = gsap.context(() => {
     const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -161,19 +162,21 @@ onMounted(() => {
       ".blog-listing__visual > strong",
     );
 
-    // Keep the article reveal ready until the reader actually reaches it.
-    gsap.set(articleHeadingItems, { autoAlpha: 0, y: 30 });
-    gsap.set(articleCards, {
-      autoAlpha: 0,
-      y: 56,
-      scale: 0.96,
-      rotationX: -7,
-    });
-    gsap.set(articleMarkers, {
-      autoAlpha: 0,
-      scale: 0.72,
-      rotation: -8,
-    });
+    // Keep the content immediately discoverable on touch-sized screens.
+    if (deferArticleReveal) {
+      gsap.set(articleHeadingItems, { autoAlpha: 0, y: 30 });
+      gsap.set(articleCards, {
+        autoAlpha: 0,
+        y: 56,
+        scale: 0.96,
+        rotationX: -7,
+      });
+      gsap.set(articleMarkers, {
+        autoAlpha: 0,
+        scale: 0.72,
+        rotation: -8,
+      });
+    }
 
     heroTimeline
       .fromTo(
@@ -227,6 +230,8 @@ onMounted(() => {
       });
     }
   }, root);
+
+  if (!deferArticleReveal) return;
 
   const articleSection = root.querySelector<HTMLElement>(".blog-listing__main");
   const articleTrigger = root.querySelector<HTMLElement>(
@@ -383,7 +388,21 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
               ]"
             >
               <NuxtLink :to="blog.route" class="blog-listing__card-link">
-                <div class="blog-listing__visual" aria-hidden="true">
+                <div
+                  class="blog-listing__visual"
+                  :class="{ 'has-image': blog.image?.src }"
+                  aria-hidden="true"
+                >
+                  <NuxtImg
+                    v-if="blog.image?.src"
+                    class="blog-listing__card-image"
+                    :src="blog.image.src"
+                    alt=""
+                    width="760"
+                    height="480"
+                    sizes="(max-width: 720px) 100vw, 50vw"
+                    :loading="index < 2 ? 'eager' : 'lazy'"
+                  />
                   <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
                   <strong>{{ String(index + 1).padStart(2, "0") }}</strong>
                   <small>{{ String(index + 1).padStart(2, "0") }}</small>
@@ -679,6 +698,38 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   content: "";
 }
 
+.blog-listing__visual.has-image::before {
+  z-index: 1;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(
+    145deg,
+    rgb(5 18 52 / 8%) 24%,
+    rgb(5 18 52 / 76%) 100%
+  );
+  opacity: 1;
+}
+
+.blog-listing__visual.has-image::after {
+  display: none;
+}
+
+.blog-listing__card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blog-listing__card:hover .blog-listing__card-image {
+  transform: scale(1.035);
+}
+
 .blog-listing__visual::before {
   bottom: -120px;
   left: -95px;
@@ -695,14 +746,14 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
 .blog-listing__visual > span {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   font-size: 12px;
   font-weight: 900;
 }
 
 .blog-listing__visual > strong {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   right: 24px;
   bottom: 20px;
   font: 900 clamp(58px, 8vw, 110px) / 1 var(--home-v2-heading);
@@ -711,6 +762,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
 .blog-listing__visual > small {
   position: absolute;
+  z-index: 2;
   top: 21px;
   left: 23px;
   font: 900 13px var(--home-v2-heading);
