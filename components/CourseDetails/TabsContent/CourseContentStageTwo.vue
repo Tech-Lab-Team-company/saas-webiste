@@ -4,15 +4,10 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
-import CourseVideoIcon from '~/public/icons/CourseVideoIcon.vue';
-import coursenotesicon from '~/public/icons/coursenotesicon.vue';
-import microphoneicon from '~/public/icons/microphoneicon.vue';
 // import type UnitsModel from '~/features/FetchCourseDetails/Data/models/units_model';
 import { useUserStore } from "~/stores/user";
 import type LessonsModel from '~/features/FetchCourseDetails/Data/models/lessons_model';
 import { ContentTypeEnum } from "~/components/CourseDetails/Enum/content_type_enum";
-import LockIcon from '~/public/icons/LockIcon.vue';
-import { IconsBook } from '#components';
 import { isExamAttemptLocked } from '~/utils/examAttempts';
 const props = defineProps({
   CourseData: {
@@ -48,18 +43,30 @@ function getExtFromUrl(url: string): string {
   return match ? match[1].toLowerCase() : '';
 }
 
-const typeIconMap: Record<ContentTypeEnum, any> = {
-  [ContentTypeEnum.VIDEO]: CourseVideoIcon,
-  [ContentTypeEnum.PDF]: coursenotesicon,
-  [ContentTypeEnum.AUDIO]: microphoneicon,
-  [ContentTypeEnum.VIDEO_PDF]: CourseVideoIcon,
-  [ContentTypeEnum.AUDIO_PDF]: microphoneicon,
-  [ContentTypeEnum.GENERALSESSION]: coursenotesicon,
-  [ContentTypeEnum.EXAM]: IconsBook
+interface ContentTypeMeta {
+  icon: string;
+  label: string;
+}
+
+const typeMetaMap: Record<ContentTypeEnum, ContentTypeMeta> = {
+  [ContentTypeEnum.VIDEO]: { icon: 'pi pi-play', label: 'فيديو' },
+  [ContentTypeEnum.PDF]: { icon: 'pi pi-file-pdf', label: 'ملف PDF' },
+  [ContentTypeEnum.AUDIO]: { icon: 'pi pi-volume-up', label: 'محتوى صوتي' },
+  [ContentTypeEnum.VIDEO_PDF]: { icon: 'pi pi-clone', label: 'فيديو وملف' },
+  [ContentTypeEnum.AUDIO_PDF]: { icon: 'pi pi-headphones', label: 'صوت وملف' },
+  [ContentTypeEnum.GENERALSESSION]: { icon: 'pi pi-file', label: 'محتوى تعليمي' },
+  [ContentTypeEnum.EXAM]: { icon: 'pi pi-file-edit', label: 'اختبار' },
 };
 
-function getIconByType(type: ContentTypeEnum) {
-  return typeIconMap[type] || CourseVideoIcon;
+function getTypeMeta(type?: number | null): ContentTypeMeta {
+  return typeMetaMap[type as ContentTypeEnum] || typeMetaMap[ContentTypeEnum.GENERALSESSION];
+}
+
+function formatContentCount(count: number): string {
+  if (count === 1) return "عنصر تعليمي واحد";
+  if (count === 2) return "عنصران تعليميان";
+  if (count >= 3 && count <= 10) return `${count} عناصر تعليمية`;
+  return `${count} عنصرًا تعليميًا`;
 }
 
 
@@ -170,55 +177,86 @@ const GotoExam = (exam: any, courseId: number) => {
     <AccordionPanel :value="index == 0 ? '0' : index" class="course-content-panel"
       v-for="(lesson, index) in CardDetails" :key="index" :class="{ 'active': activePanels.includes(index) }">
       <AccordionHeader class="course-content-header ">
-        <span class="chapter-index">{{ String(index + 1).padStart(2, "0") }}</span>
+        <span class="chapter-index">
+          <small>القسم</small>
+          <strong>{{ String(index + 1).padStart(2, "0") }}</strong>
+        </span>
         <span class="accordion-heading-copy">
           <span class="accordion-title">{{ lesson?.title }}</span>
           <span class="accordion-count" v-if="lesson?.sessions?.length">
-            <i class="pi pi-play-circle" aria-hidden="true"></i>
-            {{ lesson?.sessions?.length }} {{ $t("course_items") }}
+            <i class="pi pi-list" aria-hidden="true"></i>
+            {{ formatContentCount(lesson?.sessions?.length) }}
           </span>
         </span>
+        <template #toggleicon="{ active }">
+          <span class="accordion-toggle" aria-hidden="true">
+            <span class="accordion-toggle-label">
+              {{ active ? "إخفاء المحتوى" : "عرض المحتوى" }}
+            </span>
+            <i :class="active ? 'pi pi-minus' : 'pi pi-plus'"></i>
+          </span>
+        </template>
       </AccordionHeader>
-      <AccordionContent class="course-class-body" v-for="(session, thirdindex) in lesson?.sessions">
-        <div class="course-body-details" :key="thirdindex"
-          :class="[selectedSessionIndex === thirdindex ? 'active' : '', isdisabled == true ? 'disabled' : '']"
-          @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, session?.web_show_video, session?.is_paid)">
+      <AccordionContent class="course-class-body">
+        <template v-for="(session, thirdindex) in lesson?.sessions" :key="session?.id || thirdindex">
+          <button class="course-body-details" type="button"
+            :class="[
+              selectedSessionIndex === thirdindex ? 'active' : '',
+              isdisabled == true ? 'disabled' : '',
+              !session?.web_show_video ? 'course-body-details--app-only' : '',
+            ]"
+            @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, session?.web_show_video, session?.is_paid)">
+            <span class="session-type-icon" aria-hidden="true">
+              <i :class="getTypeMeta(session?.type).icon"></i>
+            </span>
+            <span class="session-name session-name2">
+              <span class="session-name__title">
+                <strong>{{ session?.title }}</strong>
+                <span class="preview-badge" v-if="!session?.is_paid && !props.isSubscribed">معاينة مجانية</span>
+              </span>
+              <span class="session-name__meta">
+                <span>{{ getTypeMeta(session?.type).label }}</span>
+                <span v-if="!session?.web_show_video">
+                  <i class="pi pi-mobile" aria-hidden="true"></i>
+                  متاح عبر تطبيق الموبايل فقط
+                </span>
+              </span>
+            </span>
+            <span class="session-row-action" aria-hidden="true">
+              <i :class="session?.web_show_video ? 'pi pi-arrow-left' : 'pi pi-mobile'"></i>
+            </span>
+          </button>
 
-          <component :is="getIconByType(session?.type)" />
-          <div class="session-name session-name2">
-            <LockIcon v-if="!session?.web_show_video" />
-            <p>{{ session?.title }} <span class="preview-badge" v-if="!session?.is_paid && !props.isSubscribed">مجانى</span></p>
-            <p v-if="!session?.web_show_video">(هذا المحتوى حصري لتطبيق الموبايل فقط)</p>
-          </div>
-
-        </div>
-        <div class="course-body-details course-exam" v-if="session?.exam"
-          :class="{ 'course-exam--unavailable': !isExamAvailable(session?.exam) }"
-          @click="GotoExam(session?.exam, CourseId)">
-          <div class="session-name" :class="{
-            'disabled': !isExamAvailable(session?.exam) || !userStore?.user
-              || (isPaied == true && isSubscribed == false)
-          }">
-
-            <p>{{ session?.exam?.title }} (امتحان) </p>
-            <component v-if="isExamAvailable(session?.exam)" :is="getIconByType(ContentTypeEnum.EXAM)" />
-            <div v-else-if="isExamAttemptLocked(session?.exam)">
-              <div class="exam-rate">
-                <p class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''">
-                  {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}</p>
-                <p class="rating" v-if="session?.exam.degree_type == 1"
-                  :class="(session?.exam.mark / session?.exam.exam_mark) * 100 < 50 ? 'failed' : ''"> {{
-                    ((session?.exam.mark / session?.exam.exam_mark) * 100).toFixed(2) }} %</p>
-              </div>
-            </div>
+          <button class="course-body-details course-exam" type="button" v-if="session?.exam"
+            :class="{ 'course-exam--unavailable': !isExamAvailable(session?.exam) }"
+            @click="GotoExam(session?.exam, CourseId)">
+            <span class="session-type-icon course-exam__icon" aria-hidden="true">
+              <i class="pi pi-file-edit"></i>
+            </span>
+            <span class="session-name">
+              <span class="session-name__title"><strong>{{ session?.exam?.title }}</strong></span>
+              <span class="session-name__meta"><span>اختبار على محتوى الدرس</span></span>
+            </span>
+            <span v-if="isExamAvailable(session?.exam)" class="session-row-action" aria-hidden="true">
+              <i class="pi pi-arrow-left"></i>
+            </span>
+            <span v-else-if="isExamAttemptLocked(session?.exam)" class="exam-rate">
+              <span class="rating" v-if="session?.exam.degree_type == 2" :class="session?.exam.mark < 6 ? 'failed' : ''">
+                {{ session?.exam.mark }} / {{ session?.exam.exam_mark }}
+              </span>
+              <span class="rating" v-if="session?.exam.degree_type == 1"
+                :class="(session?.exam.mark / session?.exam.exam_mark) * 100 < 50 ? 'failed' : ''">
+                {{ ((session?.exam.mark / session?.exam.exam_mark) * 100).toFixed(2) }} %
+              </span>
+            </span>
             <span v-else-if="isExpired(session?.exam)" class="exam-inline-status">
               <i class="pi pi-calendar-times"></i> انتهى الموعد
             </span>
             <span v-else-if="isUpcoming(session?.exam)" class="exam-inline-status exam-inline-status--upcoming">
               <i class="pi pi-clock"></i> لم يبدأ بعد
             </span>
-          </div>
-        </div>
+          </button>
+        </template>
       </AccordionContent>
     </AccordionPanel>
   </Accordion>

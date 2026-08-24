@@ -425,7 +425,7 @@ onUnmounted(() => {
             <article class="curriculum-section" id="course-curriculum">
               <header class="section-heading-block curriculum-heading">
                 <span class="detail-section-tag">{{ $t("course_curriculum") }}</span>
-                <h2 v-if="tab_value === 'content'">ملخص المحتوى المتاح داخل الكورس</h2>
+                <h2 v-if="tab_value === 'content'">محتوى الكورس خطوة بخطوة</h2>
                 <h2 v-else-if="tab_value === 'homework'">{{ $t("homework") }}</h2>
                 <h2 v-else-if="tab_value === 'live'">{{ $t("live_sessions") }}</h2>
                 <h2 v-else-if="tab_value === 'urls'">{{ $t("external_links") }}</h2>
@@ -433,7 +433,10 @@ onUnmounted(() => {
               </header>
 
               <div class="platform-key" v-if="tab_value === 'content'">
-                <span><i></i>ضمن محتوى الكورس</span>
+                <span>
+                  <i class="pi pi-info-circle" aria-hidden="true"></i>
+                  افتح كل قسم لاستعراض الدروس والملفات المتاحة.
+                </span>
               </div>
 
               <div class="tabs-content">
