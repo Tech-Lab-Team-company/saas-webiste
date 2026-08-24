@@ -201,36 +201,26 @@ onBeforeUnmount(() => {
         <span class="home-v2-faq__intro-mark" aria-hidden="true">FAQ</span>
       </div>
       <div class="home-v2-faq__list">
-        <!-- Backup empty state: includes FAQ loading and error placeholders.
-        <p v-if="pending" class="home-v2-faq__status">جاري تحميل الأسئلة الشائعة...</p>
-        <p v-else-if="error" class="home-v2-faq__status home-v2-faq__status--error">
-          تعذر تحميل الأسئلة الشائعة في الوقت الحالي.
-        </p>
-        <p v-else-if="faqs.length === 0" class="home-v2-faq__status">
-          لا توجد أسئلة شائعة حاليًا.
-        </p>
-        -->
-        <template>
-          <details
-            v-for="(faq, index) in faqs"
-            :key="faq.id"
-            name="home-v2-faq"
-            :open="index === 0"
-            @toggle="handleFaqToggle"
-          >
-            <summary>
-              <span class="home-v2-faq__number" aria-hidden="true">
-                {{ String(index + 1).padStart(2, "0") }}
-              </span>
-              <span class="home-v2-faq__question">{{ faq.question }}</span>
-              <span class="home-v2-faq__toggle" aria-hidden="true">
-                <i />
-                <i />
-              </span>
-            </summary>
-            <p>{{ faq.answer }}</p>
-          </details>
-        </template>
+        <!-- Backup empty state: the section stays hidden when no FAQ is available. -->
+        <details
+          v-for="(faq, index) in faqs"
+          :key="faq.id"
+          name="home-v2-faq"
+          :open="index === 0"
+          @toggle="handleFaqToggle"
+        >
+          <summary>
+            <span class="home-v2-faq__number" aria-hidden="true">
+              {{ String(index + 1).padStart(2, "0") }}
+            </span>
+            <span class="home-v2-faq__question">{{ faq.question }}</span>
+            <span class="home-v2-faq__toggle" aria-hidden="true">
+              <i />
+              <i />
+            </span>
+          </summary>
+          <p>{{ faq.answer }}</p>
+        </details>
       </div>
     </div>
   </section>

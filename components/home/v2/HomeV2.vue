@@ -103,9 +103,7 @@ const themeStyles = computed(() => {
         :hydrate-on-visible="{ rootMargin: '250px' }"
       />
       <div class="home-v2__closing-sections">
-        <LazyHomeV2SectionsHomeFaqSection
-          :hydrate-on-visible="{ rootMargin: '250px' }"
-        />
+        <LazyHomeV2SectionsHomeFaqSection />
         <LazyHomeV2SectionsHomeCtaSection
           v-if="props.home.cta.status === 'success'"
           :cta="props.home.cta"

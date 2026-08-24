@@ -112,6 +112,20 @@ test("course catalog sends its search word to filter_courses and keeps it in the
   assert.match(coursePage, /initialWord/u);
 });
 
+test("book filters preserve scroll position while pagination returns to the top", async () => {
+  const booksPage = await readSource("pages/books/index.vue");
+
+  assert.match(booksPage, /watch\(currentPage, \(\) => \{/u);
+  assert.doesNotMatch(
+    booksPage,
+    /watch\(\[currentPage, currentSubjectId, currentYearId\]/u,
+  );
+  assert.match(
+    booksPage,
+    /watch\(currentPage,[\s\S]*window\.scrollTo\(\{ top: 0, behavior: "smooth" \}\)/u,
+  );
+});
+
 test("optional home sections stay hidden when their API content is empty", async () => {
   const [
     home,
@@ -161,6 +175,7 @@ test("optional home sections stay hidden when their API content is empty", async
   const appPosition = home.indexOf("<LazyHomeV2SectionsHomeAppSection");
   const faqPosition = home.indexOf("<LazyHomeV2SectionsHomeFaqSection");
   const ctaPosition = home.indexOf("<LazyHomeV2SectionsHomeCtaSection");
+  const faqTag = home.slice(faqPosition, home.indexOf("/>", faqPosition) + 2);
   assert.ok(
     coursesPosition < booksPosition &&
       booksPosition < blogPosition &&
@@ -190,6 +205,11 @@ test("optional home sections stay hidden when their API content is empty", async
   );
   assert.match(home, /:not\(:has\(> section\)\)/u);
   assert.match(home, /:deep\(\.home-v2-faq\)/u);
+  assert.doesNotMatch(
+    faqTag,
+    /hydrate-on-visible/u,
+    "the API-backed FAQ must not stay blank while waiting for visibility hydration",
+  );
   assert.match(books, /v-if="books\.status === 'success' && featuredBook"/u);
   assert.match(blogs, /v-if="blogs\.status === 'success' && visibleBlogs\.length"/u);
   assert.match(journey, /v-if="hasJourneyContent"/u);
@@ -202,6 +222,12 @@ test("optional home sections stay hidden when their API content is empty", async
   assert.match(teachers, /catalog \|\| teachers\.status === 'success'/u);
   assert.match(aboutTeacher, /v-if="hasAboutContent"/u);
   assert.match(faq, /v-if="hasFaqContent"/u);
+  assert.match(faq, /<details\s+v-for="\(faq, index\) in faqs"/u);
+  assert.doesNotMatch(
+    faq,
+    /<template>\s*<details\s+v-for="\(faq, index\) in faqs"/u,
+    "the FAQ loop must not add fragment markers that break hydration",
+  );
   assert.match(
     faq,
     /\.home-v2-faq \{[\s\S]*var\(--home-v2-paper\)[\s\S]*var\(--home-v2-cream\)/u,

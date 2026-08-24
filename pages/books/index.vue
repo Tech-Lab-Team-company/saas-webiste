@@ -109,7 +109,7 @@ const [
   { data: books, pending, error },
 ] = await Promise.all([yearsRequest, subjectsRequest, booksRequest]);
 
-watch([currentPage, currentSubjectId, currentYearId], () => {
+watch(currentPage, () => {
   if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
