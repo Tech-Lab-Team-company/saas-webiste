@@ -1025,7 +1025,7 @@
   }
 
   .about-teacher-hero__grid {
-    gap: 28px;
+    gap: 26px;
   }
 
   .about-teacher-hero__ambient::before {
@@ -1079,10 +1079,11 @@
   }
 
   .about-teacher-portrait {
-    width: min(100%, 380px);
+    width: min(76%, 290px);
+    aspect-ratio: 1086 / 1448;
     margin-inline: auto;
-    border-width: 6px;
-    border-radius: 12px 12px 46px;
+    border-width: 5px;
+    border-radius: 16px 16px 72px 16px;
   }
 
   .about-teacher-portrait img {
