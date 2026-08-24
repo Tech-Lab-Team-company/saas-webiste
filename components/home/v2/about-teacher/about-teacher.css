@@ -917,18 +917,56 @@
 
 .about-teacher-contact__card > a {
   display: inline-flex;
-  min-height: 44px;
+  min-height: 50px;
   align-items: center;
-  color: var(--home-v2-blue);
-  font-size: 14px;
+  justify-content: center;
+  gap: 9px;
+  padding: 7px 16px;
+  border: 1px solid #1fb95a;
+  border-radius: 10px;
+  background: #25d366;
+  box-shadow: 0 12px 26px -18px rgb(18 140 126 / 75%);
+  color: #fff;
+  font-size: 13px;
   font-weight: 900;
-  transition: color 0.3s ease, transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-color 0.25s ease, border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-teacher-contact__whatsapp-icon {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.about-teacher-contact__whatsapp-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.about-teacher-contact__whatsapp i {
+  font-size: 16px;
+  font-style: normal;
+  transition: transform 0.25s ease;
 }
 
 .about-teacher-contact__card > a:hover,
 .about-teacher-contact__card > a:focus-visible {
-  color: var(--about-accent);
-  transform: translateX(-4px);
+  border-color: #128c7e;
+  background: #128c7e;
+  box-shadow: 0 16px 30px -18px rgb(18 140 126 / 90%);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.about-teacher-contact__whatsapp:hover i,
+.about-teacher-contact__whatsapp:focus-visible i {
+  transform: translateX(-3px);
 }
 
 .about-teacher-cta {
@@ -1191,6 +1229,7 @@
 
   .about-teacher-contact__card > a {
     grid-column: auto;
+    width: 100%;
   }
 
   .about-teacher-cta {

@@ -51,11 +51,20 @@ const hasContactData = computed(() =>
         </div>
         <a
           v-if="whatsappUrl"
+          class="about-teacher-contact__whatsapp"
           :href="whatsappUrl"
           target="_blank"
           rel="noreferrer"
+          aria-label="تواصل على واتساب — يفتح في نافذة جديدة"
         >
-          تواصل على واتساب ←
+          <span
+            class="about-teacher-contact__whatsapp-icon"
+            aria-hidden="true"
+          >
+            <IconsWhatsApp />
+          </span>
+          <span>تواصل على واتساب</span>
+          <i aria-hidden="true">←</i>
         </a>
       </article>
     </div>
