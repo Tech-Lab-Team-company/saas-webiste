@@ -1,131 +1,83 @@
 <script setup lang="ts">
-import { gsap } from "gsap";
-
 const nuxtApp = useNuxtApp();
 const router = useRouter();
-const transitionRoot = ref<HTMLElement | null>(null);
-const transitionStatus = ref<HTMLElement | null>(null);
-const transitionProgress = ref<HTMLElement | null>(null);
-const transitionRibbons = ref<HTMLElement[]>([]);
+
 const isVisible = ref(false);
+const isLeaving = ref(false);
+
+const SHOW_DELAY = 160;
+const MINIMUM_VISIBLE_DURATION = 320;
+const LEAVE_DURATION = 180;
 
 let transitionStartedAt = 0;
+let transitionId = 0;
+let isNavigating = false;
+let showTimer: ReturnType<typeof setTimeout> | null = null;
 let finishTimer: ReturnType<typeof setTimeout> | null = null;
-let prefersReducedMotion = false;
+let leaveTimer: ReturnType<typeof setTimeout> | null = null;
 
-const MINIMUM_VISIBLE_DURATION = 420;
-
-const collectRibbon = (element: Element | ComponentPublicInstance | null) => {
-  if (!(element instanceof HTMLElement)) return;
-  transitionRibbons.value.push(element);
+const clearTimer = (timer: ReturnType<typeof setTimeout> | null) => {
+  if (timer) clearTimeout(timer);
 };
 
-const resetFinishTimer = () => {
-  if (!finishTimer) return;
-  clearTimeout(finishTimer);
+const clearTimers = () => {
+  clearTimer(showTimer);
+  clearTimer(finishTimer);
+  clearTimer(leaveTimer);
+  showTimer = null;
   finishTimer = null;
+  leaveTimer = null;
 };
 
-const revealTransition = async () => {
-  if (isVisible.value) return;
+const revealTransition = () => {
+  // Router and Nuxt hooks can report the same navigation. Only start it once.
+  if (isNavigating) return;
 
-  resetFinishTimer();
-  transitionStartedAt = performance.now();
-  isVisible.value = true;
-  await nextTick();
+  isNavigating = true;
+  const currentTransition = ++transitionId;
 
-  if (prefersReducedMotion) return;
+  clearTimers();
+  isLeaving.value = false;
 
-  const root = transitionRoot.value;
-  const status = transitionStatus.value;
-  const progress = transitionProgress.value;
-  const ribbons = transitionRibbons.value;
-  if (!root || !status || !progress) return;
+  showTimer = setTimeout(() => {
+    if (currentTransition !== transitionId || !isNavigating) return;
 
-  gsap.killTweensOf([root, status, progress, ...ribbons]);
-  gsap.set(root, { autoAlpha: 1 });
-  gsap.fromTo(
-    ribbons,
-    { xPercent: 125, rotate: -10, autoAlpha: 0 },
-    {
-      xPercent: -135,
-      rotate: -10,
-      autoAlpha: 0.72,
-      duration: 0.95,
-      stagger: 0.08,
-      ease: "power3.inOut",
-    },
-  );
-  gsap.fromTo(
-    status,
-    { y: -18, scale: 0.92, autoAlpha: 0 },
-    {
-      y: 0,
-      scale: 1,
-      autoAlpha: 1,
-      duration: 0.42,
-      ease: "back.out(1.7)",
-    },
-  );
-  gsap.fromTo(
-    progress,
-    { scaleX: 0 },
-    { scaleX: 0.76, duration: 0.8, ease: "power3.out" },
-  );
+    transitionStartedAt = performance.now();
+    isVisible.value = true;
+    showTimer = null;
+  }, SHOW_DELAY);
 };
 
 const hideTransition = () => {
+  isNavigating = false;
+
+  clearTimer(showTimer);
+  showTimer = null;
+
+  // Fast navigations finish before the delayed loader is ever shown.
   if (!isVisible.value) return;
 
-  const elapsed = performance.now() - transitionStartedAt;
-  const remainingDuration = Math.max(0, MINIMUM_VISIBLE_DURATION - elapsed);
+  const currentTransition = transitionId;
+  const visibleFor = performance.now() - transitionStartedAt;
+  const remainingDuration = Math.max(
+    0,
+    MINIMUM_VISIBLE_DURATION - visibleFor,
+  );
 
-  resetFinishTimer();
+  clearTimer(finishTimer);
   finishTimer = setTimeout(() => {
-    if (prefersReducedMotion) {
+    if (currentTransition !== transitionId) return;
+
+    isLeaving.value = true;
+    finishTimer = null;
+
+    leaveTimer = setTimeout(() => {
+      if (currentTransition !== transitionId) return;
+
       isVisible.value = false;
-      return;
-    }
-
-    const root = transitionRoot.value;
-    const status = transitionStatus.value;
-    const progress = transitionProgress.value;
-    if (!root || !status || !progress) {
-      isVisible.value = false;
-      return;
-    }
-
-    const timeline = gsap.timeline({
-      onComplete: () => {
-        isVisible.value = false;
-        gsap.set([root, status, progress], { clearProps: "all" });
-      },
-    });
-
-    timeline
-      .to(progress, { scaleX: 1, duration: 0.2, ease: "power2.out" })
-      .to(
-        status,
-        { y: -10, scale: 0.96, autoAlpha: 0, duration: 0.24, ease: "power2.in" },
-        "+=0.06",
-      )
-      .to(root, { autoAlpha: 0, duration: 0.18, ease: "power1.out" }, "<");
-
-    const routeView = document.querySelector<HTMLElement>(".app-route-view");
-    if (routeView) {
-      gsap.fromTo(
-        routeView,
-        { y: 22, autoAlpha: 0, filter: "blur(8px)" },
-        {
-          y: 0,
-          autoAlpha: 1,
-          filter: "blur(0px)",
-          duration: 0.58,
-          ease: "power3.out",
-          clearProps: "transform,opacity,visibility,filter",
-        },
-      );
-    }
+      isLeaving.value = false;
+      leaveTimer = null;
+    }, LEAVE_DURATION);
   }, remainingDuration);
 };
 
@@ -134,181 +86,88 @@ let removePageFinishHook: (() => void) | undefined;
 let removePageErrorHook: (() => void) | undefined;
 let removeRouterBeforeHook: (() => void) | undefined;
 let removeRouterAfterHook: (() => void) | undefined;
+let removeRouterErrorHook: (() => void) | undefined;
 
 onMounted(() => {
-  prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-
   removePageStartHook = nuxtApp.hook("page:start", revealTransition);
   removePageFinishHook = nuxtApp.hook("page:finish", hideTransition);
   removePageErrorHook = nuxtApp.hook("vue:error", hideTransition);
 
-  // Router hooks keep the overlay reliable when a cached page resolves too
-  // quickly for the Nuxt page lifecycle to produce a visible transition.
+  // Course filters and pagination only update the query and already expose
+  // local loading states. Treating those updates as page navigation leaves the
+  // overlay waiting for a page:finish hook that Nuxt does not emit.
   removeRouterBeforeHook = router.beforeEach((to, from) => {
-    if (to.fullPath !== from.fullPath) void revealTransition();
+    if (to.path !== from.path) revealTransition();
   });
-  removeRouterAfterHook = router.afterEach(() => hideTransition());
+
+  removeRouterAfterHook = router.afterEach((_to, _from, failure) => {
+    if (failure) hideTransition();
+  });
+  removeRouterErrorHook = router.onError(hideTransition);
 });
 
 onBeforeUnmount(() => {
-  resetFinishTimer();
+  transitionId++;
+  isNavigating = false;
+  clearTimers();
+
   removePageStartHook?.();
   removePageFinishHook?.();
   removePageErrorHook?.();
   removeRouterBeforeHook?.();
   removeRouterAfterHook?.();
-  gsap.killTweensOf([
-    transitionRoot.value,
-    transitionStatus.value,
-    transitionProgress.value,
-    ...transitionRibbons.value,
-  ]);
+  removeRouterErrorHook?.();
 });
 </script>
 
 <template>
-  <div
-    v-show="isVisible"
-    ref="transitionRoot"
-    class="app-route-transition"
-    aria-hidden="true"
-  >
-    <span
-      v-for="index in 3"
-      :key="index"
-      :ref="collectRibbon"
-      :class="`app-route-transition__ribbon app-route-transition__ribbon--${index}`"
-    />
+  <Transition name="app-route-loader">
+    <div
+      v-if="isVisible"
+      class="app-route-transition"
+      :class="{ 'app-route-transition--leaving': isLeaving }"
+      role="status"
+      aria-live="polite"
+      aria-label="جاري تحميل الصفحة"
+    >
+      <span class="app-route-transition__track" aria-hidden="true">
+        <span class="app-route-transition__progress" />
+      </span>
 
-    <div ref="transitionStatus" class="app-route-transition__status">
-      <span class="app-route-transition__mark">
-        <i />
-        <i />
-        <i />
-      </span>
-      <span class="app-route-transition__copy">
-        <strong>لحظة واحدة من فضلك</strong>
-        <small>نجهّز لك الصفحة التالية</small>
-      </span>
+      <div class="app-route-transition__status">
+        <span class="app-route-transition__spinner" aria-hidden="true" />
+
+        <span class="app-route-transition__copy">
+          <strong>لحظة واحدة من فضلك</strong>
+          <small>نجهّز لك الصفحة التالية</small>
+        </span>
+      </div>
     </div>
-
-    <span class="app-route-transition__track">
-      <span ref="transitionProgress" class="app-route-transition__progress" />
-    </span>
-  </div>
+  </Transition>
 </template>
 
 <style scoped>
 .app-route-transition {
-  position: fixed;
-  z-index: 9998;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.app-route-transition::before {
-  position: absolute;
-  inset: 0;
-  background: rgb(5 12 28 / 9%);
-  backdrop-filter: blur(1.5px);
-  content: "";
-}
-
-.app-route-transition__ribbon {
-  position: absolute;
-  top: -32vh;
-  right: 20vw;
-  width: clamp(180px, 28vw, 430px);
-  height: 165vh;
-  border-radius: 999px;
-  filter: blur(2px);
-  transform-origin: center;
-}
-
-.app-route-transition__ribbon--1 {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--app-brand-primary) 82%, #77b7ff),
-    color-mix(in srgb, var(--app-brand-secondary) 72%, #7668ff)
+  --route-loader-primary: var(
+    --app-accent,
+    var(--app-brand-primary, var(--primary-color, #28366c))
   );
-}
+  --route-loader-secondary: var(
+    --app-accent-secondary,
+    var(--app-brand-secondary, var(--secondary-color, #3a3e7e))
+  );
 
-.app-route-transition__ribbon--2 {
-  right: 42vw;
-  width: clamp(130px, 21vw, 330px);
-  background: linear-gradient(180deg, rgb(255 255 255 / 54%), rgb(113 169 255 / 28%));
-}
-
-.app-route-transition__ribbon--3 {
-  right: 66vw;
-  width: clamp(100px, 15vw, 240px);
-  background: color-mix(in srgb, var(--app-brand-primary) 45%, #fff);
-}
-
-.app-route-transition__status {
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  display: flex;
-  min-width: min(340px, calc(100vw - 32px));
-  align-items: center;
-  gap: 12px;
-  padding: 11px 16px;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 16px;
-  background: rgb(8 17 37 / 92%);
-  box-shadow: 0 18px 50px rgb(3 9 24 / 25%);
-  color: #fff;
-  backdrop-filter: blur(16px);
-  transform: translateX(-50%);
-}
-
-.app-route-transition__mark {
-  display: flex;
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  border: 1px solid rgb(255 255 255 / 14%);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--app-brand-primary) 60%, #1a3f72);
-}
-
-.app-route-transition__mark i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff;
-  animation: app-route-dot 0.8s ease-in-out infinite alternate;
-}
-
-.app-route-transition__mark i:nth-child(2) {
-  animation-delay: 0.14s;
-}
-
-.app-route-transition__mark i:nth-child(3) {
-  animation-delay: 0.28s;
-}
-
-.app-route-transition__copy {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
   display: grid;
-  gap: 1px;
-  text-align: start;
-}
-
-.app-route-transition__copy strong {
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.app-route-transition__copy small {
-  color: rgb(255 255 255 / 66%);
-  font-size: 12px;
+  place-items: center;
+  padding: 20px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--app-bg, #fbfcff) 90%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--app-text, #081b3a);
+  cursor: wait;
 }
 
 .app-route-transition__track {
@@ -316,9 +175,13 @@ onBeforeUnmount(() => {
   top: 0;
   right: 0;
   left: 0;
-  height: 4px;
+  height: 3px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--app-brand-primary) 15%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--route-loader-primary) 12%,
+    transparent
+  );
 }
 
 .app-route-transition__progress {
@@ -327,39 +190,161 @@ onBeforeUnmount(() => {
   height: 100%;
   background: linear-gradient(
     90deg,
-    var(--app-brand-secondary),
-    #8ec8ff,
-    var(--app-brand-primary)
+    var(--route-loader-secondary),
+    var(--route-loader-primary)
   );
-  box-shadow: 0 0 18px color-mix(in srgb, var(--app-brand-primary) 70%, #fff);
+  transform: scaleX(0.08);
   transform-origin: right center;
+  animation: app-route-progress 6s cubic-bezier(0.1, 0.65, 0.25, 1) forwards;
 }
 
-@keyframes app-route-dot {
+.app-route-transition__status {
+  display: flex;
+  width: min(300px, calc(100vw - 40px));
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--app-line, rgb(8 27 58 / 14%));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--app-surface, #fff) 96%, transparent);
+  box-shadow: 0 18px 48px color-mix(
+    in srgb,
+    var(--app-shadow, rgb(6 17 71 / 24%)) 35%,
+    transparent
+  );
+  text-align: start;
+  animation: app-route-status-in 220ms ease-out both;
+}
+
+.app-route-transition__spinner {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 3px solid color-mix(
+    in srgb,
+    var(--route-loader-primary) 16%,
+    transparent
+  );
+  border-top-color: var(--route-loader-primary);
+  border-left-color: var(--route-loader-secondary);
+  border-radius: 50%;
+  animation: app-route-spin 760ms linear infinite;
+}
+
+.app-route-transition__copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.app-route-transition__copy strong {
+  color: var(--app-text, #081b3a);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.app-route-transition__copy small {
+  color: var(--app-muted, #4f617c);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.app-route-transition--leaving .app-route-transition__progress {
+  animation: none;
+  transform: scaleX(1);
+  transition: transform 160ms ease-out;
+}
+
+.app-route-transition--leaving .app-route-transition__status {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.app-route-loader-enter-active,
+.app-route-loader-leave-active {
+  transition: opacity 160ms ease;
+}
+
+.app-route-loader-enter-from,
+.app-route-loader-leave-to {
+  opacity: 0;
+}
+
+@keyframes app-route-progress {
+  0% {
+    transform: scaleX(0.08);
+  }
+
+  45% {
+    transform: scaleX(0.55);
+  }
+
+  100% {
+    transform: scaleX(0.88);
+  }
+}
+
+@keyframes app-route-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+
   to {
-    opacity: 0.35;
-    transform: translateY(-4px) scale(0.8);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-@media (max-width: 640px) {
-  .app-route-transition__status {
-    top: 14px;
-    min-width: calc(100vw - 28px);
+@keyframes app-route-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-route-transition {
+    padding: 16px;
   }
 
-  .app-route-transition__ribbon {
-    width: 42vw;
+  .app-route-transition__status {
+    width: min(280px, calc(100vw - 32px));
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .app-route-transition__spinner {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+
+  .app-route-transition__copy strong {
+    font-size: 14px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-route-transition__ribbon {
-    display: none;
+  .app-route-transition,
+  .app-route-transition *,
+  .app-route-transition *::before,
+  .app-route-transition *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition-duration: 0.01ms !important;
   }
+}
 
-  .app-route-transition__mark i {
-    animation: none;
+@media (forced-colors: active) {
+  .app-route-transition__spinner {
+    border-color: CanvasText;
+    border-bottom-color: transparent;
   }
 }
 </style>

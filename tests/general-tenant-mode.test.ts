@@ -57,7 +57,7 @@ test("homepage hero always exposes the course and about actions", async () => {
     "components/home/v2/sections/HomeHeroSection.vue",
   );
 
-  assert.match(hero, /class="home-v2-hero__primary"[\s\S]*to="\/#courses"/u);
+  assert.match(hero, /class="home-v2-hero__primary"[\s\S]*to="\/course"/u);
   assert.match(hero, /اختار صفك/u);
   assert.match(hero, /class="home-v2-hero__secondary"[\s\S]*to="\/about-teacher"/u);
   assert.match(hero, /const heroAboutLabel = computed/u);
@@ -70,6 +70,26 @@ test("homepage hero always exposes the course and about actions", async () => {
     hero,
     /v-if="heroContent\.link" class="home-v2-hero__actions"/u,
   );
+});
+
+test("mobile critical images use responsive WebP delivery and stable dimensions", async () => {
+  const [config, hero, header, speedDial] = await Promise.all([
+    readSource("nuxt.config.ts"),
+    readSource("components/home/v2/sections/HomeHeroSection.vue"),
+    readSource("components/home/v2/sections/HomeHeaderSection.vue"),
+    readSource("components/SpeedDialToast/SpeedDialToast.vue"),
+  ]);
+
+  assert.match(hero, /image\.getSizes\(source/u);
+  assert.match(hero, /sizes: "xs:100vw sm:100vw md:440px"/u);
+  assert.match(hero, /format: "webp"/u);
+  assert.match(hero, /:srcset="responsiveHeroImage\?\.srcset"/u);
+  assert.match(header, /<NuxtImg[\s\S]*width="52"[\s\S]*height="52"/u);
+  assert.match(header, /\.home-v2-header__logo\s*\{[\s\S]*height: 52px/u);
+  assert.match(config, /"primeicons\/primeicons\.css"/u);
+  assert.match(config, /font-display: swap/u);
+  assert.match(config, /max-age=31536000, immutable/u);
+  assert.doesNotMatch(speedDial, /primeicons\/primeicons\.css/u);
 });
 
 test("web status cache is isolated by tenant domain", async () => {
@@ -100,6 +120,8 @@ test("route transitions do not depend on the browser DOM update timeout", async 
   assert.match(transition, /nuxtApp\.hook\("page:finish", hideTransition\)/u);
   assert.match(transition, /router\.beforeEach/u);
   assert.match(transition, /router\.afterEach/u);
+  assert.match(transition, /to\.path !== from\.path/u);
+  assert.doesNotMatch(transition, /to\.fullPath !== from\.fullPath/u);
   assert.match(transition, /لحظة واحدة من فضلك/u);
   assert.doesNotMatch(
     transition,
@@ -349,8 +371,10 @@ test("centers load a branded teacher directory from fetch_teachers", async () =>
     ]);
 
   assert.match(api, /async fetchTeachers\(searchWord = ""\): Promise<unknown>/u);
-  assert.match(api, /method: "GET"/u);
-  assert.match(api, /\{ word: searchWord \}/u);
+  assert.match(
+    api,
+    /return this\.post\(ApiNames\.Instance\.FetchGenralTeachers, \{\s*word: searchWord,\s*\}\)/u,
+  );
   assert.match(directory, /supportsTeacherDirectory\(setting\.value\?\.type\)/u);
   assert.match(
     directory,

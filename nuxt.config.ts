@@ -1,6 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
 
+const primeIconsFontDisplayPlugin = {
+  name: 'primeicons-font-display-swap',
+  enforce: 'pre' as const,
+  transform(code: string, id: string) {
+    if (!/[\\/]primeicons[\\/]primeicons\.css(?:\?|$)/u.test(id)) return null;
+
+    return {
+      code: code.replace(/font-display:\s*block/gu, 'font-display: swap'),
+      map: null,
+    };
+  },
+};
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
@@ -86,7 +99,7 @@ export default defineNuxtConfig({
     },
     '/_ipx/**': {
       headers: {
-        'Cache-Control': 'public, max-age=2592000, stale-while-revalidate=86400',
+        'Cache-Control': 'public, max-age=31536000, immutable',
       },
     },
     '/images/**': {
@@ -231,6 +244,7 @@ export default defineNuxtConfig({
     },
   },
   css: [
+    "primeicons/primeicons.css",
     "@/assets/css/fonts.css",
     "@/assets/css/app-theme.css",
     "@/assets/css/home-v2.css",
@@ -240,6 +254,9 @@ export default defineNuxtConfig({
       'dev.saas.techlabeg.com',
       'strategyeducation.techlabeg.com',
     ],
-  }
+  },
+  vite: {
+    plugins: [primeIconsFontDisplayPlugin],
+  },
 
 })

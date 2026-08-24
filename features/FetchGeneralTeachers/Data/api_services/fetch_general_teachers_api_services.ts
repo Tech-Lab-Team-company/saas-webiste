@@ -20,7 +20,7 @@ class FetchGenralTeachersApiService extends ServicesInterface {
 
     return await super.call({
       url: ApiNames.Instance.FetchGenralTeachers,
-      type: CrudType.GET,
+      type: CrudType.POST,
       auth: true,
       params: params,
       showLoadingDialog: true,

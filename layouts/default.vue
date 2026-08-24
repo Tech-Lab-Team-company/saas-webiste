@@ -10,7 +10,6 @@
 </template>
 
 <script lang="ts" setup>
-import "primeicons/primeicons.css";
 import "swiper/swiper-bundle.css";
 import "~/assets/style/main.min.css";
 import Banner from '~/components/Global/banner.vue';

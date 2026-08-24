@@ -38,12 +38,27 @@ body:has(.profile-redesign-page) .social-icons {
 }
 
 body:has(.profile-redesign-page) {
+  width: 100%;
+  max-width: none;
   margin: 0;
+  padding: 0;
+  overflow-x: clip;
   background: var(--profile-canvas, #f4f7f6);
+}
+
+.app-route-view:has(.profile-redesign-page),
+.profile-redesign-page {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: 0;
+  overflow-x: clip;
+  box-sizing: border-box;
 }
 
 .profile-redesign-page .prfile-home.profile-dashboard {
   width: 100%;
+  max-width: none;
   min-height: 100vh;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 270px;
@@ -53,6 +68,7 @@ body:has(.profile-redesign-page) {
   text-align: right;
   direction: ltr;
   background: var(--profile-canvas);
+  box-sizing: border-box;
 }
 
 .profile-redesign-page .profile-dashboard-sidebar {

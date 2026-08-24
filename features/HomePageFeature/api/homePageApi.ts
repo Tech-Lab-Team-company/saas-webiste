@@ -165,10 +165,9 @@ export class HomePageApi {
   }
 
   async fetchTeachers(searchWord = ""): Promise<unknown> {
-    return this.get(
-      ApiNames.Instance.FetchGenralTeachers,
-      searchWord ? { word: searchWord } : undefined,
-    );
+    return this.post(ApiNames.Instance.FetchGenralTeachers, {
+      word: searchWord,
+    });
   }
 
   async fetchTeacherDetails(teacherId: number): Promise<unknown> {

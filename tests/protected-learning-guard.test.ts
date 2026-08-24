@@ -1,10 +1,20 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
   hasDeveloperToolsViewportGap,
   isProtectedLearningPath,
 } from "../utils/protectedLearningRoute.ts";
+
+test("application content protection is mounted by the root app", async () => {
+  const app = await readFile(new URL("../app.vue", import.meta.url), "utf8");
+
+  assert.match(
+    app,
+    /const \{ protectionNotice, protectionNoticeKey \} =\s*useAppContentProtection\(\)/u,
+  );
+});
 
 test("only dynamic course and exam routes are protected", () => {
   assert.equal(isProtectedLearningPath("/course"), false);

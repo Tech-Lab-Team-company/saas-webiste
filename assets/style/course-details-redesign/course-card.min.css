@@ -394,6 +394,53 @@
   font-size: 12px;
 }
 
+.course-owned-status {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 2px 11px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #16a34a 35%, var(--course-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, #16a34a 10%, var(--course-surface));
+  color: color-mix(in srgb, #15803d 88%, var(--course-ink));
+}
+
+.course-owned-status__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  grid-row: 1/3;
+  place-items: center;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 8px 20px color-mix(in srgb, #16a34a 25%, transparent);
+}
+
+.course-owned-status strong {
+  color: inherit;
+  font-family: var(--course-heading);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.5;
+}
+
+.course-owned-status small {
+  color: color-mix(in srgb, #15803d 70%, var(--course-muted));
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+:global(html[data-theme="dark"]) .course-owned-status {
+  color: #86efac;
+}
+
+:global(html[data-theme="dark"]) .course-owned-status small {
+  color: #bbf7d0;
+}
+
 .summary-meta {
   margin: 0;
 }
@@ -589,7 +636,7 @@
 }
 @media (max-width: 680px) {
   .public-detail-hero {
-    padding: 38px 0 52px;
+    padding: 30px 0 42px;
   }
   .detail-hero-grid,
   .detail-layout,
@@ -597,25 +644,38 @@
     width: calc(100% - 32px);
   }
   .detail-breadcrumb {
-    margin-bottom: 26px;
+    gap: 6px;
+    margin-bottom: 18px;
+    font-size: 11px;
   }
   .card-text-title h1 {
-    font-size: 38px;
+    margin-top: 10px;
+    font-size: clamp(30px, 8.5vw, 36px);
+    line-height: 1.25;
+  }
+  .card-text-title h2 {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .hero-description {
+    font-size: 13px;
+    line-height: 1.75;
   }
   .detail-teacher {
     flex-wrap: wrap;
+    margin-top: 18px;
   }
   .enroll-card {
-    padding-inline: 16px;
+    padding: 12px 14px 17px;
   }
   .enroll-cover {
-    height: 190px;
+    height: 160px;
   }
   .detail-final {
-    padding-block: 58px;
+    padding-block: 46px;
   }
   .detail-final h2 {
-    font-size: 29px;
+    font-size: 25px;
   }
 }
 @media (max-width: 430px) {
@@ -625,7 +685,7 @@
     width: calc(100% - 24px);
   }
   .card-text-title h1 {
-    font-size: 34px;
+    font-size: 30px;
   }
   .detail-teacher > i {
     display: none;

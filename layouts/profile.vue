@@ -12,7 +12,6 @@
   </template>
   
   <script lang="ts" setup>
-    import "primeicons/primeicons.css";
     import "~/assets/style/main.min.css";
     import ProfileSidebar from '../components/Profile/ProfileSidebar.vue'
   </script>

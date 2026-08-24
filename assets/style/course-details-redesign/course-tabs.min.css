@@ -751,7 +751,7 @@
     top: 72px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
-    margin: 12px 0 22px;
+    margin: 10px 0 18px;
     padding: 6px;
     border-radius: 13px;
   }
@@ -762,16 +762,23 @@
     font-size: 12px;
   }
   .detail-content > article {
-    padding: 42px 0;
+    padding: 32px 0;
   }
   .section-heading-block h2 {
-    font-size: 24px;
+    margin-block: 6px 10px;
+    font-size: 22px;
+    line-height: 1.45;
+  }
+  .overview-description {
+    font-size: 13px;
+    line-height: 1.75;
   }
   .detail-numbers {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .detail-numbers > div {
-    min-height: 132px;
+    min-height: 106px;
+    padding: 16px;
   }
   .detail-numbers > div:nth-child(2) {
     border-inline-end: 0;
@@ -804,8 +811,8 @@
     font-size: 13px;
   }
   .detail-numbers > div {
-    min-height: 116px;
-    padding: 15px;
+    min-height: 98px;
+    padding: 13px;
   }
   .detail-numbers strong {
     font-size: 19px;

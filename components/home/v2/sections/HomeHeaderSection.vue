@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
             { 'home-v2-header__logo--empty': !site.logo },
           ]"
         >
-          <img
+          <NuxtImg
             v-if="site.logo"
             :src="site.logo.src"
             :alt="
@@ -123,9 +123,14 @@ onBeforeUnmount(() => {
                 `شعار ${site.brandName || 'المنصة التعليمية'}`,
               )
             "
-            width="163"
+            width="52"
             height="52"
+            densities="x1 x2"
+            format="webp"
+            quality="72"
+            fit="contain"
             loading="eager"
+            decoding="async"
           />
           <span v-else aria-hidden="true">+</span>
         </span>
@@ -354,7 +359,7 @@ onBeforeUnmount(() => {
 .home-v2-header__logo {
   display: grid;
   width: 52px;
-  /* height: 52px; */
+  height: 52px;
   flex: 0 0 52px;
   place-items: center;
   overflow: hidden;

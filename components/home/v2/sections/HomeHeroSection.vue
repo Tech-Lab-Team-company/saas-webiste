@@ -9,7 +9,7 @@ import type { HomeSectionState } from "~/features/HomePageFeature/types/homePage
 import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 
 const HomeSectionEmptyState = defineAsyncComponent(
-  () => import("~/components/home/v2/ui/HomeSectionEmptyState.vue")
+  () => import("~/components/home/v2/ui/HomeSectionEmptyState.vue"),
 );
 
 const props = defineProps<{
@@ -23,30 +23,51 @@ const imageIsAvailable = (src: string | undefined): boolean =>
   Boolean(src && !failedImageSources.value.includes(src));
 
 const desktopHeroImage = computed(() =>
-  imageIsAvailable(heroData.value?.image?.src) ? heroData.value?.image : null
+  imageIsAvailable(heroData.value?.image?.src) ? heroData.value?.image : null,
 );
 const mobileHeroImage = computed(() =>
   imageIsAvailable(heroData.value?.mobileImage?.src)
     ? heroData.value?.mobileImage
-    : null
+    : null,
 );
 const settingsLogo = computed(() =>
-  imageIsAvailable(props.site.logo?.src) ? props.site.logo : null
+  imageIsAvailable(props.site.logo?.src) ? props.site.logo : null,
 );
 const settingsCover = computed(() =>
-  imageIsAvailable(props.site.cover?.src) ? props.site.cover : null
+  imageIsAvailable(props.site.cover?.src) ? props.site.cover : null,
 );
 const heroImage = computed(
   () =>
     desktopHeroImage.value ||
     mobileHeroImage.value ||
     settingsCover.value ||
-    settingsLogo.value
+    settingsLogo.value,
+);
+const image = useImage();
+const getResponsiveHeroImage = (source: string | undefined) =>
+  source
+    ? image.getSizes(source, {
+        sizes: "xs:100vw sm:100vw md:440px",
+        densities: "x1 x2",
+        modifiers: {
+          width: 1086,
+          height: 1448,
+          fit: "cover",
+          format: "webp",
+          quality: 72,
+        },
+      })
+    : null;
+const responsiveHeroImage = computed(() =>
+  getResponsiveHeroImage(heroImage.value?.src),
+);
+const responsiveMobileHeroImage = computed(() =>
+  getResponsiveHeroImage(mobileHeroImage.value?.src),
 );
 const heroUsesSettingsLogo = computed(() =>
   Boolean(
-    heroImage.value?.src && heroImage.value.src === settingsLogo.value?.src
-  )
+    heroImage.value?.src && heroImage.value.src === settingsLogo.value?.src,
+  ),
 );
 
 const handleHeroImageError = (failedSource: string | undefined) => {
@@ -89,29 +110,29 @@ const truncateText = (value: string, limit: number) => {
 };
 
 const rawHeroSubtitle = computed(() =>
-  normalizeText(heroData.value?.subtitle || "")
+  normalizeText(heroData.value?.subtitle || ""),
 );
 const heroTitleUsesSiteFallback = computed(
   () =>
     props.hero.status !== "error" &&
     !normalizeText(heroData.value?.title || "") &&
-    Boolean(normalizeText(props.site.brandName || ""))
+    Boolean(normalizeText(props.site.brandName || "")),
 );
 const heroDescriptionUsesSiteFallback = computed(
   () =>
     props.hero.status !== "error" &&
     !normalizeText(heroData.value?.description || "") &&
-    Boolean(normalizeText(props.site.description || ""))
+    Boolean(normalizeText(props.site.description || "")),
 );
 const hasOversizedSubtitle = computed(
-  () => splitGraphemes(rawHeroSubtitle.value).length > TYPEWRITER_PHRASE_LIMIT
+  () => splitGraphemes(rawHeroSubtitle.value).length > TYPEWRITER_PHRASE_LIMIT,
 );
 
 const heroContent = computed(() => ({
   title: truncateText(
     heroData.value?.title ||
       (heroTitleUsesSiteFallback.value ? props.site.brandName || "" : ""),
-    HERO_TITLE_LIMIT
+    HERO_TITLE_LIMIT,
   ),
   subtitle: truncateText(rawHeroSubtitle.value, TYPEWRITER_PHRASE_LIMIT),
   text: truncateText(
@@ -119,7 +140,7 @@ const heroContent = computed(() => ({
       (heroDescriptionUsesSiteFallback.value
         ? props.site.description || ""
         : ""),
-    HERO_DESCRIPTION_LIMIT
+    HERO_DESCRIPTION_LIMIT,
   ),
   link: heroData.value?.link || "",
 }));
@@ -128,7 +149,7 @@ const heroHeading = computed(() =>
   [heroContent.value.title, heroContent.value.subtitle]
     .filter(Boolean)
     .join(" ")
-    .replace(/\s+([.!،؛؟])/gu, "$1")
+    .replace(/\s+([.!،؛؟])/gu, "$1"),
 );
 
 const heroLead = computed(() => {
@@ -157,7 +178,7 @@ const heroImageAlt = computed(() => {
 const heroKicker = computed(() =>
   heroTitleUsesSiteFallback.value
     ? ""
-    : truncateText(props.site.brandName || "", 42)
+    : truncateText(props.site.brandName || "", 42),
 );
 
 const heroAboutLabel = computed(() => {
@@ -175,20 +196,20 @@ const hasHeroContent = computed(() =>
         heroContent.value.text ||
         heroContent.value.link ||
         heroData.value?.image ||
-        heroData.value?.mobileImage)
-  )
+        heroData.value?.mobileImage),
+  ),
 );
 
 const emptyStateTitle = computed(() =>
   props.hero.status === "error"
     ? "تعذر تحميل الواجهة الرئيسية"
-    : "أضف محتوى الواجهة الرئيسية"
+    : "أضف محتوى الواجهة الرئيسية",
 );
 
 const emptyStateDescription = computed(() =>
   props.hero.status === "error"
     ? "تعذر جلب بيانات القسم في الوقت الحالي. حاول مرة أخرى بعد التأكد من الخدمة."
-    : "أضف العنوان والوصف والصورة من لوحة التحكم ليظهر القسم الرئيسي هنا."
+    : "أضف العنوان والوصف والصورة من لوحة التحكم ليظهر القسم الرئيسي هنا.",
 );
 
 const prefersReducedMotion = ref(false);
@@ -243,55 +264,55 @@ const setupHeroMotion = async () => {
 
         const visual = heroVisual.value;
         const image = section.querySelector<HTMLElement>(
-          ".home-v2-hero__visual picture"
+          ".home-v2-hero__visual picture",
         );
         const brandLogo = section.querySelector<HTMLElement>(
-          ".home-v2-hero__brand-logo"
+          ".home-v2-hero__brand-logo",
         );
         const orbOne = section.querySelector<HTMLElement>(
-          ".home-v2-hero__ambient-orb--one"
+          ".home-v2-hero__ambient-orb--one",
         );
         const orbTwo = section.querySelector<HTMLElement>(
-          ".home-v2-hero__ambient-orb--two"
+          ".home-v2-hero__ambient-orb--two",
         );
         const particles = gsap.utils.toArray<HTMLElement>(
           ".home-v2-hero__particle",
-          section
+          section,
         );
         const titleLines = gsap.utils.toArray<HTMLElement>(
           ".home-v2-hero__title-line",
-          section
+          section,
         );
         const layout = section.querySelector<HTMLElement>(
-          ".home-v2-hero__layout"
+          ".home-v2-hero__layout",
         );
         const emptyState = section.querySelector<HTMLElement>(
-          ".home-v2-hero__empty"
+          ".home-v2-hero__empty",
         );
         const ambient = section.querySelector<HTMLElement>(
-          ".home-v2-hero__ambient"
+          ".home-v2-hero__ambient",
         );
         const kicker = section.querySelector<HTMLElement>(
-          ".home-v2-hero__kicker"
+          ".home-v2-hero__kicker",
         );
         const underline = section.querySelector<HTMLElement>(
-          ".home-v2-hero__typewriter-underline"
+          ".home-v2-hero__typewriter-underline",
         );
         const lead = section.querySelector<HTMLElement>(
-          ".home-v2-hero__copy > p:not(.home-v2-hero__kicker)"
+          ".home-v2-hero__copy > p:not(.home-v2-hero__kicker)",
         );
         const actions = gsap.utils.toArray<HTMLElement>(
           ".home-v2-hero__actions > *",
-          section
+          section,
         );
         const copy = section.querySelector<HTMLElement>(".home-v2-hero__copy");
         const scrollCue = section.querySelector<HTMLElement>(
-          ".home-v2-hero__scroll-cue"
+          ".home-v2-hero__scroll-cue",
         );
         const scrollCueIndicator =
           scrollCue?.querySelector<HTMLElement>(":scope > span");
         const shine = section.querySelector<HTMLElement>(
-          ".home-v2-hero__visual-shine"
+          ".home-v2-hero__visual-shine",
         );
 
         const entrance = gsap.timeline({
@@ -309,14 +330,14 @@ const setupHeroMotion = async () => {
           entrance.from(
             emptyState,
             { autoAlpha: 0, y: 28, scale: 0.98, duration: 0.85 },
-            0.2
+            0.2,
           );
         }
         if (kicker) {
           entrance.from(
             kicker,
             { autoAlpha: 0, x: 32, clipPath: "inset(0 100% 0 0)" },
-            0.16
+            0.16,
           );
         }
         if (titleLines.length) {
@@ -331,14 +352,14 @@ const setupHeroMotion = async () => {
               duration: 1.05,
               ease: "power4.out",
             },
-            0.24
+            0.24,
           );
         }
         if (underline) {
           entrance.from(
             underline,
             { scaleX: 0, duration: 0.82, ease: "power3.inOut" },
-            0.72
+            0.72,
           );
         }
         if (lead) {
@@ -355,7 +376,7 @@ const setupHeroMotion = async () => {
               duration: 0.68,
               ease: "back.out(1.45)",
             },
-            0.74
+            0.74,
           );
         }
 
@@ -373,7 +394,7 @@ const setupHeroMotion = async () => {
               duration: 1.28,
               ease: "expo.out",
             },
-            0.28
+            0.28,
           );
         }
 
@@ -381,7 +402,7 @@ const setupHeroMotion = async () => {
           entrance.from(
             image,
             { scale: 1.16, duration: 1.55, ease: "power3.out" },
-            0.32
+            0.32,
           );
         }
 
@@ -395,7 +416,7 @@ const setupHeroMotion = async () => {
               duration: 0.78,
               ease: "back.out(1.8)",
             },
-            0.92
+            0.92,
           );
         }
 
@@ -409,14 +430,14 @@ const setupHeroMotion = async () => {
               duration: 0.52,
               ease: "back.out(2)",
             },
-            0.82
+            0.82,
           );
         }
         if (scrollCue) {
           entrance.from(
             scrollCue,
             { autoAlpha: 0, y: -16, duration: 0.58 },
-            1.12
+            1.12,
           );
         }
         if (shine) {
@@ -430,7 +451,7 @@ const setupHeroMotion = async () => {
                 duration: 1.45,
                 ease: "power2.inOut",
               },
-              1.02
+              1.02,
             )
             .to(shine, { autoAlpha: 0, duration: 0.24 }, 2.28);
         }
@@ -475,35 +496,35 @@ const setupHeroMotion = async () => {
           scrollTimeline.to(
             copy,
             { yPercent: -14, autoAlpha: 0.32, ease: "none" },
-            0
+            0,
           );
         }
         if (image) {
           scrollTimeline.to(
             image,
             { yPercent: 12, scale: 1.08, ease: "none" },
-            0
+            0,
           );
         }
         if (orbOne) {
           scrollTimeline.to(
             orbOne,
             { xPercent: 12, yPercent: -18, ease: "none" },
-            0
+            0,
           );
         }
         if (orbTwo) {
           scrollTimeline.to(
             orbTwo,
             { xPercent: -10, yPercent: 20, ease: "none" },
-            0
+            0,
           );
         }
         if (scrollCue) {
           scrollTimeline.to(
             scrollCue,
             { autoAlpha: 0, y: 18, ease: "none" },
-            0
+            0,
           );
         }
 
@@ -537,11 +558,11 @@ const setupHeroMotion = async () => {
 
           section.style.setProperty(
             "--hero-pointer-x",
-            `${(horizontal + 0.5) * 100}%`
+            `${(horizontal + 0.5) * 100}%`,
           );
           section.style.setProperty(
             "--hero-pointer-y",
-            `${(vertical + 0.5) * 100}%`
+            `${(vertical + 0.5) * 100}%`,
           );
           pointerMotion.visualX(horizontal * 12);
           pointerMotion.visualY(vertical * 9);
@@ -609,14 +630,14 @@ const setupHeroMotion = async () => {
           section.removeEventListener("pointerleave", resetPointerMotion);
           buttonCleanups.forEach((cleanup) => cleanup());
         };
-      }
+      },
     );
   }, section);
 };
 
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
+    "(prefers-reduced-motion: reduce)",
   ).matches;
   void setupHeroMotion();
 });
@@ -699,7 +720,7 @@ onBeforeUnmount(() => {
         <div class="home-v2-hero__actions" aria-label="روابط البداية السريعة">
           <NuxtLink
             class="home-v2-hero__primary"
-            to="/#courses"
+            to="/course"
             prefetch-on="interaction"
           >
             اختار صفك <span aria-hidden="true">←</span>
@@ -723,14 +744,18 @@ onBeforeUnmount(() => {
           <source
             v-if="mobileHeroImage?.src && !heroUsesSettingsLogo"
             media="(max-width: 780px)"
-            :srcset="mobileHeroImage.src"
+            type="image/webp"
+            :srcset="responsiveMobileHeroImage?.srcset"
+            :sizes="responsiveMobileHeroImage?.sizes"
           />
           <img
             :class="[
               'home-v2-hero__image',
               { 'home-v2-hero__image--logo': heroUsesSettingsLogo },
             ]"
-            :src="heroImage.src"
+            :src="responsiveHeroImage?.src || heroImage.src"
+            :srcset="responsiveHeroImage?.srcset"
+            :sizes="responsiveHeroImage?.sizes"
             :alt="heroImageAlt"
             width="1086"
             height="1448"
@@ -756,7 +781,7 @@ onBeforeUnmount(() => {
             :alt="
               getDescriptiveImageAlt(
                 settingsLogo.alt,
-                `شعار ${site.brandName || 'المنصة التعليمية'}`
+                `شعار ${site.brandName || 'المنصة التعليمية'}`,
               )
             "
             width="160"
@@ -1214,7 +1239,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 10px 28px #06114738;
   transform: translateZ(42px);
   will-change: transform;
-  @media (max-width :620px) {
+  @media (max-width: 620px) {
     width: 55px;
     height: 55px;
     padding: 5px;
