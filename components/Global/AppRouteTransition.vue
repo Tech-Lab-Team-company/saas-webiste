@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 
 const nuxtApp = useNuxtApp();
+const router = useRouter();
 const transitionRoot = ref<HTMLElement | null>(null);
 const transitionStatus = ref<HTMLElement | null>(null);
 const transitionProgress = ref<HTMLElement | null>(null);
@@ -26,12 +27,14 @@ const resetFinishTimer = () => {
 };
 
 const revealTransition = async () => {
-  if (prefersReducedMotion) return;
+  if (isVisible.value) return;
 
   resetFinishTimer();
   transitionStartedAt = performance.now();
   isVisible.value = true;
   await nextTick();
+
+  if (prefersReducedMotion) return;
 
   const root = transitionRoot.value;
   const status = transitionStatus.value;
@@ -72,13 +75,18 @@ const revealTransition = async () => {
 };
 
 const hideTransition = () => {
-  if (prefersReducedMotion || !isVisible.value) return;
+  if (!isVisible.value) return;
 
   const elapsed = performance.now() - transitionStartedAt;
   const remainingDuration = Math.max(0, MINIMUM_VISIBLE_DURATION - elapsed);
 
   resetFinishTimer();
   finishTimer = setTimeout(() => {
+    if (prefersReducedMotion) {
+      isVisible.value = false;
+      return;
+    }
+
     const root = transitionRoot.value;
     const status = transitionStatus.value;
     const progress = transitionProgress.value;
@@ -124,6 +132,8 @@ const hideTransition = () => {
 let removePageStartHook: (() => void) | undefined;
 let removePageFinishHook: (() => void) | undefined;
 let removePageErrorHook: (() => void) | undefined;
+let removeRouterBeforeHook: (() => void) | undefined;
+let removeRouterAfterHook: (() => void) | undefined;
 
 onMounted(() => {
   prefersReducedMotion = window.matchMedia(
@@ -133,6 +143,13 @@ onMounted(() => {
   removePageStartHook = nuxtApp.hook("page:start", revealTransition);
   removePageFinishHook = nuxtApp.hook("page:finish", hideTransition);
   removePageErrorHook = nuxtApp.hook("vue:error", hideTransition);
+
+  // Router hooks keep the overlay reliable when a cached page resolves too
+  // quickly for the Nuxt page lifecycle to produce a visible transition.
+  removeRouterBeforeHook = router.beforeEach((to, from) => {
+    if (to.fullPath !== from.fullPath) void revealTransition();
+  });
+  removeRouterAfterHook = router.afterEach(() => hideTransition());
 });
 
 onBeforeUnmount(() => {
@@ -140,6 +157,8 @@ onBeforeUnmount(() => {
   removePageStartHook?.();
   removePageFinishHook?.();
   removePageErrorHook?.();
+  removeRouterBeforeHook?.();
+  removeRouterAfterHook?.();
   gsap.killTweensOf([
     transitionRoot.value,
     transitionStatus.value,
@@ -170,7 +189,7 @@ onBeforeUnmount(() => {
         <i />
       </span>
       <span class="app-route-transition__copy">
-        <strong>لحظة واحدة</strong>
+        <strong>لحظة واحدة من فضلك</strong>
         <small>نجهّز لك الصفحة التالية</small>
       </span>
     </div>
@@ -335,8 +354,8 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-route-transition {
-    display: none !important;
+  .app-route-transition__ribbon {
+    display: none;
   }
 
   .app-route-transition__mark i {

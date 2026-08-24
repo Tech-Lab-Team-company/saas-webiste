@@ -36,6 +36,13 @@ test("route transitions do not depend on the browser DOM update timeout", async 
   assert.doesNotMatch(theme, /view-transition-name/u);
   assert.match(transition, /nuxtApp\.hook\("page:start", revealTransition\)/u);
   assert.match(transition, /nuxtApp\.hook\("page:finish", hideTransition\)/u);
+  assert.match(transition, /router\.beforeEach/u);
+  assert.match(transition, /router\.afterEach/u);
+  assert.match(transition, /لحظة واحدة من فضلك/u);
+  assert.doesNotMatch(
+    transition,
+    /\.app-route-transition\s*\{\s*display:\s*none\s*!important/u,
+  );
 });
 
 test("web-status teacher types expose the correct center capabilities", () => {
