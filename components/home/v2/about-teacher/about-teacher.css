@@ -1021,30 +1021,86 @@
   }
 
   .about-teacher-hero {
-    padding: 58px 0 64px;
+    padding: 38px 0 44px;
   }
 
   .about-teacher-hero__grid {
-    gap: 40px;
+    gap: 28px;
+  }
+
+  .about-teacher-hero__ambient::before {
+    background-size: 40px 40px;
   }
 
   .about-teacher-hero__empty {
-    min-height: 320px;
-    padding: 38px 22px;
-    border-radius: 22px;
+    min-height: 260px;
+    padding: 30px 20px;
+    border-radius: 18px;
+  }
+
+  .about-teacher-hero__empty-mark {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 16px;
+    font-size: 31px;
+  }
+
+  .about-teacher-eyebrow {
+    font-size: 11px;
   }
 
   .about-teacher-hero h1 {
-    font-size: 41px;
+    margin: 10px 0 12px;
+    font-size: clamp(30px, 9vw, 36px);
+    line-height: 1.28;
+    letter-spacing: -0.015em;
   }
 
   .about-teacher-hero__copy > p {
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .about-teacher-hero__actions {
+    gap: 10px 18px;
+    margin-top: 22px;
+  }
+
+  .about-teacher-hero__actions > a:first-child {
+    min-height: 48px;
+    gap: 14px;
+    padding-inline: 18px;
+    font-size: 13px;
+  }
+
+  .about-teacher-hero__actions > a:last-child {
+    min-height: 42px;
+    font-size: 13px;
   }
 
   .about-teacher-portrait {
+    width: min(100%, 380px);
+    margin-inline: auto;
     border-width: 6px;
     border-radius: 12px 12px 46px;
+  }
+
+  .about-teacher-portrait img {
+    object-fit: cover;
+  }
+
+  .about-teacher-portrait figcaption {
+    right: 18px;
+    bottom: 17px;
+    left: 18px;
+  }
+
+  .about-teacher-portrait figcaption span {
+    font-size: 17px;
+  }
+
+  .about-teacher-portrait figcaption small {
+    font-size: 12px;
   }
 
   .about-teacher-section {
