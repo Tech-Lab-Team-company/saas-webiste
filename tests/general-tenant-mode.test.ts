@@ -10,6 +10,38 @@ import {
 const readSource = (path: string) =>
   readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
+test("Tajawal is self-hosted and used across the V2 UI", async () => {
+  const [config, fonts, theme, home, regular, black] = await Promise.all([
+    readSource("nuxt.config.ts"),
+    readSource("assets/css/fonts.css"),
+    readSource("assets/css/app-theme.css"),
+    readSource("assets/css/home-v2.css"),
+    readFile(
+      new URL(
+        "../assets/fonts/tajawal/Tajawal-Regular-arabic.woff2",
+        import.meta.url,
+      ),
+    ),
+    readFile(
+      new URL(
+        "../assets/fonts/tajawal/Tajawal-Black-arabic.woff2",
+        import.meta.url,
+      ),
+    ),
+  ]);
+
+  assert.match(config, /"@\/assets\/css\/fonts\.css"/u);
+  assert.match(fonts, /font-family: "Tajawal"/u);
+  assert.match(fonts, /font-weight: 800/u);
+  assert.match(fonts, /font-weight: 900/u);
+  assert.match(fonts, /font-display: swap/u);
+  assert.doesNotMatch(fonts, /https?:\/\//u);
+  assert.match(theme, /font-family: "Tajawal", Tahoma, Arial, sans-serif/u);
+  assert.match(home, /--home-v2-heading: "Tajawal"/u);
+  assert.equal(regular.subarray(0, 4).toString("ascii"), "wOF2");
+  assert.equal(black.subarray(0, 4).toString("ascii"), "wOF2");
+});
+
 test("web status cache is isolated by tenant domain", async () => {
   const [app, settingStore, mapper] = await Promise.all([
     readSource("app.vue"),

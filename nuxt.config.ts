@@ -231,6 +231,7 @@ export default defineNuxtConfig({
     },
   },
   css: [
+    "@/assets/css/fonts.css",
     "@/assets/css/app-theme.css",
     "@/assets/css/home-v2.css",
   ],

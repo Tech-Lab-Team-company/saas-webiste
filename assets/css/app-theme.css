@@ -32,6 +32,7 @@ body,
 body {
   background: var(--app-bg);
   color: var(--app-text);
+  font-family: "Tajawal", Tahoma, Arial, sans-serif;
   transition: background-color .3s ease, color .3s ease;
 }
 
