@@ -425,7 +425,7 @@ const submit = async () => {
     modal
     dismissable-mask
     :draggable="false"
-    :style="{ width: 'min(620px, 94vw)' }"
+    :style="{ width: 'min(680px, calc(100vw - 24px))' }"
     class="buy-book-dialog"
     dir="rtl"
   >
@@ -731,7 +731,7 @@ const submit = async () => {
 .buy-book-trigger,
 .buy-book-dialog__submit {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 54px;
   width: 100%;
   align-items: center;
   justify-content: center;
@@ -740,7 +740,7 @@ const submit = async () => {
   border-radius: 8px;
   background: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
   color: var(--book-details-action-text, #fff);
-  font: 800 14px var(--home-v2-heading, inherit);
+  font: 800 16px var(--home-v2-heading, inherit);
   cursor: pointer;
 }
 .buy-book-trigger span { transition: transform .2s ease; }
@@ -750,38 +750,41 @@ const submit = async () => {
 }
 .buy-book-dialog__header { display: flex; align-items: center; gap: 12px; }
 .buy-book-dialog__header > span:last-child { display: grid; gap: 3px; }
-.buy-book-dialog__header strong { color: var(--home-v2-ink, var(--app-text, #172033)); font-weight: 900; }
-.buy-book-dialog__header small { color: var(--home-v2-muted, var(--app-muted, #70778a)); font-size: 12px; }
-.buy-book-dialog__header-icon { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 12%, transparent); color: var(--home-v2-deep, var(--app-accent-secondary, #3a3e7e)); font-size: 18px; }
+.buy-book-dialog__header strong { color: var(--home-v2-ink, var(--app-text, #172033)); font-size: 19px; line-height: 1.45; font-weight: 900; }
+.buy-book-dialog__header small { color: var(--home-v2-muted, var(--app-muted, #70778a)); font-size: 13px; line-height: 1.6; }
+.buy-book-dialog__header-icon { display: grid; width: 46px; height: 46px; flex: 0 0 46px; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 12%, transparent); color: var(--home-v2-deep, var(--app-accent-secondary, #3a3e7e)); font-size: 20px; }
 .buy-book-dialog__form { display: grid; gap: 20px; }
 :deep(.p-dialog-content) { max-height: min(78vh, 760px); }
-.buy-book-dialog__summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 10px; background: var(--home-v2-cream, var(--app-bg-muted, #f7f5ef)); }
+.buy-book-dialog__summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 12px; background: var(--home-v2-cream, var(--app-bg-muted, #f7f5ef)); }
 .buy-book-dialog__summary div { display: grid; gap: 4px; }
-.buy-book-dialog__summary small, .buy-book-dialog__section-title small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); }
-.buy-book-dialog__summary b { color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); font-size: 20px; }
+.buy-book-dialog__summary small, .buy-book-dialog__section-title small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 13px; line-height: 1.6; }
+.buy-book-dialog__summary strong { font-size: 15px; line-height: 1.6; }
+.buy-book-dialog__summary b { color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); font-size: 22px; }
 .buy-book-dialog__modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; padding: 0; border: 0; }
-.buy-book-dialog__modes legend { grid-column: 1 / -1; margin-bottom: 6px; font-weight: 900; }
+.buy-book-dialog__modes legend { grid-column: 1 / -1; margin-bottom: 6px; font-size: 16px; font-weight: 900; }
 .buy-book-dialog__modes legend .buy-book-dialog__step { display: inline-grid; margin-inline-end: 6px; vertical-align: middle; }
-.buy-book-dialog__modes label, .buy-book-dialog__methods label { display: flex; align-items: center; gap: 10px; padding: 13px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 9px; background: var(--home-v2-surface, var(--app-surface, #fff)); cursor: pointer; }
+.buy-book-dialog__modes label, .buy-book-dialog__methods label { display: flex; align-items: center; gap: 12px; padding: 15px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 11px; background: var(--home-v2-surface, var(--app-surface, #fff)); cursor: pointer; }
 .buy-book-dialog__modes label.active, .buy-book-dialog__methods label.active { border-color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 12%, var(--home-v2-surface, var(--app-surface, #fff))); }
 .buy-book-dialog__modes span, .buy-book-dialog__methods span { display: grid; gap: 2px; }
-.buy-book-dialog__modes small, .buy-book-dialog__methods small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; }
+.buy-book-dialog__modes b, .buy-book-dialog__methods b { font-size: 15px; }
+.buy-book-dialog__modes small, .buy-book-dialog__methods small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 12px; line-height: 1.5; }
 .buy-book-dialog__section { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea)); border-radius: 10px; }
 .buy-book-dialog__delivery { background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 4%, var(--home-v2-surface, var(--app-surface, #fff))); }
 .buy-book-dialog__section-title { display: flex; align-items: center; gap: 10px; }
 .buy-book-dialog__section-title > div { display: grid; gap: 2px; }
+.buy-book-dialog__section-title b { font-size: 16px; }
 .buy-book-dialog__section-title--action { flex-wrap: wrap; }
-.buy-book-dialog__step { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border-radius: 50%; background: var(--home-v2-blue, var(--app-accent, var(--primary-color))); color: #fff; font-size: 12px; font-style: normal; }
+.buy-book-dialog__step { display: grid; width: 32px; height: 32px; flex: 0 0 32px; place-items: center; border-radius: 50%; background: var(--home-v2-blue, var(--app-accent, var(--primary-color))); color: #fff; font-size: 14px; font-style: normal; }
 .buy-book-dialog__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
 .buy-book-dialog__field { display: grid; align-content: start; gap: 7px; min-width: 0; font-weight: 800; }
 .buy-book-dialog__field--full { grid-column: 1 / -1; }
-.buy-book-dialog__field > span { font-size: 13px; }
+.buy-book-dialog__field > span { font-size: 14px; }
 .buy-book-dialog__field em { color: #dc4a4a; font-style: normal; }
 .buy-book-dialog__field input, .buy-book-dialog__field textarea { width: 100%; min-height: 48px; padding: 11px 14px; border: 1px solid var(--home-v2-line, var(--app-line, #d9dce4)); border-radius: 8px; background: var(--home-v2-surface-raised, var(--app-surface-raised, #fff)); color: var(--home-v2-ink, var(--app-text, #172033)); font: inherit; font-weight: 500; outline: none; }
 .buy-book-dialog__field textarea { min-height: 88px; resize: vertical; line-height: 1.7; }
 .buy-book-dialog__field input:focus, .buy-book-dialog__field textarea:focus { border-color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 12%, transparent); }
 .buy-book-dialog__field input.invalid, .buy-book-dialog__field textarea.invalid { border-color: #dc4a4a; }
-.buy-book-dialog__field-error { margin: 0; color: #c43e3e; font-size: 11px; font-weight: 700; }
+.buy-book-dialog__field-error { margin: 0; color: #c43e3e; font-size: 12px; font-weight: 700; }
 .buy-book-dialog__field .buy-book-dialog__receipt-input { position: absolute; width: 1px; height: 1px; padding: 0; opacity: 0; overflow: hidden; pointer-events: none; }
 .buy-book-dialog__receipt-picker { display: grid; min-height: 130px; padding: 18px; place-items: center; align-content: center; gap: 5px; border: 1.5px dashed var(--home-v2-line, var(--app-line, #cfd3dc)); border-radius: 10px; background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 3%, var(--home-v2-surface, var(--app-surface, #fff))); text-align: center; cursor: pointer; transition: border-color .2s ease, background .2s ease; }
 .buy-book-dialog__receipt-picker:hover { border-color: var(--home-v2-blue, var(--app-accent, var(--primary-color))); background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 7%, var(--home-v2-surface, var(--app-surface, #fff))); }
@@ -800,10 +803,10 @@ const submit = async () => {
 .buy-book-dialog__location-message { margin: 0; padding: 8px 10px; border-radius: 7px; background: color-mix(in srgb, #dc4a4a 10%, transparent); color: #b63c3c; font-size: 11px; }
 .buy-book-dialog__location-message.success { background: color-mix(in srgb, #32a762 11%, transparent); color: #27824d; }
 .buy-book-dialog__methods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
-.buy-book-dialog__methods label { position: relative; min-height: 72px; padding: 12px; overflow: hidden; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+.buy-book-dialog__methods label { position: relative; min-height: 88px; padding: 14px; overflow: hidden; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
 .buy-book-dialog__methods label:hover { transform: translateY(-1px); }
 .buy-book-dialog__methods label > input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.buy-book-dialog__method-visual { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 10px; background: color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 9%, transparent); color: var(--home-v2-deep, var(--app-accent-secondary, #3a3e7e)); font-size: 18px; }
+.buy-book-dialog__method-visual { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 10px; background: color-mix(in srgb, var(--home-v2-deep, #3a3e7e) 9%, transparent); color: var(--home-v2-deep, var(--app-accent-secondary, #3a3e7e)); font-size: 20px; }
 .buy-book-dialog__method-visual img { width: 34px; height: 34px; border-radius: 6px; object-fit: contain; }
 .buy-book-dialog__method-copy { min-width: 0; flex: 1; }
 .buy-book-dialog__method-check { display: grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; border: 1px solid var(--home-v2-line, var(--app-line, #d9dce4)); border-radius: 50%; color: transparent; font-size: 10px; }
@@ -811,9 +814,9 @@ const submit = async () => {
 .buy-book-dialog__gateway-note { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid color-mix(in srgb, #32a762 35%, var(--home-v2-line, var(--app-line, #d9dce4))); border-radius: 9px; background: color-mix(in srgb, #32a762 9%, var(--home-v2-surface, var(--app-surface, #fff))); }
 .buy-book-dialog__gateway-note > span { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 50%; background: color-mix(in srgb, #32a762 16%, transparent); color: #27824d; font-size: 17px; }
 .buy-book-dialog__gateway-note > div { display: grid; gap: 3px; }
-.buy-book-dialog__gateway-note b { color: var(--home-v2-ink, var(--app-text, #172033)); font-size: 13px; }
-.buy-book-dialog__gateway-note small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; line-height: 1.7; }
-.buy-book-dialog__field small:not(.buy-book-dialog__field-error), .buy-book-dialog__hint, .buy-book-dialog__privacy { margin: 0; color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 11px; }
+.buy-book-dialog__gateway-note b { color: var(--home-v2-ink, var(--app-text, #172033)); font-size: 15px; }
+.buy-book-dialog__gateway-note small { color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 13px; line-height: 1.7; }
+.buy-book-dialog__field small:not(.buy-book-dialog__field-error), .buy-book-dialog__hint, .buy-book-dialog__privacy { margin: 0; color: var(--home-v2-muted, var(--app-muted, #747b8b)); font-size: 12px; line-height: 1.6; }
 .buy-book-dialog__error { margin: 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, #dc4a4a 35%, transparent); border-radius: 7px; background: color-mix(in srgb, #dc4a4a 12%, var(--app-surface, #fff)); color: color-mix(in srgb, #dc4a4a 70%, var(--app-text, #172033)); font-size: 13px; }
 .buy-book-dialog__submit:disabled { opacity: .55; cursor: wait; }
 .buy-book-dialog__privacy { text-align: center; }

@@ -858,6 +858,7 @@ useHead(() => ({
 .blog-v2__related-grid h3 {
   margin: 10px 0;
   font: 900 22px/1.5 "bold";
+  color: var(--home-v2-ink);
 }
 .blog-v2__related-grid p {
   color: var(--muted);

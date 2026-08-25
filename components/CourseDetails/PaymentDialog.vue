@@ -413,7 +413,7 @@ onBeforeUnmount(clearReceipt);
       dismissable-mask
       :draggable="false"
       :close-on-escape="!submitting"
-      :style="{ width: 'min(640px, 94vw)' }"
+      :style="{ width: 'min(680px, calc(100vw - 24px))' }"
       class="course-payment-dialog"
       dir="rtl"
     >
@@ -740,21 +740,23 @@ onBeforeUnmount(clearReceipt);
 }
 
 .course-payment-dialog__header strong {
-  font-size: 16px;
+  font-size: 19px;
+  line-height: 1.45;
   font-weight: 900;
 }
 
 .course-payment-dialog__header small {
   overflow: hidden;
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 11px;
+  font-size: 13px;
+  line-height: 1.6;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .course-payment-dialog__form {
   display: grid;
-  gap: 17px;
+  gap: 20px;
 }
 
 .course-payment-dialog__summary {
@@ -762,7 +764,7 @@ onBeforeUnmount(clearReceipt);
   grid-template-columns: 42px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 14px;
+  padding: 17px;
   border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea));
   border-radius: 12px;
   background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 5%, var(--home-v2-surface, var(--app-surface, #fff)));
@@ -787,26 +789,26 @@ onBeforeUnmount(clearReceipt);
 
 .course-payment-dialog__summary small {
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .course-payment-dialog__summary strong {
   overflow: hidden;
-  font-size: 13px;
+  font-size: 15px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .course-payment-dialog__summary > b {
   color: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
-  font-size: 18px;
+  font-size: 21px;
   white-space: nowrap;
 }
 
 .course-payment-dialog__section {
   display: grid;
   gap: 14px;
-  padding: 15px;
+  padding: 18px;
   border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea));
   border-radius: 12px;
   background: var(--home-v2-surface, var(--app-surface, #fff));
@@ -829,25 +831,26 @@ onBeforeUnmount(clearReceipt);
 }
 
 .course-payment-dialog__section-title b {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 900;
 }
 
 .course-payment-dialog__section-title small {
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 10px;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .course-payment-dialog__step {
   display: grid;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   place-items: center;
   border-radius: 50%;
   background: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 900;
 }
 
@@ -860,11 +863,11 @@ onBeforeUnmount(clearReceipt);
 .payment-method {
   position: relative;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 22px;
-  min-height: 78px;
+  grid-template-columns: 48px minmax(0, 1fr) 24px;
+  min-height: 88px;
   align-items: center;
   gap: 10px;
-  padding: 11px;
+  padding: 14px;
   border: 1px solid var(--home-v2-line, var(--app-line, #dfe2e8));
   border-radius: 11px;
   background: var(--home-v2-surface-raised, var(--app-surface-raised, #fff));
@@ -899,8 +902,8 @@ onBeforeUnmount(clearReceipt);
 
 .payment-method__visual {
   display: grid;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   place-items: center;
   overflow: hidden;
   border: 1px solid var(--home-v2-line, var(--app-line, #e2e4ea));
@@ -925,7 +928,7 @@ onBeforeUnmount(clearReceipt);
 
 .payment-method__copy b {
   overflow: hidden;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -934,20 +937,21 @@ onBeforeUnmount(clearReceipt);
 .payment-method__copy small {
   overflow: hidden;
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 9px;
+  font-size: 12px;
+  line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .payment-method__check {
   display: grid;
-  width: 21px;
-  height: 21px;
+  width: 24px;
+  height: 24px;
   place-items: center;
   border: 1px solid var(--home-v2-line, var(--app-line, #d8dce4));
   border-radius: 50%;
   color: transparent;
-  font-size: 9px;
+  font-size: 11px;
   transition: background-color .2s ease, border-color .2s ease, color .2s ease;
 }
 
@@ -986,12 +990,12 @@ onBeforeUnmount(clearReceipt);
 }
 
 .course-payment-dialog__gateway-note b {
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .course-payment-dialog__gateway-note small {
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.7;
 }
 
@@ -1003,7 +1007,7 @@ onBeforeUnmount(clearReceipt);
 }
 
 .course-payment-dialog__field > span {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 850;
 }
 
@@ -1036,7 +1040,7 @@ onBeforeUnmount(clearReceipt);
 
 .course-payment-dialog__destination {
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .course-payment-dialog__destination b {
@@ -1090,12 +1094,12 @@ onBeforeUnmount(clearReceipt);
 }
 
 .course-payment-dialog__receipt-picker b {
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .course-payment-dialog__receipt-picker small {
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .course-payment-dialog__receipt-preview {
@@ -1125,14 +1129,14 @@ onBeforeUnmount(clearReceipt);
 
 .course-payment-dialog__receipt-preview > div b {
   overflow: hidden;
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .course-payment-dialog__receipt-preview small {
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .course-payment-dialog__receipt-preview > label,
@@ -1143,7 +1147,7 @@ onBeforeUnmount(clearReceipt);
   background: color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 10%, transparent);
   color: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 850;
   cursor: pointer;
 }
@@ -1161,7 +1165,7 @@ onBeforeUnmount(clearReceipt);
 .course-payment-dialog__selection-hint,
 .course-payment-dialog__loading {
   display: flex;
-  min-height: 58px;
+  min-height: 64px;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -1169,7 +1173,8 @@ onBeforeUnmount(clearReceipt);
   border: 1px dashed var(--home-v2-line, var(--app-line, #d9dce4));
   border-radius: 10px;
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .course-payment-dialog__empty {
@@ -1181,7 +1186,7 @@ onBeforeUnmount(clearReceipt);
   border-radius: 9px;
   background: color-mix(in srgb, #dc4a4a 8%, var(--app-surface, #fff));
   color: #b63c3c;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .course-payment-dialog__empty button {
@@ -1198,7 +1203,7 @@ onBeforeUnmount(clearReceipt);
 .course-payment-dialog__field-error {
   margin: 0;
   color: #c43e3e;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
 }
 
@@ -1212,7 +1217,7 @@ onBeforeUnmount(clearReceipt);
   border-radius: 9px;
   background: color-mix(in srgb, #dc4a4a 10%, var(--app-surface, #fff));
   color: #b63c3c;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
 }
 
@@ -1220,7 +1225,7 @@ onBeforeUnmount(clearReceipt);
 .course-payment-dialog__success button {
   display: inline-flex;
   width: 100%;
-  min-height: 50px;
+  min-height: 54px;
   align-items: center;
   justify-content: center;
   gap: 9px;
@@ -1228,7 +1233,7 @@ onBeforeUnmount(clearReceipt);
   border-radius: 10px;
   background: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
   color: #fff;
-  font: 900 13px var(--home-v2-heading, inherit);
+  font: 900 16px var(--home-v2-heading, inherit);
   cursor: pointer;
   transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
 }
@@ -1252,7 +1257,8 @@ onBeforeUnmount(clearReceipt);
   gap: 6px;
   margin: -7px 0 0;
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 9px;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 .course-payment-dialog__success {
@@ -1283,7 +1289,7 @@ onBeforeUnmount(clearReceipt);
 .course-payment-dialog__success p {
   max-width: 430px;
   color: var(--home-v2-muted, var(--app-muted, #747b8b));
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.8;
 }
 

@@ -81,6 +81,7 @@ const formatDate = (date: string | null) => {
 const blogPageRef = ref<HTMLElement | null>(null);
 let blogAnimationContext: ReturnType<typeof gsap.context> | null = null;
 let blogSectionObserver: IntersectionObserver | null = null;
+let blogRevealFallback: ReturnType<typeof setTimeout> | null = null;
 
 const animateBlogCards = (section: HTMLElement) => {
   const headingItems = section.querySelectorAll<HTMLElement>(
@@ -93,44 +94,37 @@ const animateBlogCards = (section: HTMLElement) => {
   const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
 
   timeline
-    .fromTo(
-      headingItems,
-      { autoAlpha: 0, y: 30 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.72,
-        stagger: 0.1,
-        clearProps: "opacity,visibility,transform",
-      },
-    )
-    .fromTo(
+    .to(headingItems, {
+      y: 0,
+      duration: 0.55,
+      stagger: 0.08,
+      clearProps: "transform",
+    })
+    .to(
       cards,
-      { autoAlpha: 0, y: 56, scale: 0.96, rotationX: -7 },
       {
         autoAlpha: 1,
         y: 0,
         scale: 1,
         rotationX: 0,
-        duration: 0.82,
+        duration: 0.78,
         stagger: 0.12,
         clearProps: "opacity,visibility,transform",
       },
-      0.25,
+      0.08,
     )
-    .fromTo(
+    .to(
       markers,
-      { autoAlpha: 0, scale: 0.72, rotation: -8 },
       {
         autoAlpha: 1,
         scale: 1,
         rotation: 0,
-        duration: 0.68,
+        duration: 0.62,
         stagger: 0.1,
         ease: "back.out(1.7)",
         clearProps: "opacity,visibility,transform",
       },
-      0.52,
+      0.32,
     );
 };
 
@@ -139,8 +133,6 @@ onMounted(() => {
   if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return;
   }
-  const deferArticleReveal = window.matchMedia("(min-width: 721px)").matches;
-
   blogAnimationContext = gsap.context(() => {
     const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
     const heroCopy = root.querySelectorAll<HTMLElement>(
@@ -152,32 +144,6 @@ onMounted(() => {
     const methodContent = root.querySelectorAll<HTMLElement>(
       ".blog-listing__hero-visual img",
     );
-    const articleHeadingItems = root.querySelectorAll<HTMLElement>(
-      ".blog-listing__section-heading > *",
-    );
-    const articleCards = root.querySelectorAll<HTMLElement>(
-      ".blog-listing__card",
-    );
-    const articleMarkers = root.querySelectorAll<HTMLElement>(
-      ".blog-listing__visual > strong",
-    );
-
-    // Keep the content immediately discoverable on touch-sized screens.
-    if (deferArticleReveal) {
-      gsap.set(articleHeadingItems, { autoAlpha: 0, y: 30 });
-      gsap.set(articleCards, {
-        autoAlpha: 0,
-        y: 56,
-        scale: 0.96,
-        rotationX: -7,
-      });
-      gsap.set(articleMarkers, {
-        autoAlpha: 0,
-        scale: 0.72,
-        rotation: -8,
-      });
-    }
-
     heroTimeline
       .fromTo(
         heroCopy,
@@ -231,15 +197,17 @@ onMounted(() => {
     }
   }, root);
 
-  if (!deferArticleReveal) return;
-
   const articleSection = root.querySelector<HTMLElement>(".blog-listing__main");
-  const articleTrigger = root.querySelector<HTMLElement>(
-    ".blog-listing__section-heading",
-  );
-  if (!articleSection || !articleTrigger) return;
+  const articleGrid = root.querySelector<HTMLElement>(".blog-listing__grid");
+  if (!articleSection || !articleGrid) return;
 
+  let articlesRevealed = false;
   const revealArticles = () => {
+    if (articlesRevealed) return;
+    articlesRevealed = true;
+    if (blogRevealFallback) clearTimeout(blogRevealFallback);
+    blogRevealFallback = null;
+    blogSectionObserver?.disconnect();
     blogAnimationContext?.add(() => animateBlogCards(articleSection));
   };
 
@@ -248,21 +216,50 @@ onMounted(() => {
     return;
   }
 
+  blogAnimationContext.add(() => {
+    const headingItems = articleSection.querySelectorAll<HTMLElement>(
+      ".blog-listing__section-heading > *",
+    );
+    const articleCards = articleGrid.querySelectorAll<HTMLElement>(
+      ".blog-listing__card",
+    );
+    const articleMarkers = articleGrid.querySelectorAll<HTMLElement>(
+      ".blog-listing__visual > strong",
+    );
+
+    // The heading stays readable so users always know content continues below.
+    gsap.set(headingItems, { y: 18 });
+    gsap.set(articleCards, {
+      autoAlpha: 0,
+      y: 48,
+      scale: 0.97,
+      rotationX: -6,
+    });
+    gsap.set(articleMarkers, {
+      autoAlpha: 0,
+      scale: 0.76,
+      rotation: -7,
+    });
+  });
+
   blogSectionObserver = new IntersectionObserver(
     ([entry]) => {
-      if (!entry?.isIntersecting) return;
-      revealArticles();
-      blogSectionObserver?.disconnect();
+      if (entry?.isIntersecting) revealArticles();
     },
-    { threshold: 0.2, rootMargin: "0px 0px -40% 0px" },
+    { threshold: 0.05, rootMargin: "0px 0px -22% 0px" },
   );
-  blogSectionObserver.observe(articleTrigger);
+  blogSectionObserver.observe(articleGrid);
+
+  // Never leave content hidden if a browser delays or misses observer delivery.
+  blogRevealFallback = setTimeout(revealArticles, 7000);
 });
 
 onBeforeUnmount(() => {
   blogSectionObserver?.disconnect();
+  if (blogRevealFallback) clearTimeout(blogRevealFallback);
   blogAnimationContext?.revert();
   blogSectionObserver = null;
+  blogRevealFallback = null;
   blogAnimationContext = null;
 });
 
@@ -331,6 +328,14 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
               >
               <span><b>100%</b> قراءة مجانية</span>
             </div>
+            <a
+              v-if="blogs.length"
+              class="blog-listing__hero-action"
+              href="#blog-listing-title"
+            >
+              استعرض المقالات
+              <span aria-hidden="true">↓</span>
+            </a>
           </div>
 
           <figure
@@ -377,7 +382,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
             <p>كل مقال مستقل؛ اختار الموضوع المناسب لك وابدأ منه مباشرة.</p>
           </header>
 
-          <div class="blog-listing__grid">
+          <div v-if="blogs.length" class="blog-listing__grid">
             <article
               v-for="(blog, index) in blogs"
               :key="blog.id"
@@ -493,9 +498,9 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   position: relative;
   z-index: 1;
   display: grid;
-  min-height: 540px;
+  min-height: 470px;
   align-items: center;
-  padding-block: 54px;
+  padding-block: 46px;
 }
 
 .blog-listing__hero::before,
@@ -525,11 +530,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   position: relative;
   z-index: 1;
   display: grid;
-  min-height: 540px;
+  min-height: 470px;
   grid-template-columns: minmax(0, 1.1fr) minmax(310px, 0.7fr);
   align-items: center;
   gap: clamp(50px, 8vw, 110px);
-  padding-block: 72px;
+  padding-block: 50px;
 }
 
 .blog-listing__eyebrow,
@@ -555,7 +560,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 .blog-listing__hero-copy h1 {
   max-width: 720px;
   margin: 16px 0 18px;
-  font: 900 clamp(48px, 5.3vw, 74px) / 1.16 var(--home-v2-heading);
+  font: 900 clamp(44px, 4.7vw, 64px) / 1.16 var(--home-v2-heading);
   letter-spacing: -0.04em;
 }
 
@@ -593,9 +598,40 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   font: 900 19px var(--home-v2-heading);
 }
 
+.blog-listing__hero-action {
+  display: inline-flex;
+  min-height: 44px;
+  margin-top: 18px;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 17px;
+  border: 1px solid #ffffff70;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 30px -18px #020819;
+  color: var(--home-v2-blue);
+  font-size: 13px;
+  font-weight: 900;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-listing__hero-action span {
+  color: var(--home-v2-coral);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.blog-listing__hero-action:hover,
+.blog-listing__hero-action:focus-visible {
+  outline: 3px solid #ffffff3d;
+  outline-offset: 3px;
+  box-shadow: 0 18px 34px -18px #020819;
+  transform: translateY(-2px);
+}
+
 .blog-listing__hero-visual {
   position: relative;
-  min-height: 390px;
+  min-height: 340px;
   margin: 0;
   overflow: hidden;
   border: 1px solid #ffffff2e;
@@ -630,7 +666,7 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 }
 
 .blog-listing__main {
-  padding: 86px 0 100px;
+  padding: 46px 0 100px;
 }
 
 .blog-listing__section-heading {
@@ -638,7 +674,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   grid-template-columns: minmax(0, 1fr) minmax(260px, 0.52fr);
   align-items: end;
   gap: 65px;
-  margin-bottom: 34px;
+  margin-bottom: 26px;
+}
+
+#blog-listing-title {
+  scroll-margin-top: 110px;
 }
 
 .blog-listing__section-heading h2 {
@@ -850,9 +890,10 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
 @media (max-width: 940px) {
   .blog-listing__hero-grid {
+    min-height: 0;
     grid-template-columns: 1fr;
     gap: 38px;
-    padding-block: 64px;
+    padding-block: 48px;
   }
 
   .blog-listing__hero-visual {

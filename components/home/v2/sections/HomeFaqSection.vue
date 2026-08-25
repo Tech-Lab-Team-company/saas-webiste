@@ -1,72 +1,78 @@
 <script setup lang="ts">
-import { gsap } from 'gsap'
-import type Fqs from '~/types/fqs'
-import { useBaseUrls } from '~/constant/baseUrl'
-import { getWebDomain } from '~/constant/webDomain'
+import { gsap } from "gsap";
+import type Fqs from "~/types/fqs";
+import { useBaseUrls } from "~/constant/baseUrl";
+import { getWebDomain } from "~/constant/webDomain";
 
 type FaqResponse = {
-  data: Fqs[]
-}
+  data: Fqs[];
+};
 
-const HOME_FAQ_LIMIT = 6
-const webDomain = getWebDomain()
+const HOME_FAQ_LIMIT = 5;
+const webDomain = getWebDomain();
 
-const { data: faqs, pending, error } = await useAsyncData(
+const {
+  data: faqs,
+  pending,
+  error,
+} = await useAsyncData(
   `home-v2-faqs:${webDomain}`,
   async () => {
-    const response = await $fetch<FaqResponse>(`${useBaseUrls().baseUrl}/fetch_faqs`, {
-      method: 'GET',
-      headers: {
-        'Accept-Language': 'ar',
-        'web-domain': webDomain,
+    const response = await $fetch<FaqResponse>(
+      `${useBaseUrls().baseUrl}/fetch_faqs`,
+      {
+        method: "GET",
+        headers: {
+          "Accept-Language": "ar",
+          "web-domain": webDomain,
+        },
       },
-    })
+    );
 
-    return (response.data ?? []).slice(0, HOME_FAQ_LIMIT)
+    return (response.data ?? []).slice(0, HOME_FAQ_LIMIT);
   },
   {
     default: () => [],
-    dedupe: 'defer',
+    dedupe: "defer",
   },
-)
+);
 
-const faqSection = ref<HTMLElement | null>(null)
-const faqHasEntered = ref(false)
-let faqAnimationContext: ReturnType<typeof gsap.context> | null = null
+const faqSection = ref<HTMLElement | null>(null);
+const faqHasEntered = ref(false);
+let faqAnimationContext: ReturnType<typeof gsap.context> | null = null;
 const hasFaqContent = computed(
   () => !pending.value && !error.value && faqs.value.length > 0,
-)
+);
 
 const shouldReduceMotion = () =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const cappedStagger = (
   itemCount: number,
   preferredGap = 0.11,
   maximumSpan = 0.55,
-) => itemCount > 1
-  ? Math.min(preferredGap, maximumSpan / (itemCount - 1))
-  : 0
+) =>
+  itemCount > 1 ? Math.min(preferredGap, maximumSpan / (itemCount - 1)) : 0;
 
 const revealFaqSection = () => {
-  const section = faqSection.value
-  if (!section || faqHasEntered.value) return
+  const section = faqSection.value;
+  if (!section || faqHasEntered.value) return;
 
-  faqHasEntered.value = true
-  if (shouldReduceMotion()) return
+  faqHasEntered.value = true;
+  if (shouldReduceMotion()) return;
 
   faqAnimationContext = gsap.context(() => {
-    const intro = section.querySelector('.home-v2-faq__intro')
+    const intro = section.querySelector(".home-v2-faq__intro");
     const introContent = section.querySelectorAll(
-      '.home-v2-faq__intro > :not(.home-v2-faq__intro-mark)',
-    )
-    const introMark = section.querySelector('.home-v2-faq__intro-mark')
+      ".home-v2-faq__intro > :not(.home-v2-faq__intro-mark)",
+    );
+    const introMark = section.querySelector(".home-v2-faq__intro-mark");
     const listItems = section.querySelectorAll(
-      '.home-v2-faq__list > details, .home-v2-faq__list > .home-v2-faq__status',
-    )
-    const itemNumbers = section.querySelectorAll('.home-v2-faq__number')
+      ".home-v2-faq__list > details, .home-v2-faq__list > .home-v2-faq__status",
+    );
+    const itemNumbers = section.querySelectorAll(".home-v2-faq__number");
 
-    const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } })
+    const timeline = gsap.timeline({ defaults: { ease: "power2.out" } });
 
     if (intro) {
       timeline.from(
@@ -76,13 +82,13 @@ const revealFaqSection = () => {
           x: 38,
           scale: 0.985,
           rotationY: -2,
-          transformOrigin: 'right center',
+          transformOrigin: "right center",
           duration: 1,
-          ease: 'power3.out',
-          clearProps: 'opacity,visibility,transform',
+          ease: "power3.out",
+          clearProps: "opacity,visibility,transform",
         },
         0,
-      )
+      );
     }
 
     if (introContent.length) {
@@ -93,10 +99,10 @@ const revealFaqSection = () => {
           y: 24,
           duration: 0.66,
           stagger: 0.11,
-          clearProps: 'opacity,visibility,transform',
+          clearProps: "opacity,visibility,transform",
         },
         0.34,
-      )
+      );
     }
 
     if (introMark) {
@@ -108,11 +114,11 @@ const revealFaqSection = () => {
           scale: 0.9,
           rotation: -2,
           duration: 1.1,
-          ease: 'power2.out',
-          clearProps: 'opacity,visibility,transform',
+          ease: "power2.out",
+          clearProps: "opacity,visibility,transform",
         },
         0.28,
-      )
+      );
     }
 
     if (listItems.length) {
@@ -124,13 +130,13 @@ const revealFaqSection = () => {
           y: 18,
           scale: 0.99,
           rotationX: 2,
-          transformOrigin: 'top center',
+          transformOrigin: "top center",
           duration: 0.78,
           stagger: cappedStagger(listItems.length),
-          clearProps: 'opacity,visibility,transform',
+          clearProps: "opacity,visibility,transform",
         },
         0.38,
-      )
+      );
     }
 
     if (itemNumbers.length) {
@@ -142,23 +148,23 @@ const revealFaqSection = () => {
           rotation: -5,
           duration: 0.58,
           stagger: cappedStagger(itemNumbers.length, 0.11, 0.48),
-          ease: 'power3.out',
-          clearProps: 'opacity,visibility,transform',
+          ease: "power3.out",
+          clearProps: "opacity,visibility,transform",
         },
         0.54,
-      )
+      );
     }
-  }, section)
-}
+  }, section);
+};
 
 const handleFaqToggle = (event: Event) => {
-  const item = event.currentTarget as HTMLDetailsElement
-  if (!item.open || !faqHasEntered.value || shouldReduceMotion()) return
+  const item = event.currentTarget as HTMLDetailsElement;
+  if (!item.open || !faqHasEntered.value || shouldReduceMotion()) return;
 
-  const question = item.querySelector('.home-v2-faq__question')
-  if (!question) return
+  const question = item.querySelector(".home-v2-faq__question");
+  if (!question) return;
 
-  gsap.killTweensOf(question)
+  gsap.killTweensOf(question);
   gsap.fromTo(
     question,
     { autoAlpha: 0.78, x: 8 },
@@ -166,24 +172,23 @@ const handleFaqToggle = (event: Event) => {
       autoAlpha: 1,
       x: 0,
       duration: 0.5,
-      ease: 'power3.out',
-      clearProps: 'opacity,visibility,transform',
+      ease: "power3.out",
+      clearProps: "opacity,visibility,transform",
     },
-  )
-}
+  );
+};
 
 useScrollTriggeredReveal(faqSection, revealFaqSection, {
   threshold: 0.1,
-})
+});
 
 onBeforeUnmount(() => {
-  faqAnimationContext?.revert()
+  faqAnimationContext?.revert();
 
   if (faqSection.value) {
-    gsap.killTweensOf(faqSection.value.querySelectorAll('*'))
+    gsap.killTweensOf(faqSection.value.querySelectorAll("*"));
   }
-})
-
+});
 </script>
 
 <template>
@@ -331,7 +336,11 @@ onBeforeUnmount(() => {
 }
 
 .home-v2-faq details:hover {
-  border-color: color-mix(in srgb, var(--home-v2-blue) 26%, var(--home-v2-line));
+  border-color: color-mix(
+    in srgb,
+    var(--home-v2-blue) 26%,
+    var(--home-v2-line)
+  );
   box-shadow: 0 22px 42px -32px color-mix(in srgb, var(--home-v2-deep) 52%, transparent);
   transform: translateY(-2px);
 }

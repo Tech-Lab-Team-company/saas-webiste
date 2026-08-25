@@ -467,12 +467,34 @@ onBeforeUnmount(() =>
           </header>
 
           <div class="purchase-grid">
-            <article
+            <template
               v-for="(item, itemIndex) in section.items"
               :key="`${item.kind}-${item.id}`"
-              :class="['purchase-card', `purchase-card--${item.kind}`]"
-              :style="{ '--purchase-order': itemIndex }"
             >
+              <ProfileStudentCourseCard
+                v-if="item.kind === 'course'"
+                class="purchased-course-card"
+                :style="{ '--purchase-order': itemIndex }"
+                :to="itemRoute(item)"
+                :title="item.title"
+                :image="item.image"
+                :subject="item.subjectTitle || 'كورس'"
+                :teacher-name="item.teacherName"
+                :description="item.description"
+                :video-count="item.videoCount"
+                :document-count="item.pdfCount"
+                :audio-count="item.audioCount"
+                :progress="item.progress"
+                :is-last="item.progress > 0 && item.progress < 100"
+                :is-blocked="item.isBlocked"
+                :invoice-link="item.invoiceLink"
+              />
+
+              <article
+                v-else
+                :class="['purchase-card', `purchase-card--${item.kind}`]"
+                :style="{ '--purchase-order': itemIndex }"
+              >
               <NuxtLink
                 v-if="item.kind === 'book'"
                 class="purchase-card__book-link"
@@ -613,12 +635,6 @@ onBeforeUnmount(() =>
                       {{ actionLabel(item) }}
                       <i class="pi pi-arrow-left" aria-hidden="true" />
                     </NuxtLink>
-                    <span
-                      v-else-if="item.kind === 'course' && item.isBlocked"
-                      class="purchase-card__disabled"
-                    >
-                      تواصل مع الدعم لاستعادة الوصول
-                    </span>
                     <span v-else class="purchase-card__included">
                       {{ packageItemsCount(item) }} محتوى داخل الباقة
                     </span>
@@ -636,7 +652,8 @@ onBeforeUnmount(() =>
                   </footer>
                 </div>
               </template>
-            </article>
+              </article>
+            </template>
           </div>
         </section>
       </div>
@@ -1068,6 +1085,16 @@ onBeforeUnmount(() =>
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.purchased-course-card {
+  animation: purchase-card-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--purchase-order) * 55ms);
+}
+
+.purchase-grid:has(.purchased-course-card) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .purchase-grid:has(.purchase-card--book) {
@@ -2253,6 +2280,10 @@ onBeforeUnmount(() =>
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .purchase-grid:has(.purchased-course-card) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
 }
 
 @media (max-width: 820px) {
@@ -2303,6 +2334,10 @@ onBeforeUnmount(() =>
 
   .purchase-grid:has(.purchase-card--book) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .purchase-grid:has(.purchased-course-card) {
+    grid-template-columns: 1fr;
   }
 
 }

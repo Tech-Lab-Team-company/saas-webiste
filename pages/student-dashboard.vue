@@ -298,59 +298,23 @@ onMounted(async () => {
               <span v-for="item in 3" :key="item" />
             </div>
             <div v-else-if="courses.length" class="course-grid">
-              <NuxtLink
+              <ProfileStudentCourseCard
                 v-for="course in courses.slice(0, 6)"
                 :key="course.id"
                 class="course-card"
                 :to="courseRoute(course.id)"
-              >
-                <div class="course-cover">
-                  <img
-                    v-if="courseImage(course)"
-                    :src="courseImage(course)"
-                    :alt="course.image?.alt || course.title"
-                  />
-                  <div v-else class="cover-fallback">
-                    <strong>{{ course.title?.charAt(0) || "ك" }}</strong
-                    ><small>Edu.HUB</small>
-                  </div>
-                  <span class="subject-badge">{{
-                    course.subject?.title || educationLabel
-                  }}</span>
-                  <span v-if="course.is_last" class="resume-badge"
-                    >متابعة</span
-                  >
-                </div>
-                <div class="course-info">
-                  <div v-if="course.teacher?.name" class="teacher-line">
-                    <span>{{ course.teacher.name.charAt(0) }}</span
-                    ><small>{{ course.teacher.name }}</small>
-                  </div>
-                  <h3>{{ course.title }}</h3>
-                  <p v-if="course.subtitle">{{ course.subtitle }}</p>
-                  <div class="course-meta">
-                    <span>▶ {{ course.course_videos }} فيديو</span
-                    ><span>▤ {{ course.course_docs }} ملف</span
-                    ><span>♪ {{ course.course_records }} تسجيل صوتي</span>
-                  </div>
-                  <div class="card-footer">
-                    <div class="card-progress">
-                      <div>
-                        <span>التقدم</span
-                        ><b>{{ displayCourseProgress(course) }}%</b>
-                      </div>
-                      <div class="progress">
-                        <i
-                          :style="{
-                            width: `${courseProgress(course)}%`,
-                          }"
-                        />
-                      </div>
-                    </div>
-                    <i class="card-arrow">←</i>
-                  </div>
-                </div>
-              </NuxtLink>
+                :title="course.title"
+                :image="courseImage(course)"
+                :image-alt="course.image?.alt || course.title"
+                :subject="course.subject?.title || educationLabel"
+                :teacher-name="course.teacher?.name"
+                :description="course.subtitle"
+                :video-count="course.course_videos"
+                :document-count="course.course_docs"
+                :audio-count="course.course_records"
+                :progress="courseProgress(course)"
+                :is-last="course.is_last"
+              />
             </div>
             <div v-else class="empty-list">
               <span>▤</span><b>لا توجد كورسات مرتبطة بحسابك حاليًا</b
@@ -785,181 +749,6 @@ onMounted(async () => {
 }
 .course-grid {
   perspective: 1200px;
-}
-.course-card {
-  display: flex;
-  min-height: 400px;
-  overflow: hidden;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  color: inherit;
-  background: var(--profile-surface);
-  text-decoration: none;
-  box-shadow: 0 12px 32px color-mix(in srgb, var(--navy) 6%, transparent);
-  transition: 0.25s ease;
-}
-.course-card:hover {
-  border-color: color-mix(in srgb, var(--primary) 32%, white);
-  transform: translateY(-5px);
-  box-shadow: 0 20px 45px color-mix(in srgb, var(--navy) 13%, transparent);
-}
-.course-cover {
-  position: relative;
-  width: 100%;
-  min-height: 188px;
-  aspect-ratio: 16/9;
-  overflow: hidden;
-  color: #fff;
-  background: var(--navy);
-}
-.course-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s ease;
-}
-.course-card:hover .course-cover img {
-  transform: scale(1.045);
-}
-.course-cover::after {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--navy) 72%, transparent));
-  content: "";
-}
-.cover-fallback {
-  display: flex;
-  height: 100%;
-  min-height: 188px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--primary) 72%, white), transparent 35%),
-    linear-gradient(145deg, color-mix(in srgb, var(--navy) 82%, var(--primary)), var(--navy));
-}
-.cover-fallback strong {
-  font-size: 60px;
-  line-height: 1;
-}
-.cover-fallback small {
-  margin-top: 8px;
-  color: color-mix(in srgb, var(--primary) 34%, white);
-  font-weight: 800;
-}
-.subject-badge,
-.resume-badge {
-  position: absolute;
-  z-index: 2;
-  top: 13px;
-  padding: 7px 10px;
-  border-radius: 7px;
-  font-size: 10px;
-  font-weight: 800;
-  backdrop-filter: blur(8px);
-}
-.subject-badge {
-  right: 13px;
-  max-width: 65%;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--navy) 76%, transparent);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.resume-badge {
-  left: 13px;
-  color: #0d642e;
-  background: #dff8e8e8;
-}
-.course-info {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  flex-direction: column;
-  padding: 17px 18px 16px;
-}
-.teacher-line {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.teacher-line > span {
-  display: grid;
-  width: 25px;
-  height: 25px;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--primary);
-  background: var(--primary-soft);
-  font-size: 10px;
-  font-weight: 900;
-}
-.teacher-line small {
-  color: var(--muted);
-  font-weight: 700;
-}
-.course-info h3 {
-  display: -webkit-box;
-  overflow: hidden;
-  min-height: 49px;
-  margin: 10px 0 5px;
-  color: var(--profile-ink);
-  font-size: 16px;
-  line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-.course-info > p {
-  display: -webkit-box;
-  overflow: hidden;
-  margin: 0 0 11px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.6;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-.course-meta {
-  display: flex;
-  gap: 15px;
-  color: var(--muted);
-  font-size: 10px;
-}
-.card-footer {
-  display: flex;
-  align-items: flex-end;
-  gap: 13px;
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-.card-progress {
-  flex: 1;
-}
-.card-progress > div:first-child {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  color: var(--muted);
-  font-size: 10px;
-}
-.card-progress b {
-  color: var(--profile-ink);
-}
-.card-arrow {
-  display: grid;
-  width: 31px;
-  height: 31px;
-  place-items: center;
-  border-radius: 8px;
-  color: var(--primary);
-  background: var(--primary-soft);
-  font-style: normal;
-  transition: 0.2s;
-}
-.course-card:hover .card-arrow {
-  color: var(--profile-on-action);
-  background: var(--primary);
 }
 .loading-grid span {
   height: 400px;

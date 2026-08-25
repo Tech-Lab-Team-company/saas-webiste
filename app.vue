@@ -15,6 +15,9 @@ const { protectionNotice, protectionNoticeKey } = useAppContentProtection();
 const LazyMainDialog = defineAsyncComponent(
   () => import("./base/persention/Dialogs/MainDialogs/MainDialog.vue"),
 );
+const LazyQrCodeRedeemer = defineAsyncComponent(
+  () => import("./components/Qr/QrCodeRedeemer.vue"),
+);
 
 const isCourseDetailsPage = computed(() =>
   /^\/course\/[^/]+\/?$/u.test(route.path),
@@ -64,6 +67,7 @@ const isAuthPage = computed(() => {
 });
 const { theme, isDark, toggleTheme } = useAppTheme();
 const SettingStore = useSettingStore();
+const userStore = useUserStore();
 const webDomain = getWebDomain();
 
 const getSiteImageSource = (image: unknown): string => {
@@ -460,6 +464,9 @@ onMounted(() => {
     <AppRouteTransition />
     <NuxtLayout>
       <LazyMobileNav v-if="!isHomeV2" />
+      <LazyQrCodeRedeemer
+        v-if="userStore.user && !isProtectedContentBlocked"
+      />
       <!-- <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" /> -->
       <!-- <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" /> -->
       <LazyToast v-if="!isHomeV2" />

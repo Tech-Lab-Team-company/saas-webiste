@@ -170,18 +170,25 @@ test("profilecourse keeps navigation compact and prioritizes searchable content"
   assert.match(page, /title: "مشترياتي \| مساحة الطالب"/u);
 });
 
-test("purchased courses use the original compact horizontal card", async () => {
-  const library = await readSource("components/Profile/MyPurchasesLibrary.vue");
+test("profilecourse and student dashboard share the same course card", async () => {
+  const [library, dashboard, courseCard] = await Promise.all([
+    readSource("components/Profile/MyPurchasesLibrary.vue"),
+    readSource("pages/student-dashboard.vue"),
+    readSource("components/Profile/StudentCourseCard.vue"),
+  ]);
 
-  assert.doesNotMatch(
+  assert.match(library, /<ProfileStudentCourseCard/u);
+  assert.match(library, /v-if="item\.kind === 'course'"/u);
+  assert.match(library, /:invoice-link="item\.invoiceLink"/u);
+  assert.match(
     library,
-    /<template v-else-if="item\.kind === 'course'">/u,
+    /purchase-grid:has\(\.purchased-course-card\)[\s\S]*?grid-template-columns: repeat\(3,/u,
   );
-  assert.match(library, /<template v-else>[\s\S]*purchase-card__visual/u);
-  assert.match(library, /<template v-else>[\s\S]*purchase-card__body/u);
-  assert.match(library, /class="purchase-progress"/u);
-  assert.match(library, /class="purchase-card__footer"/u);
-  assert.match(library, /normalizePercentage\(item\.progress\)/u);
-  assert.match(library, /Math\.round\(value\)/u);
-  assert.doesNotMatch(library, /\.purchase-card--course\s*\{/u);
+  assert.match(dashboard, /<ProfileStudentCourseCard/u);
+  assert.match(courseCard, /class="student-course-card__cover"/u);
+  assert.match(courseCard, /class="student-course-card__progress"/u);
+  assert.match(courseCard, /Math\.round\(value\)/u);
+  assert.match(courseCard, /student-course-card--blocked/u);
+  assert.match(courseCard, /left:13px/u);
+  assert.match(courseCard, /padding-inline-end:80px/u);
 });
