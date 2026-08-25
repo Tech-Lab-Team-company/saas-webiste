@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import FetchPurchasesParams from "../features/FetchPurchases/Core/Params/fetch_purchases_params.ts";
 import PurchasesModel from "../features/FetchPurchases/Data/models/purchases_model.ts";
 
 const readSource = (path: string) =>
@@ -98,6 +99,16 @@ test("purchased mapper tolerates partial data and unsafe links", () => {
   assert.equal(PurchasesModel.fromMap(null).totalItems, 0);
 });
 
+test("purchase filters send the supported orderable type", () => {
+  assert.deepEqual(new FetchPurchasesParams().toMap(), {});
+  assert.deepEqual(new FetchPurchasesParams(1).toMap(), { orderable_type: 1 });
+  assert.deepEqual(new FetchPurchasesParams(5).toMap(), { orderable_type: 5 });
+  assert.deepEqual(new FetchPurchasesParams(6).toMap(), { orderable_type: 6 });
+  assert.deepEqual(new FetchPurchasesParams(14).toMap(), {
+    orderable_type: 14,
+  });
+});
+
 test("purchases page calls the unified authenticated endpoint and exposes clear UX", async () => {
   const [apiNames, service, params, container, library] = await Promise.all([
     readSource("base/core/networkStructure/apiNames.ts"),
@@ -113,7 +124,8 @@ test("purchases page calls the unified authenticated endpoint and exposes clear 
   assert.match(service, /ApiNames\.Instance\.fetch_my_purchased/u);
   assert.match(service, /type: CrudType\.POST/u);
   assert.match(service, /auth: true/u);
-  assert.match(params, /return \{\};/u);
+  assert.match(params, /PurchaseOrderableType = 1 \| 5 \| 6 \| 14/u);
+  assert.match(params, /orderable_type: this\.orderableType/u);
   assert.match(container, /<ProfileMyPurchasesLibrary \/>/u);
   assert.doesNotMatch(container, /<ProfileMyCourseCard/u);
 
@@ -121,6 +133,15 @@ test("purchases page calls the unified authenticated endpoint and exposes clear 
     assert.match(library, new RegExp(label, "u"));
   }
   assert.match(library, /v-model="searchWord"/u);
+  assert.match(library, /course: 1/u);
+  assert.match(library, /book: 5/u);
+  assert.match(library, /questionBank: 6/u);
+  assert.match(library, /package: 14/u);
+  assert.match(
+    library,
+    /new FetchPurchasesParams\(orderableTypeFor\(filter\)\)/u,
+  );
+  assert.match(library, /@click="selectFilter\(filter\.key\)"/u);
   assert.match(library, /item\.invoiceLink/u);
   assert.match(library, /تعذّر تحميل مشترياتك/u);
   assert.match(library, /كل مشترياتك ستظهر هنا/u);

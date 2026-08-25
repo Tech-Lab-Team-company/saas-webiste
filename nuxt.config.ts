@@ -84,7 +84,10 @@ export default defineNuxtConfig({
     '/about-teacher': { swr: 3600 },
     '/teachers': { swr: 300 },
     '/books': { swr: 300 },
-    '/books/**': { swr: 600 },
+    '/books/**': {
+      swr: false,
+      headers: { 'Cache-Control': 'private, no-store' },
+    },
     '/blogs': { swr: 300 },
     '/blogs/**': { swr: 600 },
     '/blog-v2/**': { swr: 600 },

@@ -365,7 +365,10 @@ onBeforeUnmount(() => {
           </ul>
           <div class="home-v2-books__actions">
             <NuxtLink
-              :to="`/books/${featuredBook.bookId}`"
+              :to="{
+                path: `/books/${featuredBook.bookId}`,
+                query: { source: 'home' },
+              }"
               class="home-v2-books__primary"
             >
               تفاصيل الكتاب

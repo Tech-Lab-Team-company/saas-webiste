@@ -9,6 +9,7 @@ import {
   mapHomeSite,
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import {
+  BookOrderStatusEnum,
   BookTypeEnum,
   type HomeBookDetailsResourceViewModel,
 } from "~/features/HomePageFeature/models/HomePageViewModel";
@@ -33,7 +34,14 @@ const { siteOrigin, buildSiteUrl } = useSiteUrl();
 
 const settingsStore = useSettingStore();
 const { setting } = storeToRefs(settingsStore);
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
 const site = computed(() => mapHomeSite(setting.value));
+const accessToken = computed(() => user.value?.apiToken?.trim() || "");
+const isHomeBookEntry = computed(() => route.query.source === "home");
+const requiresLogin = computed(
+  () => !isHomeBookEntry.value && !accessToken.value,
+);
 const bookId = computed(() => {
   const rawValue = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id;
   const value = Number(rawValue);
@@ -44,13 +52,23 @@ const api = new HomePageApi(webDomain);
 const { data: bookDetails, pending, error, refresh } = await useAsyncData<
   HomeBookDetailsResourceViewModel | null
 >(
-  `book-details:${webDomain}:${bookId.value ?? "invalid"}`,
+  `book-details:${webDomain}:${isHomeBookEntry.value ? "home" : "account"}:${bookId.value ?? "invalid"}`,
   async () => {
     if (bookId.value === null) {
       throw createError({ statusCode: 404, statusMessage: "Book not found" });
     }
 
-    return mapBookDetailsResource(await api.fetchBookDetails(bookId.value));
+    if (isHomeBookEntry.value) {
+      return mapBookDetailsResource(
+        await api.fetchHomeBookDetails(bookId.value),
+      );
+    }
+
+    if (!accessToken.value) return null;
+
+    return mapBookDetailsResource(
+      await api.fetchBookDetails(bookId.value, accessToken.value),
+    );
   },
   {
     default: () => null,
@@ -58,7 +76,7 @@ const { data: bookDetails, pending, error, refresh } = await useAsyncData<
   },
 );
 
-watch(bookId, () => refresh());
+watch([bookId, isHomeBookEntry, accessToken], () => refresh());
 
 const book = computed(() => bookDetails.value?.book ?? null);
 const websiteSectionBook = computed(
@@ -76,6 +94,15 @@ const coverImage = computed(() =>
   || null,
 );
 const galleryImages = computed(() => book.value?.images ?? []);
+const isBookAccepted = computed(
+  () => book.value?.orderStatus === BookOrderStatusEnum.ACCEPTED,
+);
+const isBookPending = computed(
+  () => book.value?.orderStatus === BookOrderStatusEnum.PENDING,
+);
+const canAccessBookContent = computed(
+  () => Boolean(book.value?.isFree || isBookAccepted.value),
+);
 const displayPrice = computed(() => {
   const currentBook = book.value;
   if (!currentBook) return "";
@@ -91,19 +118,19 @@ const primaryAction = computed(() => {
   const currentBook = book.value;
   if (!currentBook) return null;
 
-  if (currentBook.hasFreePreview && currentBook.freeBookUrl) {
-    return { url: currentBook.freeBookUrl, label: "قراءة النسخة المجانية", kind: "reader" as const };
-  }
-
   if (
     currentBook.bookUrl &&
-    (currentBook.isFree || currentBook.allowStatus === 1 || currentBook.orderStatus === 1)
+    canAccessBookContent.value
   ) {
     return { url: currentBook.bookUrl, label: "قراءة الكتاب", kind: "reader" as const };
   }
 
-  if (currentBook.invoiceLink) {
-    return { url: currentBook.invoiceLink, label: "شراء الكتاب", kind: "external" as const };
+  if (currentBook.hasFreePreview && currentBook.freeBookUrl) {
+    return { url: currentBook.freeBookUrl, label: "قراءة النسخة المجانية", kind: "reader" as const };
+  }
+
+  if (isBookAccepted.value && currentBook.invoiceLink) {
+    return { url: currentBook.invoiceLink, label: "عرض الفاتورة", kind: "external" as const };
   }
 
   return null;
@@ -111,7 +138,7 @@ const primaryAction = computed(() => {
 
 const mediaItems = computed<BookMediaItem[]>(() => {
   const currentBook = book.value;
-  if (!currentBook) return [];
+  if (!currentBook || !canAccessBookContent.value) return [];
 
   const items: BookMediaItem[] = [];
   const seenUrls = new Set<string>();
@@ -185,7 +212,13 @@ const bookFeatures = computed(() => {
     ...(currentBook.bookTypes.length
       ? [`متاح بصيغة ${currentBook.bookTypes.map((type) => type.label).join(" و")}`]
       : []),
-    currentBook.isFree ? "متاح مجانًا" : "متاح للشراء",
+    currentBook.isFree
+      ? "متاح مجانًا"
+      : isBookAccepted.value
+        ? "تم شراء الكتاب"
+        : isBookPending.value
+          ? "طلب الشراء قيد المراجعة"
+          : "متاح للشراء",
     ...(currentBook.attachments.length
       ? [`${currentBook.attachments.length} مرفق`]
       : []),
@@ -299,7 +332,13 @@ const printedPurchaseOption = computed(() =>
 const printedOrderTotal = computed(() => {
   const currentBook = book.value;
   const printedOption = printedPurchaseOption.value;
-  if (!currentBook || !printedOption || Number(printedOption.price) <= 0) return null;
+  if (
+    !currentBook ||
+    !printedOption ||
+    isBookAccepted.value ||
+    isBookPending.value ||
+    Number(printedOption.price) <= 0
+  ) return null;
 
   return Number(printedOption.price) + Math.max(0, Number(currentBook.fees) || 0);
 });
@@ -406,6 +445,23 @@ useHead(() => ({
     <main class="book-details-page__main">
       <div v-if="pending" class="container book-details-page__state" role="status">
         جاري تحميل تفاصيل الكتاب...
+      </div>
+      <div
+        v-else-if="requiresLogin"
+        class="container book-details-page__state book-details-page__state--login"
+        role="status"
+      >
+        <i class="pi pi-lock" aria-hidden="true" />
+        <strong>سجّل الدخول لعرض تفاصيل الكتاب</strong>
+        <p>سنعرض حالة طلبك والنسخة المتاحة لك بعد تسجيل الدخول.</p>
+        <NuxtLink
+          :to="{
+            path: '/loginhome',
+            query: { redirect: route.fullPath },
+          }"
+        >
+          تسجيل الدخول
+        </NuxtLink>
       </div>
       <div v-else-if="error || !book" class="container book-details-page__state book-details-page__state--error" role="alert">
         <strong>تعذر العثور على الكتاب.</strong>
@@ -576,8 +632,24 @@ useHead(() => ({
             <div class="book-details-page__sidebar">
               <aside class="book-details-page__buy-card" aria-labelledby="book-purchase-title">
                 <header class="book-details-page__buy-heading">
-                  <small>نسخ الكتاب المتاحة</small>
-                  <h2 id="book-purchase-title">اختار نسختك</h2>
+                  <small>
+                    {{
+                      isBookAccepted
+                        ? "الكتاب ضمن مشترياتك"
+                        : isBookPending
+                          ? "تم استلام طلبك"
+                          : "نسخ الكتاب المتاحة"
+                    }}
+                  </small>
+                  <h2 id="book-purchase-title">
+                    {{
+                      isBookAccepted
+                        ? "ابدأ القراءة الآن"
+                        : isBookPending
+                          ? "طلبك قيد المراجعة"
+                          : "اختار نسختك"
+                    }}
+                  </h2>
                 </header>
 
                 <div
@@ -616,7 +688,38 @@ useHead(() => ({
 
                   <div class="book-details-page__format-action">
                     <button
-                      v-if="option.price === 0 && primaryAction?.kind === 'reader'"
+                      v-if="isBookAccepted && primaryAction?.kind === 'reader'"
+                      type="button"
+                      @click="openReader"
+                    >
+                      {{ primaryAction.label }}
+                      <span aria-hidden="true">←</span>
+                    </button>
+                    <a
+                      v-else-if="isBookAccepted && primaryAction"
+                      :href="primaryAction.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {{ primaryAction.label }}
+                      <span aria-hidden="true">←</span>
+                    </a>
+                    <span
+                      v-else-if="isBookAccepted"
+                      class="book-details-page__order-status book-details-page__order-status--accepted"
+                    >
+                      <i class="pi pi-check-circle" aria-hidden="true" />
+                      تم شراء الكتاب
+                    </span>
+                    <span
+                      v-else-if="isBookPending"
+                      class="book-details-page__order-status book-details-page__order-status--pending"
+                    >
+                      <i class="pi pi-clock" aria-hidden="true" />
+                      طلب الشراء قيد المراجعة
+                    </span>
+                    <button
+                      v-else-if="option.price === 0 && primaryAction?.kind === 'reader'"
                       type="button"
                       @click="openReader"
                     >
@@ -791,6 +894,17 @@ useHead(() => ({
 
 .book-details-page__state p {
   margin: 0;
+}
+
+.book-details-page__state > i {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--home-v2-blue) 10%, var(--home-v2-surface));
+  color: var(--home-v2-blue);
+  font-size: 21px;
 }
 
 .book-details-page__state a {
@@ -1582,6 +1696,32 @@ useHead(() => ({
   box-shadow: none;
   color: var(--home-v2-muted);
   cursor: default;
+}
+
+.book-details-page__order-status {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.book-details-page__order-status--accepted {
+  border-color: color-mix(in srgb, #15803d 24%, var(--home-v2-line));
+  background: color-mix(in srgb, #16a34a 10%, var(--home-v2-surface));
+  color: #15803d;
+}
+
+.book-details-page__order-status--pending {
+  border-color: color-mix(in srgb, #b45309 24%, var(--home-v2-line));
+  background: color-mix(in srgb, #f59e0b 11%, var(--home-v2-surface));
+  color: #92400e;
 }
 
 .book-details-page__order-total {

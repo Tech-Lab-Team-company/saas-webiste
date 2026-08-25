@@ -137,6 +137,7 @@ class ApiNames {
   public fetch_study_process = this.baseUrl + "fetch_study_process";
   public fetch_ready_section = this.baseUrl + "fetch_ready_section";
   public fetch_books = this.baseUrl + "fetch_books";
+  public fetch_book_details = this.baseUrl + "fetch_book_details";
   public fetch_home_book_section = this.baseUrl + "fetch_home_book_section";
   public fetch_home_websection_book_details =
     this.baseUrl + "fetch_home_websection_book_details";

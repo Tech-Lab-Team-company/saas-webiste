@@ -155,8 +155,8 @@ export interface HomeBookApiDto {
 export interface HomeBookDetailsApiDto extends HomeBookApiDto {
   images: string[]
   certificates: unknown[]
-  video_link: string[]
-  video_external_link: string[]
+  video_link: unknown[]
+  video_external_link: unknown[]
   rates: unknown[]
   number_of_video_link: number
   number_of_offline_video_link: number

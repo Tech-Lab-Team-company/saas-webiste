@@ -127,6 +127,11 @@ export interface HomeBookStepViewModel {
   order: number
 }
 
+export enum BookOrderStatusEnum {
+  ACCEPTED = 1,
+  PENDING = 2,
+}
+
 export interface HomeBookViewModel {
   id: number
   bookId: number

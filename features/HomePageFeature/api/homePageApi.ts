@@ -260,7 +260,16 @@ export class HomePageApi {
     });
   }
 
-  async fetchBookDetails(bookId: number): Promise<unknown> {
+  async fetchBookDetails(
+    bookId: number,
+    accessToken: string,
+  ): Promise<unknown> {
+    return this.post(ApiNames.Instance.fetch_book_details, {
+      book_id: bookId,
+    }, undefined, accessToken);
+  }
+
+  async fetchHomeBookDetails(bookId: number): Promise<unknown> {
     return this.post(ApiNames.Instance.fetch_home_websection_book_details, {
       book_id: bookId,
     });
@@ -305,7 +314,9 @@ export class HomePageApi {
     url: string,
     data: Record<string, number | string | null>,
     queryParams?: Record<string, number>,
+    accessToken?: string,
   ): Promise<unknown> {
+    const normalizedAccessToken = accessToken?.trim();
     const response = await $fetch<unknown>(url, {
       baseURL: ApiNames.Instance.baseUrl,
       method: "POST",
@@ -315,6 +326,9 @@ export class HomePageApi {
         "Accept-Language": "ar",
         "Content-Type": "application/json",
         "web-domain": this.webDomain,
+        ...(normalizedAccessToken
+          ? { Authorization: `Bearer ${normalizedAccessToken}` }
+          : {}),
       },
       query: queryParams,
     });

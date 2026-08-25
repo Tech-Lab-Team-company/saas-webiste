@@ -8,7 +8,9 @@ import {
   DataLoading,
   DataSuccess,
 } from "~/base/core/networkStructure/Resources/dataState/data_state";
-import FetchPurchasesParams from "~/features/FetchPurchases/Core/Params/fetch_purchases_params";
+import FetchPurchasesParams, {
+  type PurchaseOrderableType,
+} from "~/features/FetchPurchases/Core/Params/fetch_purchases_params";
 import PurchasesModel, {
   type PurchaseKind,
   type PurchasedItem,
@@ -16,6 +18,13 @@ import PurchasesModel, {
 import FetchPurchasesController from "~/features/FetchPurchases/presentation/controllers/fetch_purchases_controller";
 
 type PurchaseFilter = "all" | PurchaseKind;
+
+const ORDERABLE_TYPE_BY_KIND: Record<PurchaseKind, PurchaseOrderableType> = {
+  course: 1,
+  book: 5,
+  questionBank: 6,
+  package: 14,
+};
 
 interface PurchaseSection {
   key: PurchaseKind;
@@ -29,26 +38,100 @@ const controller = FetchPurchasesController.getInstance();
 const emptyPurchases = PurchasesModel.empty();
 const state = controller.state;
 
-void controller.fetchPurchases(new FetchPurchasesParams());
-
 const activeFilter = ref<PurchaseFilter>("all");
 const searchWord = ref("");
 const searchInput = ref<HTMLInputElement | null>(null);
+const displayedPurchases = ref<PurchasesModel>(emptyPurchases);
+const hasLoadedOnce = ref(false);
+const isFiltering = ref(false);
+const filterError = ref("");
+const purchaseCounts = reactive<Record<PurchaseFilter, number>>({
+  all: 0,
+  course: 0,
+  book: 0,
+  questionBank: 0,
+  package: 0,
+});
 
-const purchases = computed(() => state.value.data ?? emptyPurchases);
+const purchases = computed(() => displayedPurchases.value);
 const isLoading = computed(
   () =>
-    state.value instanceof DataInitial || state.value instanceof DataLoading,
+    !hasLoadedOnce.value &&
+    (state.value instanceof DataInitial || state.value instanceof DataLoading),
 );
-const isFailed = computed(() => state.value instanceof DataFailed);
-const isSuccessful = computed(
-  () => state.value instanceof DataSuccess || state.value instanceof DataDump,
+const isFailed = computed(
+  () => !hasLoadedOnce.value && state.value instanceof DataFailed,
 );
+const isSuccessful = computed(() => hasLoadedOnce.value);
 const isEmpty = computed(
   () =>
-    state.value instanceof DataEmpty ||
-    (isSuccessful.value && purchases.value.totalItems === 0),
+    activeFilter.value === "all" &&
+    isSuccessful.value &&
+    !isFiltering.value &&
+    purchases.value.totalItems === 0,
 );
+
+const orderableTypeFor = (
+  filter: PurchaseFilter,
+): PurchaseOrderableType | null =>
+  filter === "all" ? null : ORDERABLE_TYPE_BY_KIND[filter];
+
+const updatePurchaseCounts = (
+  model: PurchasesModel,
+  filter: PurchaseFilter,
+) => {
+  if (filter === "all") {
+    purchaseCounts.all = model.totalItems;
+    purchaseCounts.course = model.courses.length;
+    purchaseCounts.book = model.books.length;
+    purchaseCounts.questionBank = model.questionBanks.length;
+    purchaseCounts.package = model.packages.length;
+    return;
+  }
+
+  purchaseCounts[filter] = model.totalItems;
+};
+
+const loadPurchases = async (
+  filter: PurchaseFilter,
+  previousFilter: PurchaseFilter | null = null,
+) => {
+  const isRefresh = hasLoadedOnce.value;
+  isFiltering.value = isRefresh;
+  filterError.value = "";
+
+  const resultRef = await controller.fetchPurchases(
+    new FetchPurchasesParams(orderableTypeFor(filter)),
+  );
+  const result = resultRef.value;
+
+  if (result instanceof DataSuccess || result instanceof DataDump) {
+    const model = result.data ?? PurchasesModel.empty();
+    displayedPurchases.value = model;
+    updatePurchaseCounts(model, filter);
+    hasLoadedOnce.value = true;
+  } else if (result instanceof DataEmpty) {
+    const model = PurchasesModel.empty();
+    displayedPurchases.value = model;
+    updatePurchaseCounts(model, filter);
+    hasLoadedOnce.value = true;
+  } else if (result instanceof DataFailed && isRefresh) {
+    if (previousFilter) activeFilter.value = previousFilter;
+    filterError.value = "تعذّر تحديث المشتريات. حاول مرة أخرى.";
+  }
+
+  isFiltering.value = false;
+};
+
+const selectFilter = async (filter: PurchaseFilter) => {
+  if (filter === activeFilter.value || isFiltering.value) return;
+
+  const previousFilter = activeFilter.value;
+  activeFilter.value = filter;
+  await loadPurchases(filter, previousFilter);
+};
+
+void loadPurchases("all");
 
 const sections = computed<PurchaseSection[]>(() => [
   {
@@ -82,11 +165,11 @@ const sections = computed<PurchaseSection[]>(() => [
 ]);
 
 const filterOptions = computed(() => [
-  { key: "all" as const, label: "الكل", count: purchases.value.totalItems },
+  { key: "all" as const, label: "الكل", count: purchaseCounts.all },
   ...sections.value.map((section) => ({
     key: section.key,
     label: section.label,
-    count: section.items.length,
+    count: purchaseCounts[section.key],
   })),
 ]);
 
@@ -272,10 +355,10 @@ const packageItemsCount = (item: PurchasedItem) =>
     ? item.courses.length + item.questionBanks.length
     : 0;
 
-const retry = () => controller.fetchPurchases(new FetchPurchasesParams());
+const retry = () => loadPurchases(activeFilter.value);
 const resetSearch = () => {
   searchWord.value = "";
-  activeFilter.value = "all";
+  if (activeFilter.value !== "all") void selectFilter("all");
 };
 
 const handleSearchShortcut = (event: KeyboardEvent) => {
@@ -370,16 +453,26 @@ onBeforeUnmount(() =>
             type="button"
             :class="{ active: activeFilter === filter.key }"
             :aria-pressed="activeFilter === filter.key"
+            :disabled="isFiltering"
             aria-controls="purchase-results"
-            @click="activeFilter = filter.key"
+            @click="selectFilter(filter.key)"
           >
+            <i
+              v-if="isFiltering && activeFilter === filter.key"
+              class="pi pi-spin pi-spinner"
+              aria-hidden="true"
+            />
             {{ filter.label }}
             <span>{{ filter.count }}</span>
           </button>
         </div>
       </section>
 
-      <div class="purchases-results-meta" aria-live="polite">
+      <div
+        class="purchases-results-meta"
+        aria-live="polite"
+        :aria-busy="isFiltering"
+      >
         <p>
           <strong>{{ visibleItemsCount }}</strong>
           نتيجة ضمن <span>{{ activeFilterLabel }}</span>
@@ -392,6 +485,11 @@ onBeforeUnmount(() =>
           مسح التصفية
         </button>
       </div>
+
+      <p v-if="filterError" class="purchases-filter-error" role="alert">
+        <i class="pi pi-exclamation-circle" aria-hidden="true" />
+        {{ filterError }}
+      </p>
 
       <aside
         v-if="showContinueCourse && continueCourse"
@@ -988,6 +1086,18 @@ onBeforeUnmount(() =>
   outline: 0;
 }
 
+.purchases-filters button:disabled {
+  cursor: wait;
+}
+
+.purchases-filters button:disabled:not(.active) {
+  opacity: 0.58;
+}
+
+.purchases-filters button > i {
+  font-size: 9px;
+}
+
 .purchases-results-meta {
   display: flex;
   min-height: 34px;
@@ -1025,6 +1135,21 @@ onBeforeUnmount(() =>
   font-size: 8px;
   font-weight: 900;
   cursor: pointer;
+}
+
+.purchases-filter-error {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  margin: 0 2px 10px;
+  padding: 8px 11px;
+  border: 1px solid color-mix(in srgb, #dc2626 18%, var(--profile-border));
+  border-radius: 10px;
+  background: color-mix(in srgb, #dc2626 6%, var(--profile-surface));
+  color: #b91c1c;
+  font-size: 9px;
+  font-weight: 800;
 }
 
 .purchase-sections {

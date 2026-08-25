@@ -684,9 +684,17 @@ export const mapBookDetails = (value: unknown): HomeBookDetailsViewModel | null 
     return null
   }
 
+  const mapMediaUrl = (source: unknown): string | null => {
+    if (isRecord(source)) {
+      return toSafeUrl(source.file ?? source.link ?? source.url)
+    }
+
+    return toSafeUrl(source)
+  }
+
   const mapUrlList = (source: unknown): string[] =>
     toArray(source)
-      .map(toSafeUrl)
+      .map(mapMediaUrl)
       .filter((url): url is string => url !== null)
 
   return {
@@ -696,7 +704,7 @@ export const mapBookDetails = (value: unknown): HomeBookDetailsViewModel | null 
         if (!isRecord(attachment)) return null
 
         const id = toNullableNumber(attachment.id)
-        const file = toSafeUrl(attachment.file)
+        const file = mapMediaUrl(attachment)
         if (id === null || !file) return null
 
         return {
@@ -780,7 +788,7 @@ export const mapBookDetailsResource = (
     return null
   }
 
-  const book = mapBookDetails(value.book)
+  const book = mapBookDetails(isRecord(value.book) ? value.book : value)
   if (!book) {
     return null
   }
