@@ -39,3 +39,21 @@ test("stage two curriculum uses clear accordion actions and semantic lesson rows
   assert.match(courseTabs, /pi pi-info-circle/u);
   assert.match(courseTabsStyles, /\.platform-key > span/u);
 });
+
+test("stage three curriculum uses the same polished hierarchy for units and lessons", async () => {
+  const [curriculum, curriculumStyles] = await Promise.all([
+    readSource("components/CourseDetails/TabsContent/CourseContent.vue"),
+    readSource("assets/style/course-details-redesign/course-content.scss"),
+  ]);
+
+  assert.match(curriculum, /<small>الوحدة<\/small>/u);
+  assert.match(curriculum, /<small>الدرس<\/small>/u);
+  assert.match(curriculum, /إخفاء الوحدة/u);
+  assert.match(curriculum, /عرض الوحدة/u);
+  assert.match(curriculum, /class="course-body-details" type="button"/u);
+  assert.match(curriculum, /getTypeMeta\(session\?\.type\)\.label/u);
+  assert.doesNotMatch(curriculum, /<AccordionContent[^>]*v-for=/u);
+  assert.match(curriculumStyles, /@use "\.\/course-content-stage-two\.scss";/u);
+  assert.match(curriculumStyles, /grid-template-columns: 46px minmax\(0, 1fr\) 36px;/u);
+  assert.match(curriculumStyles, /@media \(max-width: 576px\)/u);
+});

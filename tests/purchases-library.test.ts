@@ -142,6 +142,10 @@ test("purchased books render as a standalone responsive three-book grid", async 
   assert.doesNotMatch(library, /purchase-card__book-hint/u);
   assert.match(library, /purchase-card--book:focus-within/u);
   assert.match(library, /@media \(hover: hover\) and \(pointer: fine\)/u);
+  assert.match(
+    library,
+    /purchase-card--book:hover \.purchase-card__book-cover \{[\s\S]*?transform: rotateY\(88deg\);/u,
+  );
   assert.match(library, /@media \(prefers-reduced-motion: reduce\)/u);
 });
 

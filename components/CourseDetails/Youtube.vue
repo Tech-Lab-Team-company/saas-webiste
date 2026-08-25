@@ -70,7 +70,8 @@ function markPlayerDelayed() {
 
 function retryPlayer() {
   playerInstance.value = null;
-  VideoBlurScreen.value = true;
+  isPlayerPaused.value = true;
+  showStartOverlay.value = true;
   playerReloadKey.value += 1;
   startPlayerLoading();
 }
@@ -83,20 +84,24 @@ function getYoutubeVideoId(url: string): string | null {
 const videoId = ref(getYoutubeVideoId(props.video))
 
 const settingStore = useSettingStore();
-const VideoBlurScreen = ref(true)
+const isPlayerPaused = ref(true);
+const showStartOverlay = ref(true);
 
 const onPausedChange = (event: CustomEvent<boolean>) => {
-  VideoBlurScreen.value = event.detail;
+  isPlayerPaused.value = event.detail;
   emit('playbackStateChange', !event.detail);
   watchHistory.handlePausedChange(event);
 };
 
 const handlePlaybackStarted = () => {
-  VideoBlurScreen.value = false;
+  isPlayerPaused.value = false;
+  showStartOverlay.value = false;
   emit('playbackStateChange', true);
 };
 
 const handlePlaybackEnded = () => {
+  isPlayerPaused.value = true;
+  showStartOverlay.value = true;
   emit('playbackStateChange', false);
   watchHistory.markPlaybackEnded();
 };
@@ -104,22 +109,26 @@ const handlePlaybackEnded = () => {
 async function playVideo() {
   if (isPlayerLoading.value) return;
 
-  // Keep one source of truth for playback. The old overlay and player click
-  // handlers both toggled this value, so the same tap could play and pause.
-  VideoBlurScreen.value = false;
+  // The start overlay is intentionally independent from the paused state.
+  // Mounting it during the same mobile tap that pauses playback can make the
+  // trailing click hit the new overlay and immediately resume the video.
+  showStartOverlay.value = false;
+  isPlayerPaused.value = false;
 
   try {
     await playerInstance.value?.play?.();
   } catch {
     // Autoplay policies or a transient provider error can reject play(). Keep
     // the retry action visible instead of leaving the learner on a black frame.
-    VideoBlurScreen.value = true;
+    isPlayerPaused.value = true;
+    showStartOverlay.value = true;
   }
 }
 watch(() => props.video, (newVal) => {
   videoId.value = getYoutubeVideoId(newVal)
   playerReloadKey.value += 1;
-  VideoBlurScreen.value = true;
+  isPlayerPaused.value = true;
+  showStartOverlay.value = true;
   emit('playbackStateChange', false);
   startPlayerLoading();
 })
@@ -143,9 +152,9 @@ onBeforeUnmount(() => {
       @vmPlaybackReady="finishPlayerLoading"
       @vmPlaybackEnded="handlePlaybackEnded"
       @vmError="markPlayerDelayed"
-      :paused="VideoBlurScreen">
+      :paused="isPlayerPaused">
       <button
-        v-if="VideoBlurScreen && !isPlayerLoading"
+        v-if="showStartOverlay && !isPlayerLoading"
         type="button"
         class="overlay"
         aria-label="تشغيل الفيديو"

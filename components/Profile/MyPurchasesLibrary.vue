@@ -1762,12 +1762,12 @@ onBeforeUnmount(() =>
 }
 
 .purchase-card--book:focus-within .purchase-card__book {
-  transform: translateX(-20px) rotate(0.5deg) translateZ(0);
+  transform: translateX(-28px) rotate(0.5deg) translateZ(0);
 }
 
 .purchase-card--book:focus-within .purchase-card__book-cover {
-  box-shadow: -18px 18px 32px rgb(0 0 0 / 28%);
-  transform: rotateY(78deg);
+  box-shadow: -22px 20px 34px rgb(0 0 0 / 26%);
+  transform: rotateY(88deg);
 }
 
 .purchase-card--book:focus-within .purchase-card__book-cover > img {
@@ -1777,12 +1777,12 @@ onBeforeUnmount(() =>
 
 @media (hover: hover) and (pointer: fine) {
   .purchase-card--book:hover .purchase-card__book {
-    transform: translateX(-20px) rotate(0.5deg) translateZ(0);
+    transform: translateX(-28px) rotate(0.5deg) translateZ(0);
   }
 
   .purchase-card--book:hover .purchase-card__book-cover {
-    box-shadow: -18px 18px 32px rgb(0 0 0 / 28%);
-    transform: rotateY(78deg);
+    box-shadow: -22px 20px 34px rgb(0 0 0 / 26%);
+    transform: rotateY(88deg);
   }
 
   .purchase-card--book:hover .purchase-card__book-cover > img {

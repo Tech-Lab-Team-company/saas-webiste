@@ -34,6 +34,22 @@ test("youtube course video starts from one explicit click", async () => {
   assert.doesNotMatch(youtube, /<ScrubberControl\s+@click=/u);
 });
 
+test("pausing YouTube on touch screens does not mount a play overlay under the same tap", async () => {
+  const youtube = await readSource("components/CourseDetails/Youtube.vue");
+
+  assert.match(youtube, /const isPlayerPaused = ref\(true\)/u);
+  assert.match(youtube, /const showStartOverlay = ref\(true\)/u);
+  assert.match(
+    youtube,
+    /const onPausedChange = \(event: CustomEvent<boolean>\) => \{[\s\S]*?isPlayerPaused\.value = event\.detail;[\s\S]*?emit\('playbackStateChange', !event\.detail\);/u,
+  );
+  assert.doesNotMatch(
+    youtube,
+    /const onPausedChange = \(event: CustomEvent<boolean>\) => \{[\s\S]{0,160}?showStartOverlay\.value/u,
+  );
+  assert.match(youtube, /v-if="showStartOverlay && !isPlayerLoading"/u);
+});
+
 test("course preview is sticky only while playing on small and medium screens", async () => {
   const [tabs, styles, layout] = await Promise.all([
     readSource("components/CourseDetails/CourseTabs.vue"),
