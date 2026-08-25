@@ -24,6 +24,16 @@ test("course video players report their real playback state", async () => {
   assert.match(videoBridge, /onBeforeUnmount\(\(\) => reportPlaybackState\(false\)\)/u);
 });
 
+test("youtube course video starts from one explicit click", async () => {
+  const youtube = await readSource("components/CourseDetails/Youtube.vue");
+
+  assert.match(youtube, /ref="playerInstance"/u);
+  assert.match(youtube, /@click\.stop="playVideo"/u);
+  assert.match(youtube, /await playerInstance\.value\?\.play\?\.\(\)/u);
+  assert.doesNotMatch(youtube, /@click="handlePlayerClick"/u);
+  assert.doesNotMatch(youtube, /<ScrubberControl\s+@click=/u);
+});
+
 test("course preview is sticky only while playing on small and medium screens", async () => {
   const [tabs, styles, layout] = await Promise.all([
     readSource("components/CourseDetails/CourseTabs.vue"),

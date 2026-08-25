@@ -168,9 +168,13 @@ capture shielding, PDF behavior and video-control restrictions.
 Frontend code cannot completely disable browser developer tools, operating
 system screenshots or external screen-recording software. These changes are
 deterrents and provide student accountability through watermarking. Browsers do
-not expose an official developer-tools state API. The viewport guard reliably
-handles normal side- and bottom-docked tools, but a determined user can bypass
-client code or use separately docked/remote tools.
+not expose an official developer-tools state API. The viewport guard therefore
+runs only on desktop browsers with a fine pointer, where outer and inner window
+dimensions are sufficiently stable, and requires repeated positive checks
+before hiding content. It is intentionally disabled on phones, tablets and
+touch devices because mobile browser chrome, split view, zoom and orientation
+changes can produce the same viewport gaps as docked tools. A determined user
+can still bypass client code or use separately docked/remote tools.
 
 The active exam model now discards any `correct` flag returned for an answer.
 This reduces accidental exposure in Vue component state, but it cannot remove

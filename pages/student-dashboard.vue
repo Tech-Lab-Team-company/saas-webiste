@@ -1046,7 +1046,7 @@ onMounted(async () => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (max-width: 760px) {
+@media (max-width: 820px) {
   .student-dashboard-main {
     width: min(100% - 28px, 680px);
     padding-top: 28px;

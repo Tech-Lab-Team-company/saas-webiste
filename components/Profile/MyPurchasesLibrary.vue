@@ -33,6 +33,7 @@ void controller.fetchPurchases(new FetchPurchasesParams());
 
 const activeFilter = ref<PurchaseFilter>("all");
 const searchWord = ref("");
+const searchInput = ref<HTMLInputElement | null>(null);
 
 const purchases = computed(() => state.value.data ?? emptyPurchases);
 const isLoading = computed(
@@ -128,6 +129,38 @@ const visibleItemsCount = computed(() =>
   ),
 );
 
+const continueCourse = computed(() => {
+  const availableCourses = purchases.value.courses.filter(
+    (course) => !course.isBlocked,
+  );
+
+  return (
+    availableCourses.find(
+      (course) => course.progress > 0 && course.progress < 100,
+    ) ??
+    availableCourses.find((course) => course.progress < 100) ??
+    availableCourses[0] ??
+    null
+  );
+});
+
+const showContinueCourse = computed(
+  () =>
+    continueCourse.value !== null &&
+    !normalizedSearchWord.value &&
+    (activeFilter.value === "all" || activeFilter.value === "course"),
+);
+
+const activeFilterLabel = computed(
+  () =>
+    filterOptions.value.find((filter) => filter.key === activeFilter.value)
+      ?.label ?? "الكل",
+);
+
+const hasActiveQuery = computed(
+  () => activeFilter.value !== "all" || normalizedSearchWord.value.length > 0,
+);
+
 const purchaseStatus = (item: PurchasedItem) => {
   if (item.kind === "course" && item.isBlocked) {
     return { label: "الوصول موقوف", tone: "blocked" };
@@ -212,16 +245,20 @@ const itemFacts = (item: PurchasedItem): string[] => {
   ].filter(Boolean);
 };
 
+const normalizePercentage = (value: number) =>
+  Math.min(100, Math.max(0, Math.round(value)));
+
 const progressValue = (item: PurchasedItem): number | null => {
-  if (item.kind === "course") return item.progress;
+  if (item.kind === "course") return normalizePercentage(item.progress);
   if (item.kind !== "questionBank" || !item.totalQuestions) return null;
-  return Math.min(
-    100,
-    Math.round(
-      ((item.correctAnswers + item.wrongAnswers) / item.totalQuestions) * 100,
-    ),
+  return normalizePercentage(
+    ((item.correctAnswers + item.wrongAnswers) / item.totalQuestions) * 100,
   );
 };
+
+const continueCourseProgress = computed(() =>
+  continueCourse.value ? normalizePercentage(continueCourse.value.progress) : 0,
+);
 
 const priceLabel = (item: PurchasedItem) => {
   if (item.kind === "book" && item.isFree) return "مجاني";
@@ -240,6 +277,23 @@ const resetSearch = () => {
   searchWord.value = "";
   activeFilter.value = "all";
 };
+
+const handleSearchShortcut = (event: KeyboardEvent) => {
+  const target = event.target as HTMLElement | null;
+  const isEditing =
+    target?.matches("input, textarea, select") || target?.isContentEditable;
+
+  if (event.key === "/" && !isEditing) {
+    event.preventDefault();
+    searchInput.value?.focus();
+    searchInput.value?.select();
+  }
+};
+
+onMounted(() => window.addEventListener("keydown", handleSearchShortcut));
+onBeforeUnmount(() =>
+  window.removeEventListener("keydown", handleSearchShortcut),
+);
 </script>
 
 <template>
@@ -286,45 +340,17 @@ const resetSearch = () => {
     </div>
 
     <template v-else-if="isSuccessful">
-      <section class="purchases-overview" aria-labelledby="purchases-summary-title">
-        <header>
-          <div>
-            <span class="purchases-eyebrow">ملخص المكتبة</span>
-            <h2 id="purchases-summary-title">
-              {{ purchases.totalItems }} عنصر مرتبط بحسابك
-            </h2>
-          </div>
-          <p>اختر النوع أو ابحث بالاسم للوصول إلى مشترياتك بسرعة.</p>
-        </header>
-
-        <div class="purchases-stats">
-          <button
-            v-for="section in sections"
-            :key="section.key"
-            type="button"
-            :class="[
-              'purchase-stat',
-              `purchase-stat--${section.key}`,
-              { 'purchase-stat--active': activeFilter === section.key },
-            ]"
-            :aria-pressed="activeFilter === section.key"
-            @click="activeFilter = section.key"
-          >
-            <i :class="section.icon" aria-hidden="true" />
-            <span>{{ section.label }}</span>
-            <strong>{{ section.items.length }}</strong>
-          </button>
-        </div>
-      </section>
-
       <section class="purchases-toolbar" aria-label="البحث وتصفية المشتريات">
         <label class="purchases-search">
           <span class="sr-only">ابحث في مشترياتك</span>
           <i class="pi pi-search" aria-hidden="true" />
           <input
+            ref="searchInput"
             v-model="searchWord"
             type="search"
+            aria-controls="purchase-results"
             placeholder="ابحث باسم الكورس أو الكتاب أو الباقة..."
+            @keydown.esc="searchWord = ''"
           />
           <button
             v-if="searchWord"
@@ -334,6 +360,7 @@ const resetSearch = () => {
           >
             <i class="pi pi-times" />
           </button>
+          <kbd v-else aria-hidden="true">/</kbd>
         </label>
 
         <div class="purchases-filters" role="group" aria-label="نوع المشتريات">
@@ -343,6 +370,7 @@ const resetSearch = () => {
             type="button"
             :class="{ active: activeFilter === filter.key }"
             :aria-pressed="activeFilter === filter.key"
+            aria-controls="purchase-results"
             @click="activeFilter = filter.key"
           >
             {{ filter.label }}
@@ -351,8 +379,63 @@ const resetSearch = () => {
         </div>
       </section>
 
+      <div class="purchases-results-meta" aria-live="polite">
+        <p>
+          <strong>{{ visibleItemsCount }}</strong>
+          نتيجة ضمن <span>{{ activeFilterLabel }}</span>
+          <template v-if="normalizedSearchWord">
+            للبحث عن «{{ searchWord.trim() }}»
+          </template>
+        </p>
+        <button v-if="hasActiveQuery" type="button" @click="resetSearch">
+          <i class="pi pi-times" aria-hidden="true" />
+          مسح التصفية
+        </button>
+      </div>
+
+      <aside
+        v-if="showContinueCourse && continueCourse"
+        class="purchases-resume"
+        aria-labelledby="purchases-resume-title"
+      >
+        <div class="purchases-resume__visual" aria-hidden="true">
+          <img v-if="continueCourse.image" :src="continueCourse.image" alt="" />
+          <span v-else><i class="pi pi-play-circle" /></span>
+          <i class="pi pi-play purchases-resume__play" />
+        </div>
+        <div class="purchases-resume__copy">
+          <span class="purchases-resume__eyebrow">
+            <i aria-hidden="true" />
+            أكمل من حيث توقفت
+          </span>
+          <h2 id="purchases-resume-title">{{ continueCourse.title }}</h2>
+          <p>
+            {{
+              [continueCourse.subjectTitle, continueCourse.teacherName]
+                .filter(Boolean)
+                .join(" · ") || "كورس جاهز للمتابعة"
+            }}
+          </p>
+          <div
+            class="purchases-resume__progress"
+            :aria-label="`نسبة الإنجاز ${continueCourseProgress}%`"
+          >
+            <div>
+              <span>التقدّم</span>
+              <strong>{{ continueCourseProgress }}%</strong>
+            </div>
+            <span><i :style="{ width: `${continueCourseProgress}%` }" /></span>
+          </div>
+        </div>
+        <NuxtLink :to="itemRoute(continueCourse) || '/'">
+          متابعة التعلّم
+          <i class="pi pi-arrow-left" aria-hidden="true" />
+        </NuxtLink>
+      </aside>
+
       <div
         v-if="visibleItemsCount === 0"
+        id="purchase-results"
         class="purchases-state purchases-state--search"
       >
         <span class="purchases-state__icon pi pi-search" />
@@ -363,7 +446,7 @@ const resetSearch = () => {
         <button type="button" @click="resetSearch">عرض كل المشتريات</button>
       </div>
 
-      <div v-else class="purchase-sections">
+      <div v-else id="purchase-results" class="purchase-sections">
         <section
           v-for="section in visibleSections"
           :key="section.key"
@@ -385,128 +468,174 @@ const resetSearch = () => {
 
           <div class="purchase-grid">
             <article
-              v-for="item in section.items"
+              v-for="(item, itemIndex) in section.items"
               :key="`${item.kind}-${item.id}`"
               :class="['purchase-card', `purchase-card--${item.kind}`]"
+              :style="{ '--purchase-order': itemIndex }"
             >
-              <div class="purchase-card__visual">
-                <span class="purchase-card__fallback" aria-hidden="true">
-                  <i :class="kindIcon(item.kind)" />
-                </span>
-                <img v-if="item.image" :src="item.image" :alt="item.title" />
-                <span class="purchase-card__kind">
-                  <i :class="kindIcon(item.kind)" aria-hidden="true" />
-                  {{ kindLabel(item.kind) }}
-                </span>
-              </div>
+              <NuxtLink
+                v-if="item.kind === 'book'"
+                class="purchase-card__book-link"
+                :to="itemRoute(item) || '/'"
+                :aria-label="`تفاصيل الكتاب: ${item.title}، عدد الصفحات ${item.pageCount || 'غير محدد'}`"
+              >
+                <div class="purchase-card__book" aria-hidden="true">
+                  <div class="purchase-card__book-pages">
+                    <div class="purchase-card__book-page">
+                      <i class="pi pi-book" />
+                      <small>نسختك التعليمية</small>
+                      <strong class="purchase-card__book-page-title">
+                        {{ item.title }}
+                      </strong>
+                      <span class="purchase-card__book-page-rule" />
+                      <span class="purchase-card__book-length">
+                        <small>عدد الصفحات</small>
+                        <b>{{ item.pageCount || "غير محدد" }}</b>
+                        <em v-if="item.pageCount">صفحة</em>
+                      </span>
+                    </div>
+                  </div>
 
-              <div class="purchase-card__body">
-                <div class="purchase-card__topline">
-                  <span
-                    :class="[
-                      'purchase-status',
-                      `purchase-status--${purchaseStatus(item).tone}`,
-                    ]"
-                  >
-                    <i aria-hidden="true" />
-                    {{ purchaseStatus(item).label }}
+                  <div class="purchase-card__book-cover">
+                    <img v-if="item.image" :src="item.image" alt="" />
+                    <span v-else class="purchase-card__book-cover-fallback">
+                      <i class="pi pi-book" />
+                      <strong>{{ item.title }}</strong>
+                    </span>
+                    <span class="purchase-card__book-spine" />
+                    <span class="purchase-card__book-label">
+                      <i class="pi pi-book" />
+                      كتاب
+                    </span>
+                  </div>
+                </div>
+              </NuxtLink>
+
+              <template v-else>
+                <div class="purchase-card__visual">
+                  <span class="purchase-card__fallback" aria-hidden="true">
+                    <i :class="kindIcon(item.kind)" />
                   </span>
-                  <span v-if="priceLabel(item)" class="purchase-card__price">
-                    {{ priceLabel(item) }}
+                  <img v-if="item.image" :src="item.image" :alt="item.title" />
+                  <span class="purchase-card__kind">
+                    <i :class="kindIcon(item.kind)" aria-hidden="true" />
+                    {{ kindLabel(item.kind) }}
                   </span>
                 </div>
 
-                <h3>{{ item.title }}</h3>
-                <p>
-                  {{
-                    item.description ||
-                    `كل تفاصيل ${kindLabel(item.kind)} متاحة من حسابك.`
-                  }}
-                </p>
-
-                <ul v-if="itemFacts(item).length" class="purchase-card__facts">
-                  <li v-for="fact in itemFacts(item)" :key="fact">{{ fact }}</li>
-                </ul>
-
-                <div
-                  v-if="progressValue(item) !== null"
-                  class="purchase-progress"
-                  :aria-label="`نسبة الإنجاز ${progressValue(item)}%`"
-                >
-                  <div>
-                    <span>نسبة الإنجاز</span>
-                    <strong>{{ progressValue(item) }}%</strong>
+                <div class="purchase-card__body">
+                  <div class="purchase-card__topline">
+                    <span
+                      :class="[
+                        'purchase-status',
+                        `purchase-status--${purchaseStatus(item).tone}`,
+                      ]"
+                    >
+                      <i aria-hidden="true" />
+                      {{ purchaseStatus(item).label }}
+                    </span>
+                    <span v-if="priceLabel(item)" class="purchase-card__price">
+                      {{ priceLabel(item) }}
+                    </span>
                   </div>
-                  <span>
-                    <i :style="{ width: `${progressValue(item)}%` }" />
-                  </span>
+
+                  <h3>{{ item.title }}</h3>
+                  <p>
+                    {{
+                      item.description ||
+                      `كل تفاصيل ${kindLabel(item.kind)} متاحة من حسابك.`
+                    }}
+                  </p>
+
+                  <ul v-if="itemFacts(item).length" class="purchase-card__facts">
+                    <li v-for="fact in itemFacts(item)" :key="fact">
+                      {{ fact }}
+                    </li>
+                  </ul>
+
+                  <div
+                    v-if="progressValue(item) !== null"
+                    class="purchase-progress"
+                    :aria-label="`نسبة الإنجاز ${progressValue(item)}%`"
+                  >
+                    <div>
+                      <span>نسبة الإنجاز</span>
+                      <strong>{{ progressValue(item) }}%</strong>
+                    </div>
+                    <span>
+                      <i :style="{ width: `${progressValue(item)}%` }" />
+                    </span>
+                  </div>
+
+                  <details
+                    v-if="item.kind === 'package' && packageItemsCount(item)"
+                    class="purchase-package"
+                  >
+                    <summary>
+                      <span>{{ actionLabel(item) }}</span>
+                      <i class="pi pi-chevron-down" aria-hidden="true" />
+                    </summary>
+                    <div class="purchase-package__content">
+                      <div v-if="item.courses.length">
+                        <strong>الكورسات</strong>
+                        <NuxtLink
+                          v-for="course in item.courses"
+                          :key="`package-course-${course.id}`"
+                          :to="{ name: 'course-id', params: { id: course.id } }"
+                        >
+                          {{ course.title }}
+                          <i class="pi pi-arrow-left" />
+                        </NuxtLink>
+                      </div>
+                      <div v-if="item.questionBanks.length">
+                        <strong>بنوك الأسئلة</strong>
+                        <NuxtLink
+                          v-for="bank in item.questionBanks"
+                          :key="`package-bank-${bank.id}`"
+                          :to="{
+                            path: '/questions',
+                            query: { bank_id: String(bank.id) },
+                          }"
+                        >
+                          {{ bank.title }}
+                          <i class="pi pi-arrow-left" />
+                        </NuxtLink>
+                      </div>
+                    </div>
+                  </details>
+
+                  <footer class="purchase-card__footer">
+                    <NuxtLink
+                      v-if="itemRoute(item)"
+                      class="purchase-card__primary"
+                      :to="itemRoute(item) || '/'"
+                    >
+                      {{ actionLabel(item) }}
+                      <i class="pi pi-arrow-left" aria-hidden="true" />
+                    </NuxtLink>
+                    <span
+                      v-else-if="item.kind === 'course' && item.isBlocked"
+                      class="purchase-card__disabled"
+                    >
+                      تواصل مع الدعم لاستعادة الوصول
+                    </span>
+                    <span v-else class="purchase-card__included">
+                      {{ packageItemsCount(item) }} محتوى داخل الباقة
+                    </span>
+
+                    <a
+                      v-if="item.invoiceLink"
+                      class="purchase-card__invoice"
+                      :href="item.invoiceLink"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i class="pi pi-file-pdf" aria-hidden="true" />
+                      الفاتورة
+                    </a>
+                  </footer>
                 </div>
-
-                <details
-                  v-if="item.kind === 'package' && packageItemsCount(item)"
-                  class="purchase-package"
-                >
-                  <summary>
-                    <span>{{ actionLabel(item) }}</span>
-                    <i class="pi pi-chevron-down" aria-hidden="true" />
-                  </summary>
-                  <div class="purchase-package__content">
-                    <div v-if="item.courses.length">
-                      <strong>الكورسات</strong>
-                      <NuxtLink
-                        v-for="course in item.courses"
-                        :key="`package-course-${course.id}`"
-                        :to="{ name: 'course-id', params: { id: course.id } }"
-                      >
-                        {{ course.title }}
-                        <i class="pi pi-arrow-left" />
-                      </NuxtLink>
-                    </div>
-                    <div v-if="item.questionBanks.length">
-                      <strong>بنوك الأسئلة</strong>
-                      <NuxtLink
-                        v-for="bank in item.questionBanks"
-                        :key="`package-bank-${bank.id}`"
-                        :to="{ path: '/questions', query: { bank_id: String(bank.id) } }"
-                      >
-                        {{ bank.title }}
-                        <i class="pi pi-arrow-left" />
-                      </NuxtLink>
-                    </div>
-                  </div>
-                </details>
-
-                <footer class="purchase-card__footer">
-                  <NuxtLink
-                    v-if="itemRoute(item)"
-                    class="purchase-card__primary"
-                    :to="itemRoute(item) || '/'"
-                  >
-                    {{ actionLabel(item) }}
-                    <i class="pi pi-arrow-left" aria-hidden="true" />
-                  </NuxtLink>
-                  <span
-                    v-else-if="item.kind === 'course' && item.isBlocked"
-                    class="purchase-card__disabled"
-                  >
-                    تواصل مع الدعم لاستعادة الوصول
-                  </span>
-                  <span v-else class="purchase-card__included">
-                    {{ packageItemsCount(item) }} محتوى داخل الباقة
-                  </span>
-
-                  <a
-                    v-if="item.invoiceLink"
-                    class="purchase-card__invoice"
-                    :href="item.invoiceLink"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <i class="pi pi-file-pdf" aria-hidden="true" />
-                    الفاتورة
-                  </a>
-                </footer>
-              </div>
+              </template>
             </article>
           </div>
         </section>
@@ -531,128 +660,226 @@ const resetSearch = () => {
   white-space: nowrap;
 }
 
-.purchases-overview {
-  padding: clamp(22px, 3vw, 34px);
-  border: 1px solid var(--profile-border);
-  border-radius: 20px;
-  background:
-    radial-gradient(
-      circle at 8% 18%,
-      color-mix(in srgb, var(--profile-secondary) 12%, transparent),
-      transparent 30%
-    ),
-    var(--profile-surface);
-}
-
-.purchases-overview > header {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
 .purchases-eyebrow {
   color: var(--profile-secondary);
   font-size: 11px;
   font-weight: 900;
 }
 
-.purchases-overview h2 {
-  margin: 7px 0 0;
-  color: var(--profile-ink);
-  font-size: clamp(21px, 2.2vw, 29px);
-}
-
-.purchases-overview header p {
-  max-width: 390px;
-  margin: 0;
-  color: var(--profile-muted);
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-.purchases-stats {
+.purchases-resume {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.purchase-stat {
-  display: grid;
-  min-width: 0;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
+  min-height: 108px;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  padding: 13px;
-  border: 1px solid var(--profile-border);
-  border-radius: 14px;
-  background: color-mix(
+  gap: clamp(14px, 2vw, 22px);
+  overflow: hidden;
+  margin: 4px 0 16px;
+  padding: 10px 12px 10px 10px;
+  border: 1px solid color-mix(
     in srgb,
-    var(--profile-secondary) 3%,
-    var(--profile-surface-raised)
-  );
-  color: var(--profile-ink);
-  font: inherit;
-  text-align: right;
-  cursor: pointer;
-  transition: border-color 180ms ease, background-color 180ms ease,
-    transform 180ms ease;
-}
-
-.purchase-stat:hover,
-.purchase-stat--active {
-  border-color: color-mix(
-    in srgb,
-    var(--profile-secondary) 38%,
+    var(--profile-secondary) 25%,
     var(--profile-border)
   );
-  background: var(--profile-secondary-soft);
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 8% 15%,
+      color-mix(in srgb, var(--profile-secondary) 13%, transparent),
+      transparent 28%
+    ),
+    var(--profile-surface);
+  box-shadow: 0 10px 28px
+    color-mix(in srgb, var(--profile-primary) 5%, transparent);
+}
+
+.purchases-resume::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--profile-secondary),
+    color-mix(in srgb, var(--profile-secondary) 35%, transparent)
+  );
+  content: "";
+}
+
+.purchases-resume__visual {
+  position: relative;
+  height: 86px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--profile-primary), #07152f);
+  box-shadow: 0 8px 18px rgb(3 11 29 / 18%);
+}
+
+.purchases-resume__visual::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgb(2 10 28 / 58%));
+  content: "";
+}
+
+.purchases-resume__visual > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.purchases-resume__visual > span {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: rgb(255 255 255 / 35%);
+  font-size: 34px;
+}
+
+.purchases-resume__play {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 24%);
+  color: var(--profile-secondary);
+  font-size: 10px;
+  transform: translate(-50%, -50%);
+}
+
+.purchases-resume__copy {
+  min-width: 0;
+}
+
+.purchases-resume__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #168457;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.purchases-resume__eyebrow > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+  box-shadow: 0 0 0 4px rgb(22 132 87 / 11%);
+}
+
+.purchases-resume h2 {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 4px 0 2px;
+  color: var(--profile-ink);
+  font-size: clamp(14px, 1.6vw, 17px);
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.purchases-resume__copy > p {
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 9px;
+}
+
+.purchases-resume__progress {
+  max-width: 330px;
+  margin-top: 7px;
+}
+
+.purchases-resume__progress > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  color: var(--profile-muted);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.purchases-resume__progress > div strong {
+  color: var(--profile-secondary);
+}
+
+.purchases-resume__progress > span {
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--profile-canvas);
+}
+
+.purchases-resume__progress > span > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--profile-secondary),
+    color-mix(in srgb, var(--profile-secondary) 52%, #6be7bd)
+  );
+}
+
+.purchases-resume > a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: var(--profile-action);
+  color: var(--profile-on-action);
+  font-size: 9px;
+  font-weight: 900;
+  text-decoration: none;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.purchases-resume > a:hover,
+.purchases-resume > a:focus-visible {
+  box-shadow: 0 10px 24px
+    color-mix(in srgb, var(--profile-secondary) 20%, transparent);
+  outline: 0;
   transform: translateY(-2px);
 }
 
-.purchase-stat > i {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border-radius: 11px;
-  background: var(--profile-surface);
-  color: var(--profile-secondary);
-}
-
-.purchase-stat > span {
-  overflow: hidden;
-  font-size: 11px;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.purchase-stat > strong {
-  color: var(--profile-secondary);
-  font-size: 20px;
-}
-
 .purchases-toolbar {
+  position: sticky;
+  top: 94px;
+  z-index: 12;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  margin: 22px 0 34px;
-  padding: 14px;
+  gap: 12px;
+  margin: 0 0 8px;
+  padding: 9px;
   border: 1px solid var(--profile-border);
-  border-radius: 16px;
-  background: var(--profile-surface);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--profile-surface) 94%, transparent);
+  box-shadow: 0 8px 22px
+    color-mix(in srgb, var(--profile-primary) 4%, transparent);
+  backdrop-filter: blur(14px);
 }
 
 .purchases-search {
   display: flex;
   min-width: min(100%, 360px);
-  min-height: 46px;
+  min-height: 40px;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
+  padding: 0 12px;
   border: 1px solid var(--profile-border);
   border-radius: 12px;
   background: var(--profile-surface-raised);
@@ -682,6 +909,21 @@ const resetSearch = () => {
   cursor: pointer;
 }
 
+.purchases-search kbd {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  place-items: center;
+  border: 1px solid var(--profile-border);
+  border-radius: 7px;
+  background: var(--profile-surface);
+  color: var(--profile-muted);
+  font: inherit;
+  font-size: 10px;
+  box-shadow: 0 2px 0 var(--profile-border);
+}
+
 .purchases-filters {
   display: flex;
   flex-wrap: wrap;
@@ -691,10 +933,10 @@ const resetSearch = () => {
 
 .purchases-filters button {
   display: inline-flex;
-  min-height: 38px;
+  min-height: 34px;
   align-items: center;
   gap: 8px;
-  padding: 7px 12px;
+  padding: 6px 10px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
@@ -717,7 +959,8 @@ const resetSearch = () => {
 }
 
 .purchases-filters button:hover,
-.purchases-filters button.active {
+.purchases-filters button.active,
+.purchases-filters button:focus-visible {
   border-color: color-mix(
     in srgb,
     var(--profile-secondary) 24%,
@@ -725,11 +968,51 @@ const resetSearch = () => {
   );
   background: var(--profile-secondary-soft);
   color: var(--profile-secondary);
+  outline: 0;
+}
+
+.purchases-results-meta {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 2px 8px;
+}
+
+.purchases-results-meta > p {
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 9px;
+}
+
+.purchases-results-meta > p strong {
+  color: var(--profile-ink);
+  font-size: 12px;
+}
+
+.purchases-results-meta > p span {
+  color: var(--profile-secondary);
+  font-weight: 900;
+}
+
+.purchases-results-meta > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--profile-secondary);
+  font: inherit;
+  font-size: 8px;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .purchase-sections {
   display: grid;
-  gap: 44px;
+  gap: 28px;
 }
 
 .purchase-section {
@@ -741,31 +1024,31 @@ const resetSearch = () => {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  margin-bottom: 17px;
+  margin-bottom: 11px;
 }
 
 .purchase-section__header > div {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 10px;
 }
 
 .purchase-section__icon {
   display: grid;
-  width: 46px;
-  height: 46px;
-  flex: 0 0 46px;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 11px;
   background: var(--profile-secondary-soft);
   color: var(--profile-secondary);
-  font-size: 17px;
+  font-size: 14px;
 }
 
 .purchase-section__header h2 {
   margin: 0;
   color: var(--profile-ink);
-  font-size: 19px;
+  font-size: 17px;
 }
 
 .purchase-section__header p {
@@ -787,7 +1070,16 @@ const resetSearch = () => {
   gap: 18px;
 }
 
+.purchase-grid:has(.purchase-card--book) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 2.4vw, 30px);
+  align-items: start;
+}
+
 .purchase-card {
+  --purchase-order: 0;
+  position: relative;
+  isolation: isolate;
   display: grid;
   min-width: 0;
   grid-template-columns: 145px minmax(0, 1fr);
@@ -797,6 +1089,8 @@ const resetSearch = () => {
   background: var(--profile-surface);
   box-shadow: 0 18px 38px
     color-mix(in srgb, var(--profile-primary) 5%, transparent);
+  animation: purchase-card-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--purchase-order) * 55ms);
   transition: border-color 200ms ease, box-shadow 200ms ease,
     transform 200ms ease;
 }
@@ -812,6 +1106,371 @@ const resetSearch = () => {
   transform: translateY(-3px);
 }
 
+.purchase-card--book {
+  min-height: 390px;
+  place-items: center;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.purchase-card--book:hover,
+.purchase-card--book:focus-within {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.purchase-card__course-pass {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(
+    in srgb,
+    var(--profile-primary) 15%,
+    var(--profile-border)
+  );
+  border-radius: 17px;
+  background: var(--profile-surface);
+  box-shadow: 0 12px 30px
+    color-mix(in srgb, var(--profile-primary) 7%, transparent);
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.purchase-card__course-pass::before,
+.purchase-card__course-pass::after {
+  position: absolute;
+  z-index: 4;
+  top: 149px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--profile-border);
+  border-radius: 50%;
+  background: var(--profile-canvas);
+  content: "";
+}
+
+.purchase-card__course-pass::before {
+  right: -10px;
+}
+
+.purchase-card__course-pass::after {
+  left: -10px;
+}
+
+.purchase-card--course:hover .purchase-card__course-pass,
+.purchase-card--course:focus-within .purchase-card__course-pass {
+  border-color: color-mix(
+    in srgb,
+    var(--profile-secondary) 38%,
+    var(--profile-border)
+  );
+  box-shadow: 0 30px 62px
+    color-mix(in srgb, var(--profile-primary) 16%, transparent);
+}
+
+.purchase-card__course-media-cover {
+  position: relative;
+  height: 158px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, var(--profile-secondary-soft), transparent 35%),
+    linear-gradient(135deg, var(--profile-primary), #06122d);
+}
+
+.purchase-card__course-media-cover::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(2 9 27 / 8%) 35%, rgb(2 9 27 / 76%)),
+    linear-gradient(90deg, rgb(255 255 255 / 9%), transparent 35%);
+  content: "";
+  pointer-events: none;
+}
+
+.purchase-card__course-media-cover > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 500ms ease, transform 650ms ease;
+}
+
+.purchase-card--course:hover .purchase-card__course-media-cover > img,
+.purchase-card--course:focus-within .purchase-card__course-media-cover > img {
+  filter: saturate(1.08) contrast(1.03);
+  transform: scale(1.055);
+}
+
+.purchase-card__course-cover-fallback {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: rgb(255 255 255 / 35%);
+  font-size: 62px;
+}
+
+.purchase-card__course-access {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 99px;
+  background: rgb(2 10 28 / 65%);
+  color: #d8f8e8;
+  font-size: 8px;
+  font-weight: 900;
+  backdrop-filter: blur(9px);
+}
+
+.purchase-card__course-access > i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #54d798;
+  box-shadow: 0 0 0 3px rgb(84 215 152 / 14%);
+}
+
+.purchase-card__course-access--recorded {
+  color: #ffebbd;
+}
+
+.purchase-card__course-access--recorded > i {
+  background: #f5bd51;
+}
+
+.purchase-card__course-access--blocked {
+  color: #ffd5d2;
+}
+
+.purchase-card__course-access--blocked > i {
+  background: #ff746c;
+}
+
+.purchase-card__course-play {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 42%);
+  border-radius: 50%;
+  background: color-mix(
+    in srgb,
+    var(--profile-secondary) 90%,
+    rgb(255 255 255 / 12%)
+  );
+  box-shadow:
+    0 10px 24px rgb(0 0 0 / 28%),
+    0 0 0 6px rgb(255 255 255 / 10%);
+  color: #fff;
+  text-decoration: none;
+  transform: translate(-50%, -50%);
+  transition: box-shadow 220ms ease, transform 220ms ease;
+}
+
+.purchase-card__course-play > i {
+  margin-left: 2px;
+}
+
+.purchase-card__course-play:hover,
+.purchase-card__course-play:focus-visible {
+  box-shadow:
+    0 16px 34px rgb(0 0 0 / 36%),
+    0 0 0 12px rgb(255 255 255 / 12%);
+  outline: 0;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.purchase-card__course-play--disabled {
+  background: rgb(91 103 122 / 86%);
+}
+
+.purchase-card__course-details {
+  position: relative;
+  min-height: 220px;
+  padding: 16px 17px 14px;
+  border-top: 1px dashed color-mix(
+    in srgb,
+    var(--profile-primary) 22%,
+    var(--profile-border)
+  );
+}
+
+.purchase-card__course-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.purchase-card__course-heading > span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  color: var(--profile-secondary);
+  font-size: 8px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.purchase-card__course-heading > small {
+  color: var(--profile-muted);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.purchase-card__course-details h3 {
+  margin: 6px 0 3px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.purchase-card__course-teacher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.purchase-card__course-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.purchase-card__course-content > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 7px;
+  border: 1px solid var(--profile-border);
+  border-radius: 9px;
+  background: var(--profile-surface-raised);
+  color: var(--profile-muted);
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.purchase-card__course-content i {
+  color: var(--profile-secondary);
+  font-size: 10px;
+}
+
+.purchase-card__course-content strong {
+  color: var(--profile-ink);
+  font-size: 9px;
+}
+
+.purchase-card__course-progress {
+  margin-top: 10px;
+}
+
+.purchase-card__course-progress > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: var(--profile-muted);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.purchase-card__course-progress > div strong {
+  color: var(--profile-secondary);
+}
+
+.purchase-card__course-progress > span {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--profile-canvas);
+}
+
+.purchase-card__course-progress > span > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--profile-secondary),
+    color-mix(in srgb, var(--profile-secondary) 50%, #67e8c2)
+  );
+}
+
+.purchase-card__course-footer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.purchase-card__course-footer > a:first-child,
+.purchase-card__course-footer > span:first-child {
+  display: inline-flex;
+  min-height: 36px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  background: var(--profile-action);
+  color: var(--profile-on-action);
+  font-size: 9px;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
+.purchase-card__course-footer > span:first-child {
+  background: color-mix(in srgb, #b42318 10%, var(--profile-surface-raised));
+  color: #b42318;
+}
+
+.purchase-card__course-footer > a:last-child:not(:first-child) {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border: 1px solid var(--profile-border);
+  border-radius: 10px;
+  color: var(--profile-muted);
+  text-decoration: none;
+}
+
+.purchase-card__course-footer > a:hover,
+.purchase-card__course-footer > a:focus-visible {
+  outline: 0;
+  transform: translateY(-2px);
+}
+
+.purchase-card__course-pass--blocked .purchase-card__course-media-cover > img {
+  filter: grayscale(0.72) brightness(0.74);
+}
+
 .purchase-card__visual {
   position: relative;
   min-height: 250px;
@@ -819,14 +1478,6 @@ const resetSearch = () => {
   background: color-mix(
     in srgb,
     var(--profile-secondary) 14%,
-    var(--profile-surface-raised)
-  );
-}
-
-.purchase-card--book .purchase-card__visual {
-  background: color-mix(
-    in srgb,
-    var(--profile-primary) 10%,
     var(--profile-surface-raised)
   );
 }
@@ -857,7 +1508,7 @@ const resetSearch = () => {
   opacity: 0.38;
 }
 
-.purchase-card__visual img {
+.purchase-card__visual > img {
   position: relative;
   z-index: 1;
   width: 100%;
@@ -867,7 +1518,7 @@ const resetSearch = () => {
   transition: transform 300ms ease;
 }
 
-.purchase-card:hover .purchase-card__visual img {
+.purchase-card:hover .purchase-card__visual > img {
   transform: scale(1.04);
 }
 
@@ -878,6 +1529,267 @@ const resetSearch = () => {
   background: linear-gradient(180deg, transparent 48%, rgb(5 16 38 / 55%));
   content: "";
   pointer-events: none;
+}
+
+.purchase-card__book-link {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 390px;
+  padding: 24px 8px 42px;
+  place-items: center;
+  color: inherit;
+  perspective: 1450px;
+  text-decoration: none;
+}
+
+.purchase-card__book-link::before {
+  position: absolute;
+  right: 14%;
+  bottom: 28px;
+  left: 14%;
+  height: 28px;
+  border-radius: 50%;
+  background: rgb(8 18 42 / 32%);
+  filter: blur(12px);
+  content: "";
+  opacity: 0.72;
+  transform: rotate(-1deg);
+}
+
+.purchase-card__book-link:focus-visible {
+  border-radius: 12px;
+  outline: 3px solid var(--profile-secondary-soft);
+  outline-offset: 4px;
+}
+
+.purchase-card__book {
+  position: relative;
+  z-index: 2;
+  width: 220px;
+  height: 330px;
+  transform: rotate(-1.5deg) translateZ(0);
+  transform-style: preserve-3d;
+  transition: transform 650ms cubic-bezier(0.2, 0.78, 0.18, 1);
+}
+
+.purchase-card__book-pages {
+  position: absolute;
+  inset: 5px 4px 5px 1px;
+  overflow: hidden;
+  border: 1px solid rgb(194 183 157 / 65%);
+  border-radius: 7px 3px 3px 7px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #f8f3e7 0 3px,
+      #e6dcc7 3px 4px
+    );
+  box-shadow:
+    -6px 8px 0 -2px #d9ceb7,
+    -11px 17px 28px rgb(0 0 0 / 38%);
+}
+
+.purchase-card__book-pages::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent 74%, rgb(94 75 42 / 13%));
+  content: "";
+  pointer-events: none;
+}
+
+.purchase-card__book-page {
+  position: absolute;
+  inset: 18px 17px 18px 13px;
+  display: flex;
+  padding: 20px 17px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgb(114 92 54 / 16%);
+  color: #5d513d;
+  text-align: center;
+}
+
+.purchase-card__book-page > i {
+  color: color-mix(in srgb, var(--profile-secondary) 76%, #303d52);
+  font-size: 33px;
+}
+
+.purchase-card__book-page > small {
+  color: #8a7a5f;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.purchase-card__book-page-title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #3d3427;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.purchase-card__book-page-rule {
+  width: 42px;
+  height: 2px;
+  margin-block: 2px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--profile-secondary) 62%, #8a7655);
+}
+
+.purchase-card__book-length {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px 5px;
+  color: #5d513d;
+}
+
+.purchase-card__book-length small {
+  grid-column: 1 / -1;
+  color: #9a8869;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.purchase-card__book-length b {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.purchase-card__book-length em {
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.purchase-card__book-cover {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 8px 3px 3px 8px;
+  background:
+    linear-gradient(150deg, rgb(255 255 255 / 12%), transparent 34%),
+    var(--profile-primary);
+  box-shadow:
+    -10px 14px 24px rgb(0 0 0 / 34%),
+    inset 10px 0 18px rgb(255 255 255 / 7%);
+  backface-visibility: hidden;
+  transform: rotateY(0deg);
+  transform-origin: right center;
+  transform-style: preserve-3d;
+  transition: transform 700ms cubic-bezier(0.18, 0.78, 0.16, 1),
+    box-shadow 700ms ease;
+}
+
+.purchase-card__book-cover::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 62%, rgb(0 0 0 / 24%)),
+    linear-gradient(180deg, transparent 45%, rgb(2 12 35 / 58%));
+  content: "";
+  pointer-events: none;
+}
+
+.purchase-card__book-cover > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.015);
+  transition: transform 650ms ease, filter 650ms ease;
+}
+
+.purchase-card__book-cover-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  padding: 38px 28px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  color: #fff;
+  text-align: center;
+}
+
+.purchase-card__book-cover-fallback > i {
+  font-size: 46px;
+  opacity: 0.86;
+}
+
+.purchase-card__book-cover-fallback > strong {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.purchase-card__book-spine {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  border-left: 1px solid rgb(255 255 255 / 14%);
+  background: linear-gradient(90deg, rgb(0 0 0 / 30%), rgb(255 255 255 / 9%));
+  box-shadow: -3px 0 8px rgb(0 0 0 / 18%);
+}
+
+.purchase-card__book-label {
+  position: absolute;
+  z-index: 3;
+  right: 22px;
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.purchase-card--book:focus-within .purchase-card__book {
+  transform: translateX(-20px) rotate(0.5deg) translateZ(0);
+}
+
+.purchase-card--book:focus-within .purchase-card__book-cover {
+  box-shadow: -18px 18px 32px rgb(0 0 0 / 28%);
+  transform: rotateY(78deg);
+}
+
+.purchase-card--book:focus-within .purchase-card__book-cover > img {
+  filter: saturate(1.08) contrast(1.02);
+  transform: scale(1.06);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .purchase-card--book:hover .purchase-card__book {
+    transform: translateX(-20px) rotate(0.5deg) translateZ(0);
+  }
+
+  .purchase-card--book:hover .purchase-card__book-cover {
+    box-shadow: -18px 18px 32px rgb(0 0 0 / 28%);
+    transform: rotateY(78deg);
+  }
+
+  .purchase-card--book:hover .purchase-card__book-cover > img {
+    filter: saturate(1.08) contrast(1.02);
+    transform: scale(1.06);
+  }
+
 }
 
 .purchase-card__kind {
@@ -1313,22 +2225,54 @@ const resetSearch = () => {
   }
 }
 
-@media (max-width: 1180px) {
-  .purchases-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@keyframes purchase-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .purchase-card__book-cover {
+    transform: rotateY(9deg);
+  }
+}
+
+@media (max-width: 1180px) {
   .purchase-grid,
   .purchases-loading {
     grid-template-columns: 1fr;
   }
+
+  .purchase-grid:has(.purchase-card--book) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
 }
 
 @media (max-width: 820px) {
-  .purchases-overview > header,
   .purchases-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .purchases-toolbar {
+    position: relative;
+    top: auto;
+  }
+
+  .purchases-resume {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+
+  .purchases-resume > a {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .purchases-search {
@@ -1336,7 +2280,16 @@ const resetSearch = () => {
   }
 
   .purchases-filters {
+    width: 100%;
+    flex-wrap: nowrap;
     justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+
+  .purchases-filters button {
+    flex: 0 0 auto;
   }
 
   .purchases-state--empty {
@@ -1347,22 +2300,75 @@ const resetSearch = () => {
   .purchases-empty-actions {
     justify-content: center;
   }
+
+  .purchase-grid:has(.purchase-card--book) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
 }
 
 @media (max-width: 560px) {
-  .purchases-stats {
-    grid-template-columns: 1fr;
-  }
-
   .purchase-card,
   .purchase-skeleton {
     grid-template-columns: 1fr;
   }
 
+  .purchase-card--book {
+    min-height: 350px;
+  }
+
+  .purchase-card__course-media-cover {
+    height: 170px;
+  }
+
+  .purchase-card__course-pass::before,
+  .purchase-card__course-pass::after {
+    top: 161px;
+  }
+
+  .purchase-card__course-details {
+    min-height: 0;
+    padding-inline: 16px;
+  }
+
+  .purchases-resume {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+    padding: 9px;
+  }
+
+  .purchases-resume__visual {
+    height: 72px;
+  }
+
+  .purchases-resume > a {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  .purchases-results-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .purchase-card__visual,
-  .purchase-card__visual img {
+  .purchase-card__visual > img {
     min-height: 190px;
     max-height: 230px;
+  }
+
+  .purchase-grid:has(.purchase-card--book) {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase-card__book-link {
+    min-height: 350px;
+    padding: 20px 8px 38px;
+  }
+
+  .purchase-card__book {
+    width: 190px;
+    height: 285px;
   }
 
   .purchase-card__footer,
@@ -1383,12 +2389,30 @@ const resetSearch = () => {
 
 @media (prefers-reduced-motion: reduce) {
   .purchase-card,
-  .purchase-card__visual img,
-  .purchase-stat,
+  .purchase-card__visual > img,
+  .purchase-card__book,
+  .purchase-card__book-cover,
+  .purchase-card__book-cover > img,
+  .purchase-card__course-pass,
+  .purchase-card__course-media-cover > img,
+  .purchase-card__course-play,
+  .purchases-resume > a,
   .purchase-skeleton > span,
   .purchase-skeleton i {
     animation: none;
     transition: none;
+  }
+
+  .purchase-card--book:hover .purchase-card__book,
+  .purchase-card--book:focus-within .purchase-card__book,
+  .purchase-card--book:hover .purchase-card__book-cover,
+  .purchase-card--book:focus-within .purchase-card__book-cover {
+    transform: none;
+  }
+
+  .purchase-card--course:hover .purchase-card__course-media-cover > img,
+  .purchase-card--course:focus-within .purchase-card__course-media-cover > img {
+    transform: none;
   }
 }
 </style>

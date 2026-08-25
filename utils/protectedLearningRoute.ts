@@ -5,6 +5,15 @@ export interface BrowserViewportMetrics {
   outerHeight: number;
 }
 
+export interface BrowserInputCapabilities {
+  maxTouchPoints: number;
+  coarsePointer: boolean;
+  userAgent: string;
+}
+
+const MOBILE_BROWSER_PATTERN =
+  /Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle/u;
+
 export const isProtectedLearningPath = (path: string) => {
   const pathname = path.split(/[?#]/u, 1)[0] || "";
   return /^\/course\/[^/]+(?:\/[^/]+)?\/?$/u.test(pathname);
@@ -29,4 +38,15 @@ export const hasDeveloperToolsViewportGap = (
   const heightGap = Math.max(0, metrics.outerHeight - metrics.innerHeight);
 
   return widthGap >= threshold || heightGap >= threshold;
+};
+
+export const supportsReliableDeveloperToolsViewportDetection = (
+  capabilities: BrowserInputCapabilities,
+) => {
+  if (!Number.isFinite(capabilities.maxTouchPoints)) return false;
+
+  const isTouchDevice = capabilities.maxTouchPoints > 0;
+  const isMobileBrowser = MOBILE_BROWSER_PATTERN.test(capabilities.userAgent);
+
+  return !isTouchDevice && !capabilities.coarsePointer && !isMobileBrowser;
 };

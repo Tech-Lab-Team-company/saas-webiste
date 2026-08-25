@@ -1,5 +1,8 @@
 import type { MaybeRefOrGetter } from "vue";
-import { hasDeveloperToolsViewportGap } from "~/utils/protectedLearningRoute";
+import {
+  hasDeveloperToolsViewportGap,
+  supportsReliableDeveloperToolsViewportDetection,
+} from "~/utils/protectedLearningRoute";
 
 const PROTECTED_COPY_EVENTS = ["copy", "cut", "dragstart"] as const;
 
@@ -10,6 +13,7 @@ export function useProtectedLearningGuard(
   const isDeveloperToolsOpen = ref(false);
   const isProtectedWindowInactive = ref(false);
   let detectionTimer: ReturnType<typeof setInterval> | null = null;
+  let consecutiveOpenChecks = 0;
   let consecutiveClosedChecks = 0;
 
   const readViewportMetrics = () => ({
@@ -18,6 +22,15 @@ export function useProtectedLearningGuard(
     outerWidth: window.outerWidth,
     outerHeight: window.outerHeight,
   });
+
+  const supportsViewportDetection = () =>
+    supportsReliableDeveloperToolsViewportDetection({
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      coarsePointer:
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(any-pointer: coarse)").matches,
+      userAgent: navigator.userAgent || "",
+    });
 
   const emitSecurityEvent = (blocked: boolean) => {
     window.dispatchEvent(
@@ -74,7 +87,12 @@ export function useProtectedLearningGuard(
   };
 
   const checkDeveloperTools = (immediate = false) => {
-    if (!toValue(protectionActive) || !config.developerToolsGuard) {
+    if (
+      !toValue(protectionActive) ||
+      !config.developerToolsGuard ||
+      !supportsViewportDetection()
+    ) {
+      consecutiveOpenChecks = 0;
       consecutiveClosedChecks = 0;
       setDeveloperToolsState(false);
       return;
@@ -90,14 +108,20 @@ export function useProtectedLearningGuard(
 
     if (detected) {
       consecutiveClosedChecks = 0;
-      setDeveloperToolsState(true);
+      consecutiveOpenChecks += 1;
+      if (consecutiveOpenChecks >= config.developerToolsOpenChecks) {
+        consecutiveOpenChecks = 0;
+        setDeveloperToolsState(true);
+      }
     } else if (isDeveloperToolsOpen.value && !immediate) {
+      consecutiveOpenChecks = 0;
       consecutiveClosedChecks += 1;
       if (consecutiveClosedChecks >= config.developerToolsClosedChecks) {
         consecutiveClosedChecks = 0;
         setDeveloperToolsState(false);
       }
     } else if (!isDeveloperToolsOpen.value) {
+      consecutiveOpenChecks = 0;
       consecutiveClosedChecks = 0;
     }
   };
@@ -114,7 +138,11 @@ export function useProtectedLearningGuard(
     if (!document.hidden) checkDeveloperTools(true);
   };
   const handleWindowBlur = () => {
-    if (toValue(protectionActive) && config.blockProtectedWindowBlur) {
+    if (
+      toValue(protectionActive) &&
+      config.blockProtectedWindowBlur &&
+      document.hidden
+    ) {
       setProtectedWindowInactive(true);
     }
   };
@@ -122,9 +150,10 @@ export function useProtectedLearningGuard(
     setProtectedWindowInactive(false);
     checkDeveloperTools(true);
   };
-  const handleWindowResize = () => checkDeveloperTools(true);
-
-  if (import.meta.client) checkDeveloperTools(true);
+  const handleWindowResize = () => {
+    consecutiveOpenChecks = 0;
+    checkDeveloperTools(true);
+  };
 
   onMounted(() => {
     checkDeveloperTools(true);

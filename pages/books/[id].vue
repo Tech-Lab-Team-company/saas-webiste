@@ -1737,6 +1737,7 @@ useHead(() => ({
 
   .book-details-page__cover {
     width: min(430px, 100%);
+    justify-self: center;
   }
 
   .book-details-page__information-grid {

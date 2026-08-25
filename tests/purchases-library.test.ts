@@ -125,3 +125,59 @@ test("purchases page calls the unified authenticated endpoint and exposes clear 
   assert.match(library, /تعذّر تحميل مشترياتك/u);
   assert.match(library, /كل مشترياتك ستظهر هنا/u);
 });
+
+test("purchased books render as a standalone responsive three-book grid", async () => {
+  const library = await readSource("components/Profile/MyPurchasesLibrary.vue");
+
+  assert.match(library, /v-if="item\.kind === 'book'"/u);
+  assert.match(library, /class="purchase-card__book-link"/u);
+  assert.match(library, /purchase-card__book-cover/u);
+  assert.match(library, /purchase-card__book-pages/u);
+  assert.match(
+    library,
+    /purchase-grid:has\(\.purchase-card--book\)[\s\S]*?grid-template-columns: repeat\(3,/u,
+  );
+  assert.match(library, /<template v-else>[\s\S]*purchase-card__body/u);
+  assert.doesNotMatch(library, /purchase-card__book-stage/u);
+  assert.doesNotMatch(library, /purchase-card__book-hint/u);
+  assert.match(library, /purchase-card--book:focus-within/u);
+  assert.match(library, /@media \(hover: hover\) and \(pointer: fine\)/u);
+  assert.match(library, /@media \(prefers-reduced-motion: reduce\)/u);
+});
+
+test("profilecourse keeps navigation compact and prioritizes searchable content", async () => {
+  const [container, library, page] = await Promise.all([
+    readSource("components/Profile/MyCourseContainer.vue"),
+    readSource("components/Profile/MyPurchasesLibrary.vue"),
+    readSource("pages/profilecourse.vue"),
+  ]);
+
+  assert.match(container, /class="profilecourse-intro"/u);
+  assert.match(container, /class="profilecourse-shortcuts"/u);
+  assert.match(container, /aria-label="وصول سريع للمحتوى"/u);
+  assert.doesNotMatch(container, /profilecourse-hero/u);
+  assert.doesNotMatch(container, /profilecourse-library-heading/u);
+  assert.match(library, /const continueCourse = computed/u);
+  assert.match(library, /class="purchases-resume"/u);
+  assert.match(library, /handleSearchShortcut/u);
+  assert.match(library, /aria-controls="purchase-results"/u);
+  assert.match(library, /class="purchases-results-meta"/u);
+  assert.doesNotMatch(library, /class="purchases-overview"/u);
+  assert.match(page, /title: "مشترياتي \| مساحة الطالب"/u);
+});
+
+test("purchased courses use the original compact horizontal card", async () => {
+  const library = await readSource("components/Profile/MyPurchasesLibrary.vue");
+
+  assert.doesNotMatch(
+    library,
+    /<template v-else-if="item\.kind === 'course'">/u,
+  );
+  assert.match(library, /<template v-else>[\s\S]*purchase-card__visual/u);
+  assert.match(library, /<template v-else>[\s\S]*purchase-card__body/u);
+  assert.match(library, /class="purchase-progress"/u);
+  assert.match(library, /class="purchase-card__footer"/u);
+  assert.match(library, /normalizePercentage\(item\.progress\)/u);
+  assert.match(library, /Math\.round\(value\)/u);
+  assert.doesNotMatch(library, /\.purchase-card--course\s*\{/u);
+});

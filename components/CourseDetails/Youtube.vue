@@ -41,17 +41,6 @@ function TogglePip() {
   isPiP.value = !isPiP.value;
 }
 
-function setHDQuality() {
-  if (playerInstance.value && playerInstance.value.setPlaybackQuality) {
-    playerInstance.value.setPlaybackQuality('hd1080');
-  }
-}
-
-function onPlayerReady(event: any) {
-  playerInstance.value = event.detail;
-  setHDQuality();
-}
-
 function clearLoadingDelayTimer() {
   if (!loadingDelayTimer) return;
   clearTimeout(loadingDelayTimer);
@@ -112,17 +101,21 @@ const handlePlaybackEnded = () => {
   watchHistory.markPlaybackEnded();
 };
 
-function handlePlayerClick() {
+async function playVideo() {
   if (isPlayerLoading.value) return;
-  VideoBlurScreen.value = !VideoBlurScreen.value;
-}
 
-// function playVideo() {
-//   if (playerInstance.value) {
-//     playerInstance.value.play();
-//     VideoBlurScreen.value = false;
-//   }
-// }
+  // Keep one source of truth for playback. The old overlay and player click
+  // handlers both toggled this value, so the same tap could play and pause.
+  VideoBlurScreen.value = false;
+
+  try {
+    await playerInstance.value?.play?.();
+  } catch {
+    // Autoplay policies or a transient provider error can reject play(). Keep
+    // the retry action visible instead of leaving the learner on a black frame.
+    VideoBlurScreen.value = true;
+  }
+}
 watch(() => props.video, (newVal) => {
   videoId.value = getYoutubeVideoId(newVal)
   playerReloadKey.value += 1;
@@ -142,8 +135,7 @@ onBeforeUnmount(() => {
 <template>
   <br>
   <div :class="isPiP ? 'video-player-pip' : 'video-player'" @contextmenu.prevent>
-    <Player theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
-      @click="handlePlayerClick"
+    <Player ref="playerInstance" theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
       @vmPlay="handlePlaybackStarted"
       @vmPausedChange="onPausedChange"
       @vmDurationChange="watchHistory.updateDuration"
@@ -152,20 +144,25 @@ onBeforeUnmount(() => {
       @vmPlaybackEnded="handlePlaybackEnded"
       @vmError="markPlayerDelayed"
       :paused="VideoBlurScreen">
-      <div @click="VideoBlurScreen = false" v-if="VideoBlurScreen && !isPlayerLoading" class="overlay">
-        <!-- <img :src="settingStore.setting?.image?.img" class="logo-image" alt=""> -->
-        <IconsPause  class="logo-image" @click="VideoBlurScreen = false" />
-        <!-- <i class="pi pi-play "></i> -->
-      </div>
+      <button
+        v-if="VideoBlurScreen && !isPlayerLoading"
+        type="button"
+        class="overlay"
+        aria-label="تشغيل الفيديو"
+        @click.stop="playVideo"
+      >
+        <IconsPause class="logo-image" aria-hidden="true" />
+        <span>تشغيل الفيديو</span>
+      </button>
 
-      <Youtube :showFullscreenControl="false"  :key="videoId" :videoId="videoId!"  @vmReady="onPlayerReady" />
+      <Youtube :showFullscreenControl="false" :key="videoId" :videoId="videoId!" />
       <CourseDetailsMediaWatermark :course-id="courseId" />
       <Ui>
         <DefaultSettings />
         <Controls>
           <PlaybackControl />
           <VolumeControl />
-          <ScrubberControl @click="VideoBlurScreen = true" />
+          <ScrubberControl />
           <SettingsControl />
           <FullscreenControl />
           <!--          <button @click="TogglePip" class="pip-button">PIP</button>-->
@@ -193,33 +190,46 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .overlay {
-  background-color: rgb(0, 0, 0);
   position: absolute;
-  width: 100%;
-  height: 100%;
   top: 0;
   left: 0;
   z-index: 100;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  place-content: center;
+  gap: 12px;
+  border: 0;
+  background:
+    radial-gradient(circle at center, rgb(40 120 232 / 24%), transparent 34%),
+    rgb(0 0 0 / 88%);
+  color: #fff;
   cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
 }
 
-.play-icon {
-  width: 50px;
-  margin-left: auto;
-  margin-right: auto;
-  top: 0;
-  transform: translateY(-10%);
-  cursor: pointer;
+.overlay:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: -6px;
 }
 
 .logo-image {
-  width: 300px;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-  cursor: pointer;
-  border-radius: 20px;
+  width: 76px;
+  height: 76px;
+  margin-inline: auto;
+  padding: 25px 22px 25px 26px;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  background: var(--secondary-color, #2878e8);
+  box-shadow: 0 14px 38px rgb(0 0 0 / 42%);
+  transition: transform 180ms ease, filter 180ms ease;
+}
 
+.overlay:hover .logo-image {
+  filter: brightness(1.08);
+  transform: scale(1.06);
 }
 </style>

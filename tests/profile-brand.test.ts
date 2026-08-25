@@ -44,7 +44,7 @@ test("profile brand is dynamic and has a professional fallback", async () => {
   assert.match(sidebar, /studentIdentity\.fullName \|\| "الطالب"/u);
 });
 
-test("mobile profile navigation is explicit, compact, and does not rely on horizontal scrolling", async () => {
+test("tablet and mobile profile navigation is compact and avoids horizontal scrolling", async () => {
   const [sidebar, styles] = await Promise.all([
     readSource("components/Profile/ProfileSidebar.vue"),
     readSource("assets/style/profile-redesign/profile.scss"),
@@ -54,10 +54,23 @@ test("mobile profile navigation is explicit, compact, and does not rely on horiz
   assert.match(sidebar, /أنت الآن في/u);
   assert.match(sidebar, /:aria-expanded="isMobileNavigationOpen"/u);
   assert.match(sidebar, /'is-mobile-open': isMobileNavigationOpen/u);
-  assert.match(styles, /@media \(max-width: 720px\)/u);
+  assert.match(styles, /@media \(max-width: 820px\)/u);
   assert.match(styles, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/u);
   assert.match(styles, /\.profile-options\.is-mobile-open/u);
   assert.doesNotMatch(styles, /\.profile-options \{[\s\S]{0,180}overflow-x: auto/u);
+});
+
+test("student dashboard switches to one column at the shared tablet breakpoint", async () => {
+  const dashboard = await readSource("pages/student-dashboard.vue");
+
+  assert.match(
+    dashboard,
+    /@media \(max-width: 820px\) \{[\s\S]*?\.continue-panel \{[\s\S]*?grid-template-columns: 1fr;/u,
+  );
+  assert.match(
+    dashboard,
+    /@media \(max-width: 820px\) \{[\s\S]*?\.course-grid,[\s\S]*?grid-template-columns: 1fr;/u,
+  );
 });
 
 test("profile dashboard fills intermediate viewports without an empty side gutter", async () => {
@@ -68,6 +81,14 @@ test("profile dashboard fills intermediate viewports without an empty side gutte
   assert.match(
     styles,
     /\.profile-redesign-page \.prfile-home\.profile-dashboard \{[\s\S]*?max-width: none/u,
+  );
+  assert.match(
+    styles,
+    /\.profile-dashboard-sidebar\.profile-sidebar-container \{[\s\S]*?width: 100%;[\s\S]*?margin: 0;/u,
+  );
+  assert.match(
+    styles,
+    /@media \(max-width: 980px\) \{[\s\S]*?\.profile-redesign-page \.prfile-home\.profile-dashboard \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 230px;/u,
   );
   assert.match(styles, /overflow-x: clip/u);
 });

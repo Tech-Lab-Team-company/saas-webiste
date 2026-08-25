@@ -12,6 +12,7 @@ export function useCourseProtectionConfig() {
     developerToolsGuard: true,
     developerToolsOpenThresholdPx: 170,
     developerToolsCloseThresholdPx: 120,
+    developerToolsOpenChecks: 3,
     developerToolsClosedChecks: 3,
     developerToolsPollIntervalMs: 500,
     shieldOnWindowBlur: true,

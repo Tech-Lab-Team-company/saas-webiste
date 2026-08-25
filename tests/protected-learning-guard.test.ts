@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   hasDeveloperToolsViewportGap,
   isProtectedLearningPath,
+  supportsReliableDeveloperToolsViewportDetection,
 } from "../utils/protectedLearningRoute.ts";
 
 test("application content protection is mounted by the root app", async () => {
@@ -51,6 +52,63 @@ test("responsive device emulation still detects the desktop viewport gap", () =>
       170,
     ),
     true,
+  );
+});
+
+test("developer tools viewport detection is disabled on phones and tablets", () => {
+  assert.equal(
+    supportsReliableDeveloperToolsViewportDetection({
+      maxTouchPoints: 0,
+      coarsePointer: false,
+      userAgent:
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Mobile/15E148",
+    }),
+    false,
+  );
+  assert.equal(
+    supportsReliableDeveloperToolsViewportDetection({
+      maxTouchPoints: 5,
+      coarsePointer: false,
+      userAgent:
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15",
+    }),
+    false,
+  );
+  assert.equal(
+    supportsReliableDeveloperToolsViewportDetection({
+      maxTouchPoints: 0,
+      coarsePointer: true,
+      userAgent: "Mozilla/5.0 (Linux; Android 15; Tablet) Mobile",
+    }),
+    false,
+  );
+});
+
+test("developer tools viewport detection remains enabled on desktop browsers", () => {
+  assert.equal(
+    supportsReliableDeveloperToolsViewportDetection({
+      maxTouchPoints: 0,
+      coarsePointer: false,
+      userAgent: "Mozilla/5.0 (X11; Linux x86_64) Chrome/140 Safari/537.36",
+    }),
+    true,
+  );
+});
+
+test("learning guard confirms desktop signals and ignores ordinary mobile blur", async () => {
+  const guard = await readFile(
+    new URL("../composables/useProtectedLearningGuard.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(guard, /supportsReliableDeveloperToolsViewportDetection/u);
+  assert.match(
+    guard,
+    /consecutiveOpenChecks >= config\.developerToolsOpenChecks/u,
+  );
+  assert.match(
+    guard,
+    /config\.blockProtectedWindowBlur &&\s*document\.hidden/u,
   );
 });
 

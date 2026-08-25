@@ -409,13 +409,23 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
                 </div>
                 <div class="blog-listing__card-body">
                   <div class="blog-listing__card-meta">
-                    <span v-if="blog.subtitle">{{ blog.subtitle }}</span>
                     <time v-if="blog.date" :datetime="blog.date">{{
                       formatDate(blog.date)
                     }}</time>
                   </div>
                   <h2>{{ blog.title }}</h2>
-                  <p v-if="blog.description">{{ blog.description }}</p>
+                  <p
+                    v-if="blog.subtitle"
+                    class="blog-listing__card-subtitle"
+                  >
+                    {{ blog.subtitle }}
+                  </p>
+                  <p
+                    v-if="blog.description"
+                    class="blog-listing__card-description"
+                  >
+                    {{ blog.description }}
+                  </p>
                   <span class="blog-listing__read"
                     >اقرأ المقال <i aria-hidden="true">←</i></span
                   >
@@ -798,10 +808,6 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   font-weight: 800;
 }
 
-.blog-listing__card-meta span:first-child {
-  color: var(--home-v2-blue);
-}
-
 .blog-listing__card-body h2 {
   margin: 13px 0 9px;
   color: var(--home-v2-ink);
@@ -809,7 +815,15 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
   letter-spacing: -0.02em;
 }
 
-.blog-listing__card-body p {
+.blog-listing__card-body .blog-listing__card-subtitle {
+  margin: 0 0 7px;
+  color: var(--home-v2-blue);
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.75;
+}
+
+.blog-listing__card-body .blog-listing__card-description {
   margin: 0;
   color: var(--home-v2-muted);
   font-size: 15px;
