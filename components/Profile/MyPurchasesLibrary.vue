@@ -588,50 +588,20 @@ onBeforeUnmount(() =>
                 :invoice-link="item.invoiceLink"
               />
 
+              <ProfilePurchaseBookCard
+                v-else-if="item.kind === 'book'"
+                :title="item.title"
+                :to="itemRoute(item) || '/'"
+                :image="item.image"
+                :page-count="item.pageCount"
+                :order="itemIndex"
+              />
+
               <article
                 v-else
                 :class="['purchase-card', `purchase-card--${item.kind}`]"
                 :style="{ '--purchase-order': itemIndex }"
               >
-              <NuxtLink
-                v-if="item.kind === 'book'"
-                class="purchase-card__book-link"
-                :to="itemRoute(item) || '/'"
-                :aria-label="`تفاصيل الكتاب: ${item.title}، عدد الصفحات ${item.pageCount || 'غير محدد'}`"
-              >
-                <div class="purchase-card__book" aria-hidden="true">
-                  <div class="purchase-card__book-pages">
-                    <div class="purchase-card__book-page">
-                      <i class="pi pi-book" />
-                      <small>نسختك التعليمية</small>
-                      <strong class="purchase-card__book-page-title">
-                        {{ item.title }}
-                      </strong>
-                      <span class="purchase-card__book-page-rule" />
-                      <span class="purchase-card__book-length">
-                        <small>عدد الصفحات</small>
-                        <b>{{ item.pageCount || "غير محدد" }}</b>
-                        <em v-if="item.pageCount">صفحة</em>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="purchase-card__book-cover">
-                    <img v-if="item.image" :src="item.image" alt="" />
-                    <span v-else class="purchase-card__book-cover-fallback">
-                      <i class="pi pi-book" />
-                      <strong>{{ item.title }}</strong>
-                    </span>
-                    <span class="purchase-card__book-spine" />
-                    <span class="purchase-card__book-label">
-                      <i class="pi pi-book" />
-                      كتاب
-                    </span>
-                  </div>
-                </div>
-              </NuxtLink>
-
-              <template v-else>
                 <div class="purchase-card__visual">
                   <span class="purchase-card__fallback" aria-hidden="true">
                     <i :class="kindIcon(item.kind)" />
@@ -749,7 +719,6 @@ onBeforeUnmount(() =>
                     </a>
                   </footer>
                 </div>
-              </template>
               </article>
             </template>
           </div>
@@ -1256,22 +1225,6 @@ onBeforeUnmount(() =>
   box-shadow: 0 24px 46px
     color-mix(in srgb, var(--profile-primary) 10%, transparent);
   transform: translateY(-3px);
-}
-
-.purchase-card--book {
-  min-height: 390px;
-  place-items: center;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.purchase-card--book:hover,
-.purchase-card--book:focus-within {
-  border-color: transparent;
-  box-shadow: none;
 }
 
 .purchase-card__course-pass {

@@ -127,10 +127,6 @@ const priceLabel = (book: HomeBookViewModel) => {
   return `${book.price} ${book.currency}`.trim();
 };
 
-const coverTones = ["mint", "coral", "sky", "gold", "deep", "violet"] as const;
-const coverTone = (book: HomeBookViewModel) =>
-  coverTones[Math.abs(book.id) % coverTones.length];
-
 type FormatKey = "all" | "digital" | "printed";
 
 const selectedFormat = ref<FormatKey>("all");
@@ -423,49 +419,18 @@ useHead({
           </div>
 
           <div v-else class="books-page__grid">
-            <article v-for="book in filteredBooks" :key="book.id" class="books-page__card">
-              <NuxtLink
-                class="books-page__cover-link"
-                :to="`/books/${book.bookId}`"
-                :aria-label="`عرض تفاصيل ${book.title}`"
-              />
-
-              <div :class="['books-page__cover', `books-page__cover--${coverTone(book)}`]">
-                <img
-                  v-if="book.image"
-                  :src="book.image"
-                  :alt="book.title"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <template v-else>
-                  <span>كتاب رقم {{ book.bookId }}</span>
-                  <b>{{ book.title }}</b>
-                  <small v-if="site.brandName">{{ site.brandName }}</small>
-                </template>
-                <em>{{ book.isFree ? "مجاني" : "متاح الآن" }}</em>
-              </div>
-
-              <div class="books-page__card-body">
-                <span v-if="book.subtitle">{{ book.subtitle }}</span>
-                <h3>{{ book.title }}</h3>
-                <p v-if="book.description">{{ book.description }}</p>
-                <div class="books-page__formats">
-                  <div v-if="book.numberOfPages">
-                    <small>عدد الصفحات</small>
-                    <b>{{ book.numberOfPages }} صفحة</b>
-                  </div>
-                  <div>
-                    <small>السعر</small>
-                    <b>{{ priceLabel(book) }}</b>
-                  </div>
-                </div>
-                <span class="books-page__details">
-                  تفاصيل الكتاب
-                  <span aria-hidden="true">←</span>
-                </span>
-              </div>
-            </article>
+            <ProfilePurchaseBookCard
+              v-for="(book, bookIndex) in filteredBooks"
+              :key="book.id"
+              class="books-page__purchase-card"
+              :title="book.title"
+              :to="`/books/${book.bookId}`"
+              :image="book.image"
+              :page-count="book.numberOfPages"
+              :label="priceLabel(book)"
+              :order="bookIndex"
+              size="showcase"
+            />
           </div>
 
           <nav
@@ -1046,9 +1011,14 @@ useHead({
 }
 
 .books-page__grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px)));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  align-items: start;
   justify-content: start;
-  gap: 24px;
+  gap: clamp(24px, 3vw, 42px);
+}
+
+.books-page__purchase-card {
+  width: 100%;
 }
 
 .books-page__card {

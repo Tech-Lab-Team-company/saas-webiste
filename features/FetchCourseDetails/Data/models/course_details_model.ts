@@ -30,6 +30,7 @@ export default class CourseDetailsModel {
   public course_videos: number;
   public is_subscribed: boolean;
   public is_paid: boolean;
+  public is_favorite: boolean;
   
 
 
@@ -57,6 +58,7 @@ export default class CourseDetailsModel {
     course_videos: number,
     is_paid: boolean,
     is_subscribed: boolean,
+    is_favorite: boolean,
 
   ) {
     this.id = id;
@@ -82,6 +84,7 @@ export default class CourseDetailsModel {
     this.course_videos = course_videos;
     this.is_paid = is_paid;
     this.is_subscribed = is_subscribed;
+    this.is_favorite = is_favorite;
  
   }
 
@@ -118,6 +121,7 @@ export default class CourseDetailsModel {
       map["course_videos"],
       toBoolean(map["is_paid"]),
       toBoolean(map["is_subscribed"]),
+      toBoolean(map["is_favorite"]),
     );
   }
 }
