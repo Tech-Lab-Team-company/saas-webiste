@@ -47,8 +47,8 @@ const LoginData = async () => {
     window.localStorage.clear();
     const loginParams = new LoginParams(Credential.value, LoginPassword.value);
     const loginController = LoginController.getInstance();
-    await loginController.login(loginParams, router);
-    await FetchPaymentMethod();
+    const didLogin = await loginController.login(loginParams, router);
+    if (didLogin) await FetchPaymentMethod();
 
 }
 
