@@ -27,6 +27,10 @@ export const useUserStore = defineStore('user', {
       }
     },
     logout() {
+      if (import.meta.client) {
+        localStorage.removeItem("auth");
+        localStorage.removeItem("user");
+      }
       this.user = null;
       this.image = null;
       this.isAuth = false;

@@ -2,6 +2,7 @@
 import type { HomeSiteViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
 import { getDescriptiveImageAlt } from "~/utils/imageAlt";
+import { markUserOffline } from "~/utils/onlineStatusTracking";
 
 const props = defineProps<{
   site: HomeSiteViewModel;
@@ -25,15 +26,13 @@ const handleUserImageError = (event: Event) => {
 };
 
 const handleLogout = async () => {
-  if (import.meta.client) {
-    localStorage.removeItem("auth");
-    localStorage.removeItem("user");
+  try {
+    await markUserOffline();
+  } finally {
+    userStore.logout();
+    await router.push("/");
   }
-
-  userStore.logout();
-  await router.push("/");
 };
-
 const headerDescription = computed(() => {
   const description = (props.site.description || "")
     .replace(/\s+/g, " ")

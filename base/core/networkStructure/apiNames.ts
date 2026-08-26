@@ -28,6 +28,8 @@ class ApiNames {
   // public resetPassword = "change_password";
 
   public setNewPassword = "reset_password";
+   // update online status
+  public updateOnlineStatus = "change_online_status";
 
   //Education Stages
   public educationstages = this.baseUrl + "fetch_education_type";
