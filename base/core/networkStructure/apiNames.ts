@@ -170,8 +170,13 @@ class ApiNames {
   //Courses
   public fetch_courses = "fetch_my_courses";
   public fetch_my_purchased = "fetch_my_purchased";
-
   public generalSubjects = "fetch_general_subjects ";
+
+  // Favorite
+  public addFavorite = "add_favorite";
+  public fetchMyLibraryBooks = "fetch_my_library_books";
+  public fetchMyLibraryCourses = "fetch_my_library_courses";
+
 }
 
 export { ApiNames };

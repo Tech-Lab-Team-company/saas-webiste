@@ -743,6 +743,7 @@ useHead(() => ({
                       :currency="book.currency"
                       :option-label="option.label"
                       :requires-delivery="option.requiresDelivery"
+                      :is-favorite="book.isFavorite"
                       :trigger-label="option.triggerLabel"
                       @purchased="refresh"
                     />

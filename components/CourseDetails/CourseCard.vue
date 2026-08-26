@@ -12,6 +12,10 @@ import successImage from "~/public/images/success-dialog.png";
 import microphone from "@/public/icons/microphone.vue";
 import note from "@/public/icons/note.vue";
 import video1 from "~/public/icons/video1.vue";
+import { DataSuccess } from "~/base/core/networkStructure/Resources/dataState/data_state";
+import AddFavoriteController from "~/features/Favorite/presentation/controllers/add_favorite_controller";
+import AddFavoriteParams from "~/features/Favorite/Core/Params/add_favorite_params";
+import { FavoriteEnum } from "~/features/Favorite/Core/enums/favorite_params";
 
 const props = defineProps({
   CourseData: {
@@ -59,6 +63,69 @@ const introUrl = computed(() => {
   const value = CardDetails.value?.intro;
   return typeof value === "string" && value.trim() ? value.trim() : null;
 });
+
+const favController = AddFavoriteController.getInstance();
+const isFavorite = ref(false);
+const isFavoritePending = ref(false);
+
+watch(
+  () => CardDetails.value,
+  (course) => {
+    isFavorite.value = Boolean(course?.is_favorite);
+  },
+  { immediate: true },
+);
+
+const toggleFavorite = async () => {
+  if (!CardDetails.value || isFavoritePending.value) return;
+
+  const courseId = Number(CardDetails.value.id);
+  if (!Number.isInteger(courseId) || courseId <= 0) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: "تعذر تحديد الكورس لإضافته إلى المفضلة.",
+      life: 3000,
+    });
+    return;
+  }
+
+  const wasFavorite = isFavorite.value;
+  isFavoritePending.value = true;
+  try {
+    const stateRef = await favController.addFavorite(
+      new AddFavoriteParams(FavoriteEnum.COURSE, courseId),
+    );
+
+    if (!(stateRef.value instanceof DataSuccess)) {
+      throw new Error(
+        stateRef.value.error?.title ?? "تعذر إضافة الكورس إلى المفضلة.",
+      );
+    }
+
+    isFavorite.value = !wasFavorite;
+    toast.add({
+      severity: "success",
+      summary: wasFavorite ? "تمت الإزالة من المفضلة" : "تمت الإضافة للمفضلة",
+      detail: wasFavorite
+        ? "تمت إزالة الكورس من قائمة المفضلة."
+        : "تمت إضافة الكورس إلى قائمة المفضلة بنجاح.",
+      life: 3000,
+    });
+  } catch (error: unknown) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        error instanceof Error
+          ? error.message
+          : "تعذر إضافة الكورس إلى المفضلة. حاول مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isFavoritePending.value = false;
+  }
+};
 
 const youtubeEmbedUrl = computed(() => {
   if (!introUrl.value) return null;
@@ -244,6 +311,7 @@ const userStore = useUserStore();
               <b>{{ CardDetails?.Subject?.title }}</b>
             </div>
           </div>
+
         </div>
 
         <div class="hero-media detail-art">
@@ -254,6 +322,7 @@ const userStore = useUserStore();
           <span>{{ CardDetails?.Teacher?.name || userSetting.setting?.name }}</span>
           <small v-if="CardDetails?.Subject?.title">{{ CardDetails?.Subject?.title }}</small>
         </div>
+
       </div>
     </section>
 
@@ -306,6 +375,28 @@ const userStore = useUserStore();
                   {{ $t("free") }}
                 </p>
                 </div>
+
+                <button
+                  type="button"
+                  class="favorite-action"
+                  :class="{ 'favorite-action--active': isFavorite }"
+                  :disabled="isFavoritePending"
+                  :aria-pressed="isFavorite"
+                  :aria-label="isFavorite ? 'أزل الكورس من المفضلة' : 'أضف الكورس إلى المفضلة'"
+                  @click="toggleFavorite"
+                >
+                  <span class="favorite-action__heart" aria-hidden="true">
+                    <i :class="isFavorite ? 'pi pi-heart-fill' : 'pi pi-heart'"></i>
+                  </span>
+                  <span class="favorite-action__label">
+                    {{ isFavorite ? "إزالة من المفضلة" : "أضف إلى المفضلة" }}
+                  </span>
+                  <i
+                    v-if="isFavoritePending"
+                    class="pi pi-spin pi-spinner favorite-action__spinner"
+                    aria-hidden="true"
+                  ></i>
+                </button>
 
                 <div class="summary-meta"><ul>
                   <li>

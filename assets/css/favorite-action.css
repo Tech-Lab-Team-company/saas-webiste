@@ -1,0 +1,174 @@
+/*
+ * Reusable favorite button.
+ * Add `favorite-action--active` when the resource is already saved.
+ * Add `favorite-action--compact` or `favorite-action--icon-only` for cards.
+ */
+.favorite-action {
+  --favorite-brand: #27468e;
+  --favorite-brand-dark: #18377f;
+  --favorite-active: #c71d42;
+  --favorite-active-light: #e75170;
+  --favorite-surface: #fff;
+  --favorite-focus: color-mix(in srgb, var(--favorite-brand) 38%, white);
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 14px 0 0;
+  padding: 7px 58px;
+  overflow: hidden;
+  border: 1.5px solid var(--favorite-brand);
+  border-radius: 999px;
+  background: var(--favorite-surface);
+  color: #213d83;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--favorite-brand-dark) 10%, transparent);
+  cursor: pointer;
+  font: 900 13px/1 "Cairo", sans-serif;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+
+.favorite-action::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(135deg, #294a94, var(--favorite-brand-dark));
+  transition: opacity 180ms ease;
+}
+
+.favorite-action__heart {
+  position: absolute;
+  left: 7px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--favorite-surface);
+  color: var(--favorite-brand);
+  box-shadow: 0 5px 12px color-mix(in srgb, var(--favorite-brand-dark) 15%, transparent);
+  font-size: 14px;
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.25, 1.35);
+}
+
+.favorite-action__label {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  white-space: nowrap;
+  font-weight: 900;
+}
+
+.favorite-action:hover:not(:disabled),
+.favorite-action:focus-visible {
+  border-color: var(--favorite-brand-dark);
+  color: #fff;
+  box-shadow: 0 14px 26px color-mix(in srgb, var(--favorite-brand-dark) 27%, transparent);
+  transform: translateY(-2px);
+}
+
+.favorite-action:hover:not(:disabled)::before,
+.favorite-action:focus-visible::before,
+.favorite-action--active::before {
+  opacity: 1;
+}
+
+.favorite-action:hover:not(:disabled) .favorite-action__heart,
+.favorite-action:focus-visible .favorite-action__heart,
+.favorite-action--active .favorite-action__heart {
+  background: #fff;
+  color: var(--favorite-brand-dark);
+  transform: scale(1.1);
+}
+
+.favorite-action:focus-visible {
+  outline: 3px solid var(--favorite-focus);
+  outline-offset: 3px;
+}
+
+.favorite-action:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.favorite-action--active {
+  border-color: var(--favorite-active);
+  background: color-mix(in srgb, var(--favorite-active) 7%, var(--favorite-surface));
+  color: #fff;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--favorite-active) 17%, transparent);
+}
+
+.favorite-action--active::before {
+  background: linear-gradient(135deg, var(--favorite-active-light), var(--favorite-active));
+}
+
+.favorite-action--active .favorite-action__heart,
+.favorite-action--active:hover:not(:disabled) .favorite-action__heart,
+.favorite-action--active:focus-visible .favorite-action__heart {
+  border-color: var(--favorite-active);
+  color: var(--favorite-active);
+}
+
+.favorite-action--active:hover:not(:disabled),
+.favorite-action--active:focus-visible {
+  border-color: var(--favorite-active);
+  color: #fff;
+}
+
+.favorite-action__spinner {
+  position: absolute;
+  right: 18px;
+  font-size: 12px;
+}
+
+.favorite-action--compact {
+  width: auto;
+  min-height: 42px;
+  margin-top: 0;
+  padding: 6px 15px 6px 47px;
+}
+
+.favorite-action--compact .favorite-action__heart {
+  left: 6px;
+}
+
+.favorite-action--icon-only {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  margin-top: 0;
+  padding: 0;
+}
+
+.favorite-action--icon-only .favorite-action__heart {
+  position: static;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  box-shadow: none;
+}
+
+.favorite-action--icon-only .favorite-action__spinner {
+  right: auto;
+}
+
+html[data-theme="dark"] .favorite-action {
+  --favorite-surface: #141a26;
+  --favorite-focus: color-mix(in srgb, var(--favorite-brand) 52%, white);
+  color: #a9c0ff;
+}
+
+@media (max-width: 430px) {
+  .favorite-action {
+    min-height: 48px;
+    font-size: 12px;
+  }
+}

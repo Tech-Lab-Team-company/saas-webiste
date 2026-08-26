@@ -1,0 +1,12 @@
+export enum FavoriteEnum {
+  COURSE = 1,
+  SESSION = 4,
+  BOOK = 5,
+  QUESTION_BANK = 6,
+  QUESTION = 7,
+  BOOK_ATTACHMENT = 8,
+  QUESTION_QUESTION_BANK = 9,
+  FLASH_CARD = 12,
+  MIND_MAP = 13,
+  PACKAGE = 14,
+}

@@ -10,6 +10,10 @@ import OnlinePaymentController from "~/features/OnlinePayment/presentation/contr
 import errorImage from "~/public/images/error.png";
 import successImage from "~/public/images/success-dialog.png";
 import { useSiteUrl } from "~/utils/siteUrl";
+import { DataSuccess } from "~/base/core/networkStructure/Resources/dataState/data_state";
+import AddFavoriteController from "~/features/Favorite/presentation/controllers/add_favorite_controller";
+import AddFavoriteParams from "~/features/Favorite/Core/Params/add_favorite_params";
+import { FavoriteEnum } from "~/features/Favorite/Core/enums/favorite_params";
 
 const props = defineProps<{
   bookId: number;
@@ -18,6 +22,7 @@ const props = defineProps<{
   currency: string;
   optionLabel: string;
   requiresDelivery: boolean;
+  isFavorite: boolean;
   triggerLabel?: string;
 }>();
 
@@ -50,7 +55,17 @@ const errorMessage = ref("");
 const fieldErrors = ref<Record<string, string>>({});
 const locationMessage = ref("");
 const locationMessageType = ref<"success" | "error" | null>(null);
+const favoriteController = AddFavoriteController.getInstance();
+const isFavorite = ref(props.isFavorite);
+const isFavoritePending = ref(false);
 const { getLocation, isLoading: locating } = useGeolocation();
+
+watch(
+  () => props.isFavorite,
+  (value) => {
+    isFavorite.value = value;
+  },
+);
 
 const paymentMethods = computed(() => paymentStore.Payment ?? []);
 const selectedMethod = computed(() =>
@@ -61,6 +76,58 @@ const isOfflinePayment = computed(() => Number(selectedMethod.value?.type) === 2
 const receiptSize = computed(() => receiptFile.value
   ? `${(receiptFile.value.size / 1024 / 1024).toFixed(2)} MB`
   : "");
+
+const toggleFavorite = async () => {
+  if (isFavoritePending.value) return;
+
+  const bookId = Number(props.bookId);
+  if (!Number.isInteger(bookId) || bookId <= 0) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail: "تعذر تحديد الكتاب لإضافته إلى المفضلة.",
+      life: 3000,
+    });
+    return;
+  }
+
+  const wasFavorite = isFavorite.value;
+  isFavoritePending.value = true;
+
+  try {
+    const stateRef = await favoriteController.addFavorite(
+      new AddFavoriteParams(FavoriteEnum.BOOK, bookId),
+    );
+
+    if (!(stateRef.value instanceof DataSuccess)) {
+      throw new Error(
+        stateRef.value.error?.title ?? "تعذر تحديث المفضلة.",
+      );
+    }
+
+    isFavorite.value = !wasFavorite;
+    toast.add({
+      severity: "success",
+      summary: wasFavorite ? "تمت الإزالة من المفضلة" : "تمت الإضافة للمفضلة",
+      detail: wasFavorite
+        ? "تمت إزالة الكتاب من قائمة المفضلة."
+        : "تمت إضافة الكتاب إلى قائمة المفضلة بنجاح.",
+      life: 3000,
+    });
+  } catch (error: unknown) {
+    toast.add({
+      severity: "error",
+      summary: "خطأ",
+      detail:
+        error instanceof Error
+          ? error.message
+          : "تعذر تحديث المفضلة. حاول مرة أخرى.",
+      life: 3000,
+    });
+  } finally {
+    isFavoritePending.value = false;
+  }
+};
 
 const loadPaymentMethods = async () => {
   if (bookPaymentMethodsLoaded.value) return;
@@ -419,6 +486,28 @@ const submit = async () => {
     {{ triggerLabel || "شراء هذه النسخة" }}
     <span aria-hidden="true">←</span>
   </button>
+
+             <button
+                  type="button"
+                  class="favorite-action"
+                  :class="{ 'favorite-action--active': isFavorite }"
+                  :disabled="isFavoritePending"
+                  :aria-pressed="isFavorite"
+                  :aria-label="isFavorite ? 'أزل الكتاب من المفضلة' : 'أضف الكتاب إلى المفضلة'"
+                  @click="toggleFavorite"
+                >
+                  <span class="favorite-action__heart" aria-hidden="true">
+                    <i :class="isFavorite ? 'pi pi-heart-fill' : 'pi pi-heart'"></i>
+                  </span>
+                  <span class="favorite-action__label">
+                    {{ isFavorite ? "إزالة من المفضلة" : "أضف إلى المفضلة" }}
+                  </span>
+                  <i
+                    v-if="isFavoritePending"
+                    class="pi pi-spin pi-spinner favorite-action__spinner"
+                    aria-hidden="true"
+                  ></i>
+                </button>
 
   <Dialog
     v-model:visible="visible"

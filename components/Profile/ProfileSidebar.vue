@@ -20,6 +20,7 @@ const isMobileNavigationOpen = ref(false);
 const profileSectionLabels: Record<string, string> = {
   "student-dashboard": "الرئيسية",
   profilecourse: "مشترياتي",
+  profilefavorites: "المفضلة",
   profileexams: "اختباراتي",
   profileavailablecourses: "الكورسات",
   profilesubjectinfo: "المعلومات الدراسية",
@@ -180,6 +181,7 @@ const uploadImage = async () => {
         </span>
         <p>مشترياتي</p>
       </NuxtLink>
+
       <NuxtLink
         :to="{ name: 'profileexams' }"
         exact-active-class="active"
@@ -199,6 +201,17 @@ const uploadImage = async () => {
           <i class="pi pi-graduation-cap" />
         </span>
         <p>الكورسات</p>
+      </NuxtLink>
+
+            <NuxtLink
+        :to="{ name: 'profilefavorites' }"
+        exact-active-class="active"
+        class="profile-option"
+      >
+        <span class="profile-icon profile-option-icon" aria-hidden="true">
+          <i class="pi pi-heart" />
+        </span>
+        <p>المفضلة</p>
       </NuxtLink>
       <NuxtLink
         :to="{ name: 'profilesubjectinfo' }"

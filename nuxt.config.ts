@@ -251,6 +251,7 @@ export default defineNuxtConfig({
     "@/assets/css/fonts.css",
     "@/assets/css/app-theme.css",
     "@/assets/css/home-v2.css",
+    "@/assets/css/favorite-action.css",
   ],
   image: {
     domains: [
