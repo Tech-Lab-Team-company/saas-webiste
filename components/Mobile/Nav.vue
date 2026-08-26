@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { markUserOffline } from "~/utils/onlineStatusTracking";
+
 const route = useRoute();
 const UserStore = useUserStore();
 const signedIn = ref(UserStore.user);
@@ -38,10 +40,12 @@ watch(() => UserStore.user, (newValue) => {
   signedIn.value = newValue;
 });
 
-const handleLogout = () => {
-  localStorage.removeItem("auth");
-  localStorage.removeItem("user");
-  UserStore.logout();
+const handleLogout = async () => {
+  try {
+    await markUserOffline();
+  } finally {
+    UserStore.logout();
+  }
 };
 
 function updateNavVisibility() {

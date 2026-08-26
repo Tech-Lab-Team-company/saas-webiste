@@ -4,6 +4,7 @@ import { useUserStore } from "~/stores/user";
 import { useRouter } from "vue-router";
 import { useSettingStore } from "~/stores/setting";
 import AppThemeToggle from "~/components/Global/AppThemeToggle.vue";
+import { markUserOffline } from "~/utils/onlineStatusTracking";
 
 const isLoggedIn = ref(false);
 const userStore = useUserStore()
@@ -28,14 +29,14 @@ const handleLogin = () => {
   isLoggedIn.value = true;
 };
 
-const handleLogout = () => {
-  localStorage.removeItem("auth");          
-  // localStorage.removeItem("profileImage");
-  localStorage.removeItem("user");          
-  userStore.logout();                     
-  isLoggedIn.value = false; 
-  router.push(`/`); // Redirect to the home page after logout
-
+const handleLogout = async () => {
+  try {
+    await markUserOffline();
+  } finally {
+    userStore.logout();
+    isLoggedIn.value = false;
+    await router.push(`/`);
+  }
 };
 
 const settingStore = useSettingStore();

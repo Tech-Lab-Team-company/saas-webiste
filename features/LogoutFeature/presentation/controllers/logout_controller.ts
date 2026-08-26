@@ -7,6 +7,7 @@ import { useUserStore } from "~/stores/user";
 import errorImage from "~/public/images/error.png";
 import successImage from "~/public/images/success-dialog.png";
 import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
+import { markUserOffline } from "~/utils/onlineStatusTracking";
 
 export default class LogoutController extends ControllerInterface<UserModel> {
   private static instance: LogoutController;
@@ -25,7 +26,7 @@ export default class LogoutController extends ControllerInterface<UserModel> {
   async Logout(router: any) {
     // useLoaderStore().setLoadingWithDialog();
     try {
-      const router = useRouter();
+      await markUserOffline();
       const dataState: DataState<UserModel> =
         await this.LogoutUseCase.call();
       this.setState(dataState);
@@ -36,11 +37,9 @@ export default class LogoutController extends ControllerInterface<UserModel> {
           imageElement: successImage,
           messageContent: null,
         });
-        await router.push("/");
         const userStore = useUserStore();
-        if (this.state.value.data) {
-          userStore.logout();
-        }
+        userStore.logout();
+        await router.push("/");
       }else {
         throw new Error(this.state.value.error?.title);
       }
