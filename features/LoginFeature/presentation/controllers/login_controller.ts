@@ -10,6 +10,10 @@ import DialogSelector from "~/base/persention/Dialogs/dialog_selector";
 import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/email_builder";
 import LoginParams from "~/features/LoginFeature/Core/Params/login_params";
 import { consumeAuthRedirect } from "~/utils/authRedirect";
+import { ErrorType } from "~/base/core/networkStructure/Resources/errors/errorModel";
+
+const LOGIN_UNAUTHORIZED_MESSAGE =
+  "ليس لديك حق تسجيل الدخول تواصل مع المسؤول";
 
 export default class LoginController extends ControllerInterface<UserModel> {
   private static instance: LoginController;
@@ -24,7 +28,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
     }
     return this.instance;
   }
-  async login(params: LoginParams, router: any) {
+  async login(params: LoginParams, router: any): Promise<boolean> {
     // useLoaderStore().setLoadingWithDialog();
     try {
       const dataState: DataState<UserModel> = await this.LoginUseCase.call(
@@ -46,18 +50,33 @@ export default class LoginController extends ControllerInterface<UserModel> {
           );
           await router.replace(redirect || "/student-dashboard");
         }
+        return true;
       } else {
-        throw new Error(this.state.value.error?.title);
+        const error = this.state.value.error;
+        const message =
+          error?.type === ErrorType.unAuthorized
+            ? LOGIN_UNAUTHORIZED_MESSAGE
+            : error?.title || "تعذر تسجيل الدخول. حاول مرة أخرى.";
+
+        DialogSelector.instance.errorDialog.openDialog({
+          dialogName: "dialog",
+          titleContent: message,
+          imageElement: errorImage,
+          messageContent: null,
+        });
+        return false;
       }
       // useLoaderStore().endLoadingWithDialog();
     } catch (error: any) {
       console.log("log in error", error);
       DialogSelector.instance.errorDialog.openDialog({
         dialogName: "dialog",
-        titleContent: error,
+        titleContent:
+          error instanceof Error ? error.message : "تعذر تسجيل الدخول. حاول مرة أخرى.",
         imageElement: errorImage,
         messageContent: null,
       });
+      return false;
     }
     console.log(this.state.value);
   }
