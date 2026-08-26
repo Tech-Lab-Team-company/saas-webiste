@@ -119,6 +119,62 @@ test("web status cache is isolated by tenant domain", async () => {
   assert.match(mapper, /value\.replace\(\/\\r\\n\?\/gu, '\\n'\)\.trim\(\)/u);
 });
 
+test("website domain is resolved dynamically from the request/browser URL, never from a configured web link", async () => {
+  const [webDomain, nuxtConfig, sitemap, envExample] = await Promise.all([
+    readSource("constant/webDomain.ts"),
+    readSource("nuxt.config.ts"),
+    readSource("server/routes/sitemap.xml.ts"),
+    readSource(".env.example"),
+  ]);
+
+  assert.match(webDomain, /window\.location\.hostname/u);
+  assert.match(webDomain, /useRequestURL\(\)\.hostname/u);
+  assert.doesNotMatch(webDomain, /useRuntimeConfig/u);
+  assert.doesNotMatch(webDomain, /public\.webLink/u);
+
+  assert.doesNotMatch(nuxtConfig, /webLink:/u);
+
+  assert.match(sitemap, /const webDomain = requestUrl\.hostname;/u);
+  assert.doesNotMatch(sitemap, /public\.webLink/u);
+  assert.doesNotMatch(sitemap, /WEB_LINK/u);
+
+  assert.doesNotMatch(envExample, /WEB_LINK/u);
+});
+
+test("the current hostname is what web-domain resolves to for any tenant, not a hardcoded one", () => {
+  assert.equal(
+    new URL("https://physicsbytes.techlabeg.com/loginhome").hostname,
+    "physicsbytes.techlabeg.com",
+  );
+  assert.equal(
+    new URL("https://another-site.example.com/").hostname,
+    "another-site.example.com",
+  );
+});
+
+test("the login flow sends web-domain only as a header resolved by getWebDomain, never as a client-controlled body field", async () => {
+  const [loginParams, headerHandler, loginApiService, networkService] =
+    await Promise.all([
+      readSource("features/LoginFeature/Core/Params/login_params.ts"),
+      readSource(
+        "base/core/networkStructure/networking/utils/header_handler.ts",
+      ),
+      readSource(
+        "features/LoginFeature/Data/api_services/login_api_service.ts",
+      ),
+      readSource("base/core/networkStructure/networking/network_service.ts"),
+    ]);
+
+  assert.doesNotMatch(loginParams, /web_domain/u);
+  assert.doesNotMatch(loginParams, /web-domain/u);
+  assert.match(headerHandler, /headers\['web-domain'\] = getWebDomain\(\)/u);
+  assert.doesNotMatch(loginApiService, /headers/u);
+  assert.match(
+    networkService,
+    /headers:\s*\{\s*\.\.\.HeaderHandler\.getInstance\(\)\.getHeader\(isAuth\),\s*\.\.\.headers,\s*\}/u,
+  );
+});
+
 test("route transitions do not depend on the browser DOM update timeout", async () => {
   const [config, transition, theme] = await Promise.all([
     readSource("nuxt.config.ts"),

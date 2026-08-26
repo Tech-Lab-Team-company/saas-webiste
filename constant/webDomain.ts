@@ -1,19 +1,16 @@
+// Resolves the tenant purely from the URL that was actually opened, so one
+// deployment serves every domain without a per-tenant .env value.
+// `useRequestURL()` is Nuxt's SSR-safe equivalent of `window.location` here:
+// it reads the incoming request's Host header during SSR and falls back to
+// `window.location` once hydrated on the client.
 export function getWebDomain(): string {
-  const configuredWebLink = String(
-    useRuntimeConfig().public.webLink || "",
-  ).trim();
-
-  if (!configuredWebLink) return "";
+  if (import.meta.client) {
+    return window.location.hostname;
+  }
 
   try {
-    const url = configuredWebLink.includes("://")
-      ? configuredWebLink
-      : `https://${configuredWebLink}`;
-    return new URL(url).hostname;
+    return useRequestURL().hostname;
   } catch {
-    return configuredWebLink
-      .replace(/^https?:\/\//i, "")
-      .split("/")[0]
-      .trim();
+    return "";
   }
 }
