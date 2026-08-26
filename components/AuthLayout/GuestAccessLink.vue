@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink class="login-home-guest" to="/">
+  <NuxtLink class="login-home-guest" to="/loginhome">
     <span class="pi pi-globe" aria-hidden="true" />
     <span>
       <strong>{{ $t("المتابعة كزائر") }}</strong>

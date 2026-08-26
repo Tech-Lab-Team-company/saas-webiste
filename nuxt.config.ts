@@ -80,7 +80,9 @@ export default defineNuxtConfig({
         'X-Content-Type-Options': 'nosniff',
       },
     },
-    '/': { swr: 300 },
+    '/': {
+      redirect: { to: '/loginhome', statusCode: 302 },
+    },
     '/about-teacher': { swr: 3600 },
     '/teachers': { swr: 300 },
     '/books': { swr: 300 },
