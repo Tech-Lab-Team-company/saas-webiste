@@ -263,7 +263,7 @@ const purchaseStatus = (item: PurchasedItem) => {
 
 const itemRoute = (item: PurchasedItem): RouteLocationRaw | null => {
   if (item.kind === "course" && !item.isBlocked) {
-    return { name: "course-id", params: { id: item.courseId } };
+    return { name: "student-dashboard-course-id", params: { id: item.courseId } };
   }
   if (item.kind === "book") {
     return { path: `/books/${item.bookId}` };
@@ -671,7 +671,7 @@ onBeforeUnmount(() =>
                         <NuxtLink
                           v-for="course in item.courses"
                           :key="`package-course-${course.id}`"
-                          :to="{ name: 'course-id', params: { id: course.id } }"
+                          :to="{ name: 'student-dashboard-course-id', params: { id: course.id } }"
                         >
                           {{ course.title }}
                           <i class="pi pi-arrow-left" />

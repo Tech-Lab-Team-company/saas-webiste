@@ -19,6 +19,7 @@ const isMobileNavigationOpen = ref(false);
 
 const profileSectionLabels: Record<string, string> = {
   "student-dashboard": "الرئيسية",
+  "student-dashboard-course-id": "تفاصيل الكورس",
   profilecourse: "مشترياتي",
   profilefavorites: "المفضلة",
   profileexams: "اختباراتي",

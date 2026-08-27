@@ -80,7 +80,7 @@ const courseImage = (course: CoursesModel) => {
 };
 
 const courseRoute = (courseId: number) => ({
-  name: "course-id",
+  name: "student-dashboard-course-id",
   params: { id: courseId },
 });
 

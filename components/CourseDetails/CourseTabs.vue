@@ -14,9 +14,11 @@ import Dialog from "primevue/dialog";
 const props = withDefaults(defineProps<{
   courseData?: CourseDetailsModel | null;
   pending?: boolean;
+  dashboardMode?: boolean;
 }>(), {
   courseData: null,
   pending: false,
+  dashboardMode: false,
 });
 const emit = defineEmits<{
   refresh: [];
@@ -279,6 +281,7 @@ onUnmounted(() => {
       :status="CardData?.allow_status"
       :isSubscribed="CardData?.is_subscribed"
       :isPaied="CardData?.is_paid"
+      :dashboard-mode="dashboardMode"
       @Changestatus="refreshCourseDetails"
     >
       <template #main="{ platformTeacher }">
