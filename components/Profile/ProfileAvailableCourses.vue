@@ -144,6 +144,7 @@ const { data: courses, pending, error, refresh } = await useAsyncData<HomeCourse
             :index="index"
             :level-label="courseLevelLabel(course)"
             :interactive="false"
+            :to="{ name: 'student-dashboard-course-id', params: { id: course.id } }"
           />
         </section>
       </main>

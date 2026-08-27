@@ -175,6 +175,22 @@ test("the login flow sends web-domain only as a header resolved by getWebDomain,
   );
 });
 
+test("available courses in the student dashboard open the dashboard course route, not the public one", async () => {
+  const [availableCourses, courseCard, coursesSection] = await Promise.all([
+    readSource("components/Profile/ProfileAvailableCourses.vue"),
+    readSource("components/home/v2/HomeCourseCard.vue"),
+    readSource("components/Home/v2/sections/HomeCoursesSection.vue"),
+  ]);
+
+  assert.match(
+    availableCourses,
+    /:to="\{ name: 'student-dashboard-course-id', params: \{ id: course\.id \} \}"/u,
+  );
+  assert.match(courseCard, /const courseLink = computed\(\(\) => props\.to \?\? props\.course\.route\)/u);
+  assert.match(courseCard, /:to="courseLink"/u);
+  assert.doesNotMatch(coursesSection, /<HomeCourseCard[^>]*:to=/u);
+});
+
 test("route transitions do not depend on the browser DOM update timeout", async () => {
   const [config, transition, theme] = await Promise.all([
     readSource("nuxt.config.ts"),
