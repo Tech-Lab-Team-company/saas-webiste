@@ -299,11 +299,11 @@ onUnmounted(() => {
             :course-id="CardData?.id"
             @playback-state-change="handleCourseVideoPlaybackState"
           />
-          <div v-if="isCaptureShielded" class="course-capture-shield">
+          <!-- <div v-if="isCaptureShielded" class="course-capture-shield">
             <i class="pi pi-lock" aria-hidden="true"></i>
             <strong>المحتوى محمي</strong>
             <span>ارجع إلى نافذة الكورس لمتابعة الدرس</span>
-          </div>
+          </div> -->
         </div>
 
         <section class="course-tabs">
