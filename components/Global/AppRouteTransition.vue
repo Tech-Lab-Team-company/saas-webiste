@@ -1,9 +1,17 @@
 <script setup lang="ts">
 const nuxtApp = useNuxtApp();
 const router = useRouter();
+const settingStore = useSettingStore();
 
 const isVisible = ref(false);
 const isLeaving = ref(false);
+const logoLoadFailed = ref(false);
+
+const loaderLogo = computed(() =>
+  logoLoadFailed.value
+    ? "/favicon.ico"
+    : settingStore.setting?.image?.img?.trim() || "/favicon.ico",
+);
 
 const SHOW_DELAY = 160;
 const MINIMUM_VISIBLE_DURATION = 320;
@@ -135,7 +143,15 @@ onBeforeUnmount(() => {
       </span>
 
       <div class="app-route-transition__status">
-        <span class="app-route-transition__spinner" aria-hidden="true" />
+        <span class="app-route-transition__spinner" aria-hidden="true">
+          <span class="app-route-transition__spinner-ring" />
+          <img
+            :src="loaderLogo"
+            class="app-route-transition__logo"
+            alt=""
+            @error="logoLoadFailed = true"
+          />
+        </span>
 
         <span class="app-route-transition__copy">
           <strong>لحظة واحدة من فضلك</strong>
@@ -217,9 +233,24 @@ onBeforeUnmount(() => {
 }
 
 .app-route-transition__spinner {
+  position: relative;
   width: 34px;
   height: 34px;
   flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--app-surface, #fff);
+  box-shadow: 0 5px 14px color-mix(
+    in srgb,
+    var(--app-shadow, rgb(6 17 71 / 24%)) 24%,
+    transparent
+  );
+}
+
+.app-route-transition__spinner-ring {
+  position: absolute;
+  inset: -3px;
   border: 3px solid color-mix(
     in srgb,
     var(--route-loader-primary) 16%,
@@ -229,6 +260,17 @@ onBeforeUnmount(() => {
   border-left-color: var(--route-loader-secondary);
   border-radius: 50%;
   animation: app-route-spin 760ms linear infinite;
+}
+
+.app-route-transition__logo {
+  position: relative;
+  z-index: 1;
+  object-fit: cover;
+  width: 100%;
+  /* height: 34px; */
+  border-radius: 50%;
+  object-fit: contain;
+  background: var(--app-surface, #fff);
 }
 
 .app-route-transition__copy {
@@ -325,6 +367,11 @@ onBeforeUnmount(() => {
     flex-basis: 30px;
   }
 
+  .app-route-transition__logo {
+    width: 21px;
+    height: 21px;
+  }
+
   .app-route-transition__copy strong {
     font-size: 14px;
   }
@@ -342,7 +389,7 @@ onBeforeUnmount(() => {
 }
 
 @media (forced-colors: active) {
-  .app-route-transition__spinner {
+  .app-route-transition__spinner-ring {
     border-color: CanvasText;
     border-bottom-color: transparent;
   }

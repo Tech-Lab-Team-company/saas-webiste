@@ -23,6 +23,7 @@ const profileSectionLabels: Record<string, string> = {
   profilecourse: "مشترياتي",
   profilefavorites: "المفضلة",
   profileexams: "اختباراتي",
+  questions: "بنك الأسئلة",
   profileavailablecourses: "الكورسات",
   profilesubjectinfo: "المعلومات الدراسية",
   profile: "الملف الشخصي",
@@ -237,7 +238,7 @@ const uploadImage = async () => {
         </span>
         <p>الملف الشخصي</p>
       </NuxtLink>
-      <!-- <NuxtLink
+      <NuxtLink
         to="/questions"
         exact-active-class="active"
         class="profile-option"
@@ -246,7 +247,7 @@ const uploadImage = async () => {
           <i class="pi pi-question-circle" />
         </span>
         <p>بنك الأسئلة</p>
-      </NuxtLink> -->
+      </NuxtLink>
 
       <NuxtLink
         :to="{ name: 'passwordupdate' }"

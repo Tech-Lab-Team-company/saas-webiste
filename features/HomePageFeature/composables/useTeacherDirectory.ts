@@ -13,6 +13,7 @@ export const useTeacherDirectory = async () => {
   const hasTeacherDirectory = supportsTeacherDirectory(setting.value?.type);
   const api = new HomePageApi(webDomain);
   const searchWord = ref("");
+  const MIN_SEARCH_LENGTH = 2;
 
   const { data, pending, error, refresh } = await useAsyncData<
     HomeTeacherViewModel[]
@@ -30,7 +31,7 @@ export const useTeacherDirectory = async () => {
 
   const searchTeachers = async (value: string) => {
     const normalizedValue = value.trim();
-    if (normalizedValue === searchWord.value) return;
+    if (normalizedValue === searchWord.value || normalizedValue.length < MIN_SEARCH_LENGTH) return;
 
     searchWord.value = normalizedValue;
     await refresh({ dedupe: "cancel" });
