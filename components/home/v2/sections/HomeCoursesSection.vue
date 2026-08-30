@@ -676,20 +676,16 @@ const animateCourseResults = async () => {
     targets,
     {
       autoAlpha: 0,
-      y: 30,
-      scale: 0.98,
-      rotationX: 3,
+      y: 24,
     },
     {
       autoAlpha: 1,
       y: 0,
-      scale: 1,
-      rotationX: 0,
-      duration: 0.92,
+      duration: 0.72,
       stagger: targets.length > 1
-        ? Math.min(0.1, 0.7 / (targets.length - 1))
+        ? Math.min(0.075, 0.5 / (targets.length - 1))
         : 0,
-      ease: "power2.out",
+      ease: "power3.out",
       clearProps: "opacity,visibility,transform",
     },
   );
@@ -753,18 +749,18 @@ const revealCoursesSection = () => {
     timeline
       .from(".split-heading .section-tag", {
         autoAlpha: 0,
-        x: 30,
-        duration: 0.68,
+        x: 22,
+        duration: 0.58,
       })
       .from(
         ".split-heading h2",
-        { autoAlpha: 0, y: 38, duration: 1.05 },
-        0.14,
+        { autoAlpha: 0, y: 28, duration: 0.72 },
+        0.1,
       )
       .from(
         ".split-heading > p",
-        { autoAlpha: 0, y: 24, duration: 0.82 },
-        0.38,
+        { autoAlpha: 0, y: 18, duration: 0.6 },
+        0.28,
       );
 
     const filterPanels = section.querySelectorAll(
@@ -781,11 +777,11 @@ const revealCoursesSection = () => {
         {
           autoAlpha: 0,
           clipPath: "inset(0 50% 0 50%)",
-          y: 24,
-          duration: 1.15,
-          ease: "power3.inOut",
+          y: 20,
+          duration: 0.82,
+          ease: "power3.out",
         },
-        0.58,
+        0.45,
       );
     }
 
@@ -794,25 +790,25 @@ const revealCoursesSection = () => {
         filterOptions,
         {
           autoAlpha: 0,
-          duration: 0.68,
-          stagger: 0.11,
+          duration: 0.52,
+          stagger: 0.075,
           clearProps: "opacity,visibility",
         },
-        0.92,
+        0.68,
       );
     }
 
     timeline.from(
       ".home-course-result > *",
-      { autoAlpha: 0, y: 28, duration: 0.82 },
-      1.16,
+      { autoAlpha: 0, y: 22, duration: 0.66 },
+      0.86,
     );
 
     if (allCoursesLink) {
       timeline.from(
         allCoursesLink,
-        { autoAlpha: 0, y: 14, duration: 0.66 },
-        1.38,
+        { autoAlpha: 0, y: 12, duration: 0.52 },
+        1.02,
       );
     }
 

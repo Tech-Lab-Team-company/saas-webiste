@@ -8,6 +8,7 @@ import type { ProfileImage } from "~/types/profileimage";
 import UpdateProfileImageParams from "~/features/UpdateProfileImageFeature/Core/Params/update_profile_image_params";
 import UpdateProfileImageController from "~/features/UpdateProfileImageFeature/presentation/controllers/update_profile_image_controller";
 import { resolveStudentIdentity } from "~/utils/studentIdentity";
+import { markUserOffline } from "~/utils/onlineStatusTracking";
 const selectedImage = ref<File | null>(null);
 const imagePreview = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
@@ -23,6 +24,7 @@ const profileSectionLabels: Record<string, string> = {
   profilecourse: "مشترياتي",
   profilefavorites: "المفضلة",
   profileexams: "اختباراتي",
+  questions: "بنك الأسئلة",
   profileavailablecourses: "الكورسات",
   profilesubjectinfo: "المعلومات الدراسية",
   profile: "الملف الشخصي",
@@ -48,11 +50,13 @@ watch(
   },
 );
 
-const handleLogout = () => {
-  localStorage.removeItem("auth");
-  localStorage.removeItem("user");
-  userStore.logout();
-  router.push("/loginhome");
+const handleLogout = async () => {
+  try {
+    await markUserOffline();
+  } finally {
+    userStore.logout();
+    await router.push("/loginhome");
+  }
 };
 
 const handleImageChange = async (event: Event) => {
@@ -235,7 +239,7 @@ const uploadImage = async () => {
         </span>
         <p>الملف الشخصي</p>
       </NuxtLink>
-      <!-- <NuxtLink
+      <NuxtLink
         to="/questions"
         exact-active-class="active"
         class="profile-option"
@@ -244,7 +248,7 @@ const uploadImage = async () => {
           <i class="pi pi-question-circle" />
         </span>
         <p>بنك الأسئلة</p>
-      </NuxtLink> -->
+      </NuxtLink>
 
       <NuxtLink
         :to="{ name: 'passwordupdate' }"
