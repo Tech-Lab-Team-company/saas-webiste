@@ -29,14 +29,18 @@ const props = withDefaults(defineProps<Props>(), {
     <NuxtLink
       class="purchase-card__book-link"
       :to="props.to"
-      :aria-label="`تفاصيل الكتاب: ${props.title}، عدد الصفحات ${props.pageCount || 'غير محدد'}`"
+      :aria-label="`تفاصيل الكتاب: ${props.title}، عدد الصفحات ${
+        props.pageCount || 'غير محدد'
+      }`"
     >
       <div class="purchase-card__book" aria-hidden="true">
         <div class="purchase-card__book-pages">
           <div class="purchase-card__book-page">
             <i class="pi pi-book" />
             <small>نسختك التعليمية</small>
-            <strong class="purchase-card__book-page-title">{{ props.title }}</strong>
+            <strong class="purchase-card__book-page-title">{{
+              props.title
+            }}</strong>
             <span class="purchase-card__book-page-rule" />
             <span class="purchase-card__book-length">
               <small>عدد الصفحات</small>
@@ -67,7 +71,10 @@ const props = withDefaults(defineProps<Props>(), {
 .purchase-card.purchase-card--book {
   --purchase-order: 0;
   --purchase-book-primary: var(--profile-primary, var(--home-v2-deep, #061147));
-  --purchase-book-secondary: var(--profile-secondary, var(--home-v2-blue, #1769aa));
+  --purchase-book-secondary: var(
+    --profile-secondary,
+    var(--home-v2-blue, #1769aa)
+  );
   --purchase-book-secondary-soft: var(
     --profile-secondary-soft,
     color-mix(in srgb, var(--purchase-book-secondary) 18%, #fff)
@@ -195,7 +202,7 @@ const props = withDefaults(defineProps<Props>(), {
 .purchase-card__book-page-title {
   display: -webkit-box;
   overflow: hidden;
-  color: #3d3427;
+  color: #3d3427 !important;
   font-size: 15px;
   font-weight: 900;
   line-height: 1.65;
@@ -245,8 +252,7 @@ const props = withDefaults(defineProps<Props>(), {
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 8px 3px 3px 8px;
-  background:
-    linear-gradient(150deg, rgb(255 255 255 / 12%), transparent 34%),
+  background: linear-gradient(150deg, rgb(255 255 255 / 12%), transparent 34%),
     var(--purchase-book-primary);
   box-shadow: -10px 14px 24px rgb(0 0 0 / 34%),
     inset 10px 0 18px rgb(255 255 255 / 7%);
