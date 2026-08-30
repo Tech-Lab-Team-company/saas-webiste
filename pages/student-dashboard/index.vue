@@ -230,7 +230,7 @@ onMounted(async () => {
                   }}
                 </p>
               </div>
-              <NuxtLink :to="{ name: 'course' }">استعرض الكورسات ←</NuxtLink>
+              <NuxtLink :to="{ name: 'profilecourse' }">استعرض الكورسات ←</NuxtLink>
             </section>
 
             <aside class="study-summary">
@@ -318,7 +318,7 @@ onMounted(async () => {
             </div>
             <div v-else class="empty-list">
               <span>▤</span><b>لا توجد كورسات مرتبطة بحسابك حاليًا</b
-              ><NuxtLink :to="{ name: 'course' }">تصفح الكورسات</NuxtLink>
+              ><NuxtLink :to="{ name: 'profilecourse' }">تصفح الكورسات</NuxtLink>
             </div>
           </section>
         </main>

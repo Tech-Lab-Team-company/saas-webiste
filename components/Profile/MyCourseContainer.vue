@@ -29,7 +29,7 @@ const yearLabel = computed(() => {
           <strong>مشترياتي</strong>
         </nav>
 
-        <NuxtLink class="profilecourse-topbar-action" :to="{ name: 'course' }">
+        <NuxtLink class="profilecourse-topbar-action" :to="{ name: 'profilecourse' }">
           <i class="pi pi-plus" aria-hidden="true" />
           استكشف المحتوى
         </NuxtLink>
@@ -53,18 +53,18 @@ const yearLabel = computed(() => {
             class="profilecourse-shortcuts"
             aria-label="وصول سريع للمحتوى"
           >
-            <NuxtLink :to="{ name: 'course' }">
+            <NuxtLink :to="{ name: 'profilecourse' }">
               <i class="pi pi-play-circle" aria-hidden="true" />
               الكورسات
             </NuxtLink>
-            <NuxtLink to="/books">
+            <!-- <NuxtLink to="/books">
               <i class="pi pi-book" aria-hidden="true" />
               الكتب
             </NuxtLink>
             <NuxtLink to="/questions">
               <i class="pi pi-file-edit" aria-hidden="true" />
               التدريبات
-            </NuxtLink>
+            </NuxtLink> -->
           </nav>
         </header>
 
