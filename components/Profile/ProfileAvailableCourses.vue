@@ -111,10 +111,10 @@ const { data: courses, pending, error, refresh } = await useAsyncData<HomeCourse
             <h1>{{ isCenter ? "كل كورسات المركز" : `كورسات ${educationLabel}` }}</h1>
             <p>{{ isCenter ? "نعرض لك هنا جميع الكورسات المتاحة داخل المركز دون تقييدها بمرحلة أو سنة دراسية." : "نعرض لك هنا الكورسات المرتبطة بمرحلتك وسنتك المسجلتين في بيانات حسابك." }}</p>
           </div>
-          <NuxtLink to="/course" class="explore-stages">
+          <!-- <NuxtLink to="/course" class="explore-stages">
             {{ isCenter ? "تصفّح صفحة الكورسات" : "تفقّد كورسات المراحل الأخرى" }}
             <span aria-hidden="true">←</span>
-          </NuxtLink>
+          </NuxtLink> -->
         </header>
 
         <section v-if="pending" class="available-state" aria-live="polite">
@@ -133,7 +133,7 @@ const { data: courses, pending, error, refresh } = await useAsyncData<HomeCourse
           <i class="pi pi-book" />
           <strong>{{ isCenter ? "لا توجد كورسات متاحة في المركز حاليًا" : "لا توجد كورسات متاحة لمرحلتك حاليًا" }}</strong>
           <p>{{ isCenter ? "ستظهر هنا كل كورسات المركز فور إضافتها." : "يمكنك استعراض كورسات باقي المراحل من صفحة الكورسات العامة." }}</p>
-          <NuxtLink to="/course">{{ isCenter ? "تصفّح صفحة الكورسات" : "تفقّد كورسات المراحل الأخرى" }}</NuxtLink>
+          <!-- <NuxtLink to="/course">{{ isCenter ? "تصفّح صفحة الكورسات" : "تفقّد كورسات المراحل الأخرى" }}</NuxtLink> -->
         </section>
 
         <section v-else class="available-course-grid">
