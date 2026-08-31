@@ -1,5 +1,4 @@
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { nextTick, onBeforeUnmount, onMounted, type Ref } from "vue";
 
 type QuickMotion = ReturnType<typeof gsap.quickTo>;
@@ -32,49 +31,6 @@ const DEPTH_TARGETS = [
 export const useHomePageCinematicMotion = (root: Ref<HTMLElement | null>) => {
   let animationContext: ReturnType<typeof gsap.context> | null = null;
   let motionMedia: ReturnType<typeof gsap.matchMedia> | null = null;
-  let refreshFrame: number | null = null;
-  let removeLoadListener: (() => void) | null = null;
-
-  const queueRefresh = () => {
-    if (refreshFrame !== null) cancelAnimationFrame(refreshFrame);
-    refreshFrame = requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-      refreshFrame = null;
-    });
-  };
-
-  const setupSectionScenes = (homeRoot: HTMLElement, desktop: boolean) => {
-    const scenes = gsap.utils.toArray<HTMLElement>(
-      ":scope > main > section:not(.home-v2-hero)",
-      homeRoot
-    );
-
-    scenes.forEach((scene) => {
-      gsap.fromTo(
-        scene,
-        {
-          autoAlpha: desktop ? 0.64 : 0.8,
-          y: desktop ? 66 : 34,
-          scale: desktop ? 0.982 : 0.992,
-          transformOrigin: "center top",
-        },
-        {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          ease: "none",
-          force3D: true,
-          scrollTrigger: {
-            trigger: scene,
-            start: "top 96%",
-            end: desktop ? "top 58%" : "top 72%",
-            scrub: desktop ? 0.6 : 0.35,
-            invalidateOnRefresh: true,
-          },
-        }
-      );
-    });
-  };
 
   const setupMagneticTargets = (homeRoot: HTMLElement) => {
     const targets = gsap.utils.toArray<HTMLElement>(MAGNETIC_TARGETS, homeRoot);
@@ -247,7 +203,6 @@ export const useHomePageCinematicMotion = (root: Ref<HTMLElement | null>) => {
     const homeRoot = root.value;
     if (!homeRoot) return;
 
-    gsap.registerPlugin(ScrollTrigger);
     motionMedia?.revert();
     animationContext?.revert();
 
@@ -268,7 +223,6 @@ export const useHomePageCinematicMotion = (root: Ref<HTMLElement | null>) => {
 
           if (conditions.reduceMotion || !conditions.motion) return;
 
-          setupSectionScenes(homeRoot, conditions.desktop);
           if (!conditions.desktop) return;
 
           const cleanupMagneticTargets = setupMagneticTargets(homeRoot);
@@ -284,22 +238,11 @@ export const useHomePageCinematicMotion = (root: Ref<HTMLElement | null>) => {
       );
     }, homeRoot);
 
-    queueRefresh();
-    void document.fonts?.ready.then(queueRefresh);
-    if (document.readyState !== "complete") {
-      const handleLoad = () => queueRefresh();
-      window.addEventListener("load", handleLoad, { once: true });
-      removeLoadListener = () => window.removeEventListener("load", handleLoad);
-    }
   };
 
   onMounted(() => void setupMotion());
 
   onBeforeUnmount(() => {
-    removeLoadListener?.();
-    removeLoadListener = null;
-    if (refreshFrame !== null) cancelAnimationFrame(refreshFrame);
-    refreshFrame = null;
     motionMedia?.revert();
     motionMedia = null;
     animationContext?.revert();

@@ -11,6 +11,7 @@ import EmailBuilder from "~/features/VerifyCodeFeature/presentation/builder/emai
 import LoginParams from "~/features/LoginFeature/Core/Params/login_params";
 import { consumeAuthRedirect } from "~/utils/authRedirect";
 import { ErrorType } from "~/base/core/networkStructure/Resources/errors/errorModel";
+import { markUserOnline } from "~/utils/onlineStatusTracking";
 
 const LOGIN_UNAUTHORIZED_MESSAGE =
   "ليس لديك حق تسجيل الدخول تواصل مع المسؤول";
@@ -45,6 +46,7 @@ export default class LoginController extends ControllerInterface<UserModel> {
         const userStore = useUserStore();
         if (this.state.value.data) {
           await userStore.setUser(this.state.value.data);
+          void markUserOnline();
           const redirect = consumeAuthRedirect(
             router.currentRoute.value.query.redirect,
           );

@@ -149,20 +149,31 @@ onBeforeUnmount(() => {
         class="teacher-directory__filters"
         aria-label="تصفية المدرسين"
       >
-        <label class="teacher-directory__search">
-          <span>ابحث عن مدرس</span>
-          <input
-            v-model="searchQuery"
-            type="search"
-            inputmode="search"
-            placeholder="اكتب اسم المدرس أو خبرته"
-            @input="requestSearch"
-          />
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-4-4" />
-          </svg>
-        </label>
+        <div class="teacher-directory__search-field">
+          <label class="teacher-directory__search">
+            <span>ابحث عن مدرس</span>
+            <input
+              v-model="searchQuery"
+              type="search"
+              inputmode="search"
+              placeholder="اكتب اسم المدرس أو خبرته"
+              @input="requestSearch"
+            />
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+          </label>
+
+          <span
+            v-if="searchQuery.trim().length > 0 && searchQuery.trim().length < 3"
+            class="handle-low-text"
+            role="status"
+          >
+            <i class="pi pi-info-circle" aria-hidden="true" />
+            أدخل 2 أحرف على الأقل للبحث
+          </span>
+        </div>
 
         <label class="teacher-directory__select">
           <span>الموقع</span>
@@ -733,6 +744,12 @@ onBeforeUnmount(() => {
   background: var(--app-surface, #fff);
 }
 
+.teacher-directory__search-field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
 .teacher-directory__search > span,
 .teacher-directory__select > span {
   position: absolute;
@@ -1157,5 +1174,23 @@ onBeforeUnmount(() => {
   .teacher-directory-card,
   .teacher-directory-card__profile span { transition: none; }
   .home-teachers__loader { animation: none; }
+}
+
+.handle-low-text {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid color-mix(in srgb, #d78a10 28%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, #fff7e6 80%, var(--app-surface, #fff));
+  color: #9a5c00;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.handle-low-text i {
+  font-size: 14px;
 }
 </style>
