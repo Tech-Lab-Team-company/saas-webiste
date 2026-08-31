@@ -42,6 +42,7 @@ export interface PurchasedBook extends PurchasedItemBase {
 
 export interface PurchasedQuestionBank extends PurchasedItemBase {
   kind: "questionBank";
+  questionBankId: number;
   totalQuestions: number;
   correctAnswers: number;
   wrongAnswers: number;
@@ -124,7 +125,10 @@ const toImage = (value: unknown): string | null => {
 
 const mapPackageEntry = (value: unknown): PurchasedPackageEntry | null => {
   if (!isRecord(value)) return null;
-  const id = toNumber(value.course_id ?? value.book_id ?? value.id, -1);
+  const id = toNumber(
+    value.course_id ?? value.book_id ?? value.question_bank_id ?? value.id,
+    -1,
+  );
   const title = toText(value.title);
   return id >= 0 && title ? { id, title } : null;
 };
@@ -192,12 +196,14 @@ const mapBook = (value: unknown): PurchasedBook | null => {
 const mapQuestionBank = (value: unknown): PurchasedQuestionBank | null => {
   if (!isRecord(value)) return null;
   const id = toNumber(value.id, -1);
+  const questionBankId = toNumber(value.question_bank_id ?? value.id, -1);
   const title = toText(value.title);
-  if (id < 0 || !title) return null;
+  if (id < 0 || questionBankId < 0 || !title) return null;
 
   return {
     id,
     kind: "questionBank",
+    questionBankId,
     title,
     description: toText(value.description),
     image: toImage(value.image),

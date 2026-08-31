@@ -31,13 +31,19 @@ const profileSectionLabels: Record<string, string> = {
   passwordupdate: "تغيير كلمة المرور",
 };
 
-const displayedImage = computed(() =>
-  imagePreview.value || userStore.image || userStore.user?.image || "/images/user.png",
+const displayedImage = computed(
+  () =>
+    imagePreview.value ||
+    userStore.image ||
+    userStore.user?.image ||
+    "/images/user.png",
 );
 const studentIdentity = computed(() => resolveStudentIdentity(userStore.user));
 const educationLabel = computed(() => {
   const info = userStore.user?.userInfo;
-  return info?.year_title || info?.stage_title || info?.university_title || "طالب";
+  return (
+    info?.year_title || info?.stage_title || info?.university_title || "طالب"
+  );
 });
 const currentSectionLabel = computed(
   () => profileSectionLabels[String(route.name || "")] || "مساحة الطالب",
@@ -100,7 +106,9 @@ const uploadImage = async () => {
   <div class="profile-sidebar-container">
     <div class="profile-sidebar-brand">
       <span class="profile-brand-mark" aria-hidden="true">
-        <span v-if="studentIdentity.initial">{{ studentIdentity.initial }}</span>
+        <span v-if="studentIdentity.initial">{{
+          studentIdentity.initial
+        }}</span>
         <i v-else class="pi pi-user" />
       </span>
       <div>
@@ -116,11 +124,7 @@ const uploadImage = async () => {
 
     <div class="person-data">
       <div class="profile-image-container">
-        <img
-          :src="displayedImage"
-          class="course-image"
-          alt="الصورة الشخصية"
-        />
+        <img :src="displayedImage" class="course-image" alt="الصورة الشخصية" />
         <label for="profile-image-input">
           <EditImageIcon class="edit-icon" />
         </label>
@@ -208,7 +212,7 @@ const uploadImage = async () => {
         <p>الكورسات</p>
       </NuxtLink>
 
-            <NuxtLink
+      <NuxtLink
         :to="{ name: 'profilefavorites' }"
         exact-active-class="active"
         class="profile-option"
@@ -379,7 +383,8 @@ const uploadImage = async () => {
         border-radius: 9px;
         background: color-mix(in srgb, currentColor 7%, transparent);
         opacity: 0.82;
-        transition: background 180ms ease, color 180ms ease, opacity 180ms ease, transform 180ms ease;
+        transition: background 180ms ease, color 180ms ease, opacity 180ms ease,
+          transform 180ms ease;
 
         i {
           font-size: 14px;

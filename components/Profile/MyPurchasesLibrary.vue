@@ -269,7 +269,7 @@ const itemRoute = (item: PurchasedItem): RouteLocationRaw | null => {
     return { path: `/books/${item.bookId}` };
   }
   if (item.kind === "questionBank") {
-    return { path: "/questions", query: { bank_id: String(item.id) } };
+    return { path: `/question-bank/${item.questionBankId}` };
   }
   return null;
 };
@@ -588,20 +588,21 @@ onBeforeUnmount(() =>
                 :invoice-link="item.invoiceLink"
               />
 
-              <ProfilePurchaseBookCard
-                v-else-if="item.kind === 'book'"
-                :title="item.title"
-                :to="itemRoute(item) || '/'"
-                :image="item.image"
-                :page-count="item.pageCount"
-                :order="itemIndex"
-              />
+              <template v-else>
+                <ProfilePurchaseBookCard
+                  v-if="item.kind === 'book'"
+                  :title="item.title"
+                  :to="itemRoute(item) || '/'"
+                  :image="item.image"
+                  :page-count="item.pageCount"
+                  :order="itemIndex"
+                />
 
-              <article
-                v-else
-                :class="['purchase-card', `purchase-card--${item.kind}`]"
-                :style="{ '--purchase-order': itemIndex }"
-              >
+                <article
+                  v-else
+                  :class="['purchase-card', `purchase-card--${item.kind}`]"
+                  :style="{ '--purchase-order': itemIndex }"
+                >
                 <div class="purchase-card__visual">
                   <span class="purchase-card__fallback" aria-hidden="true">
                     <i :class="kindIcon(item.kind)" />
@@ -683,8 +684,7 @@ onBeforeUnmount(() =>
                           v-for="bank in item.questionBanks"
                           :key="`package-bank-${bank.id}`"
                           :to="{
-                            path: '/questions',
-                            query: { bank_id: String(bank.id) },
+                            path: `/question-bank/${bank.id}`,
                           }"
                         >
                           {{ bank.title }}
@@ -719,7 +719,8 @@ onBeforeUnmount(() =>
                     </a>
                   </footer>
                 </div>
-              </article>
+                </article>
+              </template>
             </template>
           </div>
         </section>

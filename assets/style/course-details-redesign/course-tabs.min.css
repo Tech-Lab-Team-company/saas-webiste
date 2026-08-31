@@ -244,29 +244,36 @@
 }
 
 .curriculum-heading {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .platform-key {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin: 0 0 15px;
+  gap: 10px;
+  margin: 0 0 18px;
 }
 
 .platform-key > span {
-  display: flex;
+  width: -moz-fit-content;
+  width: fit-content;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid color-mix(in srgb, var(--course-accent) 14%, var(--course-border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--course-accent) 5%, var(--course-surface));
   color: var(--course-muted);
   font-size: 12px;
+  font-weight: 600;
+  line-height: 1.7;
 }
 
 .platform-key i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--course-accent);
+  flex: 0 0 auto;
+  color: var(--course-accent);
+  font-size: 14px;
 }
 
 .tabs-content {

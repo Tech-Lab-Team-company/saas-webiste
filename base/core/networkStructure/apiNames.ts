@@ -179,6 +179,10 @@ class ApiNames {
   public fetchMyLibraryBooks = "fetch_my_library_books";
   public fetchMyLibraryCourses = "fetch_my_library_courses";
 
+  //Questions Banks
+  public fetchQuestionBanks = "fetch_all_question_banks";
+  public fetchQuestionBankQuestions = "fetch_question_bank_questions";
+
 }
 
 export { ApiNames };

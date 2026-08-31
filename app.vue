@@ -43,6 +43,7 @@ const isHomeV2 = computed(
       "/books",
       "/blogs",
       "/course",
+      "/question-bank",
       "/app",
       "/fqs",
       "/privacy",
@@ -77,10 +78,10 @@ const getSiteImageSource = (image: unknown): string => {
   const imageRecord = image as Record<string, unknown>;
   return String(
     imageRecord.img ||
-      imageRecord.image ||
-      imageRecord.src ||
-      imageRecord.url ||
-      "",
+    imageRecord.image ||
+    imageRecord.src ||
+    imageRecord.url ||
+    "",
   ).trim();
 };
 
@@ -132,6 +133,7 @@ const primaryColor = computed(() =>
 const secondaryColor = computed(() =>
   normalizeThemeColor(webStatus.value?.secondary_color, "#3a3e7e"),
 );
+
 
 const themeVariables = computed<Record<string, string>>(() => ({
   "--primary-color": primaryColor.value,
@@ -291,18 +293,18 @@ const siteSchema = computed(() => ({
       ...(socialProfiles.value.length ? { sameAs: socialProfiles.value } : {}),
       ...(webStatus.value?.phone || webStatus.value?.email
         ? {
-            contactPoint: {
-              "@type": "ContactPoint",
-              ...(webStatus.value?.phone
-                ? { telephone: webStatus.value.phone }
-                : {}),
-              ...(webStatus.value?.email
-                ? { email: webStatus.value.email }
-                : {}),
-              contactType: "customer support",
-              availableLanguage: ["Arabic"],
-            },
-          }
+          contactPoint: {
+            "@type": "ContactPoint",
+            ...(webStatus.value?.phone
+              ? { telephone: webStatus.value.phone }
+              : {}),
+            ...(webStatus.value?.email
+              ? { email: webStatus.value.email }
+              : {}),
+            contactType: "customer support",
+            availableLanguage: ["Arabic"],
+          },
+        }
         : {}),
     },
     {
@@ -342,23 +344,23 @@ useHead(() => ({
     },
     ...(googleAnalyticsId.value
       ? [
-          {
-            key: "google-analytics-loader",
-            src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId.value}`,
-            async: true,
-            tagPosition: "bodyClose" as const,
-          },
-          {
-            key: "google-analytics-config",
-            innerHTML: [
-              "window.dataLayer=window.dataLayer||[];",
-              "function gtag(){dataLayer.push(arguments);}",
-              "gtag('js',new Date());",
-              `gtag('config','${googleAnalyticsId.value}',{anonymize_ip:true});`,
-            ].join(""),
-            tagPosition: "bodyClose" as const,
-          },
-        ]
+        {
+          key: "google-analytics-loader",
+          src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId.value}`,
+          async: true,
+          tagPosition: "bodyClose" as const,
+        },
+        {
+          key: "google-analytics-config",
+          innerHTML: [
+            "window.dataLayer=window.dataLayer||[];",
+            "function gtag(){dataLayer.push(arguments);}",
+            "gtag('js',new Date());",
+            `gtag('config','${googleAnalyticsId.value}',{anonymize_ip:true});`,
+          ].join(""),
+          tagPosition: "bodyClose" as const,
+        },
+      ]
       : []),
   ],
 }));
@@ -415,42 +417,15 @@ onMounted(() => {
 <template>
   <div>
     <Transition name="app-protection-notice">
-      <div
-        v-if="protectionNotice"
-        :key="protectionNoticeKey"
-        class="app-protection-notice"
-        role="status"
-        aria-live="polite"
-      >
+      <div v-if="protectionNotice" :key="protectionNoticeKey" class="app-protection-notice" role="status"
+        aria-live="polite">
         <span class="app-protection-notice__icon" aria-hidden="true">
-          <svg
-            class="app-protection-notice__shield"
-            viewBox="0 0 32 32"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M16 3.25 26 7v7.4c0 6.36-3.88 11.45-10 14.35C9.88 25.85 6 20.76 6 14.4V7l10-3.75Z"
-              fill="currentColor"
-              fill-opacity=".16"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linejoin="round"
-            />
-            <rect
-              x="11.25"
-              y="14.25"
-              width="9.5"
-              height="7.5"
-              rx="2.2"
-              fill="currentColor"
-            />
-            <path
-              d="M13.4 14.2v-1.45a2.6 2.6 0 1 1 5.2 0v1.45"
-              stroke="#12244f"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
+          <svg class="app-protection-notice__shield" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 3.25 26 7v7.4c0 6.36-3.88 11.45-10 14.35C9.88 25.85 6 20.76 6 14.4V7l10-3.75Z"
+              fill="currentColor" fill-opacity=".16" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            <rect x="11.25" y="14.25" width="9.5" height="7.5" rx="2.2" fill="currentColor" />
+            <path d="M13.4 14.2v-1.45a2.6 2.6 0 1 1 5.2 0v1.45" stroke="#12244f" stroke-width="1.8"
+              stroke-linecap="round" />
             <circle cx="16" cy="18" r="1.15" fill="#12244f" />
           </svg>
           <span class="app-protection-notice__status-dot" />
@@ -464,29 +439,21 @@ onMounted(() => {
     <AppRouteTransition />
     <NuxtLayout>
       <LazyMobileNav v-if="!isHomeV2" />
-      <LazyQrCodeRedeemer
-        v-if="userStore.user && !isProtectedContentBlocked"
-      />
+      <LazyQrCodeRedeemer v-if="userStore.user && !isProtectedContentBlocked" />
       <!-- <LazyChatBotButton v-if="!isHomeV2" class="chat-bot-button" /> -->
       <!-- <LazySpeedDialToast v-if="!isHomeV2" class="social-icons" /> -->
       <LazyToast v-if="!isHomeV2" />
-      <div
-        class="app-route-view"
-        :class="{ 'app-route-view--protected': isProtectedLearningPage }"
-      >
+      <div class="app-route-view" :class="{ 'app-route-view--protected': isProtectedLearningPage }">
         <GlobalDeveloperToolsBlocker v-if="isProtectedContentBlocked" />
         <NuxtPage v-else />
       </div>
       <LazyMainDialog v-if="!pending && !isProtectedContentBlocked" />
     </NuxtLayout>
   </div>
-  <AppThemeToggle
-    v-if="!hasNavbarThemeToggle"
-    :class="{ 'auth-route-theme-toggle': isAuthPage }"
-    :is-dark="isDark"
-    :icon-only="isAuthPage"
-    @toggle="toggleTheme"
-  />
+  <AppThemeToggle v-if="!hasNavbarThemeToggle" :class="{ 'auth-route-theme-toggle': isAuthPage }" :is-dark="isDark"
+    :icon-only="isAuthPage" @toggle="toggleTheme" />
+
+
 </template>
 
 <style scoped lang="scss">
@@ -538,11 +505,9 @@ onMounted(() => {
   padding: 15px 20px;
   border: 1px solid rgb(255 255 255 / 20%);
   border-radius: 18px;
-  background: radial-gradient(
-      circle at 10% 20%,
+  background: radial-gradient(circle at 10% 20%,
       rgb(72 117 255 / 25%),
-      transparent 34%
-    ),
+      transparent 34%),
     rgb(9 15 29 / 96%);
   box-shadow: 0 24px 65px rgb(0 0 0 / 34%), 0 0 0 1px rgb(7 17 38 / 20%);
   color: #fff;
@@ -573,11 +538,9 @@ onMounted(() => {
   place-items: center;
   border: 1px solid rgb(255 255 255 / 18%);
   border-radius: 14px;
-  background: linear-gradient(
-    145deg,
-    rgb(70 126 255 / 38%),
-    rgb(111 79 255 / 18%)
-  );
+  background: linear-gradient(145deg,
+      rgb(70 126 255 / 38%),
+      rgb(111 79 255 / 18%));
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%);
   color: #a9ceff;
   font-size: 21px;
@@ -625,7 +588,7 @@ onMounted(() => {
   font-weight: 800;
 }
 
-.app-protection-notice__content > span {
+.app-protection-notice__content>span {
   color: rgb(255 255 255 / 72%);
   font-size: 13px;
   font-weight: 600;
@@ -649,6 +612,7 @@ onMounted(() => {
 }
 
 @keyframes app-protection-shield {
+
   0%,
   100% {
     transform: scale(1) rotate(0);
@@ -694,6 +658,7 @@ onMounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .app-protection-notice,
   .app-protection-notice::after,
   .app-protection-notice__icon,
