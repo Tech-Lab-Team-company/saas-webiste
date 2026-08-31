@@ -8,20 +8,30 @@ import FetchPaymentMethodsParams from "~/features/fetch_payment_methods/Core/Par
 import type PaymentMethodModel from "~/features/fetch_payment_methods/Data/models/fetch_payment_method_model";
 import FetchPaymentMethodController from "~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller";
 import OnlinePaymentParams from "~/features/OnlinePayment/Core/Params/online_payment_params";
+import QuestionBankOnlinePaymentParams from "~/features/OnlinePayment/Core/Params/question_bank_online_payment_params";
 import OnlinePaymentController from "~/features/OnlinePayment/presentation/controllers/online_payment_controller";
 import errorImage from "~/public/images/error.png";
 import successImage from "~/public/images/success-dialog.png";
 import { useSiteUrl } from "~/utils/siteUrl";
 import { PaymentTypes } from "./Enum/payment_types_enum";
+import { PaymentProductType } from "./Enum/payment_product_type_enum";
 
-const props = defineProps<{
+type CoursePaymentIdentity = {
   courseId: number;
+};
+
+const props = withDefaults(defineProps<Partial<CoursePaymentIdentity> & {
+  questionBankId?: number;
+  productType?: PaymentProductType;
   status: number;
   courseTitle?: string;
+  productTitle?: string;
   price?: number;
   currency?: string;
   pendingLabel?: string;
-}>();
+}>(), {
+  productType: PaymentProductType.COURSE,
+});
 const emit = defineEmits<{
   statusChanged: [status: number];
 }>();
@@ -33,6 +43,37 @@ const paymentStore = usePaymentStore();
 const toast = useToast();
 const { buildSiteUrl } = useSiteUrl();
 const { promptCourseSubscription } = useCourseAccessPrompt();
+
+const isQuestionBankPayment = computed(
+  () => props.productType === PaymentProductType.QUESTION_BANK,
+);
+const productId = computed(() =>
+  Number(
+    isQuestionBankPayment.value ? props.questionBankId : props.courseId,
+  ),
+);
+const productTitle = computed(
+  () => props.productTitle || props.courseTitle || "",
+);
+const productLabel = computed(() =>
+  isQuestionBankPayment.value ? "بنك الأسئلة" : "الكورس",
+);
+const productIcon = computed(() =>
+  isQuestionBankPayment.value ? "pi pi-file-edit" : "pi pi-graduation-cap",
+);
+const productSource = computed(() =>
+  isQuestionBankPayment.value ? "questionBank" : "course",
+);
+const purchaseSuccessTitle = computed(() =>
+  isQuestionBankPayment.value
+    ? "تم إرسال طلب شراء بنك الأسئلة بنجاح"
+    : "تم إرسال طلب شراء الكورس بنجاح",
+);
+const purchaseFailureTitle = computed(() =>
+  isQuestionBankPayment.value
+    ? "لم يتم إرسال طلب شراء بنك الأسئلة"
+    : "لم يتم إرسال طلب شراء الكورس",
+);
 
 const visible = ref(false);
 const normalizeStatus = (value: unknown): number => {
@@ -203,7 +244,10 @@ const ensureSuccessfulBuyProductResponse = (response: any) => {
     || httpStatus >= 300
     || hasFailedApiStatus
   ) {
-    throw new Error(apiResponseMessage(response) || "تعذر إتمام طلب شراء الكورس.");
+    throw new Error(
+      apiResponseMessage(response)
+      || `تعذر إتمام طلب شراء ${productLabel.value}.`,
+    );
   }
 };
 
@@ -224,12 +268,15 @@ const requestErrorMessage = (error: any): string => {
   const responseStatus = Number(response?.status);
   if (responseStatus === 401) return "انتهت جلسة تسجيل الدخول. سجّل الدخول ثم أعد المحاولة.";
   if (responseStatus === 403) return "لا يمكنك إرسال طلب الشراء حاليًا.";
-  if (responseStatus === 404) return "خدمة شراء الكورس غير متاحة حاليًا.";
+  if (responseStatus === 404) {
+    return `خدمة شراء ${productLabel.value} غير متاحة حاليًا.`;
+  }
   if (responseStatus === 422) return "بعض بيانات الدفع غير صحيحة. راجعها ثم حاول مرة أخرى.";
   if (responseStatus === 429) return "تم إرسال محاولات كثيرة. انتظر قليلًا ثم حاول مجددًا.";
   if (responseStatus >= 500) return "حدث خطأ بالخادم أثناء إرسال الطلب. حاول لاحقًا.";
 
-  return error?.message || "تعذر إرسال طلب شراء الكورس. راجع البيانات وحاول مرة أخرى.";
+  return error?.message
+    || `تعذر إرسال طلب شراء ${productLabel.value}. راجع البيانات وحاول مرة أخرى.`;
 };
 
 const showPurchaseResultDialog = async (
@@ -255,15 +302,21 @@ const showPurchaseResultDialog = async (
 const submitOfflinePayment = async () => {
   if (!selectedMethod.value) return;
 
-  if (!Number.isInteger(props.courseId) || props.courseId <= 0) {
-    throw new Error("معرّف الكورس غير صالح. أعد تحميل الصفحة وحاول مرة أخرى.");
+  if (!Number.isInteger(productId.value) || productId.value <= 0) {
+    throw new Error(
+      `معرّف ${productLabel.value} غير صالح. أعد تحميل الصفحة وحاول مرة أخرى.`,
+    );
   }
+
+  const productPayload = isQuestionBankPayment.value
+    ? { question_bank_id: props.questionBankId }
+    : { course_id: props.courseId };
 
   const response = await NetworkService.instance.postFormData({
     url: ApiNames.Instance.buy_product,
     isAuth: true,
     data: {
-      course_id: props.courseId,
+      ...productPayload,
       subscription_type: 1,
       payment_method_id: selectedMethod.value.id,
       transferred_account: transferredAccount.value.trim(),
@@ -276,33 +329,43 @@ const submitOfflinePayment = async () => {
   emit("statusChanged", 1);
   await showPurchaseResultDialog(
     "success",
-    "تم إرسال طلب شراء الكورس بنجاح",
+    purchaseSuccessTitle.value,
     String(
       apiResponseMessage(response)
-      || "سنراجع بيانات الدفع، وسيتم تفعيل الكورس على حسابك فور اعتماد الطلب.",
+      || `سنراجع بيانات الدفع، وسيتم تفعيل ${productLabel.value} على حسابك فور اعتماد الطلب.`,
     ),
   );
 };
 
 const submitOnlinePayment = async () => {
   if (!selectedMethod.value) return;
-  if (!Number.isInteger(props.courseId) || props.courseId <= 0) {
-    throw new Error("معرّف الكورس غير صالح. أعد تحميل الصفحة وحاول مرة أخرى.");
+  if (!Number.isInteger(productId.value) || productId.value <= 0) {
+    throw new Error(
+      `معرّف ${productLabel.value} غير صالح. أعد تحميل الصفحة وحاول مرة أخرى.`,
+    );
   }
 
   const callbackUrl = buildSiteUrl(
-    `/paymentverify/${selectedMethod.value.id}?source=course&courseId=${props.courseId}`,
+    isQuestionBankPayment.value
+      ? `/paymentverify/${selectedMethod.value.id}?source=questionBank&questionBankId=${productId.value}`
+      : `/paymentverify/${selectedMethod.value.id}?source=course&courseId=${productId.value}`,
   );
-  const params = new OnlinePaymentParams(
-    String(props.courseId),
-    String(selectedMethod.value.id),
-    null,
-    callbackUrl,
-    callbackUrl,
-    callbackUrl,
-    callbackUrl,
-    callbackUrl,
-  );
+  const params = isQuestionBankPayment.value
+    ? new QuestionBankOnlinePaymentParams(
+        productId.value,
+        selectedMethod.value.id,
+        callbackUrl,
+      )
+    : new OnlinePaymentParams(
+        String(productId.value),
+        String(selectedMethod.value.id),
+        null,
+        callbackUrl,
+        callbackUrl,
+        callbackUrl,
+        callbackUrl,
+        callbackUrl,
+      );
   const state = await OnlinePaymentController.getInstance().CreateOnlinePayment(params, router);
   const gatewayUrl = state.value.data?.url;
   const paymentId = Number(state.value.data?.id);
@@ -315,9 +378,11 @@ const submitOnlinePayment = async () => {
 
   window.localStorage.setItem("onlinePaymentId", String(paymentId));
   window.localStorage.setItem("onlinePaymentContext", JSON.stringify({
-    source: "course",
-    courseId: props.courseId,
-    title: props.courseTitle,
+    source: productSource.value,
+    ...(isQuestionBankPayment.value
+      ? { questionBankId: productId.value }
+      : { courseId: productId.value }),
+    title: productTitle.value,
     returnUrl: route.fullPath,
   }));
   window.location.assign(gatewayUrl);
@@ -338,7 +403,7 @@ const submitPayment = async () => {
     errorMessage.value = requestErrorMessage(error);
     await showPurchaseResultDialog(
       "error",
-      "لم يتم إرسال طلب شراء الكورس",
+      purchaseFailureTitle.value,
       errorMessage.value,
     );
   } finally {
@@ -350,13 +415,22 @@ const fireLoginToast = () => {
   toast.add({
     severity: "info",
     summary: "سجّل دخولك أولًا",
-    detail: "يلزم تسجيل الدخول لإتمام شراء الكورس.",
+    detail: `يلزم تسجيل الدخول لإتمام شراء ${productLabel.value}.`,
     life: 3500,
   });
   router.push({ path: "/loginhome", query: { redirect: route.fullPath } });
 };
 
 const showPendingRequestDetails = () => {
+  if (isQuestionBankPayment.value) {
+    toast.add({
+      severity: "info",
+      summary: "طلب الشراء قيد المراجعة",
+      detail: "سنفعّل بنك الأسئلة على حسابك فور اعتماد بيانات الدفع.",
+      life: 4500,
+    });
+    return;
+  }
   promptCourseSubscription(status.value);
 };
 
@@ -365,74 +439,47 @@ onBeforeUnmount(clearReceipt);
 
 <template>
   <div class="course-payment">
-    <button
-      v-if="status === 0 && userStore.user"
-      type="button"
-      class="course-payment__trigger"
-      @click="openDialog"
-    >
+    <button v-if="status === 0 && userStore.user" type="button" class="course-payment__trigger" @click="openDialog">
       <span class="pi pi-shopping-cart" aria-hidden="true" />
-      شراء الكورس
+      شراء {{ productLabel }}
     </button>
 
-    <button
-      v-else-if="status === 1 && userStore.user"
-      type="button"
-      class="course-payment__trigger course-payment__trigger--pending"
-      aria-haspopup="dialog"
-      aria-label="عرض حالة طلب الاشتراك"
-      @click="showPendingRequestDetails"
-    >
+    <button v-else-if="status === 1 && userStore.user" type="button"
+      class="course-payment__trigger course-payment__trigger--pending" aria-haspopup="dialog"
+      aria-label="عرض حالة طلب الاشتراك" @click="showPendingRequestDetails">
       <span class="pi pi-clock" aria-hidden="true" />
       {{ props.pendingLabel || "في انتظار قبول الطلب" }}
     </button>
 
-    <button
-      v-else-if="status === 4 && userStore.user"
-      type="button"
-      disabled
-      class="course-payment__trigger course-payment__trigger--rejected"
-    >
+    <button v-else-if="status === 4 && userStore.user" type="button" disabled
+      class="course-payment__trigger course-payment__trigger--rejected">
       <span class="pi pi-times-circle" aria-hidden="true" />
       تم رفض الطلب
     </button>
 
-    <button
-      v-else-if="!userStore.user"
-      type="button"
-      class="course-payment__trigger"
-      @click="fireLoginToast"
-    >
+    <button v-else-if="!userStore.user" type="button" class="course-payment__trigger" @click="fireLoginToast">
       <span class="pi pi-sign-in" aria-hidden="true" />
-      شراء الكورس
+      شراء {{ productLabel }}
     </button>
 
-    <Dialog
-      v-model:visible="visible"
-      modal
-      dismissable-mask
-      :draggable="false"
-      :close-on-escape="!submitting"
-      :style="{ width: 'min(680px, calc(100vw - 24px))' }"
-      class="course-payment-dialog"
-      dir="rtl"
-    >
+    <Dialog v-model:visible="visible" modal dismissable-mask :draggable="false" :close-on-escape="!submitting"
+      :style="{ width: 'min(680px, calc(100vw - 24px))' }" class="course-payment-dialog" dir="rtl">
       <template #header>
         <div class="course-payment-dialog__header">
           <span class="course-payment-dialog__header-icon pi pi-shopping-bag" aria-hidden="true" />
           <span>
-            <strong>إتمام شراء الكورس</strong>
-            <small>{{ courseTitle || "اختر وسيلة الدفع المناسبة لإكمال الاشتراك" }}</small>
+            <strong>إتمام شراء {{ productLabel }}</strong>
+            <small>{{ productTitle || "اختر وسيلة الدفع المناسبة لإكمال الاشتراك" }}</small>
           </span>
         </div>
       </template>
 
       <form class="course-payment-dialog__form" @submit.prevent="submitPayment">
-        <div v-if="courseTitle || formattedPrice" class="course-payment-dialog__summary">
-          <span class="course-payment-dialog__summary-icon pi pi-graduation-cap" aria-hidden="true" />
+        <div v-if="productTitle || formattedPrice" class="course-payment-dialog__summary">
+          <span :class="['course-payment-dialog__summary-icon', productIcon]" aria-hidden="true" />
           <div>
-            <small>الكورس المختار</small>
-            <strong>{{ courseTitle || "اشتراك الكورس" }}</strong>
+            <small>{{ productLabel }} المختار</small>
+            <strong>{{ productTitle || `اشتراك ${productLabel}` }}</strong>
           </div>
           <b v-if="formattedPrice">{{ formattedPrice }}</b>
         </div>
@@ -458,28 +505,15 @@ onBeforeUnmount(clearReceipt);
           </div>
 
           <div v-else class="payment-method-container" role="radiogroup" aria-label="وسائل الدفع المتاحة">
-            <label
-              v-for="method in paymentMethods"
-              :key="method.id"
-              class="payment-method"
-              :class="{ active: selectedPaymentMethodId === method.id }"
-            >
-              <input
-                v-model="selectedPaymentMethodId"
-                type="radio"
-                name="course-payment-method"
-                :value="method.id"
-              />
+            <label v-for="method in paymentMethods" :key="method.id" class="payment-method"
+              :class="{ active: selectedPaymentMethodId === method.id }">
+              <input v-model="selectedPaymentMethodId" type="radio" name="product-payment-method" :value="method.id" />
               <span class="payment-method__visual">
                 <img v-if="method.image" :src="method.image" alt="" />
-                <span
-                  v-else
-                  :class="[
-                    'pi',
-                    Number(method.type) === PaymentTypes.ONLINE ? 'pi-credit-card' : 'pi-wallet',
-                  ]"
-                  aria-hidden="true"
-                />
+                <span v-else :class="[
+                  'pi',
+                  Number(method.type) === PaymentTypes.ONLINE ? 'pi-credit-card' : 'pi-wallet',
+                ]" aria-hidden="true" />
               </span>
               <span class="payment-method__copy">
                 <b>{{ method.title }}</b>
@@ -505,12 +539,9 @@ onBeforeUnmount(clearReceipt);
             </div>
           </div>
 
-          <section
-            v-else-if="isOfflinePayment"
-            key="offline"
+          <section v-else-if="isOfflinePayment" key="offline"
             class="course-payment-dialog__section course-payment-dialog__offline"
-            aria-labelledby="course-transfer-details-title"
-          >
+            aria-labelledby="course-transfer-details-title">
             <div class="course-payment-dialog__section-title">
               <span class="course-payment-dialog__step" aria-hidden="true">٢</span>
               <div>
@@ -521,15 +552,9 @@ onBeforeUnmount(clearReceipt);
 
             <label class="course-payment-dialog__field">
               <span>رقم الحساب أو الهاتف المحوّل منه <em>*</em></span>
-              <input
-                v-model="transferredAccount"
-                type="text"
-                inputmode="numeric"
-                autocomplete="tel"
-                placeholder="مثال: 01000000000"
-                :class="{ invalid: fieldErrors.transferredAccount }"
-                @input="delete fieldErrors.transferredAccount"
-              />
+              <input v-model="transferredAccount" type="text" inputmode="numeric" autocomplete="tel"
+                placeholder="مثال: 01000000000" :class="{ invalid: fieldErrors.transferredAccount }"
+                @input="delete fieldErrors.transferredAccount" />
               <small v-if="selectedMethod?.account_number" class="course-payment-dialog__destination">
                 التحويل إلى: <b>{{ selectedMethod.account_number }}</b>
               </small>
@@ -540,20 +565,11 @@ onBeforeUnmount(clearReceipt);
 
             <div class="course-payment-dialog__field">
               <span>صورة إيصال التحويل <em>*</em></span>
-              <input
-                :id="receiptInputId"
-                ref="receiptInput"
-                class="course-payment-dialog__receipt-input"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                @change="selectReceipt"
-              />
+              <input :id="receiptInputId" ref="receiptInput" class="course-payment-dialog__receipt-input" type="file"
+                accept="image/jpeg,image/png,image/webp" @change="selectReceipt" />
 
-              <label
-                v-if="!receiptPreviewUrl"
-                :for="receiptInputId"
-                :class="['course-payment-dialog__receipt-picker', { invalid: fieldErrors.receipt }]"
-              >
+              <label v-if="!receiptPreviewUrl" :for="receiptInputId"
+                :class="['course-payment-dialog__receipt-picker', { invalid: fieldErrors.receipt }]">
                 <span class="pi pi-cloud-upload" aria-hidden="true" />
                 <b>اضغط لرفع صورة الإيصال</b>
                 <small>JPG أو PNG أو WebP — بحد أقصى 5MB</small>
@@ -587,11 +603,8 @@ onBeforeUnmount(clearReceipt);
           {{ errorMessage }}
         </p>
 
-        <button
-          type="submit"
-          class="course-payment-dialog__submit"
-          :disabled="submitting || loadingMethods || !paymentMethods.length"
-        >
+        <button type="submit" class="course-payment-dialog__submit"
+          :disabled="submitting || loadingMethods || !paymentMethods.length">
           <span v-if="submitting" class="pi pi-spin pi-spinner" aria-hidden="true" />
           <span v-else-if="isOnlinePayment" class="pi pi-lock" aria-hidden="true" />
           <span v-else class="pi pi-check-circle" aria-hidden="true" />
@@ -733,7 +746,7 @@ onBeforeUnmount(clearReceipt);
   font-size: 18px;
 }
 
-.course-payment-dialog__header > span:last-child {
+.course-payment-dialog__header>span:last-child {
   display: grid;
   min-width: 0;
   gap: 3px;
@@ -799,7 +812,7 @@ onBeforeUnmount(clearReceipt);
   white-space: nowrap;
 }
 
-.course-payment-dialog__summary > b {
+.course-payment-dialog__summary>b {
   color: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
   font-size: 21px;
   white-space: nowrap;
@@ -825,7 +838,7 @@ onBeforeUnmount(clearReceipt);
   text-align: start;
 }
 
-.course-payment-dialog__section-title > div {
+.course-payment-dialog__section-title>div {
   display: grid;
   gap: 2px;
 }
@@ -887,7 +900,7 @@ onBeforeUnmount(clearReceipt);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 10%, transparent);
 }
 
-.payment-method > input {
+.payment-method>input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -972,7 +985,7 @@ onBeforeUnmount(clearReceipt);
   text-align: start;
 }
 
-.course-payment-dialog__gateway-note > span {
+.course-payment-dialog__gateway-note>span {
   display: grid;
   width: 40px;
   height: 40px;
@@ -984,7 +997,7 @@ onBeforeUnmount(clearReceipt);
   font-size: 17px;
 }
 
-.course-payment-dialog__gateway-note > div {
+.course-payment-dialog__gateway-note>div {
   display: grid;
   gap: 3px;
 }
@@ -1006,7 +1019,7 @@ onBeforeUnmount(clearReceipt);
   text-align: start;
 }
 
-.course-payment-dialog__field > span {
+.course-payment-dialog__field>span {
   font-size: 14px;
   font-weight: 850;
 }
@@ -1016,7 +1029,7 @@ onBeforeUnmount(clearReceipt);
   font-style: normal;
 }
 
-.course-payment-dialog__field > input:not(.course-payment-dialog__receipt-input) {
+.course-payment-dialog__field>input:not(.course-payment-dialog__receipt-input) {
   width: 100%;
   min-height: 48px;
   padding: 11px 13px;
@@ -1029,12 +1042,12 @@ onBeforeUnmount(clearReceipt);
   transition: border-color .2s ease, box-shadow .2s ease;
 }
 
-.course-payment-dialog__field > input:not(.course-payment-dialog__receipt-input):focus {
+.course-payment-dialog__field>input:not(.course-payment-dialog__receipt-input):focus {
   border-color: var(--home-v2-blue, var(--app-accent, var(--primary-color)));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue, var(--app-accent, #28366c)) 12%, transparent);
 }
 
-.course-payment-dialog__field > input.invalid {
+.course-payment-dialog__field>input.invalid {
   border-color: #dc4a4a;
 }
 
@@ -1082,7 +1095,7 @@ onBeforeUnmount(clearReceipt);
   border-color: #dc4a4a;
 }
 
-.course-payment-dialog__receipt-picker > span {
+.course-payment-dialog__receipt-picker>span {
   display: grid;
   width: 38px;
   height: 38px;
@@ -1121,13 +1134,13 @@ onBeforeUnmount(clearReceipt);
   object-fit: cover;
 }
 
-.course-payment-dialog__receipt-preview > div {
+.course-payment-dialog__receipt-preview>div {
   display: grid;
   min-width: 0;
   gap: 3px;
 }
 
-.course-payment-dialog__receipt-preview > div b {
+.course-payment-dialog__receipt-preview>div b {
   overflow: hidden;
   font-size: 13px;
   text-overflow: ellipsis;
@@ -1139,8 +1152,8 @@ onBeforeUnmount(clearReceipt);
   font-size: 12px;
 }
 
-.course-payment-dialog__receipt-preview > label,
-.course-payment-dialog__receipt-preview > button {
+.course-payment-dialog__receipt-preview>label,
+.course-payment-dialog__receipt-preview>button {
   padding: 7px 9px;
   border: 0;
   border-radius: 7px;
@@ -1152,7 +1165,7 @@ onBeforeUnmount(clearReceipt);
   cursor: pointer;
 }
 
-.course-payment-dialog__receipt-preview > button {
+.course-payment-dialog__receipt-preview>button {
   display: grid;
   width: 32px;
   height: 32px;
@@ -1269,7 +1282,7 @@ onBeforeUnmount(clearReceipt);
   text-align: center;
 }
 
-.course-payment-dialog__success > span {
+.course-payment-dialog__success>span {
   display: grid;
   width: 62px;
   height: 62px;
@@ -1333,7 +1346,7 @@ onBeforeUnmount(clearReceipt);
     grid-template-columns: 38px minmax(0, 1fr);
   }
 
-  .course-payment-dialog__summary > b {
+  .course-payment-dialog__summary>b {
     grid-column: 2;
     font-size: 16px;
   }
@@ -1355,12 +1368,13 @@ onBeforeUnmount(clearReceipt);
     height: 58px;
   }
 
-  .course-payment-dialog__receipt-preview > button {
+  .course-payment-dialog__receipt-preview>button {
     grid-column: 3;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .course-payment__trigger,
   .payment-method,
   .course-payment-dialog__submit,

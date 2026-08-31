@@ -27,11 +27,15 @@ const site = computed(() => mapHomeSite(settingsStore.setting));
 
 <style scoped>
 .home-v2-layout {
+  display: flex;
   min-width: 0;
   min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
 }
 
 .home-v2-layout__content {
   min-width: 0;
+  flex: 1 0 auto;
 }
 </style>

@@ -24,11 +24,8 @@ class HeaderHandler {
     const headers: { [key: string]: string } = {};
     const userStore = this.userStore; // Initialize the store here
 
-    if (userStore?.user !== null) {
-      const token: string | undefined = userStore?.user?.apiToken;
-      if (userStore?.user) {
-        headers['Authorization'] = 'Bearer ' + token;
-      }
+    if (isAuth && userStore?.user?.apiToken) {
+      headers['Authorization'] = `Bearer ${userStore.user.apiToken}`;
     }
 
     // const savedLocale = localStorage.getItem('lang');

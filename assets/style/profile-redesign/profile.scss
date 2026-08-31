@@ -31,10 +31,18 @@ html[data-theme="dark"] .profile-redesign-page {
 body:has(.profile-redesign-page) .header,
 body:has(.profile-redesign-page) .banner,
 body:has(.profile-redesign-page) .footer-container,
+body:has(.profile-redesign-page) .home-v2-header,
+body:has(.profile-redesign-page) .home-v2-footer,
 body:has(.profile-redesign-page) .chat-bot-button,
 body:has(.profile-redesign-page) .chat-icons,
 body:has(.profile-redesign-page) .social-icons {
   display: none !important;
+}
+
+/* The profile is a self-contained dashboard. Remove the space reserved by
+   the fixed Home V2 header when the dashboard is rendered in default layout. */
+body:has(.profile-redesign-page) .home-v2-layout__content {
+  padding-top: 0 !important;
 }
 
 body:has(.profile-redesign-page) {
@@ -617,7 +625,9 @@ body:has(.profile-redesign-page) {
   top: 0;
   width: 270px;
   height: 100vh;
-  min-height: 700px;
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -1360,6 +1370,7 @@ body:has(.profile-redesign-page) {
 
 .profile-redesign-page .profile-dashboard-sidebar.profile-sidebar-container {
   z-index: 25;
+
   box-shadow: -18px 0 50px
     color-mix(in srgb, var(--profile-primary) 22%, transparent);
 }

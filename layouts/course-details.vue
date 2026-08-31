@@ -16,7 +16,8 @@ const syncCourseHeaderOffset = () => {
   const headerElement = courseHeader.value?.$el;
   if (!(headerElement instanceof HTMLElement)) return;
 
-  courseHeaderOffset.value = Math.ceil(headerElement.getBoundingClientRect().height) + 8;
+  courseHeaderOffset.value =
+    Math.ceil(headerElement.getBoundingClientRect().height) + 8;
 };
 
 onMounted(async () => {
@@ -57,17 +58,16 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .course-details-layout {
+  display: flex;
+  min-width: 0;
   min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
 }
 
 .course-details-layout__content {
-  min-height: 70vh;
-  padding-top: 86px;
-}
-
-@media (max-width: 700px) {
-  .course-details-layout__content {
-    padding-top: 86px;
-  }
+  min-width: 0;
+  flex: 1 0 auto;
+  padding-top: var(--course-header-offset, 86px);
 }
 </style>

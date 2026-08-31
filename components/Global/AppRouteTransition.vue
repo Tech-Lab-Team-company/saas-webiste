@@ -130,14 +130,8 @@ onBeforeUnmount(() => {
 
 <template>
   <Transition name="app-route-loader">
-    <div
-      v-if="isVisible"
-      class="app-route-transition"
-      :class="{ 'app-route-transition--leaving': isLeaving }"
-      role="status"
-      aria-live="polite"
-      aria-label="جاري تحميل الصفحة"
-    >
+    <div v-if="isVisible" class="app-route-transition" :class="{ 'app-route-transition--leaving': isLeaving }"
+      role="status" aria-live="polite" aria-label="جاري تحميل الصفحة">
       <span class="app-route-transition__track" aria-hidden="true">
         <span class="app-route-transition__progress" />
       </span>
@@ -145,12 +139,7 @@ onBeforeUnmount(() => {
       <div class="app-route-transition__status">
         <span class="app-route-transition__spinner" aria-hidden="true">
           <span class="app-route-transition__spinner-ring" />
-          <img
-            :src="loaderLogo"
-            class="app-route-transition__logo"
-            alt=""
-            @error="logoLoadFailed = true"
-          />
+          <img :src="loaderLogo" class="app-route-transition__logo" alt="" @error="logoLoadFailed = true" />
         </span>
 
         <span class="app-route-transition__copy">
@@ -164,14 +153,10 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .app-route-transition {
-  --route-loader-primary: var(
-    --app-accent,
-    var(--app-brand-primary, var(--primary-color, #28366c))
-  );
-  --route-loader-secondary: var(
-    --app-accent-secondary,
-    var(--app-brand-secondary, var(--secondary-color, #3a3e7e))
-  );
+  --route-loader-primary: var(--app-accent,
+      var(--app-brand-primary, var(--primary-color, #28366c)));
+  --route-loader-secondary: var(--app-accent-secondary,
+      var(--app-brand-secondary, var(--secondary-color, #3a3e7e)));
 
   position: fixed;
   z-index: 99999;
@@ -193,22 +178,18 @@ onBeforeUnmount(() => {
   left: 0;
   height: 3px;
   overflow: hidden;
-  background: color-mix(
-    in srgb,
-    var(--route-loader-primary) 12%,
-    transparent
-  );
+  background: color-mix(in srgb,
+      var(--route-loader-primary) 12%,
+      transparent);
 }
 
 .app-route-transition__progress {
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--route-loader-secondary),
-    var(--route-loader-primary)
-  );
+  background: linear-gradient(90deg,
+      var(--route-loader-secondary),
+      var(--route-loader-primary));
   transform: scaleX(0.08);
   transform-origin: right center;
   animation: app-route-progress 6s cubic-bezier(0.1, 0.65, 0.25, 1) forwards;
@@ -223,11 +204,9 @@ onBeforeUnmount(() => {
   border: 1px solid var(--app-line, rgb(8 27 58 / 14%));
   border-radius: 16px;
   background: color-mix(in srgb, var(--app-surface, #fff) 96%, transparent);
-  box-shadow: 0 18px 48px color-mix(
-    in srgb,
-    var(--app-shadow, rgb(6 17 71 / 24%)) 35%,
-    transparent
-  );
+  box-shadow: 0 18px 48px color-mix(in srgb,
+      var(--app-shadow, rgb(6 17 71 / 24%)) 35%,
+      transparent);
   text-align: start;
   animation: app-route-status-in 220ms ease-out both;
 }
@@ -241,21 +220,17 @@ onBeforeUnmount(() => {
   place-items: center;
   border-radius: 50%;
   background: var(--app-surface, #fff);
-  box-shadow: 0 5px 14px color-mix(
-    in srgb,
-    var(--app-shadow, rgb(6 17 71 / 24%)) 24%,
-    transparent
-  );
+  box-shadow: 0 5px 14px color-mix(in srgb,
+      var(--app-shadow, rgb(6 17 71 / 24%)) 24%,
+      transparent);
 }
 
 .app-route-transition__spinner-ring {
   position: absolute;
   inset: -3px;
-  border: 3px solid color-mix(
-    in srgb,
-    var(--route-loader-primary) 16%,
-    transparent
-  );
+  border: 3px solid color-mix(in srgb,
+      var(--route-loader-primary) 16%,
+      transparent);
   border-top-color: var(--route-loader-primary);
   border-left-color: var(--route-loader-secondary);
   border-radius: 50%;
@@ -266,8 +241,8 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
   object-fit: cover;
-  width: 100%;
-  /* height: 34px; */
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: contain;
   background: var(--app-surface, #fff);
@@ -378,6 +353,7 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .app-route-transition,
   .app-route-transition *,
   .app-route-transition *::before,

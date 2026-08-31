@@ -5,9 +5,10 @@ import VerifyPaymentParams from "~/features/VerifyPayment/Core/Params/verify_pay
 import VerifyPaymentController from "~/features/VerifyPayment/presentation/controllers/verify_payment_controller";
 
 type OnlinePaymentContext = {
-  source?: "book" | "course";
+  source?: "book" | "course" | "questionBank";
   bookId?: number;
   courseId?: number;
+  questionBankId?: number;
   title?: string;
   optionLabel?: string;
   returnUrl?: string;
@@ -23,11 +24,20 @@ const paymentContext = ref<OnlinePaymentContext>({});
 const isBookPayment = computed(() =>
   route.query.source === "book" || paymentContext.value.source === "book",
 );
+const isQuestionBankPayment = computed(() =>
+  route.query.source === "questionBank"
+  || paymentContext.value.source === "questionBank",
+);
+const productLabel = computed(() => {
+  if (isBookPayment.value) return "الكتاب";
+  if (isQuestionBankPayment.value) return "بنك الأسئلة";
+  return "الكورس";
+});
 const resultTitle = computed(() => {
   if (verifying.value) return "جاري التحقق من عملية الدفع";
   if (errorMessage.value) return "تعذر التحقق من عملية الدفع";
   if (paymentStatus.value === PaymentVerifyEnum.SUCCESS) {
-    return isBookPayment.value ? "تم شراء الكتاب بنجاح" : "تم شراء الكورس بنجاح";
+    return `تم شراء ${productLabel.value} بنجاح`;
   }
   if (paymentStatus.value === PaymentVerifyEnum.FAILED) return "عملية الدفع غير مكتملة";
   return "عملية الدفع قيد المراجعة";
@@ -36,6 +46,9 @@ const resultDescription = computed(() => {
   if (verifying.value) return "انتظر لحظات بينما نتأكد من نتيجة الدفع من بوابة Fawaterk.";
   if (errorMessage.value) return errorMessage.value;
   if (paymentStatus.value === PaymentVerifyEnum.SUCCESS) {
+    if (isQuestionBankPayment.value) {
+      return "تم تأكيد الدفع، ويمكنك الآن فتح بنك الأسئلة من مشترياتك وبدء التدريب.";
+    }
     return isBookPayment.value
       ? "تم تأكيد الدفع، وستجد الكتاب متاحًا على حسابك بعد تحديث بيانات الطلب."
       : "تم تأكيد الدفع، وأصبح اشتراك الكورس مرتبطًا بحسابك.";
@@ -45,7 +58,7 @@ const resultDescription = computed(() => {
   }
   return "وصلت عملية الدفع وجارٍ اعتمادها. يمكنك إعادة التحقق بعد قليل.";
 });
-const returnLabel = computed(() => isBookPayment.value ? "العودة إلى الكتاب" : "العودة إلى الكورس");
+const returnLabel = computed(() => `العودة إلى ${productLabel.value}`);
 
 const readPaymentContext = () => {
   try {
@@ -65,6 +78,15 @@ const normalizedReturnUrl = () => {
   if (isBookPayment.value) {
     const bookId = Number(route.query.bookId || paymentContext.value.bookId);
     return Number.isFinite(bookId) && bookId > 0 ? `/books/${bookId}` : "/books";
+  }
+
+  if (isQuestionBankPayment.value) {
+    const questionBankId = Number(
+      route.query.questionBankId || paymentContext.value.questionBankId,
+    );
+    return Number.isFinite(questionBankId) && questionBankId > 0
+      ? `/question-bank/${questionBankId}`
+      : "/question-bank";
   }
 
   const courseId = Number(paymentContext.value.courseId);
@@ -129,13 +151,26 @@ onMounted(() => {
   <main
     :class="[
       'payment-verify-page',
-      { 'payment-verify-page--book': isBookPayment },
+      {
+        'payment-verify-page--book': isBookPayment,
+        'payment-verify-page--question-bank': isQuestionBankPayment,
+      },
     ]"
   >
     <article class="payment-verify-card" aria-live="polite">
       <span class="payment-verify-card__eyebrow">
-        <i :class="['pi', isBookPayment ? 'pi-book' : 'pi-graduation-cap']" aria-hidden="true" />
-        {{ isBookPayment ? "دفع الكتاب" : "دفع الكورس" }}
+        <i
+          :class="[
+            'pi',
+            isBookPayment
+              ? 'pi-book'
+              : isQuestionBankPayment
+                ? 'pi-file-edit'
+                : 'pi-graduation-cap',
+          ]"
+          aria-hidden="true"
+        />
+        دفع {{ productLabel }}
       </span>
 
       <div class="payment-verify-card__visual">
