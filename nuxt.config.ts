@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import Aura from '@primeuix/themes/aura';
+import { vimeProtectedFullscreenPlugin } from './utils/vimeProtectedFullscreen';
 
 const primeIconsFontDisplayPlugin = {
   name: 'primeicons-font-display-swap',
@@ -260,7 +261,9 @@ export default defineNuxtConfig({
     ],
   },
   vite: {
-    plugins: [primeIconsFontDisplayPlugin],
+    plugins: [primeIconsFontDisplayPlugin, vimeProtectedFullscreenPlugin()],
+    // Keep the same compatibility transform active in development and builds.
+    optimizeDeps: { exclude: ['@vime/core', '@vime/vue-next'] },
   },
 
 })

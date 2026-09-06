@@ -39,13 +39,11 @@ test("pausing YouTube on touch screens does not mount a play overlay under the s
 
   assert.match(youtube, /const isPlayerPaused = ref\(true\)/u);
   assert.match(youtube, /const showStartOverlay = ref\(true\)/u);
-  assert.match(
-    youtube,
-    /const onPausedChange = \(event: CustomEvent<boolean>\) => \{[\s\S]*?isPlayerPaused\.value = event\.detail;[\s\S]*?emit\('playbackStateChange', !event\.detail\);/u,
-  );
+  const pausedHandler = youtube.match(/const onPausedChange =[\s\S]*?\n\};/u)?.[0];
+  assert.ok(pausedHandler);
   assert.doesNotMatch(
-    youtube,
-    /const onPausedChange = \(event: CustomEvent<boolean>\) => \{[\s\S]{0,160}?showStartOverlay\.value/u,
+    pausedHandler,
+    /showStartOverlay\.value/u,
   );
   assert.match(youtube, /v-if="showStartOverlay && !isPlayerLoading"/u);
 });

@@ -87,9 +87,11 @@ const settingStore = useSettingStore();
 const isPlayerPaused = ref(true);
 const showStartOverlay = ref(true);
 
-const onPausedChange = (event: CustomEvent<boolean>) => {
-  isPlayerPaused.value = event.detail;
-  emit('playbackStateChange', !event.detail);
+const onPausedChange = (event: CustomEvent<boolean> | boolean) => {
+  // The Vue wrapper emits event.detail directly; native Vime events wrap it.
+  const paused = typeof event === 'boolean' ? event : event.detail;
+  isPlayerPaused.value = paused;
+  emit('playbackStateChange', !paused);
   watchHistory.handlePausedChange(event);
 };
 
@@ -144,7 +146,8 @@ onBeforeUnmount(() => {
 <template>
   <br>
   <div :class="isPiP ? 'video-player-pip' : 'video-player'" @contextmenu.prevent>
-    <Player ref="playerInstance" theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
+    <!-- Vime removes its iframe blocker and enables native controls on iOS unless playback is inline. -->
+    <Player ref="playerInstance" playsinline data-protected-youtube theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
       @vmPlay="handlePlaybackStarted"
       @vmPausedChange="onPausedChange"
       @vmDurationChange="watchHistory.updateDuration"
