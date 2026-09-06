@@ -14,7 +14,7 @@ const ast = babelParse(patched, { sourceType: 'module' });
 
 // Execute the installed package's renderers, rather than duplicating Vime's
 // platform decision in the test. DOM rendering itself is checked in browsers.
-function method(className: string, methodName: string, document: object, ios: boolean) {
+function method(className: string, methodName: string, document: object, ios: boolean, globals = {}) {
   const variable = ast.program.body.flatMap(node =>
     node.type === 'VariableDeclaration' ? node.declarations : [],
   ).find(node => node.id.type === 'Identifier' && node.id.name === className);
@@ -29,7 +29,7 @@ function method(className: string, methodName: string, document: object, ios: bo
   )!;
   return runInNewContext(
     `${patched.slice(helper.start!, helper.end!)}\n(function() ${patched.slice(member.body.start!, member.body.end!)})`,
-    { document, IS_IOS: ios, Host: 'host', Universe: { Provider: 'provider' },
+    { document, IS_IOS: ios, Host: 'host', Universe: { Provider: 'provider' }, ...globals,
       isUndefined: (value: unknown) => value === undefined,
       h: (tag: string, props: object, ...children: unknown[]) => ({ tag, props, children }) },
   );
@@ -133,4 +133,67 @@ test('native video fullscreen and unmarked players keep the existing Vime behavi
 test('compatibility patch ignores other modules and fails clearly if Vime changes', () => {
   assert.equal(plugin.transform(bundle, '/other/index.js'), null);
   assert.throws(() => plugin.transform('', bundleUrl.pathname), /needs review/u);
+  assert.throws(() => plugin.transform(bundle.replace('.settings.mobile.active', '.changed'), bundleUrl.pathname), /needs review/u);
+});
+
+test('installed Vime hides fullscreen when container/provider capability is unavailable', () => {
+  const renderControl = method('FullscreenControl', 'render', {}, true);
+  for (const canSetFullscreen of [false, true]) {
+    const control = renderControl.call({ canSetFullscreen, i18n: {}, onClick() {} });
+    assert.equal(control.props.hidden, !canSetFullscreen);
+    assert.equal(control.children[0].props.hidden, !canSetFullscreen);
+  }
+});
+
+test('mobile settings containment is scoped to marked course players', () => {
+  for (const protectedPlayer of [false, true]) {
+    const settings = method('Settings', 'render', {}, true, {
+      getPlayerFromRegistry: () => ({ matches: () => protectedPlayer }),
+    }).call({ isMobile: true, active: true, menuHeight: 180, getPosition: () => ({}),
+      onOpen() {}, onClose() {}, onHeightChange() {} });
+    assert.equal(settings.props.class.mobile, true);
+    assert.equal(settings.props.class.contained, protectedPlayer);
+  }
+});
+
+test('viewport fullscreen resizes and exits without replacing the player or iframe', async () => {
+  const source = await readFile(new URL('../components/CourseDetails/Youtube.vue', import.meta.url), 'utf8');
+  const script = parse(source).descriptor.scriptSetup!.content;
+  const scriptAst = babelParse(script, { sourceType: 'module', plugins: ['typescript'] });
+  const names = ['resizeViewportPlayer', 'exitViewportFullscreen', 'toggleViewportFullscreen'];
+  const declarations = scriptAst.program.body.filter(node =>
+    node.type === 'FunctionDeclaration' && names.includes(node.id!.name),
+  ).map(node => script.slice(node.start!, node.end!)).join('\n');
+  const calls: string[] = [];
+  const shell = { clientWidth: 390, clientHeight: 664,
+    close: () => calls.push('close'), show: () => calls.push('inline'),
+    showModal: () => calls.push('modal') };
+  const viewportFullscreen = { value: false };
+  const playerAspectRatio = { value: '16:9' };
+  const document = { body: { style: { overflow: 'auto' } } };
+  const handlers = runInNewContext(stripTypeScriptTypes(`
+    let fullscreenResizeObserver, previousBodyOverflow;
+    ${declarations}
+    ({ toggleViewportFullscreen, resizeViewportPlayer, exitViewportFullscreen });
+  `), { playerShell: { value: shell }, viewportFullscreen, playerAspectRatio, document,
+    ResizeObserver: class {
+      observe(target: object) { assert.equal(target, shell); calls.push('observe'); }
+      disconnect() { calls.push('disconnect'); }
+    } });
+  handlers.toggleViewportFullscreen();
+  handlers.resizeViewportPlayer();
+  assert.equal(viewportFullscreen.value, true);
+  assert.equal(document.body.style.overflow, 'hidden');
+  assert.equal(playerAspectRatio.value, '390:664');
+  shell.clientWidth = 844;
+  shell.clientHeight = 390;
+  handlers.resizeViewportPlayer();
+  assert.equal(playerAspectRatio.value, '844:390');
+  handlers.exitViewportFullscreen();
+  assert.equal(viewportFullscreen.value, false);
+  assert.equal(document.body.style.overflow, 'auto');
+  assert.equal(playerAspectRatio.value, '16:9');
+  assert.deepEqual(calls, ['close', 'modal', 'observe', 'disconnect', 'close', 'inline']);
+  handlers.exitViewportFullscreen();
+  assert.equal(calls.length, 6);
 });

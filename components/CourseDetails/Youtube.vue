@@ -12,6 +12,9 @@ import {
   Poster,
   DefaultSettings,
   FullscreenControl,
+  Control,
+  Icon,
+  Tooltip,
   ClickToPlay,
 } from '@vime/vue-next';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -30,6 +33,12 @@ const emit = defineEmits<{
 // State
 const isPiP = ref(false);
 const playerInstance = ref<any>(null);
+const playerShell = ref<HTMLDialogElement | null>(null);
+const needsViewportFullscreen = ref(false);
+const viewportFullscreen = ref(false);
+const playerAspectRatio = ref('16:9');
+let fullscreenResizeObserver: ResizeObserver | undefined;
+let previousBodyOverflow = '';
 const playerReloadKey = ref(0);
 const isPlayerLoading = ref(true);
 const isPlayerTakingLong = ref(false);
@@ -56,10 +65,48 @@ function startPlayerLoading() {
   }, 10_000);
 }
 
-function finishPlayerLoading() {
+async function finishPlayerLoading() {
   clearLoadingDelayTimer();
   isPlayerLoading.value = false;
   isPlayerTakingLong.value = false;
+  // Vime hides FullscreenControl when the container API is unavailable (iPhone).
+  needsViewportFullscreen.value = !(await playerInstance.value?.canSetFullscreen?.());
+}
+
+function resizeViewportPlayer() {
+  const shell = playerShell.value;
+  if (shell && viewportFullscreen.value) {
+    playerAspectRatio.value = `${shell.clientWidth}:${shell.clientHeight}`;
+  }
+}
+
+function exitViewportFullscreen() {
+  if (!viewportFullscreen.value) return;
+  fullscreenResizeObserver?.disconnect();
+  document.body.style.overflow = previousBodyOverflow;
+  viewportFullscreen.value = false;
+  playerAspectRatio.value = '16:9';
+  // Keep the same dialog and iframe mounted when returning to inline playback.
+  playerShell.value?.close();
+  playerShell.value?.show();
+}
+
+function toggleViewportFullscreen() {
+  if (viewportFullscreen.value) {
+    exitViewportFullscreen();
+    return;
+  }
+  const shell = playerShell.value;
+  if (!shell) return;
+  // The top layer escapes the course viewer's clipping/sticky stacking context.
+  // Native video fullscreen would leave the blocker and custom controls behind.
+  shell.close();
+  shell.showModal();
+  previousBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  viewportFullscreen.value = true;
+  fullscreenResizeObserver = new ResizeObserver(resizeViewportPlayer);
+  fullscreenResizeObserver.observe(shell);
 }
 
 function markPlayerDelayed() {
@@ -137,6 +184,7 @@ watch(() => props.video, (newVal) => {
 
 onMounted(startPlayerLoading);
 onBeforeUnmount(() => {
+  exitViewportFullscreen();
   clearLoadingDelayTimer();
   emit('playbackStateChange', false);
 });
@@ -145,7 +193,10 @@ onBeforeUnmount(() => {
 
 <template>
   <br>
-  <div :class="isPiP ? 'video-player-pip' : 'video-player'" @contextmenu.prevent>
+  <dialog ref="playerShell" open class="protected-player"
+    :class="[isPiP ? 'video-player-pip' : 'video-player', { 'protected-player--fullscreen': viewportFullscreen }]"
+    :role="viewportFullscreen ? 'dialog' : 'group'" aria-label="Video player"
+    @cancel.prevent="exitViewportFullscreen" @contextmenu.prevent>
     <!-- Vime removes its iframe blocker and enables native controls on iOS unless playback is inline. -->
     <Player ref="playerInstance" playsinline data-protected-youtube theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
       @vmPlay="handlePlaybackStarted"
@@ -155,7 +206,7 @@ onBeforeUnmount(() => {
       @vmPlaybackReady="finishPlayerLoading"
       @vmPlaybackEnded="handlePlaybackEnded"
       @vmError="markPlayerDelayed"
-      :paused="isPlayerPaused">
+      :paused="isPlayerPaused" :aspectRatio="playerAspectRatio">
       <button
         v-if="showStartOverlay && !isPlayerLoading"
         type="button"
@@ -176,7 +227,12 @@ onBeforeUnmount(() => {
           <VolumeControl />
           <ScrubberControl />
           <SettingsControl />
-          <FullscreenControl />
+          <Control v-if="needsViewportFullscreen" class="viewport-fullscreen-control"
+            label="Fullscreen" :pressed="viewportFullscreen" keys="f" @click="toggleViewportFullscreen">
+            <Icon :name="viewportFullscreen ? 'fullscreen-exit' : 'fullscreen-enter'" />
+            <Tooltip>{{ viewportFullscreen ? 'Exit fullscreen' : 'Enter fullscreen' }}</Tooltip>
+          </Control>
+          <FullscreenControl v-else />
           <!--          <button @click="TogglePip" class="pip-button">PIP</button>-->
         </Controls>
         <Poster />
@@ -197,10 +253,42 @@ onBeforeUnmount(() => {
       can-retry
       @retry="retryPlayer"
     />
-  </div>
+  </dialog>
 </template>
 
 <style scoped>
+.protected-player {
+  position: relative;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  color: inherit;
+}
+
+.protected-player--fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  background: #000;
+}
+
+.protected-player--fullscreen::backdrop {
+  background: #000;
+}
+
+.protected-player--fullscreen > .content {
+  width: 100%;
+  margin: 0;
+  --vm-controls-padding: 8px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+
 .overlay {
   position: absolute;
   top: 0;

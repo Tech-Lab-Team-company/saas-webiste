@@ -1,5 +1,90 @@
 # Course YouTube protection on iOS
 
+## Follow-up: fullscreen and Settings controls
+
+The latest starting commit was `f1ad752` (`youtube`). Its inline protection
+exposed a separate limitation in Vime 5.4.1: `FullscreenControl` explicitly hides
+both its host and inner button when `player.canSetFullscreen()` returns false.
+That method checks the container Fullscreen API or a provider fullscreen adapter.
+YouTube has no such adapter. On an iPhone without container fullscreen support,
+the custom fullscreen button therefore disappears. It was not removed from the
+template, covered by the blocker, or hidden by application iOS CSS.
+
+The Settings diagnosis is more limited. Actual `touchstart`, `touchend`, pointer,
+and click traces in Windows WebKit reach the custom gear with no prevented
+default, then fire `vmOpen` and set `isSettingsActive=true`. The reported swallowed
+tap has **not** been reproduced on physical Safari. Inspection did establish that
+Vime's mobile Settings sheet uses `position:fixed; bottom:0` inside its shadow
+tree, placing it outside the player. In the iPhone fixture the player occupied
+y=190–396 while the open menu occupied y=489–664. This is incompatible with
+keeping the settings inside the course viewer's clipped control layer; older
+WebKit also has documented fixed-descendant clipping issues. This is evidence
+for correcting placement, not proof that clipping caused the reported device's
+unresponsive gear.
+
+Follow-up changes:
+
+- `Youtube.vue`: retain Vime's native fullscreen control when supported. When
+  unavailable, use Vime's existing `Control`, `Icon`, and `Tooltip` to toggle a
+  persistent dialog wrapper into the browser's top layer. The iframe is never
+  reparented or recreated. All provider, blocker, watermark, and custom control
+  elements remain together. A ResizeObserver updates Vime's aspect ratio to the
+  viewport; exit restores 16:9 and the previous body scroll setting. Escape and
+  component teardown also clean up the fallback.
+- `vimeProtectedFullscreen.ts`: extend the existing checked build patch so
+  mobile Settings in marked course players use an absolute sheet inside the
+  player. It sits above the measured control-bar height, with scrollable height
+  limited to the remaining player area. Other players and desktop menu rules
+  retain their existing behavior. No pointer/touch cancellation is introduced.
+- `youtube-protection.test.ts`: cover Vime's actual fullscreen visibility
+  decision, scoped Settings rendering, fallback resize/exit/scroll restoration,
+  and failure on unexpected upstream Settings changes.
+
+The fullscreen fallback deliberately keeps `playsinline=true` and Vime's native
+fullscreen flag false; it never calls `webkitEnterFullscreen()` on a video or
+enables YouTube controls. The existing native container fullscreen compatibility
+patch is retained. The stacking order remains iframe/media 0, blocker 1,
+custom UI 2, controls 50, settings 70. Active controls and menu content receive
+pointer events; the passive UI surface does not intercept them.
+
+### Follow-up verification
+
+Tests use the actual course component, real YouTube playback, and the installed
+package in a local fixture with the course viewer's sticky/overflow behavior and
+sticky navigation. The live course requires an enrolled login for its lesson.
+No authenticated session or physical Apple/Android devices are available here.
+Touch configurations now use `.tap()` for the controls, including opening the
+Settings submenu, changing playback rate, Play/Pause, and fullscreen entry/exit.
+
+| Environment | Settings and Play/Pause, inline and fullscreen | Fullscreen | Native iframe input |
+| --- | --- | --- | --- |
+| Windows Chrome | Pass | Existing native container mode passes | Blocked |
+| Android Chrome emulation | Pass | Existing native container mode passes | Blocked |
+| iPhone WebKit emulation | Pass | Viewport fallback entry/exit and landscape resize pass | Blocked |
+| iPad WebKit emulation | Pass | Viewport fallback entry/exit and landscape resize pass | Blocked |
+| iPad desktop user agent in WebKit | Pass | Viewport fallback entry/exit and landscape resize pass | Blocked |
+
+Input probes in the real iframe record zero pointer/touch/click events at
+protected locations, including fullscreen. Embed parameters remain `controls=0`,
+`disablekb=1`, `playsinline=1`, and `fs=0`. The custom Settings sheet remains
+inside the player and the gear can also close it. Fullscreen dimensions match
+the viewport; returning restores the original inline dimensions. Resizing keeps
+the same iframe element and its playback position. Screenshots were inspected;
+portrait letterboxing preserves the video's source aspect ratio.
+
+The production build and 17 focused checks pass. The full suite has 93 passes and the same unrelated
+purchased-book grid assertion failure described below. Browser artifacts and
+the fixture are in the ignored `.cache/player-investigation/` directory.
+
+Remaining limits: physical iPhone/iPad testing is still required to confirm the
+original Settings symptom and OS long-press behavior. Viewport fullscreen cannot
+hide Safari's browser chrome or force device orientation; it requires the dialog
+API (Safari 15.4+). URL secrecy/DRM is outside iframe interaction protection.
+
+References: [Vime fullscreen control](https://vimejs.com/components/controls/fullscreen-control),
+[WebKit dialog/top-layer support](https://webkit.org/blog/12209/introducing-the-dialog-element/),
+[WebKit fixed-content clipping issue](https://bugs.webkit.org/show_bug.cgi?id=160953).
+
 ## Implementation and root cause
 
 `/course/3491` resolves through `pages/course/[id]/index.vue`,
@@ -58,7 +143,7 @@ replacing the package, its controls, fullscreen controller, or layout. No
 dependency versions or CSS sizing rules changed. Unexpected changes to Vime's
 two conditions fail the build with an explicit patch-review error.
 
-## Verification
+## Original protection verification (before the follow-up above)
 
 The live URL returned HTTP 200 and was opened in Chrome. Selecting a lesson
 displayed the login-required dialog. Without an enrolled test session, playback
@@ -105,8 +190,8 @@ suite has 90 passing tests and one existing unrelated failure:
 - Physical iPhone/iPad Safari and Android Chrome testing with an enrolled
   session remains necessary, including long-press copy/link menus, rotation,
   and actual Safari fullscreen entry/exit where available.
-- The existing Vime fullscreen capability check remains in charge. Browsers
-  without container fullscreen support do not gain a new fullscreen mode.
+- The follow-up above adds viewport fullscreen when Vime's native container
+  capability check fails.
 - This restores UI interaction blocking. It cannot make a YouTube URL secret
   from browser/network inspection or provide DRM.
 
