@@ -68,9 +68,16 @@ const activetab = ref(1)
 
 const emit = defineEmits(['coursechanged']);
 
-const sendactivetab = (activetabvalue: number, sessionId: number, link: string, title: string, description: string) => {
+const sendactivetab = (
+  activetabvalue: number,
+  sessionId: number,
+  link: string,
+  title: string,
+  description: string,
+  securityData?: any,
+) => {
   activetab.value = activetabvalue;
-  emit('coursechanged', { activetabvalue, sessionId, link, title, description });
+  emit('coursechanged', { activetabvalue, sessionId, link, title, description, securityData });
 }
 
 const userStore = useUserStore()
@@ -83,7 +90,14 @@ const toast = useToast();
 const { promptCourseSubscription } = useCourseAccessPrompt();
 const isdisabled = ref(false)
 
-function handleSessionClick(sessionId: number, link: string, title: string, text: string, show: boolean) {
+function handleSessionClick(
+  sessionId: number,
+  link: string,
+  title: string,
+  text: string,
+  show: boolean,
+  securityData?: any,
+) {
   if (show === false) {
     visible.value = true;
     return;
@@ -105,7 +119,7 @@ function handleSessionClick(sessionId: number, link: string, title: string, text
       else if (props.isSubscribed && props.isPaied) {
         isdisabled.value = false
         selectedSessionId.value = sessionId;
-        sendactivetab(0, sessionId, link, title, text);
+        sendactivetab(0, sessionId, link, title, text, securityData);
         visible.value = false;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -114,7 +128,7 @@ function handleSessionClick(sessionId: number, link: string, title: string, text
       else if ((!props.isPaied)) {
         isdisabled.value = false
         selectedSessionId.value = sessionId;
-        sendactivetab(0, sessionId, link, title, text);
+        sendactivetab(0, sessionId, link, title, text, securityData);
         visible.value = false;
       }
     }
@@ -217,7 +231,7 @@ const GotoExam = (exam:any, CourseId:number)=>{
                     isdisabled ? 'disabled' : '',
                     !session?.web_show_video ? 'course-body-details--app-only' : '',
                   ]"
-                  @click="handleSessionClick(session?.id, session?.link, session?.title, session?.text, session?.web_show_video)">
+                  @click="handleSessionClick(session?.id, session?.link, session?.title, session?.text, session?.web_show_video, session?.security_data)">
                   <span class="session-type-icon" aria-hidden="true">
                     <i :class="getTypeMeta(session?.type).icon"></i>
                   </span>

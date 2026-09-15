@@ -7,6 +7,7 @@ const props = defineProps<{
     video: string;
     sessionId?: number | null;
     courseId?: number | null;
+    securityData?: any;
 }>();
 const emit = defineEmits<{
     playbackStateChange: [isPlaying: boolean];
@@ -125,7 +126,7 @@ onBeforeUnmount(() => {
                 <source :data-src="props.video" type="video/mp4" />
             </Video>
 
-            <CourseDetailsMediaWatermark :course-id="courseId" />
+            <CourseDetailsMediaWatermark :course-id="courseId" :security-data="securityData" />
 
             <DefaultUi noControls>
                 <DefaultControls hideOnMouseLeave :activeDuration="2000" />

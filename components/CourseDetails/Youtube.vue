@@ -22,6 +22,7 @@ const props = defineProps<{
   video: string;
   sessionId?: number | null;
   courseId?: number | null;
+  securityData?: any;
 }>();
 const emit = defineEmits<{
   playbackStateChange: [isPlaying: boolean];
@@ -144,28 +145,20 @@ onBeforeUnmount(() => {
 <template>
   <br>
   <div :class="isPiP ? 'video-player-pip' : 'video-player'" @contextmenu.prevent>
-    <Player ref="playerInstance" theme="dark" id="myVideo" :key="playerReloadKey" :style="`--vm-player-theme: var(--secondary-color)`" class="content"
-      @vmPlay="handlePlaybackStarted"
-      @vmPausedChange="onPausedChange"
-      @vmDurationChange="watchHistory.updateDuration"
-      @vmCurrentTimeChange="watchHistory.updateCurrentTime"
-      @vmPlaybackReady="finishPlayerLoading"
-      @vmPlaybackEnded="handlePlaybackEnded"
-      @vmError="markPlayerDelayed"
-      :paused="isPlayerPaused">
-      <button
-        v-if="showStartOverlay && !isPlayerLoading"
-        type="button"
-        class="overlay"
-        aria-label="تشغيل الفيديو"
-        @click.stop="playVideo"
-      >
+    <Player ref="playerInstance" theme="dark" id="myVideo" :key="playerReloadKey"
+      :style="`--vm-player-theme: var(--secondary-color)`" class="content" @vmPlay="handlePlaybackStarted"
+      @vmPausedChange="onPausedChange" @vmDurationChange="watchHistory.updateDuration"
+      @vmCurrentTimeChange="watchHistory.updateCurrentTime" @vmPlaybackReady="finishPlayerLoading"
+      @vmPlaybackEnded="handlePlaybackEnded" @vmError="markPlayerDelayed" :paused="isPlayerPaused">
+      <button v-if="showStartOverlay && !isPlayerLoading" type="button" class="overlay" aria-label="تشغيل الفيديو"
+        @click.stop="playVideo">
         <IconsPause class="logo-image" aria-hidden="true" />
         <span>تشغيل الفيديو</span>
       </button>
 
       <Youtube :showFullscreenControl="false" :key="videoId" :videoId="videoId!" />
-      <CourseDetailsMediaWatermark :course-id="courseId" />
+
+      <CourseDetailsMediaWatermark :course-id="courseId" :security-data="securityData" />
       <Ui>
         <DefaultSettings />
         <Controls>
@@ -182,19 +175,20 @@ onBeforeUnmount(() => {
           <img :src="settingStore.setting?.image?.img" class="image_loading" alt="logo" />
         </LoadingScreen>
       </Ui>
+
       <div class="tapSidesToSeek">
         <div class="spacer"></div>
         <div class="tapTarget"></div>
         <div class="spacer"></div>
       </div>
     </Player>
-    <CourseDetailsVideoLoadingState
-      v-if="isPlayerLoading"
-      :taking-long="isPlayerTakingLong"
-      can-retry
-      @retry="retryPlayer"
-    />
+
+
+    <CourseDetailsVideoLoadingState v-if="isPlayerLoading" :taking-long="isPlayerTakingLong" can-retry
+      @retry="retryPlayer" />
   </div>
+
+
 </template>
 
 <style scoped>
