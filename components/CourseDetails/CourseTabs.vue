@@ -14,9 +14,11 @@ import Dialog from "primevue/dialog";
 const props = withDefaults(defineProps<{
   courseData?: CourseDetailsModel | null;
   pending?: boolean;
+  dashboardMode?: boolean;
 }>(), {
   courseData: null,
   pending: false,
+  dashboardMode: false,
 });
 const emit = defineEmits<{
   refresh: [];
@@ -282,6 +284,7 @@ onUnmounted(() => {
       :status="CardData?.allow_status"
       :isSubscribed="CardData?.is_subscribed"
       :isPaied="CardData?.is_paid"
+      :dashboard-mode="dashboardMode"
       @Changestatus="refreshCourseDetails"
     >
       <template #main="{ platformTeacher }">
@@ -299,11 +302,11 @@ onUnmounted(() => {
             :course-id="CardData?.id"
             @playback-state-change="handleCourseVideoPlaybackState"
           />
-          <div v-if="isCaptureShielded" class="course-capture-shield">
+          <!-- <div v-if="isCaptureShielded" class="course-capture-shield">
             <i class="pi pi-lock" aria-hidden="true"></i>
             <strong>المحتوى محمي</strong>
             <span>ارجع إلى نافذة الكورس لمتابعة الدرس</span>
-          </div>
+          </div> -->
         </div>
 
         <section class="course-tabs">

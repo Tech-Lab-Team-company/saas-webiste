@@ -219,9 +219,9 @@ const GotoExam = (exam: any, courseId: number) => {
             :class="[
               selectedSessionIndex === thirdindex ? 'active' : '',
               isdisabled == true ? 'disabled' : '',
-              !session?.web_show_video ? 'course-body-details--app-only' : '',
             ]"
-            @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, session?.web_show_video, session?.is_paid, session?.security_data)">
+            @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, true, session?.is_paid, session?.security_data)">
+
             <span class="session-type-icon" aria-hidden="true">
               <i :class="getTypeMeta(session?.type).icon"></i>
             </span>
@@ -232,10 +232,10 @@ const GotoExam = (exam: any, courseId: number) => {
               </span>
               <span class="session-name__meta">
                 <span>{{ getTypeMeta(session?.type).label }}</span>
-                <span v-if="!session?.web_show_video">
+                <!-- <span v-if="!session?.web_show_video">
                   <i class="pi pi-mobile" aria-hidden="true"></i>
                   متاح عبر تطبيق الموبايل فقط
-                </span>
+                </span> -->
               </span>
             </span>
             <span class="session-row-action" aria-hidden="true">

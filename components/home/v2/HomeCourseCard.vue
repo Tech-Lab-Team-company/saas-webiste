@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from "vue-router";
 import type { HomeCourseViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { getDescriptiveImageAlt } from "~/utils/imageAlt";
 import { htmlToSeoText } from "~/utils/seoText";
@@ -10,13 +11,17 @@ const props = withDefaults(defineProps<{
   progress?: number | null;
   animate?: boolean;
   interactive?: boolean;
+  to?: RouteLocationRaw | null;
 }>(), {
   levelLabel: "",
   index: 0,
   progress: null,
   animate: true,
   interactive: true,
+  to: null,
 });
+
+const courseLink = computed(() => props.to ?? props.course.route);
 
 const tone = computed(() => ["mint", "violet", "sky", "deep"][props.index % 4]);
 const safeProgress = computed(() => Math.min(100, Math.max(0, props.progress ?? 0)));
@@ -48,7 +53,7 @@ const resetCard = (event: PointerEvent) => {
 
 <template>
   <NuxtLink
-    :to="course.route"
+    :to="courseLink"
     class="course-card"
     :class="[tone, { 'course-card--animate': animate }]"
     :style="{ '--course-delay': `${index * 80}ms` }"

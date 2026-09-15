@@ -80,7 +80,7 @@ test("sitemap course collection consumes every page and detects omissions", asyn
 });
 
 test("book, blog, payment, and sitemap keep tenant and public URLs separate", async () => {
-  const [book, blog, payment, sitemap, homeApi, coursePage, courseTabs] = await Promise.all([
+  const [book, blog, payment, sitemap, homeApi, coursePage, courseTabs, courseDetailsData] = await Promise.all([
     readSource("pages/books/[id].vue"),
     readSource("pages/blogs/[slug].vue"),
     readSource("components/CourseDetails/PaymentDialog.vue"),
@@ -88,6 +88,7 @@ test("book, blog, payment, and sitemap keep tenant and public URLs separate", as
     readSource("features/HomePageFeature/api/homePageApi.ts"),
     readSource("pages/course/[id]/index.vue"),
     readSource("components/CourseDetails/CourseTabs.vue"),
+    readSource("composables/useCourseDetailsData.ts"),
   ]);
 
   for (const source of [book, blog, payment, coursePage]) {
@@ -100,7 +101,8 @@ test("book, blog, payment, and sitemap keep tenant and public URLs separate", as
   assert.match(homeApi, /"web-domain": this\.webDomain/u);
   assert.match(sitemap, /fetchPublicCourseCatalog/u);
   assert.match(sitemap, /path: `\/course\/\$\{course\.id\}`/u);
-  assert.match(coursePage, /await fetchCourseDetails/u);
+  assert.match(coursePage, /await useCourseDetailsData\(/u);
+  assert.match(courseDetailsData, /await fetchCourseDetails/u);
   assert.match(coursePage, /rel: "canonical", href: courseUrl\.value/u);
   assert.match(coursePage, /"@type": "Course"/u);
   assert.doesNotMatch(courseTabs, /onMounted\(\(\) => \{\s*FetchCourseDetails/u);

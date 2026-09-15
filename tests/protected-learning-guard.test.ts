@@ -25,6 +25,12 @@ test("only dynamic course and exam routes are protected", () => {
   assert.equal(isProtectedLearningPath("/books/12"), false);
 });
 
+test("the student-dashboard course view keeps the same content protection as the public course page", () => {
+  assert.equal(isProtectedLearningPath("/student-dashboard/course/3250"), true);
+  assert.equal(isProtectedLearningPath("/student-dashboard"), false);
+  assert.equal(isProtectedLearningPath("/student-dashboard/course"), false);
+});
+
 test("developer tools viewport detection handles side and bottom docks", () => {
   const normalWindow = {
     innerWidth: 1280,

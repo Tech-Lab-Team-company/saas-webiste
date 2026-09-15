@@ -112,34 +112,27 @@ These headers are configured in `nuxt.config.ts`. When deploying as fully
 static files, configure the same headers in the hosting platform because Nuxt
 route rules require a compatible server or hosting adapter.
 
-## `WEB_LINK` configuration
+## Tenant domain resolution
 
-The tenant identifier is configured separately from the public frontend URL:
+The tenant identifier is no longer a configured `.env` value. It is resolved
+dynamically from the URL that was actually opened:
 
 ```dotenv
-NUXT_PUBLIC_WEB_LINK=your-tenant.example.com
 NUXT_PUBLIC_SITE_URL=https://web.your-tenant.example.com
 ```
 
-`WEB_LINK` remains a backward-compatible deployment fallback for
-`NUXT_PUBLIC_WEB_LINK`; `SITE_URL` does the same for `NUXT_PUBLIC_SITE_URL`.
-The `webLink` value identifies the backend tenant and is never a public URL.
-The `siteUrl` value is the public frontend origin.
-
-`nuxt.config.ts` exposes the tenant value as `runtimeConfig.public.webLink`.
-`constant/webDomain.ts` only normalizes this configured value into a hostname
-for the `web-domain` API header. It no longer:
-
-- Reads `window.location`
-- Uses the current browser hostname
-- Replaces localhost with a hardcoded production domain
-- Contains a fallback production domain
+`constant/webDomain.ts` returns `window.location.hostname` on the client and
+Nuxt's `useRequestURL().hostname` (the incoming request's Host header) during
+SSR, so the same deployment serves every tenant domain without a per-tenant
+`WEB_LINK`/`NUXT_PUBLIC_WEB_LINK` value. `server/routes/sitemap.xml.ts`
+resolves the tenant the same way, from the request host.
 
 Books, blogs, FAQs, legal documents, teacher content, general API headers and
-the home-course request now all use the same configured `WEB_LINK` source.
+the home-course request now all use this same request-derived hostname as the
+`web-domain` API header.
 
-After changing either runtime value, restart the development server or rebuild the
-production application.
+After changing `NUXT_PUBLIC_SITE_URL`, restart the development server or
+rebuild the production application.
 
 ## Internal protection defaults
 
@@ -153,7 +146,7 @@ capture shielding, PDF behavior and video-control restrictions.
 
 ## Verification checklist
 
-1. Set `WEB_LINK` in `.env` and restart Nuxt.
+1. Open the app on the target tenant domain.
 2. Open `/course/3250` and select an available video or PDF lesson.
 3. Confirm the student and course watermark is visible.
 4. Confirm right-click is blocked on the course page.

@@ -62,28 +62,12 @@ export default defineEventHandler(async (event) => {
   const configuredUrl = String(runtimeConfig.public.siteUrl || "").trim();
   const siteOrigin = resolveSiteOrigin(configuredUrl, requestUrl.origin);
 
-  const configuredWebLink = String(runtimeConfig.public.webLink || "").trim();
-  let webDomain = "";
-
-  if (configuredWebLink) {
-    try {
-      webDomain = new URL(
-        configuredWebLink.includes("://")
-          ? configuredWebLink
-          : `https://${configuredWebLink}`,
-      ).hostname;
-    } catch {
-      webDomain = configuredWebLink
-        .replace(/^https?:\/\//iu, "")
-        .split("/")[0]
-        .trim();
-    }
-  }
+  const webDomain = requestUrl.hostname;
 
   if (!webDomain) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Tenant WEB_LINK is not configured",
+      statusMessage: "Unable to resolve tenant from the request host",
     });
   }
   const api = new HomePageApi(webDomain);
