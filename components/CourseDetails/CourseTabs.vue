@@ -42,6 +42,7 @@ const videoLink = ref({
   videoLink: "",
   title: "",
   description: "",
+  securityData: null as any,
 });
 const isCourseVideoPlaying = ref(false);
 const isViewingCourseContent = computed(() => activetab.value === 0);
@@ -121,6 +122,7 @@ const Data = (data: {
   title: string;
   description: string;
   sessionId: number;
+  securityData?: any;
 }) => {
   // console.log(data, "data")
   activetab.value = data.activetabvalue;
@@ -128,6 +130,7 @@ const Data = (data: {
   videoLink.value.title = data.title;
   videoLink.value.description = data.description;
   videoLink.value.sessionId = data.sessionId;
+  videoLink.value.securityData = data.securityData || null;
   isCourseVideoPlaying.value = false;
 };
 

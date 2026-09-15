@@ -58,9 +58,10 @@ test("question bank content mapper supports grouped questions and progress", () 
 });
 
 test("question bank catalog, content, payment, and purchases use one flow", async () => {
-  const [apiNames, contentService, action, dialog, purchases] =
+  const [apiNames, catalog, contentService, action, dialog, purchases] =
     await Promise.all([
       readSource("base/core/networkStructure/apiNames.ts"),
+      readSource("pages/question-bank/index.vue"),
       readSource(
         "features/QuestionBank/Data/api_services/fetch_question_bank_questions_api_service.ts",
       ),
@@ -70,6 +71,9 @@ test("question bank catalog, content, payment, and purchases use one flow", asyn
     ]);
 
   assert.match(apiNames, /fetch_question_bank_questions/u);
+  assert.match(catalog, /state\.error\?\.type === ErrorType\.dataEmpty/u);
+  assert.match(catalog, /banks\.length === 0/u);
+  assert.match(catalog, /لا توجد بنوك أسئلة متاحة لمرحلتك حاليًا/u);
   assert.match(contentService, /auth: true/u);
   assert.match(contentService, /fetchQuestionBankQuestions/u);
   assert.match(action, /PaymentProductType\.QUESTION_BANK/u);

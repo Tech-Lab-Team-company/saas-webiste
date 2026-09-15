@@ -13,6 +13,7 @@ interface CourseVideoSelection {
   videoLink: string;
   title: string;
   description: string;
+  securityData?: any;
 }
 
 const props = defineProps({
@@ -24,6 +25,10 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  CourseData: {
+    type: Object as () => any,
+    default: null,
+  },
 });
 const emit = defineEmits<{
   playbackStateChange: [isPlaying: boolean];
@@ -31,6 +36,47 @@ const emit = defineEmits<{
 
 const CourseVideoLink = computed(() => props.CourseVideoLink);
 const protectionConfig = useCourseProtectionConfig();
+
+const currentSecurityData = computed(() => {
+  if (CourseVideoLink.value?.securityData) {
+    return CourseVideoLink.value.securityData;
+  }
+
+  const sessionId = CourseVideoLink.value?.sessionId;
+  if (!sessionId || !props.CourseData) return null;
+
+  // Search Stage 1 sessions
+  if (Array.isArray(props.CourseData.sessions)) {
+    const found = props.CourseData.sessions.find((s: any) => s?.id === sessionId);
+    if (found?.security_data) return found.security_data;
+  }
+
+  // Search Stage 2 lessons -> sessions
+  if (Array.isArray(props.CourseData.lessons)) {
+    for (const lesson of props.CourseData.lessons) {
+      if (Array.isArray(lesson?.sessions)) {
+        const found = lesson.sessions.find((s: any) => s?.id === sessionId);
+        if (found?.security_data) return found.security_data;
+      }
+    }
+  }
+
+  // Search Stage 3 units -> lessons -> sessions
+  if (Array.isArray(props.CourseData.units)) {
+    for (const unit of props.CourseData.units) {
+      if (Array.isArray(unit?.lessons)) {
+        for (const lesson of unit.lessons) {
+          if (Array.isArray(lesson?.sessions)) {
+            const found = lesson.sessions.find((s: any) => s?.id === sessionId);
+            if (found?.security_data) return found.security_data;
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+});
 
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
@@ -102,6 +148,7 @@ function openFullscreen() {
         :video="embedVideoLink"
         :session-id="CourseVideoLink?.sessionId"
         :course-id="courseId"
+        :security-data="currentSecurityData"
         @playback-state-change="reportPlaybackState"
       />
       <template #fallback>
@@ -116,6 +163,7 @@ function openFullscreen() {
         :video="embedVideoLink"
         :session-id="CourseVideoLink?.sessionId"
         :course-id="courseId"
+        :security-data="currentSecurityData"
         @playback-state-change="reportPlaybackState"
       />
       <template #fallback>
@@ -135,7 +183,7 @@ function openFullscreen() {
         allowfullscreen
         @contextmenu.prevent
       ></iframe>
-      <CourseDetailsMediaWatermark :course-id="courseId" />
+      <CourseDetailsMediaWatermark :course-id="courseId" :security-data="currentSecurityData" />
       <div class="flex justify-end">
         <button class="btn-primary" @click="openFullscreen">
           تكبير الشاشة

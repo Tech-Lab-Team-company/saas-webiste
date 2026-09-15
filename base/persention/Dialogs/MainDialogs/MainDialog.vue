@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
+import NewDeviceRequestDialog from '../NewDeviceRequestDialog.vue'
 
 const dialogRef = ref<HTMLDialogElement | null>(null)
+
 let closeTimer: ReturnType<typeof setTimeout> | null = null
 
 const clearAutoClose = () => {
@@ -9,6 +11,7 @@ const clearAutoClose = () => {
     clearTimeout(closeTimer)
     closeTimer = null
   }
+
   dialogRef.value?.classList.remove('is-counting')
 }
 
@@ -23,13 +26,24 @@ const show = () => {
 
 const startAutoClose = (event: Event) => {
   clearAutoClose()
-  const duration = Number((event as CustomEvent<{ autoCloseMs?: number }>).detail?.autoCloseMs)
-  if (!Number.isFinite(duration) || duration <= 0 || !dialogRef.value) return
 
-  dialogRef.value.style.setProperty('--dialog-auto-close-duration', `${duration}ms`)
-  // Force the countdown animation to restart when dialogs open consecutively.
+  const duration = Number(
+    (event as CustomEvent<{ autoCloseMs?: number }>).detail?.autoCloseMs
+  )
+
+  if (!Number.isFinite(duration) || duration <= 0 || !dialogRef.value) {
+    return
+  }
+
+  dialogRef.value.style.setProperty(
+    '--dialog-auto-close-duration',
+    `${duration}ms`
+  )
+
   void dialogRef.value.offsetWidth
+
   dialogRef.value.classList.add('is-counting')
+
   closeTimer = setTimeout(close, duration)
 }
 
@@ -37,28 +51,15 @@ onBeforeUnmount(clearAutoClose)
 
 defineExpose({
   show,
-  close
+  close,
 })
 </script>
 
 <template>
-  <dialog
-    ref="dialogRef"
-    class="dialog"
-    aria-labelledby="base-dialog-title"
-    aria-describedby="base-dialog-message"
-    @click.self="close"
-    @cancel.prevent="close"
-    @close="clearAutoClose"
-    @base-dialog-opened="startAutoClose"
-  >
+  <dialog ref="dialogRef" class="dialog" aria-labelledby="base-dialog-title" aria-describedby="base-dialog-message"
+    @click.self="close" @cancel.prevent="close" @close="clearAutoClose" @base-dialog-opened="startAutoClose">
     <div class="dialog-container" dir="rtl">
-      <button
-        type="button"
-        class="dialog-dismiss"
-        aria-label="إغلاق الرسالة"
-        @click="close"
-      >
+      <button type="button" class="dialog-dismiss" aria-label="إغلاق الرسالة" @click="close">
         ×
       </button>
 
@@ -76,11 +77,16 @@ defineExpose({
           <span class="dialog-close-success">تم، شكرًا</span>
           <span class="dialog-close-error">إغلاق الرسالة</span>
         </button>
+
+        <button type="button" class="dialog-error-action" hidden>
+          إرسال طلب جهاز
+        </button>
       </div>
 
       <span class="dialog-countdown" aria-hidden="true"><i /></span>
     </div>
   </dialog>
+    <NewDeviceRequestDialog />
 </template>
 
 <style scoped>
@@ -247,6 +253,13 @@ defineExpose({
   display: inline;
 }
 
+.dialog[data-variant="error"] .dialog-close-error-2 {
+  display: inline;
+  text-align: center;
+  margin: 14px 0;
+  background-color: #1d9b68;
+}
+
 .dialog-close-btn:hover,
 .dialog-close-btn:focus-visible {
   filter: brightness(0.94);
@@ -262,6 +275,26 @@ defineExpose({
   height: 2px;
   overflow: hidden;
   background: var(--dialog-accent-soft);
+}
+
+.dialog-error-action {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 10px;
+  padding: 9px 18px;
+  border: 1px solid #1d9b68;
+  border-radius: 11px;
+  background: transparent;
+  color: #1d9b68;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dialog-error-action:hover {
+  background: #1d9b68;
+  color: #fff;
 }
 
 .dialog-countdown i {
@@ -288,18 +321,35 @@ defineExpose({
 }
 
 @keyframes base-dialog-enter {
-  from { opacity: 0; transform: translateY(14px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes base-dialog-backdrop {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes base-dialog-countdown {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
 }
 
 @media (max-width: 520px) {
@@ -313,13 +363,27 @@ defineExpose({
     inset-inline-end: 12px;
   }
 
-  .dialog-visual { width: 66px; height: 66px; }
-  .dialog-icon { width: 52px; height: 52px; }
-  .dialog-copy { margin-top: 16px; }
-  .dialog-actions { margin-top: 18px; }
+  .dialog-visual {
+    width: 66px;
+    height: 66px;
+  }
+
+  .dialog-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .dialog-copy {
+    margin-top: 16px;
+  }
+
+  .dialog-actions {
+    margin-top: 18px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .dialog[open],
   .dialog::backdrop,
   .dialog-countdown i {

@@ -1,6 +1,16 @@
-import ReplayModel from "~/features/MakeCommentFeature/Data/models/replay_model";
-import type LessonsModel from "./lessons_model";
-
+export interface SecurityDataModel {
+  secure?: number;
+  is_flipbook?: number;
+  code_duration?: number;
+  is_fixed?: number;
+  show_video_code?: number;
+  code_font_size?: number;
+  open_pdf_type?: number;
+  download_option?: number;
+  can_download_offline?: number;
+  can_save_to_device?: number;
+  long_video?: boolean;
+}
 
 export default class SessionsModel {
   public id: number;
@@ -16,10 +26,7 @@ export default class SessionsModel {
   public EndDate: string;
   public Secure: number;
   public web_show_video: boolean;
-
-
-
-
+  public security_data?: SecurityDataModel;
 
   constructor(
     id: number,
@@ -35,8 +42,7 @@ export default class SessionsModel {
     EndDate: string,
     Secure: number,
     web_show_video: boolean,
-
-
+    security_data?: SecurityDataModel,
   ) {
     this.id = id;
     this.LessonId = LessonId;
@@ -51,10 +57,8 @@ export default class SessionsModel {
     this.EndDate = EndDate;
     this.Secure = Secure;
     this.web_show_video = web_show_video;
-    
- 
+    this.security_data = security_data;
   }
-
 
   static fromMap(map: { [key: string]: any }): SessionsModel {
     return new SessionsModel(
@@ -71,9 +75,11 @@ export default class SessionsModel {
       map["end_date"],
       map["secure"],
       map["web_show_video"],
+      map["security_data"],
     );
   }
 }
+
 
 
 

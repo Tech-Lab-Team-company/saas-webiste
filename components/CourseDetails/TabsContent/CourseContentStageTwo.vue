@@ -78,9 +78,16 @@ const activetab = ref(1)
 
 const emit = defineEmits(['coursechanged']);
 
-const sendactivetab = (activetabvalue: number, sessionId: number, link: string, title: string, description: string) => {
+const sendactivetab = (
+  activetabvalue: number,
+  sessionId: number,
+  link: string,
+  title: string,
+  description: string,
+  securityData?: any,
+) => {
   activetab.value = activetabvalue;
-  emit('coursechanged', { activetabvalue, sessionId, link, title, description });
+  emit('coursechanged', { activetabvalue, sessionId, link, title, description, securityData });
 }
 const toast = useToast();
 
@@ -94,7 +101,16 @@ const isdisabled = ref(false)
 const selectedSessionIndex = ref<number | null>(null);
 const { promptCourseSubscription } = useCourseAccessPrompt();
 
-function handleSessionClick(index: number, sessionId: number, link: string, title: string, text: string, show: boolean, sessionPaid: boolean) {
+function handleSessionClick(
+  index: number,
+  sessionId: number,
+  link: string,
+  title: string,
+  text: string,
+  show: boolean,
+  sessionPaid: boolean,
+  securityData?: any,
+) {
   if (show === false) {
     visible.value = true;
     return;
@@ -109,7 +125,7 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
       if (!sessionPaid && !props.isSubscribed) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, sessionId, link, title, text);
+        sendactivetab(0, sessionId, link, title, text, securityData);
         visible.value = false;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -122,7 +138,7 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
       else if ((props.isSubscribed && props.isPaied)) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, sessionId, link, title, text);
+        sendactivetab(0, sessionId, link, title, text, securityData);
         visible.value = false;
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -130,7 +146,7 @@ function handleSessionClick(index: number, sessionId: number, link: string, titl
       else if ((!props.isPaied)) {
         isdisabled.value = false
         selectedSessionIndex.value = index;
-        sendactivetab(0, sessionId, link, title, text);
+        sendactivetab(0, sessionId, link, title, text, securityData);
         visible.value = false;
       }
     }
@@ -204,8 +220,8 @@ const GotoExam = (exam: any, courseId: number) => {
               selectedSessionIndex === thirdindex ? 'active' : '',
               isdisabled == true ? 'disabled' : '',
             ]"
-            @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, true, session?.is_paid)">
-              <!-- !session?.web_show_video ? 'course-body-details--app-only' : '', -->
+            @click="handleSessionClick(thirdindex, session?.id, session?.link, session?.title, session?.text, true, session?.is_paid, session?.security_data)">
+
             <span class="session-type-icon" aria-hidden="true">
               <i :class="getTypeMeta(session?.type).icon"></i>
             </span>

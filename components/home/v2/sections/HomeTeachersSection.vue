@@ -51,9 +51,7 @@ const visibleTeachers = computed(() =>
 );
 
 const hasActiveFilters = computed(
-  () =>
-    Boolean(searchQuery.value.trim()) ||
-    selectedLocation.value !== "all",
+  () => Boolean(searchQuery.value.trim()) || selectedLocation.value !== "all",
 );
 
 const requestSearch = () => {
@@ -112,8 +110,7 @@ onBeforeUnmount(() => {
 <template>
   <section
     v-if="
-      site.hasTeacherDirectory &&
-      (catalog || teachers.status === 'success')
+      site.hasTeacherDirectory && (catalog || teachers.status === 'success')
     "
     id="teachers"
     class="home-teachers"
@@ -125,9 +122,7 @@ onBeforeUnmount(() => {
       <header v-if="!catalog" class="home-teachers__header">
         <div>
           <span>خبرات متعددة، في مكان واحد</span>
-          <h2 id="home-teachers-title">
-            تعرّف على <em>مدرّسي المنصة</em>
-          </h2>
+          <h2 id="home-teachers-title">تعرّف على <em>مدرّسي المنصة</em></h2>
         </div>
         <p>
           اختر المدرس الأقرب لهدفك، وتعرّف على خبرته والمحتوى الذي يقدمه على
@@ -139,8 +134,8 @@ onBeforeUnmount(() => {
         <span>مدرسون بخبرات متنوعة</span>
         <h1 id="home-teachers-title">مدرسينا</h1>
         <p>
-          تعرّف على مدرسي {{ site.brandName || "المنصة" }} واختر المدرس
-          الأنسب لهدفك التعليمي.
+          تعرّف على مدرسي {{ site.brandName || "المنصة" }} واختر المدرس الأنسب
+          لهدفك التعليمي.
         </p>
       </header>
 
@@ -166,7 +161,9 @@ onBeforeUnmount(() => {
           </label>
 
           <span
-            v-if="searchQuery.trim().length > 0 && searchQuery.trim().length < 3"
+            v-if="
+              searchQuery.trim().length > 0 && searchQuery.trim().length < 3
+            "
             class="handle-low-text"
             role="status"
           >
@@ -179,7 +176,11 @@ onBeforeUnmount(() => {
           <span>الموقع</span>
           <select v-model="selectedLocation">
             <option value="all">جميع المواقع</option>
-            <option v-for="location in locations" :key="location" :value="location">
+            <option
+              v-for="location in locations"
+              :key="location"
+              :value="location"
+            >
               {{ location }}
             </option>
           </select>
@@ -218,11 +219,15 @@ onBeforeUnmount(() => {
         <span aria-hidden="true">!</span>
         <strong>تعذر تحميل المدرسين الآن</strong>
         <p>{{ teachers.error?.message }}</p>
-        <button v-if="onRetry" type="button" @click="onRetry">حاول مرة أخرى</button>
+        <button v-if="onRetry" type="button" @click="onRetry">
+          حاول مرة أخرى
+        </button>
       </div>
 
       <div
-        v-else-if="teachers.status === 'empty' && catalog && !searchQuery.trim()"
+        v-else-if="
+          teachers.status === 'empty' && catalog && !searchQuery.trim()
+        "
         class="home-teachers__state"
         role="status"
       >
@@ -276,7 +281,9 @@ onBeforeUnmount(() => {
               loading="lazy"
               @error="markImageAsFailed(teacher.id)"
             />
-            <span v-else aria-hidden="true">{{ teacherInitials(teacher.name) }}</span>
+            <span v-else aria-hidden="true">{{
+              teacherInitials(teacher.name)
+            }}</span>
           </div>
 
           <div class="teacher-directory-card__content">
@@ -298,8 +305,12 @@ onBeforeUnmount(() => {
               <dt>{{ teacher.coursesCount }}</dt>
               <dd>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4Z" />
-                  <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v17a3 3 0 0 1 3-3h3Z" />
+                  <path
+                    d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4Z"
+                  />
+                  <path
+                    d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v17a3 3 0 0 1 3-3h3Z"
+                  />
                 </svg>
                 الكورسات
               </dd>
@@ -308,7 +319,9 @@ onBeforeUnmount(() => {
               <dt>{{ teacher.revisionsCount }}</dt>
               <dd>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z" />
+                  <path
+                    d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z"
+                  />
                 </svg>
                 المراجعات
               </dd>
@@ -318,12 +331,17 @@ onBeforeUnmount(() => {
           <div class="teacher-directory-card__actions">
             <NuxtLink
               class="teacher-directory-card__courses"
-              :to="{ path: '/course', query: { teacher_id: String(teacher.id) } }"
+              :to="{
+                path: '/course',
+                query: { teacher_id: String(teacher.id) },
+              }"
               :aria-label="`عرض كورسات ${teacher.name}`"
               title="عرض الكورسات"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4Z" />
+                <path
+                  d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4Z"
+                />
                 <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v17a3 3 0 0 1 3-3h3Z" />
               </svg>
             </NuxtLink>
@@ -383,8 +401,13 @@ onBeforeUnmount(() => {
 
             <div v-if="catalog" class="home-teacher-card__meta">
               <span v-if="teacher.address">⌖ {{ teacher.address }}</span>
-              <a v-if="teacher.email" :href="`mailto:${teacher.email}`">راسل المدرس</a>
-              <a v-else-if="phoneHref(teacher.phone)" :href="phoneHref(teacher.phone)!">
+              <a v-if="teacher.email" :href="`mailto:${teacher.email}`"
+                >راسل المدرس</a
+              >
+              <a
+                v-else-if="phoneHref(teacher.phone)"
+                :href="phoneHref(teacher.phone)!"
+              >
                 تواصل مع المدرس
               </a>
             </div>
@@ -400,7 +423,10 @@ onBeforeUnmount(() => {
         </article>
       </div>
 
-      <footer v-if="!catalog && teachers.status === 'success'" class="home-teachers__footer">
+      <footer
+        v-if="!catalog && teachers.status === 'success'"
+        class="home-teachers__footer"
+      >
         <p>اكتشف كل المدرسين والخبرات المتاحة على المنصة.</p>
         <NuxtLink to="/teachers" prefetch-on="interaction">
           كل المدرسين <span aria-hidden="true">←</span>
@@ -415,17 +441,27 @@ onBeforeUnmount(() => {
   position: relative;
   overflow: hidden;
   padding: clamp(76px, 9vw, 132px) 0;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--home-v2-blue) 6%, #fff), #fff 55%),
+  background: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--home-v2-blue) 6%, #fff),
+      #fff 55%
+    ),
     #fff;
 }
 
 .home-teachers--catalog {
   min-height: calc(100vh - 86px);
   padding: clamp(42px, 6vw, 78px) 0 clamp(72px, 8vw, 112px);
-  background:
-    radial-gradient(circle at 8% 4%, color-mix(in srgb, var(--home-v2-blue) 9%, transparent), transparent 26%),
-    linear-gradient(180deg, color-mix(in srgb, var(--home-v2-blue) 2.5%, var(--app-bg, #fbfcff)), var(--app-bg, #fbfcff));
+  background: radial-gradient(
+      circle at 8% 4%,
+      color-mix(in srgb, var(--home-v2-blue) 9%, transparent),
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-v2-blue) 2.5%, var(--app-bg, #fbfcff)),
+      var(--app-bg, #fbfcff)
+    );
 }
 
 .home-teachers--catalog .home-teachers__glow {
@@ -497,13 +533,15 @@ onBeforeUnmount(() => {
   border-radius: 28px;
   background: var(--app-surface, #fff);
   box-shadow: 0 24px 60px rgb(17 32 66 / 9%);
-  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+  transition: transform 240ms ease, box-shadow 240ms ease,
+    border-color 240ms ease;
 }
 
 .home-teacher-card:hover {
   transform: translateY(-7px);
   border-color: color-mix(in srgb, var(--home-v2-blue) 42%, #dfe5ee);
-  box-shadow: 0 32px 74px color-mix(in srgb, var(--home-v2-blue) 16%, transparent);
+  box-shadow: 0 32px 74px
+    color-mix(in srgb, var(--home-v2-blue) 16%, transparent);
 }
 
 .home-teacher-card__visual {
@@ -512,8 +550,11 @@ onBeforeUnmount(() => {
   min-height: 310px;
   place-items: center;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 75% 20%, rgb(255 255 255 / 45%), transparent 28%),
+  background: radial-gradient(
+      circle at 75% 20%,
+      rgb(255 255 255 / 45%),
+      transparent 28%
+    ),
     linear-gradient(145deg, var(--home-v2-blue), var(--home-v2-deep));
 }
 
@@ -726,9 +767,14 @@ onBeforeUnmount(() => {
   grid-template-columns: minmax(240px, 1.6fr) minmax(180px, 0.8fr) auto;
   gap: 12px;
   padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 12%, var(--app-line, #e1e7f0));
+  border: 1px solid
+    color-mix(in srgb, var(--home-v2-blue) 12%, var(--app-line, #e1e7f0));
   border-radius: 20px;
-  background: color-mix(in srgb, var(--app-surface, #fff) 96%, var(--home-v2-blue));
+  background: color-mix(
+    in srgb,
+    var(--app-surface, #fff) 96%,
+    var(--home-v2-blue)
+  );
   box-shadow: 0 18px 48px rgb(17 32 66 / 7%);
 }
 
@@ -798,16 +844,25 @@ onBeforeUnmount(() => {
 
 .teacher-directory__search:focus-within,
 .teacher-directory__select:focus-within {
-  border-color: color-mix(in srgb, var(--home-v2-blue) 70%, var(--app-line, #e1e7f0));
+  border-color: color-mix(
+    in srgb,
+    var(--home-v2-blue) 70%,
+    var(--app-line, #e1e7f0)
+  );
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--home-v2-blue) 11%, transparent);
 }
 
 .teacher-directory__reset {
   min-height: 54px;
   padding: 0 18px;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 18%, var(--app-line, #e1e7f0));
+  border: 1px solid
+    color-mix(in srgb, var(--home-v2-blue) 18%, var(--app-line, #e1e7f0));
   border-radius: 13px;
-  background: color-mix(in srgb, var(--home-v2-blue) 7%, var(--app-surface, #fff));
+  background: color-mix(
+    in srgb,
+    var(--home-v2-blue) 7%,
+    var(--app-surface, #fff)
+  );
   color: var(--home-v2-blue);
   font: inherit;
   font-size: 12px;
@@ -848,11 +903,13 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 18px;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 12%, var(--app-line, #e1e7f0));
+  border: 1px solid
+    color-mix(in srgb, var(--home-v2-blue) 12%, var(--app-line, #e1e7f0));
   border-radius: 22px;
   background: var(--app-surface, #fff);
   box-shadow: 0 13px 35px rgb(17 32 66 / 7%);
-  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  transition: transform 220ms ease, border-color 220ms ease,
+    box-shadow 220ms ease;
 }
 
 .teacher-directory-card::before {
@@ -860,17 +917,29 @@ onBeforeUnmount(() => {
   top: 0;
   inset-inline: 0;
   height: 92px;
-  background:
-    radial-gradient(circle at 75% 0, color-mix(in srgb, var(--home-v2-blue) 15%, transparent), transparent 50%),
-    linear-gradient(180deg, color-mix(in srgb, var(--home-v2-blue) 7%, var(--app-surface, #fff)), transparent);
+  background: radial-gradient(
+      circle at 75% 0,
+      color-mix(in srgb, var(--home-v2-blue) 15%, transparent),
+      transparent 50%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--home-v2-blue) 7%, var(--app-surface, #fff)),
+      transparent
+    );
   content: "";
   pointer-events: none;
 }
 
 .teacher-directory-card:hover {
   transform: translateY(-5px);
-  border-color: color-mix(in srgb, var(--home-v2-blue) 38%, var(--app-line, #e1e7f0));
-  box-shadow: 0 22px 52px color-mix(in srgb, var(--home-v2-blue) 12%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--home-v2-blue) 38%,
+    var(--app-line, #e1e7f0)
+  );
+  box-shadow: 0 22px 52px
+    color-mix(in srgb, var(--home-v2-blue) 12%, transparent);
 }
 
 .teacher-directory-card__status {
@@ -884,7 +953,11 @@ onBeforeUnmount(() => {
   padding: 5px 9px;
   border: 1px solid color-mix(in srgb, var(--home-v2-blue) 24%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--home-v2-blue) 9%, var(--app-surface, #fff));
+  background: color-mix(
+    in srgb,
+    var(--home-v2-blue) 9%,
+    var(--app-surface, #fff)
+  );
   color: var(--home-v2-blue);
   font-size: 10px;
   font-weight: 900;
@@ -909,8 +982,13 @@ onBeforeUnmount(() => {
   overflow: hidden;
   border: 4px solid var(--app-surface, #fff);
   border-radius: 50%;
-  background: linear-gradient(145deg, color-mix(in srgb, var(--home-v2-blue) 22%, #fff), color-mix(in srgb, var(--home-v2-deep) 18%, #fff));
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--home-v2-blue) 16%, transparent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--home-v2-blue) 22%, #fff),
+    color-mix(in srgb, var(--home-v2-deep) 18%, #fff)
+  );
+  box-shadow: 0 10px 28px
+    color-mix(in srgb, var(--home-v2-blue) 16%, transparent);
 }
 
 .teacher-directory-card__portrait img {
@@ -992,7 +1070,11 @@ onBeforeUnmount(() => {
   gap: 4px;
   border: 1px solid var(--app-line, #e1e7f0);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--home-v2-blue) 2.5%, var(--app-surface, #fff));
+  background: color-mix(
+    in srgb,
+    var(--home-v2-blue) 2.5%,
+    var(--app-surface, #fff)
+  );
 }
 
 .teacher-directory-card__stats dt {
@@ -1039,7 +1121,8 @@ onBeforeUnmount(() => {
 }
 
 .teacher-directory-card__courses {
-  border: 1px solid color-mix(in srgb, var(--home-v2-blue) 20%, var(--app-line, #e1e7f0));
+  border: 1px solid
+    color-mix(in srgb, var(--home-v2-blue) 20%, var(--app-line, #e1e7f0));
   background: var(--app-surface, #fff);
 }
 
@@ -1049,7 +1132,8 @@ onBeforeUnmount(() => {
   color: #fff;
   font-size: 12px;
   font-weight: 900;
-  box-shadow: 0 9px 22px color-mix(in srgb, var(--home-v2-blue) 18%, transparent);
+  box-shadow: 0 9px 22px
+    color-mix(in srgb, var(--home-v2-blue) 18%, transparent);
 }
 
 .teacher-directory-card__profile span {
@@ -1130,50 +1214,128 @@ onBeforeUnmount(() => {
 }
 
 @keyframes home-teachers-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 960px) {
-  .home-teachers__header { grid-template-columns: 1fr; align-items: start; }
-  .home-teachers__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .teacher-directory__filters { grid-template-columns: minmax(220px, 1.4fr) 1fr auto; }
-  .teacher-directory__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-teachers__header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .home-teachers__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .teacher-directory__filters {
+    grid-template-columns: minmax(220px, 1.4fr) 1fr auto;
+  }
+  .teacher-directory__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
-  .home-teachers { padding: 56px 0; }
-  .home-teachers__header { gap: 12px; margin-bottom: 24px; }
-  .home-teachers__header h2 { font-size: clamp(30px, 8.5vw, 36px); }
-  .home-teachers__grid { grid-template-columns: 1fr; }
+  .home-teachers {
+    padding: 56px 0;
+  }
+  .home-teachers__header {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .home-teachers__header h2 {
+    font-size: clamp(30px, 8.5vw, 36px);
+  }
+  .home-teachers__grid {
+    grid-template-columns: 1fr;
+  }
   .home-teacher-card__visual,
-  .home-teacher-card__visual img { min-height: 220px; height: 220px; }
-  .home-teachers__footer { align-items: stretch; flex-direction: column; }
-  .home-teachers__footer a { text-align: center; }
-  .home-teachers--catalog { padding: 34px 0 68px; }
-  .teacher-directory__header { margin-bottom: 26px; }
-  .teacher-directory__header h1 { font-size: 34px; }
-  .teacher-directory__filters { grid-template-columns: 1fr; padding: 10px; }
-  .teacher-directory__summary { align-items: flex-start; flex-direction: column; gap: 3px; margin-top: 20px; }
-  .teacher-directory__grid { grid-template-columns: 1fr; }
-  .teacher-directory-card { display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: center; gap: 12px; padding: 14px; }
-  .teacher-directory-card::before { display: none; }
-  .teacher-directory-card__status { top: 10px; inset-inline-end: 10px; }
-  .teacher-directory-card__portrait { width: 78px; height: 78px; margin: 0; }
-  .teacher-directory-card__portrait > span { font-size: 23px; }
-  .teacher-directory-card__content { margin: 0; padding-inline-end: 2px; text-align: start; }
-  .teacher-directory-card__location { justify-content: flex-start; }
-  .teacher-directory-card__description { min-height: 0; -webkit-line-clamp: 1; }
+  .home-teacher-card__visual img {
+    min-height: 220px;
+    height: 220px;
+  }
+  .home-teachers__footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .home-teachers__footer a {
+    text-align: center;
+  }
+  .home-teachers--catalog {
+    padding: 34px 0 68px;
+  }
+  .teacher-directory__header {
+    margin-bottom: 26px;
+  }
+  .teacher-directory__header h1 {
+    font-size: 34px;
+  }
+  .teacher-directory__filters {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  .teacher-directory__summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 20px;
+  }
+  .teacher-directory__grid {
+    grid-template-columns: 1fr;
+  }
+  .teacher-directory-card {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+  }
+  .teacher-directory-card::before {
+    display: none;
+  }
+  .teacher-directory-card__status {
+    top: 10px;
+    inset-inline-end: 10px;
+  }
+  .teacher-directory-card__portrait {
+    width: 78px;
+    height: 78px;
+    margin: 0;
+  }
+  .teacher-directory-card__portrait > span {
+    font-size: 23px;
+  }
+  .teacher-directory-card__content {
+    margin: 0;
+    padding-inline-end: 2px;
+    text-align: start;
+  }
+  .teacher-directory-card__location {
+    justify-content: flex-start;
+  }
+  .teacher-directory-card__description {
+    min-height: 0;
+    -webkit-line-clamp: 1;
+  }
   .teacher-directory-card__stats,
-  .teacher-directory-card__actions { grid-column: 1 / -1; }
-  .teacher-directory-card__stats { margin: 4px 0 0; }
+  .teacher-directory-card__actions {
+    grid-column: 1 / -1;
+  }
+  .teacher-directory-card__stats {
+    margin: 4px 0 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .home-teacher-card,
   .home-teacher-card__visual img,
   .teacher-directory-card,
-  .teacher-directory-card__profile span { transition: none; }
-  .home-teachers__loader { animation: none; }
+  .teacher-directory-card__profile span {
+    transition: none;
+  }
+  .home-teachers__loader {
+    animation: none;
+  }
 }
 
 .handle-low-text {

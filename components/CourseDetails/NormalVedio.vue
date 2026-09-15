@@ -7,6 +7,7 @@ const props = defineProps<{
     video: string;
     sessionId?: number | null;
     courseId?: number | null;
+    securityData?: any;
 }>();
 const emit = defineEmits<{
     playbackStateChange: [isPlaying: boolean];
@@ -54,19 +55,90 @@ function retryPlayer() {
     startPlayerLoading();
 }
 
+const isPlayerPaused = ref(true);
+
 function handlePausedChange(event: CustomEvent<boolean>) {
+    isPlayerPaused.value = event.detail;
     emit('playbackStateChange', !event.detail);
     watchHistory.handlePausedChange(event);
 }
 
+function handlePlaybackStarted() {
+    isPlayerPaused.value = false;
+    emit('playbackStateChange', true);
+}
+
 function handlePlaybackEnded() {
+    isPlayerPaused.value = true;
     emit('playbackStateChange', false);
     watchHistory.markPlaybackEnded();
+}
+
+async function playVideo() {
+    if (isPlayerLoading.value) return;
+    try {
+        if (playerRef.value?.play) {
+            await playerRef.value.play();
+        } else {
+            const nativeVideo = videoContainer.value?.querySelector('video');
+            if (nativeVideo) await nativeVideo.play();
+        }
+        isPlayerPaused.value = false;
+    } catch {
+        // ignore
+    }
+}
+
+async function pauseVideo() {
+    if (isPlayerLoading.value) return;
+    try {
+        if (playerRef.value?.pause) {
+            await playerRef.value.pause();
+        } else {
+            const nativeVideo = videoContainer.value?.querySelector('video');
+            if (nativeVideo) nativeVideo.pause();
+        }
+        isPlayerPaused.value = true;
+    } catch {
+        // ignore
+    }
+}
+
+async function togglePlayPause() {
+    if (isPlayerLoading.value) return;
+    const nativeVideo = videoContainer.value?.querySelector('video');
+    const isPaused = nativeVideo ? nativeVideo.paused : (playerRef.value?.paused ?? isPlayerPaused.value);
+    if (isPaused) {
+        await playVideo();
+    } else {
+        await pauseVideo();
+    }
+}
+
+function isInteractiveTarget(target: EventTarget | null): boolean {
+    if (!target || !(target instanceof HTMLElement)) return false;
+    const tagName = target.tagName.toLowerCase();
+    if (['input', 'textarea', 'select'].includes(tagName)) return true;
+    if (target.isContentEditable) return true;
+    if (target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], .p-dialog')) return true;
+    return false;
+}
+
+function handleGlobalKeydown(event: KeyboardEvent) {
+    if (event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar') {
+        if (isInteractiveTarget(event.target)) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        void togglePlayPause();
+    }
 }
 
 watch(
     () => props.video,
     (newVal) => {
+        isPlayerPaused.value = true;
         emit('playbackStateChange', false);
         startPlayerLoading();
         if (videoRef.value && newVal) {
@@ -99,9 +171,11 @@ const applyVideoProtection = () => {
 onMounted(() => {
     startPlayerLoading();
     nextTick(applyVideoProtection);
+    window.addEventListener('keydown', handleGlobalKeydown);
 });
 onBeforeUnmount(() => {
     clearLoadingDelayTimer();
+    window.removeEventListener('keydown', handleGlobalKeydown);
     emit('playbackStateChange', false);
 });
 </script>
@@ -125,7 +199,7 @@ onBeforeUnmount(() => {
                 <source :data-src="props.video" type="video/mp4" />
             </Video>
 
-            <CourseDetailsMediaWatermark :course-id="courseId" />
+            <CourseDetailsMediaWatermark :course-id="courseId" :security-data="securityData" />
 
             <DefaultUi noControls>
                 <DefaultControls hideOnMouseLeave :activeDuration="2000" />
