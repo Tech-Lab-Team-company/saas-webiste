@@ -61,8 +61,33 @@ const togglePlay = () => {
   isPlaying.value = wavesurfer.isPlaying()
 }
 
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof HTMLElement)) return false;
+  const tagName = target.tagName.toLowerCase();
+  if (['input', 'textarea', 'select'].includes(tagName)) return true;
+  if (target.isContentEditable) return true;
+  if (target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], .p-dialog')) return true;
+  return false;
+}
+
+function handleGlobalKeydown(event: KeyboardEvent) {
+  if (event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar') {
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    togglePlay();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeydown);
+});
+
 onBeforeUnmount(() => {
-  if (wavesurfer) wavesurfer.destroy()
+  window.removeEventListener('keydown', handleGlobalKeydown);
+  if (wavesurfer) wavesurfer.destroy();
 })
 
 // Helper to format time as mm:ss

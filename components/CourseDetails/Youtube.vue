@@ -125,6 +125,46 @@ async function playVideo() {
     showStartOverlay.value = true;
   }
 }
+
+async function pauseVideo() {
+  if (isPlayerLoading.value) return;
+  isPlayerPaused.value = true;
+  try {
+    await playerInstance.value?.pause?.();
+  } catch {
+    // ignore
+  }
+}
+
+async function togglePlayPause() {
+  if (isPlayerLoading.value) return;
+  if (isPlayerPaused.value || showStartOverlay.value) {
+    await playVideo();
+  } else {
+    await pauseVideo();
+  }
+}
+
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof HTMLElement)) return false;
+  const tagName = target.tagName.toLowerCase();
+  if (['input', 'textarea', 'select'].includes(tagName)) return true;
+  if (target.isContentEditable) return true;
+  if (target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], .p-dialog')) return true;
+  return false;
+}
+
+function handleGlobalKeydown(event: KeyboardEvent) {
+  if (event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar') {
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    void togglePlayPause();
+  }
+}
+
 watch(() => props.video, (newVal) => {
   videoId.value = getYoutubeVideoId(newVal)
   playerReloadKey.value += 1;
@@ -134,9 +174,14 @@ watch(() => props.video, (newVal) => {
   startPlayerLoading();
 })
 
-onMounted(startPlayerLoading);
+onMounted(() => {
+  startPlayerLoading();
+  window.addEventListener('keydown', handleGlobalKeydown);
+});
+
 onBeforeUnmount(() => {
   clearLoadingDelayTimer();
+  window.removeEventListener('keydown', handleGlobalKeydown);
   emit('playbackStateChange', false);
 });
 
