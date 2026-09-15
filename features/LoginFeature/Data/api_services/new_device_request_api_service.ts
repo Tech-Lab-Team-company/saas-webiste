@@ -3,24 +3,22 @@ import ServicesInterface from '~/base/Data/ApiService/api_service_interface'
 import { CrudType } from '~/base/core/Params/call_params_interface'
 import type Params from '~/base/core/Params/params'
 
-class LoginApiService extends ServicesInterface {
-  private static instance: LoginApiService
+class NewDeviceRequestApiService extends ServicesInterface {
+  private static instance: NewDeviceRequestApiService
   // eslint-disable-next-line ~typescript-eslint/no-empty-function
   private constructor() {
     super()
   }
   static getInstance() {
     if (!this.instance) {
-      this.instance = new LoginApiService()
+      this.instance = new NewDeviceRequestApiService()
     }
     return this.instance
   }
 
   async applyService(params: Params): Promise<{ data: any; statusCode: number }> {
-    console.log(CrudType.POST)
-    console.log(params, 'params in LoginApiService')
     return await super.call({
-      url: ApiNames.Instance.login,
+      url: ApiNames.Instance.sendRequestNewDevice,
       type: CrudType.POST,
       auth: false,
       params: params,
@@ -29,4 +27,4 @@ class LoginApiService extends ServicesInterface {
   }
 }
 
-export { LoginApiService }
+export { NewDeviceRequestApiService }

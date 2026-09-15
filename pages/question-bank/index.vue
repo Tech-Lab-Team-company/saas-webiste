@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import QuestionBankAction from "~/components/QuestionBank/QuestionBankAction.vue";
+import { ErrorType } from "~/base/core/networkStructure/Resources/errors/errorModel";
 import QuestionBankParams from "~/features/QuestionBank/Core/Params/index_question_banks_params";
 import type QuestionBankModel from "~/features/QuestionBank/Data/models/question_banks_model";
 import QuestionBankController from "~/features/QuestionBank/presentation/controllers/index_question_banks_controller";
@@ -38,7 +39,8 @@ const loadQuestionBanks = async () => {
     const state = stateRef.value;
 
     banks.value = Array.isArray(state.data) ? state.data : [];
-    errorMessage.value = state.error?.title || "";
+    errorMessage.value =
+      state.error?.type === ErrorType.dataEmpty ? "" : state.error?.title || "";
   } catch {
     banks.value = [];
     errorMessage.value = "تعذر تحميل بنوك الأسئلة الآن. حاول مرة أخرى.";
@@ -165,11 +167,11 @@ useHead({ htmlAttrs: { lang: "ar", dir: "rtl" } });
 
         <div v-else-if="banks.length === 0" class="question-bank-state">
           <span><i class="pi pi-file-edit" /></span>
-          <h3>{{ submittedSearch ? "لا توجد نتائج مطابقة" : "لا توجد بنوك أسئلة حاليًا" }}</h3>
+          <h3>{{ submittedSearch ? "لا توجد نتائج مطابقة" : "لا توجد بنوك أسئلة متاحة لمرحلتك حاليًا" }}</h3>
           <p>
             {{ submittedSearch
               ? "جرّب اسمًا آخر أو امسح البحث لعرض كل بنوك الأسئلة."
-              : "ستظهر بنوك الأسئلة هنا فور إضافتها إلى المنصة." }}
+              : "ستظهر بنوك الأسئلة هنا فور إضافتها لمرحلتك الدراسية." }}
           </p>
           <button v-if="submittedSearch" type="button" @click="clearSearch">عرض الكل</button>
         </div>

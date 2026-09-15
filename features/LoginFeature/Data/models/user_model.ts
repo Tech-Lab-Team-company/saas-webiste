@@ -22,6 +22,7 @@ export default class UserModel {
   public userInfo?:UserInfo;
   public category_id?:Number
   public join_option_status?:Number
+  public comment?: string
 
 
   constructor(
@@ -45,7 +46,8 @@ export default class UserModel {
     whatsapp?: string,
     userInfo?: UserInfo,
     category_id?: Number,
-    join_option_status?: Number
+    join_option_status?: Number,
+    comment?: string
   ) {
     this.id = id;
     this.name = name;
@@ -68,6 +70,7 @@ export default class UserModel {
     this.userInfo = userInfo;
     this.category_id = category_id;
     this.join_option_status = join_option_status;
+    this.comment = comment;
   }
 
   static fromMap(map: { [key: string]: any }): UserModel {
@@ -93,6 +96,7 @@ export default class UserModel {
       map["user_info"] ? UserInfo.fromMap(map["user_info"]) : undefined,
       map["category_id"],
       map["join_option_status"],
+      map["comment"]
     );
   }
 }

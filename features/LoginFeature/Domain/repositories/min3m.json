@@ -1,0 +1,35 @@
+{
+    "user": {
+        "id": 12884,
+        "name": "ibrahim",
+        "email": "",
+        "image": "https://dev.saas.techlabeg.com/storage/users/nRuHcNK1JvScPmsUyRsfZT0LOrZf7sztIjxUG2b5.jpg",
+        "isVerified": 1,
+        "phone": "01017100093",
+        "type": 2,
+        "apiToken": "52470|JM1edwBznsg082THEvHi0s3qtDR2B8kEo39sPkZ6614bcb77",
+        "userInfo": {
+            "id": 10670,
+            "basic_education_type_id": 2,
+            "stage_id": 4,
+            "year_id": 9,
+            "university_education_type_id": null,
+            "university_id": null,
+            "college_id": null,
+            "department_id": null,
+            "division_id": null,
+            "basic_education_type_title": "حكومي - عربي",
+            "stage_title": "ثانوي",
+            "year_title": "اولي ثانوي",
+            "university_education_type_title": "",
+            "university_title": "",
+            "college_title": "",
+            "department_title": "",
+            "division_title": "",
+            "failing_subjects": []
+        },
+        "category_id": 0
+    },
+    "image": null,
+    "isAuth": true
+}

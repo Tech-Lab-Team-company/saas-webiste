@@ -22,6 +22,9 @@ class ApiNames {
   public updateProfileImage = "update_profile_image";
   public removeProfileImage = "remove_profile_image";
 
+  //Request New Device 
+  public sendRequestNewDevice = "send_request_device"
+
   //reset password
   public forgotPassword = "forgot_password";
   public resetPassword = "verify_code";

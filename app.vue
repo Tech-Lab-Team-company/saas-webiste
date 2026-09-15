@@ -99,6 +99,8 @@ const { data: webStatus, pending } = await useAsyncData<WebStatus | null>(
           "web-domain": webDomain,
         },
       });
+      console.log(response, "response");
+
       return response.data || null;
     } catch (requestError) {
       // Site settings enhance branding, but a temporary API failure must never
