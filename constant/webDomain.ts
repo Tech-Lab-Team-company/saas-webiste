@@ -5,7 +5,7 @@
 // `window.location` once hydrated on the client.
 export function getWebDomain(): string {
   if (import.meta.client) {
-    return window.location.hostname;
+    return "myonline.techlabeg.com";
   }
 
   try {
