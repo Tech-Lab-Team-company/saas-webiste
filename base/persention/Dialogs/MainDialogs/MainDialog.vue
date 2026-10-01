@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
-import NewDeviceRequestDialog from '../NewDeviceRequestDialog.vue'
+// NewDeviceRequestDialog is temporarily disabled for phone login.
+// import NewDeviceRequestDialog from '../NewDeviceRequestDialog.vue'
 
 const dialogRef = ref<HTMLDialogElement | null>(null)
 
@@ -86,7 +87,7 @@ defineExpose({
       <span class="dialog-countdown" aria-hidden="true"><i /></span>
     </div>
   </dialog>
-    <NewDeviceRequestDialog />
+    <!-- <NewDeviceRequestDialog /> -->
 </template>
 
 <style scoped>
