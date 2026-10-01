@@ -1,5 +1,6 @@
 import { $fetch, FetchError } from "ofetch";
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
+import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 import { HeroSectionTypeEnum } from "../types/homePage.types";
 import type {
   HomeApiSourceResult,
@@ -50,6 +51,9 @@ class HomeApiResponseError extends Error {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+const toPositiveFilterId = (value: number | null): number | null =>
+  Number.isInteger(value) && Number(value) > 0 ? Number(value) : null;
 
 const readEnvelopeData = (value: unknown): unknown => {
   if (!isRecord(value) || !("data" in value)) {
@@ -103,21 +107,28 @@ export class HomePageApi {
   }
 
   async fetchCoursesByYear(
-    stageId: number,
-    yearId: number,
+    categoryId: CategoryIdEnum.BASIC | CategoryIdEnum.UNIVERSITY,
+    stageId: number | null,
+    yearId: number | null,
     page = 1,
     perPage = 9,
     teacherId: number | null = null,
     word = "",
   ): Promise<unknown> {
+    const usesBasicEducationFilters = categoryId === CategoryIdEnum.BASIC;
+
     return this.post(
       ApiNames.Instance.filter_courses,
       {
-        category_id: 1,
+        category_id: categoryId,
         type: 1,
         education_type_id: null,
-        stage_id: stageId,
-        year_id: yearId,
+        stage_id: usesBasicEducationFilters
+          ? toPositiveFilterId(stageId)
+          : null,
+        year_id: usesBasicEducationFilters
+          ? toPositiveFilterId(yearId)
+          : null,
         subject_id: null,
         university_id: null,
         college_id: null,

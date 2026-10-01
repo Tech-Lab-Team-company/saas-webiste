@@ -18,6 +18,10 @@ import type {
 } from '../models/HomePageViewModel'
 import type { HomeDataError, HomeSectionState } from '../types/homePage.types'
 import { supportsTeacherDirectory } from '../types/teacherType'
+import {
+  CategoryIdEnum,
+  resolveEducationCategoryId,
+} from '~/features/RegisterFeature/Core/Enums/education_type_enum'
 import { useTeacherDirectory } from './useTeacherDirectory'
 
 interface UseHomePageOptions {
@@ -213,11 +217,28 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
     word = '',
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
+      const categoryId = resolveEducationCategoryId(
+        setting.value?.categories,
+        stageId,
+        yearId,
+      )
       const [coursesResponse, subjectsResponse] = await Promise.all([
-        api.fetchCoursesByYear(stageId, yearId, page, perPage, teacherId, word),
-        api.fetchSubjectsByYear(yearId),
+        api.fetchCoursesByYear(
+          categoryId,
+          stageId,
+          yearId,
+          page,
+          perPage,
+          teacherId,
+          word,
+        ),
+        categoryId === CategoryIdEnum.BASIC && yearId > 0
+          ? api.fetchSubjectsByYear(yearId)
+          : Promise.resolve(null),
       ])
-      const allowedSubjectIds = mapHomeCourseSubjectIds(subjectsResponse)
+      const allowedSubjectIds = categoryId === CategoryIdEnum.BASIC
+        ? mapHomeCourseSubjectIds(subjectsResponse)
+        : undefined
       const coursePage = filterCoursePageByTeacher(
         mapHomeCoursePage(
           coursesResponse,

@@ -219,6 +219,41 @@ test("homepage automatically opens the first education year that has courses", a
   assert.match(section, /if \(!props\.catalog\) \{[\s\S]*void autoSelectHomepageCourseTab\(\)/u);
 });
 
+test("education course requests use the tenant category and omit basic filters for university tenants", async () => {
+  const [categoryEnum, api, homePage] = await Promise.all([
+    readSource("features/RegisterFeature/Core/Enums/education_type_enum.ts"),
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+    readSource("features/HomePageFeature/composables/useHomePage.ts"),
+  ]);
+
+  assert.match(categoryEnum, /resolveEducationCategoryId/u);
+  assert.match(
+    categoryEnum,
+    /hasBasicEducationSelection[\s\S]*categoryIds\.includes\(CategoryIdEnum\.BASIC\)[\s\S]*return CategoryIdEnum\.BASIC/u,
+  );
+  assert.match(
+    categoryEnum,
+    /categoryIds\.includes\(CategoryIdEnum\.UNIVERSITY\)[\s\S]*return CategoryIdEnum\.UNIVERSITY/u,
+  );
+  assert.match(api, /category_id: categoryId/u);
+  assert.match(
+    api,
+    /stage_id: usesBasicEducationFilters[\s\S]*toPositiveFilterId\(stageId\)[\s\S]*: null/u,
+  );
+  assert.match(
+    api,
+    /year_id: usesBasicEducationFilters[\s\S]*toPositiveFilterId\(yearId\)[\s\S]*: null/u,
+  );
+  assert.match(
+    homePage,
+    /api\.fetchCoursesByYear\([\s\S]*categoryId,[\s\S]*stageId,[\s\S]*yearId/u,
+  );
+  assert.match(
+    homePage,
+    /categoryId === CategoryIdEnum\.BASIC && yearId > 0[\s\S]*api\.fetchSubjectsByYear\(yearId\)[\s\S]*Promise\.resolve\(null\)/u,
+  );
+});
+
 test("course catalog filters by teacher through the API and shareable URL", async () => {
   const [api, homePage, section, coursePage, teacherPage] = await Promise.all([
     readSource("features/HomePageFeature/api/homePageApi.ts"),
@@ -230,7 +265,7 @@ test("course catalog filters by teacher through the API and shareable URL", asyn
 
   assert.match(api, /fetchPublicCourseCatalog\([\s\S]*teacherId: number \| null = null/u);
   assert.match(api, /teacher_id: teacherId/u);
-  assert.match(homePage, /api\.fetchCoursesByYear\(stageId, yearId, page, perPage, teacherId, word\)/u);
+  assert.match(homePage, /api\.fetchCoursesByYear\([\s\S]*categoryId,[\s\S]*stageId,[\s\S]*yearId/u);
   assert.match(homePage, /api\.fetchPublicCourseCatalog\(page, perPage, teacherId, word\)/u);
   assert.match(homePage, /course\.teacher\?\.id === teacherId/u);
   assert.match(section, /route\.query\.teacher_id/u);
