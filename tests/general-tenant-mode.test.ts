@@ -163,7 +163,7 @@ test("center student profile loads the full catalog without stage data", async (
   assert.match(profileCourses, /isCenterTeacherType\(settingStore\.setting\?\.type\)/u);
   assert.match(profileCourses, /if \(isCenter\.value\) return fetchAllCenterCourses\(\)/u);
   assert.match(profileCourses, /requestKey\.value,\s*async/u);
-  assert.match(profileCourses, /watch: \[isCenter, stageId, yearId\]/u);
+  assert.match(profileCourses, /watch: \[requestKey\]/u);
   assert.match(profileCourses, /api\.fetchPublicCourseCatalog\(1, perPage\)/u);
   assert.match(profileCourses, /firstPage\.pagination\.lastPage - 1/u);
   assert.match(profileCourses, /if \(!uniqueCourses\.has\(course\.id\)\)/u);
@@ -172,6 +172,33 @@ test("center student profile loads the full catalog without stage data", async (
     profileCourses.indexOf("if (isCenter.value) return fetchAllCenterCourses()") <
       profileCourses.indexOf("بيانات المرحلة الدراسية غير مكتملة"),
   );
+});
+
+test("student profile sends authenticated university education filters with named pagination", async () => {
+  const [profileCourses, api] = await Promise.all([
+    readSource("components/Profile/ProfileAvailableCourses.vue"),
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+  ]);
+
+  assert.match(profileCourses, /api\.fetchEducationCourses\(\{/u);
+  assert.match(profileCourses, /categoryId: categoryId\.value/u);
+  assert.match(
+    profileCourses,
+    /university_education_type_id[\s\S]*universityId:[\s\S]*university_id[\s\S]*collegeId:[\s\S]*college_id[\s\S]*departmentId:[\s\S]*department_id[\s\S]*divisionId:[\s\S]*division_id/u,
+  );
+  assert.match(profileCourses, /page: 1,[\s\S]*perPage: 100/u);
+  assert.match(profileCourses, /accessToken: userStore\.user\?\.apiToken/u);
+  assert.doesNotMatch(
+    profileCourses,
+    /fetchCoursesByYear\(stageId\.value, yearId\.value, 1, 100\)/u,
+  );
+  assert.match(api, /async fetchEducationCourses\(\{/u);
+  assert.match(api, /education_type_id: toPositiveFilterId\(educationTypeId\)/u);
+  assert.match(
+    api,
+    /university_id: usesUniversityEducationFilters[\s\S]*college_id: usesUniversityEducationFilters[\s\S]*department_id: usesUniversityEducationFilters[\s\S]*division_id: usesUniversityEducationFilters/u,
+  );
+  assert.match(api, /per_page: perPage,[\s\S]*accessToken/u);
 });
 
 test("center mode loads both education taxonomy and the public catalog fallback", async () => {

@@ -1,13 +1,13 @@
 export default class UserInfo {
   public id: number;
-  public basic_education_type_id: string;
-  public stage_id: string;
-  public year_id: string;
-  public university_education_type_id: number;
-  public university_id: string;
-  public college_id: string;
-  public department_id: string;
-  public division_id: number;
+  public basic_education_type_id: number | null;
+  public stage_id: number | null;
+  public year_id: number | null;
+  public university_education_type_id: number | null;
+  public university_id: number | null;
+  public college_id: number | null;
+  public department_id: number | null;
+  public division_id: number | null;
   public basic_education_type_title: string;
   public stage_title: string;
   public year_title: string;
@@ -20,14 +20,14 @@ export default class UserInfo {
 
   constructor(
     id: number,
-    basic_education_type_id: string,
-    stage_id: string,
-    year_id: string,
-    university_education_type_id: number,
-    university_id: string,
-    college_id: string,
-    department_id: string,
-    division_id: number,
+    basic_education_type_id: number | null,
+    stage_id: number | null,
+    year_id: number | null,
+    university_education_type_id: number | null,
+    university_id: number | null,
+    college_id: number | null,
+    department_id: number | null,
+    division_id: number | null,
     basic_education_type_title: string,
     stage_title: string,
     year_title: string,
@@ -82,4 +82,3 @@ export default class UserInfo {
     );
   }
 }
-

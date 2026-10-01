@@ -8,6 +8,7 @@ import {
 } from "~/features/HomePageFeature/mappers/homePageMapper";
 import type { HomeCourseViewModel } from "~/features/HomePageFeature/models/HomePageViewModel";
 import { isCenterTeacherType } from "~/features/HomePageFeature/types/teacherType";
+import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 
 const userStore = useUserStore();
 const settingStore = useSettingStore();
@@ -15,13 +16,29 @@ const userInfo = computed(() => userStore.user?.userInfo);
 const isCenter = computed(() =>
   isCenterTeacherType(settingStore.setting?.type),
 );
-const stageId = computed(() => Number(userInfo.value?.stage_id));
-const yearId = computed(() => Number(userInfo.value?.year_id));
+const toPositiveId = (value: unknown): number | null => {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
+};
+const categoryId = computed<
+  CategoryIdEnum.BASIC | CategoryIdEnum.UNIVERSITY | null
+>(() => {
+  const id = Number(userStore.user?.category_id);
+  return id === CategoryIdEnum.BASIC || id === CategoryIdEnum.UNIVERSITY
+    ? id
+    : null;
+});
+const stageId = computed(() => toPositiveId(userInfo.value?.stage_id));
+const yearId = computed(() => toPositiveId(userInfo.value?.year_id));
 const educationLabel = computed(() =>
   isCenter.value
     ? "كل كورسات المركز"
     : userInfo.value?.year_title ||
       userInfo.value?.stage_title ||
+      userInfo.value?.division_title ||
+      userInfo.value?.department_title ||
+      userInfo.value?.college_title ||
+      userInfo.value?.university_title ||
       "مرحلتك الدراسية",
 );
 
@@ -29,7 +46,18 @@ const api = new HomePageApi(getWebDomain());
 const requestKey = computed(() =>
   isCenter.value
     ? `profile-available-courses:${userStore.user?.id ?? "guest"}:center-all`
-    : `profile-available-courses:${userStore.user?.id ?? "guest"}:${stageId.value}:${yearId.value}`,
+    : [
+        "profile-available-courses",
+        userStore.user?.id ?? "guest",
+        categoryId.value ?? "category-missing",
+        stageId.value ?? "stage-none",
+        yearId.value ?? "year-none",
+        toPositiveId(userInfo.value?.university_education_type_id) ?? "university-type-none",
+        toPositiveId(userInfo.value?.university_id) ?? "university-none",
+        toPositiveId(userInfo.value?.college_id) ?? "college-none",
+        toPositiveId(userInfo.value?.department_id) ?? "department-none",
+        toPositiveId(userInfo.value?.division_id) ?? "division-none",
+      ].join(":"),
 );
 
 const fetchAllCenterCourses = async (): Promise<HomeCourseViewModel[]> => {
@@ -72,21 +100,49 @@ const { data: courses, pending, error, refresh } = await useAsyncData<HomeCourse
   async () => {
     if (isCenter.value) return fetchAllCenterCourses();
 
-    if (!Number.isFinite(stageId.value) || !Number.isFinite(yearId.value)) {
+    if (!categoryId.value) {
+      throw new Error("فئة التعليم غير محددة");
+    }
+
+    if (
+      categoryId.value === CategoryIdEnum.BASIC &&
+      (!stageId.value || !yearId.value)
+    ) {
       throw new Error("بيانات المرحلة الدراسية غير مكتملة");
     }
 
-    const [coursesResponse, subjectsResponse] = await Promise.all([
-      api.fetchCoursesByYear(stageId.value, yearId.value, 1, 100),
-      api.fetchSubjectsByYear(yearId.value),
-    ]);
-    const subjectIds = mapHomeCourseSubjectIds(subjectsResponse);
+    const coursesResponse = await api.fetchEducationCourses({
+      categoryId: categoryId.value,
+      educationTypeId: categoryId.value === CategoryIdEnum.BASIC
+        ? toPositiveId(userInfo.value?.basic_education_type_id)
+        : toPositiveId(userInfo.value?.university_education_type_id),
+      stageId: categoryId.value === CategoryIdEnum.BASIC ? stageId.value : null,
+      yearId: categoryId.value === CategoryIdEnum.BASIC ? yearId.value : null,
+      universityId: toPositiveId(userInfo.value?.university_id),
+      collegeId: toPositiveId(userInfo.value?.college_id),
+      departmentId: toPositiveId(userInfo.value?.department_id),
+      divisionId: toPositiveId(userInfo.value?.division_id),
+      page: 1,
+      perPage: 100,
+      accessToken: userStore.user?.apiToken,
+    });
+
+    let subjectIds: ReadonlySet<number> | undefined;
+    if (categoryId.value === CategoryIdEnum.BASIC && yearId.value) {
+      try {
+        subjectIds = mapHomeCourseSubjectIds(
+          await api.fetchSubjectsByYear(yearId.value),
+        );
+      } catch {
+        subjectIds = undefined;
+      }
+    }
 
     return mapHomeCoursePage(coursesResponse, 1, 100, subjectIds).courses;
   },
   {
     default: () => [],
-    watch: [isCenter, stageId, yearId],
+    watch: [requestKey],
   },
 );
 </script>
