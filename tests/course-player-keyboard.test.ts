@@ -55,7 +55,16 @@ test("AudioPlayer.vue handles Space key for audio toggle and prevents page scrol
   assert.match(content, /window\.removeEventListener\('keydown',\s*handleGlobalKeydown\)/u);
   assert.match(content, /event\.preventDefault\(\)/u);
   assert.match(content, /togglePlay/u);
-  assert.match(content, /<audio[\s\S]*preload="metadata"/u);
+  assert.match(content, /<audio[\s\S]*controls[\s\S]*preload="auto"/u);
   assert.doesNotMatch(content, /WaveSurfer/u);
   assert.doesNotMatch(content, /audio\s*\{\s*display:\s*none/u);
+});
+
+test("course media protection does not pause localhost development playback", async () => {
+  const content = await readFile(
+    new URL("../composables/useCourseProtectionConfig.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(content, /developerToolsGuard:\s*!import\.meta\.dev/u);
 });

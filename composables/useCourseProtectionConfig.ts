@@ -9,7 +9,8 @@ export function useCourseProtectionConfig() {
     blockProtectedWindowBlur: true,
     blockPrint: true,
     captureShield: true,
-    developerToolsGuard: true,
+    // Keep local development debuggable; production course protection stays on.
+    developerToolsGuard: !import.meta.dev,
     developerToolsOpenThresholdPx: 170,
     developerToolsCloseThresholdPx: 120,
     developerToolsOpenChecks: 3,

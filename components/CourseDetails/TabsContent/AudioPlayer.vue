@@ -15,11 +15,6 @@ const loadError = ref(false);
 const watchHistory = useCourseWatchHistory(() => props.sessionId);
 
 const audioUrl = computed(() => props.src.trim());
-const progress = computed(() =>
-  duration.value > 0
-    ? Math.min(100, (currentTime.value / duration.value) * 100)
-    : 0,
-);
 
 const readDuration = () => {
   const value = Number(audioElement.value?.duration);
@@ -66,17 +61,6 @@ const togglePlay = async () => {
   }
 };
 
-const seekAudio = (event: Event) => {
-  const audio = audioElement.value;
-  const target = event.target as HTMLInputElement;
-  if (!audio || duration.value <= 0) return;
-
-  const nextTime = Math.min(duration.value, Math.max(0, Number(target.value)));
-  audio.currentTime = nextTime;
-  currentTime.value = nextTime;
-  watchHistory.updateCurrentTime(nextTime);
-};
-
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!target || !(target instanceof HTMLElement)) return false;
   const tagName = target.tagName.toLowerCase();
@@ -120,24 +104,20 @@ onBeforeUnmount(() => {
   audioElement.value?.pause();
 });
 
-function formatTime(value: number) {
-  const seconds = Number.isFinite(value) ? Math.max(0, value) : 0;
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-}
 </script>
 
 <template>
   <div class="audio-player">
-    <!-- Native media loading works for playable cross-origin files without
-         requiring the CORS-enabled fetch that waveform decoding needs. -->
     <audio
       ref="audioElement"
+      class="native-audio"
       :src="audioUrl"
-      preload="metadata"
+      controls
+      controlslist="nodownload"
+      preload="auto"
       @loadedmetadata="readDuration"
       @durationchange="readDuration"
+      @canplay="loadError = false"
       @timeupdate="handleTimeUpdate"
       @play="isPlaying = true"
       @pause="handlePause"
@@ -145,40 +125,9 @@ function formatTime(value: number) {
       @error="handleError"
     ></audio>
 
-    <button
-      type="button"
-      class="play-audio"
-      :disabled="!audioUrl || loadError"
-      :aria-label="isPlaying ? 'إيقاف الصوت مؤقتًا' : 'تشغيل الصوت'"
-      @click="togglePlay"
-    >
-      <IconsPause v-if="isPlaying" />
-      <IconsPlay v-else />
-    </button>
-
-    <input
-      class="audio-progress"
-      type="range"
-      dir="ltr"
-      min="0"
-      :max="duration || 0"
-      step="0.1"
-      :value="currentTime"
-      :disabled="duration <= 0 || loadError"
-      :style="{ '--audio-progress': `${progress}%` }"
-      aria-label="موضع تشغيل الصوت"
-      @input="seekAudio"
-    />
-
     <p v-if="loadError" class="audio-error" role="alert">
       تعذر تحميل الملف الصوتي. حاول مرة أخرى.
     </p>
-
-    <div class="time-display" dir="ltr">
-      <span>{{ formatTime(currentTime) }}</span>
-      <span>/</span>
-      <span>{{ formatTime(duration) }}</span>
-    </div>
   </div>
 </template>
 
@@ -190,73 +139,11 @@ function formatTime(value: number) {
   border-radius: 8px;
   background: linear-gradient(30deg, rgb(41 33 29) 0%, #000 100%);
 
-  audio {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .play-audio {
-    display: grid;
-    width: 55px;
-    height: 55px;
-    padding: 0.8rem;
-    border: 0;
-    border-radius: 50%;
-    margin: 0 auto 1.5rem;
-    background-color: rgb(240 241 244 / 40%);
-    color: #fff;
-    cursor: pointer;
-    place-items: center;
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-
-    svg {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  .audio-progress {
+  .native-audio {
+    display: block;
     width: 100%;
-    height: 6px;
-    border-radius: 999px;
-    appearance: none;
-    background: linear-gradient(
-      to right,
-      var(--primary-color, #ef233c) var(--audio-progress),
-      rgb(240 241 244 / 35%) var(--audio-progress)
-    );
-    cursor: pointer;
-
-    &::-webkit-slider-thumb {
-      width: 16px;
-      height: 16px;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      appearance: none;
-      background: var(--primary-color, #ef233c);
-    }
-
-    &::-moz-range-thumb {
-      width: 13px;
-      height: 13px;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      background: var(--primary-color, #ef233c);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-    }
+    min-height: 54px;
+    accent-color: var(--primary-color, #ef233c);
   }
 
   .audio-error {
@@ -266,17 +153,5 @@ function formatTime(value: number) {
     text-align: center;
   }
 
-  .time-display {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0.25rem;
-    padding-top: 0.5rem;
-    margin-top: 0.5rem;
-    border-top: 1px solid rgb(240 241 244 / 20%);
-    color: #f0f1f4;
-    font-family: "regular", sans-serif;
-    font-size: 1.2rem;
-  }
 }
 </style>
