@@ -250,7 +250,19 @@ test("education course requests use the tenant category and omit basic filters f
   );
   assert.match(
     homePage,
-    /categoryId === CategoryIdEnum\.BASIC && yearId > 0[\s\S]*api\.fetchSubjectsByYear\(yearId\)[\s\S]*Promise\.resolve\(null\)/u,
+    /if \(categoryId === CategoryIdEnum\.BASIC && yearId > 0\)[\s\S]*await api\.fetchSubjectsByYear\(yearId\)/u,
+  );
+  assert.match(
+    homePage,
+    /\[400, 422\]\.includes[\s\S]*categoryId = CategoryIdEnum\.UNIVERSITY[\s\S]*api\.fetchCoursesByYear\([\s\S]*categoryId,[\s\S]*null,[\s\S]*null/u,
+  );
+  assert.ok(
+    homePage.indexOf('await api.fetchCoursesByYear(') <
+      homePage.indexOf('await api.fetchSubjectsByYear(yearId)'),
+  );
+  assert.match(
+    homePage,
+    /if \(!setting\.value\)[\s\S]*settingsStore\.setSetting\(await api\.fetchWebStatus\(\)\)/u,
   );
 });
 

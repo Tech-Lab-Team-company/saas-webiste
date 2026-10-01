@@ -1,6 +1,7 @@
 import { $fetch, FetchError } from "ofetch";
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
 import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
+import type WebStatus from "~/types/webStatus";
 import { HeroSectionTypeEnum } from "../types/homePage.types";
 import type {
   HomeApiSourceResult,
@@ -75,6 +76,10 @@ const toSourceResult = (
 
 export class HomePageApi {
   constructor(private readonly webDomain: string) {}
+
+  async fetchWebStatus(): Promise<WebStatus> {
+    return this.get(`${ApiNames.Instance.baseUrl}fetch_web_status`) as Promise<WebStatus>;
+  }
 
   async load(): Promise<HomePageApiSources> {
     const [

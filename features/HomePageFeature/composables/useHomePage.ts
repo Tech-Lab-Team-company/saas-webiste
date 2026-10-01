@@ -63,6 +63,20 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
   const { setting } = storeToRefs(settingsStore)
   const webDomain = getWebDomain()
   const api = new HomePageApi(webDomain)
+
+  // The page and root app can initialize concurrently during SSR. Resolve the
+  // tenant categories here before building course requests so university-only
+  // tenants never fall back to the basic category while settings are pending.
+  if (!setting.value) {
+    try {
+      settingsStore.setSetting(await api.fetchWebStatus())
+    } catch {
+      // Other home data can still render with its existing fallbacks. The
+      // course request below also retries the university category on a
+      // validation response.
+    }
+  }
+
   const initialTeacherId = options.initialTeacherId ?? null
   const initialWord = options.initialWord?.trim().slice(0, 100) ?? ''
   const tenantMode = supportsTeacherDirectory(setting.value?.type)
@@ -217,13 +231,15 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
     word = '',
   ): Promise<HomeSectionState<HomeCoursePageViewModel>> => {
     try {
-      const categoryId = resolveEducationCategoryId(
+      let categoryId = resolveEducationCategoryId(
         setting.value?.categories,
         stageId,
         yearId,
       )
-      const [coursesResponse, subjectsResponse] = await Promise.all([
-        api.fetchCoursesByYear(
+
+      let coursesResponse: unknown
+      try {
+        coursesResponse = await api.fetchCoursesByYear(
           categoryId,
           stageId,
           yearId,
@@ -231,14 +247,42 @@ export const useHomePage = async (options: UseHomePageOptions = {}) => {
           perPage,
           teacherId,
           word,
-        ),
-        categoryId === CategoryIdEnum.BASIC && yearId > 0
-          ? api.fetchSubjectsByYear(yearId)
-          : Promise.resolve(null),
-      ])
-      const allowedSubjectIds = categoryId === CategoryIdEnum.BASIC
-        ? mapHomeCourseSubjectIds(subjectsResponse)
-        : undefined
+        )
+      } catch (requestError) {
+        const normalizedRequestError = normalizeHomeDataError(requestError)
+        const isValidationError =
+          normalizedRequestError.type === 'server' &&
+          [400, 422].includes(normalizedRequestError.statusCode ?? 0)
+
+        if (categoryId !== CategoryIdEnum.BASIC || !isValidationError) {
+          throw requestError
+        }
+
+        categoryId = CategoryIdEnum.UNIVERSITY
+        coursesResponse = await api.fetchCoursesByYear(
+          categoryId,
+          null,
+          null,
+          page,
+          perPage,
+          teacherId,
+          word,
+        )
+      }
+
+      let allowedSubjectIds: ReadonlySet<number> | undefined
+      if (categoryId === CategoryIdEnum.BASIC && yearId > 0) {
+        try {
+          allowedSubjectIds = mapHomeCourseSubjectIds(
+            await api.fetchSubjectsByYear(yearId),
+          )
+        } catch {
+          // filter_courses already applies the year filter. Subject metadata is
+          // optional and must not turn a valid course response into an error.
+          allowedSubjectIds = undefined
+        }
+      }
+
       const coursePage = filterCoursePageByTeacher(
         mapHomeCoursePage(
           coursesResponse,
