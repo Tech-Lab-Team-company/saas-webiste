@@ -55,4 +55,6 @@ test("AudioPlayer.vue handles Space key for audio toggle and prevents page scrol
   assert.match(content, /window\.removeEventListener\('keydown',\s*handleGlobalKeydown\)/u);
   assert.match(content, /event\.preventDefault\(\)/u);
   assert.match(content, /togglePlay/u);
+  assert.match(content, /<audio[\s\S]*preload="metadata"/u);
+  assert.doesNotMatch(content, /WaveSurfer/u);
 });
