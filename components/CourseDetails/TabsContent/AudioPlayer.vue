@@ -191,7 +191,13 @@ function formatTime(value: number) {
   background: linear-gradient(30deg, rgb(41 33 29) 0%, #000 100%);
 
   audio {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    opacity: 0;
+    pointer-events: none;
   }
 
   .play-audio {
