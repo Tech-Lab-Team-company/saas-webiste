@@ -52,8 +52,8 @@ const fetchStageYears = async (stageId: number, stagetitle: string) => {
   ActiveStage.value = !ActiveStage.value;
   const response = await $fetch<{
     data: Stages[];
-    message: string;    
-    status: number; 
+    message: string;
+    status: number;
   }>(`${useBaseUrls().baseUrl}/fetch_stage_years`, {
     method: "POST",
     body: { stage_id: stageId },
@@ -236,8 +236,8 @@ const SelectSubject = (typeId: number) => {
   SendData();
 }
 
-const CategryId = ref((settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(1) ) ? 1: 
-    (settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(2) ) ? 2 :filtersStore.CategryId)
+const CategryId = ref((settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(1)) ? 1 :
+  (settingStore.setting?.categories.length == 1 && settingStore.setting?.categories.includes(2)) ? 2 : filtersStore.CategryId)
 
 
 watch(
@@ -336,16 +336,12 @@ watch(() => props.with_text,
     </div>
 
     <div class="stages stages-dot">
-      <StagesTitle v-if="TextShow" :maintitle="`المواد`"
-        :subtitle="`اختر المادة للوصول إلى الكورسات المتاحة`" />
+      <StagesTitle v-if="TextShow" :maintitle="`المواد`" :subtitle="`اختر المادة للوصول إلى الكورسات المتاحة`" />
 
       <div class="stages-buttons mt-4 flex flex-wrap gap-3">
         <NuxtLink v-for="subject in Subjects" :key="`gender-subject-${subject.id}`" to="/course">
-          <button
-            class="btn btn-secondary btn-stages btn-stages-education"
-            :class="{ 'active-btn': SelectedSubject === subject.id }"
-            @click="SelectSubject(subject.id)"
-          >
+          <button class="btn btn-secondary btn-stages btn-stages-education"
+            :class="{ 'active-btn': SelectedSubject === subject.id }" @click="SelectSubject(subject.id)">
             {{ subject.title }}
           </button>
         </NuxtLink>
@@ -366,11 +362,12 @@ watch(() => props.with_text,
       <div class="stages-buttons flex flex-row gap-4 justify-start mt-4">
         <button class="btn btn-secondary btn-stages"
           @click="showStages = !showStages; showUniversities = false; CategryId = 1; CategoryBtn = true"
-          :class="{ 'active-btn': CategryId === 1 || (settingStore.setting?.categories.length > 1 && settingStore.setting?.categories?.includes(1))}" v-if="settingStore.setting?.categories?.includes(1)">
+          :class="{ 'active-btn': CategryId === 1 || (settingStore.setting?.categories.length > 1 && settingStore.setting?.categories?.includes(1)) }"
+          v-if="settingStore.setting?.categories?.includes(1)">
           {{ $t('basic_education') }}
         </button>
         <button class="btn btn-secondary btn-stages"
-        :class="{ 'active-btn': CategryId === 2 || (settingStore.setting?.categories.length > 1 && settingStore.setting?.categories?.includes(2))}"
+          :class="{ 'active-btn': CategryId === 2 || (settingStore.setting?.categories.length > 1 && settingStore.setting?.categories?.includes(2)) }"
           @click="showUniversities = !showUniversities; showStages = false; CategryId = 2"
           v-if="settingStore.setting?.categories?.includes(2)">
           {{ $t('university_education') }}
@@ -378,8 +375,8 @@ watch(() => props.with_text,
       </div>
 
       <!-- التعليم الأساسي -->
-      <div v-if="showStages || CategryId == 1 ||CategryId == 2" class="stages-buttons mt-4 flex flex-wrap gap-3">
-        <template v-if="stages ">
+      <div v-if="showStages || CategryId == 1 || CategryId == 2" class="stages-buttons mt-4 flex flex-wrap gap-3">
+        <template v-if="stages">
           <button v-for="stage in stages" :key="`basic-${stage.id}`"
             class="btn btn-secondary btn-stages btn-stages-education "
             :class="{ 'active-btn': SelectedStage === stage.id }"
