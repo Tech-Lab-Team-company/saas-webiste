@@ -61,7 +61,7 @@ test("tablet and mobile profile navigation is compact and avoids horizontal scro
 });
 
 test("student dashboard switches to one column at the shared tablet breakpoint", async () => {
-  const dashboard = await readSource("pages/student-dashboard.vue");
+  const dashboard = await readSource("pages/student-dashboard/index.vue");
 
   assert.match(
     dashboard,

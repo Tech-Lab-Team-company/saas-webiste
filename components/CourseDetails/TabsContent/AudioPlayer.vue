@@ -1,85 +1,99 @@
 <script lang="ts" setup>
-import WaveSurfer from 'wavesurfer.js'
+const props = withDefaults(defineProps<{
+  src?: string;
+  sessionId?: number | null;
+}>(), {
+  src: "",
+  sessionId: null,
+});
 
-const props = defineProps({
-    src: String,
-    sessionId: {
-      type: Number,
-      default: null,
-    },
-})
-const waveform = ref(null)
-let wavesurfer: WaveSurfer | null = null
-const isPlaying = ref(false)
-const currentTime = ref(0)
-const duration = ref(0)
-const watchHistory = useCourseWatchHistory(() => props.sessionId)
+const audioElement = ref<HTMLAudioElement | null>(null);
+const isPlaying = ref(false);
+const currentTime = ref(0);
+const duration = ref(0);
+const loadError = ref(false);
+const watchHistory = useCourseWatchHistory(() => props.sessionId);
 
-const audioUrl = computed(() => props.src || '')
+const audioUrl = computed(() => props.src.trim());
 
-onMounted(() => {
-  wavesurfer = WaveSurfer.create({
-    container: waveform.value,
-    waveColor: '#949494',
-    progressColor: '#fff',
-    cursorColor: '#fff',
-    height: 60,
-    responsive: true,
-  })
+const readDuration = () => {
+  const value = Number(audioElement.value?.duration);
+  duration.value = Number.isFinite(value) && value > 0 ? value : 0;
+  watchHistory.updateDuration(duration.value);
+  loadError.value = false;
+};
 
-  wavesurfer.load(audioUrl.value)
+const handleTimeUpdate = () => {
+  currentTime.value = audioElement.value?.currentTime || 0;
+  watchHistory.updateCurrentTime(currentTime.value);
+};
 
-  wavesurfer.on('ready', () => {
-    duration.value = wavesurfer.getDuration()
-    watchHistory.updateDuration(duration.value)
-  })
+const handlePause = () => {
+  isPlaying.value = false;
+  void watchHistory.saveProgress(true);
+};
 
-  wavesurfer.on('audioprocess', () => {
-    currentTime.value = wavesurfer.getCurrentTime()
-    watchHistory.updateCurrentTime(currentTime.value)
-  })
+const handleEnded = () => {
+  isPlaying.value = false;
+  currentTime.value = duration.value;
+  watchHistory.markPlaybackEnded();
+};
 
-  wavesurfer.on('seek', () => {
-    currentTime.value = wavesurfer.getCurrentTime()
-    watchHistory.updateCurrentTime(currentTime.value)
-  })
+const handleError = () => {
+  isPlaying.value = false;
+  loadError.value = true;
+};
 
-  wavesurfer.on('pause', () => {
-    void watchHistory.saveProgress(true)
-  })
+const togglePlay = async () => {
+  const audio = audioElement.value;
+  if (!audio || !audioUrl.value || loadError.value) return;
 
-  wavesurfer.on('finish', () => {
-    isPlaying.value = false
-    currentTime.value = duration.value
-    watchHistory.markPlaybackEnded()
-  })
-})
+  if (!audio.paused) {
+    audio.pause();
+    return;
+  }
 
-const togglePlay = () => {
-  if (!wavesurfer) return
-  wavesurfer.playPause()
-  isPlaying.value = wavesurfer.isPlaying()
-}
+  try {
+    await audio.play();
+  } catch {
+    isPlaying.value = false;
+    loadError.value = true;
+  }
+};
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!target || !(target instanceof HTMLElement)) return false;
   const tagName = target.tagName.toLowerCase();
-  if (['input', 'textarea', 'select'].includes(tagName)) return true;
+  if (["input", "textarea", "select"].includes(tagName)) return true;
   if (target.isContentEditable) return true;
-  if (target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], .p-dialog')) return true;
-  return false;
+  return Boolean(
+    target.closest(
+      'input, textarea, select, [contenteditable="true"], [role="dialog"], .p-dialog',
+    ),
+  );
 }
 
 function handleGlobalKeydown(event: KeyboardEvent) {
-  if (event.code === 'Space' || event.key === ' ' || event.key === 'Spacebar') {
-    if (isInteractiveTarget(event.target)) {
-      return;
-    }
+  if (
+    event.code === "Space" ||
+    event.key === " " ||
+    event.key === "Spacebar"
+  ) {
+    if (isInteractiveTarget(event.target)) return;
     event.preventDefault();
     event.stopPropagation();
-    togglePlay();
+    void togglePlay();
   }
 }
+
+watch(audioUrl, async () => {
+  isPlaying.value = false;
+  currentTime.value = 0;
+  duration.value = 0;
+  loadError.value = false;
+  await nextTick();
+  audioElement.value?.load();
+});
 
 onMounted(() => {
   window.addEventListener('keydown', handleGlobalKeydown);
@@ -87,65 +101,57 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleGlobalKeydown);
-  if (wavesurfer) wavesurfer.destroy();
-})
+  audioElement.value?.pause();
+});
 
-// Helper to format time as mm:ss
-function formatTime(sec) {
-  const m = Math.floor(sec / 60)
-  const s = Math.floor(sec % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
 </script>
 
 <template>
   <div class="audio-player">
-    <button class="play-audio" @click="togglePlay">
-      <IconsPause v-if="isPlaying" />
-      <IconsPlay v-else />
-    </button>
-    <div ref="waveform" class="waveform"></div>
-    <div class="time-display">
-      <span>{{ formatTime(currentTime) }}</span> /
-      <span>{{ formatTime(duration) }}</span>
-    </div>
+    <audio
+      ref="audioElement"
+      class="native-audio"
+      :src="audioUrl"
+      controls
+      controlslist="nodownload"
+      preload="auto"
+      @loadedmetadata="readDuration"
+      @durationchange="readDuration"
+      @canplay="loadError = false"
+      @timeupdate="handleTimeUpdate"
+      @play="isPlaying = true"
+      @pause="handlePause"
+      @ended="handleEnded"
+      @error="handleError"
+    ></audio>
+
+    <p v-if="loadError" class="audio-error" role="alert">
+      تعذر تحميل الملف الصوتي. حاول مرة أخرى.
+    </p>
   </div>
 </template>
 
-
 <style scoped lang="scss">
 .audio-player {
+  width: 100%;
+  height: fit-content;
+  padding: 2rem 1rem 0.75rem;
+  border-radius: 8px;
+  background: linear-gradient(30deg, rgb(41 33 29) 0%, #000 100%);
+
+  .native-audio {
+    display: block;
     width: 100%;
-    height: fit-content;
-    padding: 2rem 0 0.25rem;
-    border-radius: 8px;
-    background: linear-gradient(30deg, rgba(41, 33, 29, 1) 0%, rgba(0, 0, 0, 1) 100%);
+    min-height: 54px;
+    accent-color: var(--primary-color, #ef233c);
+  }
 
-    .play-audio {
-        display: block;
-        width: 55px;
-        height: 55px;
-        padding: 0.8rem;
-        background-color: rgba(240, 241, 244, 0.4);
-        border-radius: 50%;
-        margin: 0 auto 2rem;
+  .audio-error {
+    margin: 0.75rem 0 0;
+    color: #ffb7bd;
+    font-size: 0.9rem;
+    text-align: center;
+  }
 
-        svg {
-            width: 100%;
-            height: 100%;
-        }
-    }
-
-    .time-display {
-        display: flex;
-        justify-content: end;
-        align-items: center;
-        color: #f0f1f4;
-        font-family: "regular", sans-serif;
-        padding: 0.5rem 0.5rem 0;
-        font-size: 1.2rem;
-        margin-top: 0.5rem;
-        border-top: 1px solid rgba(240, 241, 244, 0.2);
-    }
 }
 </style>

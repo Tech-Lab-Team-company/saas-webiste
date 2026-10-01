@@ -194,7 +194,7 @@ test("profilecourse keeps navigation compact and prioritizes searchable content"
 test("profilecourse and student dashboard share the same course card", async () => {
   const [library, dashboard, courseCard] = await Promise.all([
     readSource("components/Profile/MyPurchasesLibrary.vue"),
-    readSource("pages/student-dashboard.vue"),
+    readSource("pages/student-dashboard/index.vue"),
     readSource("components/Profile/StudentCourseCard.vue"),
   ]);
 

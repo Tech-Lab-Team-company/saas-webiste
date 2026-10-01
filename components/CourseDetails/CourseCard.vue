@@ -26,6 +26,10 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  dashboardMode: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const CardDetails = ref(props.CourseData);
@@ -261,11 +265,20 @@ const userStore = useUserStore();
       <div class="course-hero-inner detail-hero-grid">
         <div class="card-text detail-copy">
           <div class="detail-breadcrumb" aria-label="مسار الصفحة">
-            <NuxtLink to="/">الرئيسية</NuxtLink>
-            <span>/</span>
-            <NuxtLink to="/course">{{ $t("all_courses") }}</NuxtLink>
-            <span>/</span>
-            <b>{{ CardDetails?.title }}</b>
+            <template v-if="dashboardMode">
+              <NuxtLink :to="{ name: 'student-dashboard' }">الرئيسية</NuxtLink>
+              <span>/</span>
+              <NuxtLink :to="{ name: 'profilecourse' }">مشترياتي</NuxtLink>
+              <span>/</span>
+              <b>{{ CardDetails?.title }}</b>
+            </template>
+            <template v-else>
+              <NuxtLink to="/">الرئيسية</NuxtLink>
+              <span>/</span>
+              <NuxtLink to="/course">{{ $t("all_courses") }}</NuxtLink>
+              <span>/</span>
+              <b>{{ CardDetails?.title }}</b>
+            </template>
           </div>
 
           <div class="course-badges">

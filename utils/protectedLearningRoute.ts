@@ -16,7 +16,9 @@ const MOBILE_BROWSER_PATTERN =
 
 export const isProtectedLearningPath = (path: string) => {
   const pathname = path.split(/[?#]/u, 1)[0] || "";
-  return /^\/course\/[^/]+(?:\/[^/]+)?\/?$/u.test(pathname);
+  return /^\/(?:student-dashboard\/)?course\/[^/]+(?:\/[^/]+)?\/?$/u.test(
+    pathname,
+  );
 };
 
 export const hasDeveloperToolsViewportGap = (
