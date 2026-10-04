@@ -79,7 +79,7 @@ export default defineNuxtConfig({
       },
     },
     '/': {
-      redirect: { to: '/', statusCode: 302 },
+      redirect: { to: '/loginhome', statusCode: 302 },
     },
     '/about-teacher': { swr: 3600 },
     '/teachers': { swr: 300 },
