@@ -46,13 +46,17 @@ const courseRoute = (course: CoursesModel) => ({
   <GlobalDataStatues :status="state">
     <template #initial>
       <div class="library-grid library-loading" aria-label="جارٍ تحميل الكورسات">
-        <article v-for="item in 2" :key="item" class="library-course"><span /><div><i /><i /><i /></div></article>
+        <article v-for="item in 2" :key="item" class="library-course"><span />
+          <div><i /><i /><i /></div>
+        </article>
       </div>
     </template>
 
     <template #loader>
       <div class="library-grid library-loading" aria-label="جارٍ تحميل الكورسات">
-        <article v-for="item in 2" :key="item" class="library-course"><span /><div><i /><i /><i /></div></article>
+        <article v-for="item in 2" :key="item" class="library-course"><span />
+          <div><i /><i /><i /></div>
+        </article>
       </div>
     </template>
 
@@ -102,18 +106,10 @@ const courseRoute = (course: CoursesModel) => ({
 
     <template #success>
       <div class="library-grid">
-        <article
-          v-for="(course, index) in courses"
-          :key="course.id"
-          class="library-course"
-          :style="{ '--order': index }"
-        >
+        <article v-for="(course, index) in courses" :key="course.id" class="library-course"
+          :style="{ '--order': index }">
           <div class="library-cover" :class="`tone-${index % 3}`">
-            <img
-              v-if="courseImage(course)"
-              :src="courseImage(course)"
-              :alt="course.image?.alt || course.title"
-            />
+            <img v-if="courseImage(course)" :src="courseImage(course)" :alt="course.image?.alt || course.title" />
             <span v-else>{{ course.title?.charAt(0) || "ك" }}</span>
 
             <div class="cover-caption">
@@ -158,7 +154,7 @@ const courseRoute = (course: CoursesModel) => ({
   border-radius: 0;
   background: var(--profile-surface);
   box-shadow: none;
-  animation: library-course-in 0.58s cubic-bezier(.2,.8,.2,1) both;
+  animation: library-course-in 0.58s cubic-bezier(.2, .8, .2, 1) both;
   animation-delay: calc(var(--order) * 70ms);
   transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
 }
@@ -197,7 +193,7 @@ const courseRoute = (course: CoursesModel) => ({
   pointer-events: none;
 }
 
-.library-cover > span {
+.library-cover>span {
   font-size: 142px;
   font-weight: 900;
   line-height: 1;
@@ -205,7 +201,7 @@ const courseRoute = (course: CoursesModel) => ({
   transition: opacity 260ms ease, transform 350ms ease;
 }
 
-.library-cover > img {
+.library-cover>img {
   width: 100%;
   height: 100%;
   min-height: 240px;
@@ -213,9 +209,14 @@ const courseRoute = (course: CoursesModel) => ({
   transition: transform 350ms ease;
 }
 
-.library-course:hover .library-cover > img { transform: scale(1.035); }
+.library-course:hover .library-cover>img {
+  transform: scale(1.035);
+}
 
-.library-course:hover .library-cover > span { opacity: .19; transform: scale(1.06) rotate(-2deg); }
+.library-course:hover .library-cover>span {
+  opacity: .19;
+  transform: scale(1.06) rotate(-2deg);
+}
 
 .cover-caption {
   position: absolute;
@@ -283,7 +284,7 @@ const courseRoute = (course: CoursesModel) => ({
   -webkit-line-clamp: 2;
 }
 
-.library-body > p {
+.library-body>p {
   display: -webkit-box;
   overflow: hidden;
   margin: 0;
@@ -325,8 +326,13 @@ const courseRoute = (course: CoursesModel) => ({
   text-decoration: none;
 }
 
-.library-footer a span { transition: transform 180ms ease; }
-.library-footer a:hover span { transform: translateX(-3px); }
+.library-footer a span {
+  transition: transform 180ms ease;
+}
+
+.library-footer a:hover span {
+  transform: translateX(-3px);
+}
 
 .library-empty {
   display: flex;
@@ -356,6 +362,7 @@ const courseRoute = (course: CoursesModel) => ({
   box-shadow: 0 24px 64px color-mix(in srgb, var(--profile-primary) 8%, transparent);
   text-align: right;
 }
+
 /*
 .library-empty--courses::before {
   position: absolute;
@@ -462,7 +469,7 @@ const courseRoute = (course: CoursesModel) => ({
   line-height: 1.45;
 }
 
-.library-empty--courses .library-empty-content > p {
+.library-empty--courses .library-empty-content>p {
   max-width: 560px;
   color: var(--profile-muted);
   font-size: 13px;
@@ -519,10 +526,16 @@ const courseRoute = (course: CoursesModel) => ({
   transform: translateY(-2px);
 }
 
-.library-empty-action span { font-size: 18px; transition: transform 180ms ease; }
-.library-empty-action:hover span { transform: translateX(-4px); }
+.library-empty-action span {
+  font-size: 18px;
+  transition: transform 180ms ease;
+}
 
-.library-empty > span {
+.library-empty-action:hover span {
+  transform: translateX(-4px);
+}
+
+.library-empty>span {
   display: grid;
   width: 58px;
   height: 58px;
@@ -533,46 +546,170 @@ const courseRoute = (course: CoursesModel) => ({
   font-size: 24px;
 }
 
-.library-empty h2 { margin: 15px 0 3px; color: var(--profile-ink); font-size: 19px; }
-.library-empty p { margin: 0; color: var(--profile-muted); font-size: 11px; }
-.library-empty a { margin-top: 16px; color: var(--profile-secondary); font-size: 11px; font-weight: 900; text-decoration: none; }
-.library-error > span { color: #ff8f83; background: color-mix(in srgb, #b42318 18%, var(--profile-surface)); }
+.library-empty h2 {
+  margin: 15px 0 3px;
+  color: var(--profile-ink);
+  font-size: 19px;
+}
 
-.library-loading .library-course { min-height: 240px; animation: none; }
-.library-loading article > span { background: linear-gradient(100deg,var(--profile-surface),var(--profile-surface-raised),var(--profile-surface)); background-size: 200%; animation: library-loading 1.2s infinite; }
-.library-loading article > div { display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px; }
-.library-loading i { height: 13px; border-radius: 5px; background: linear-gradient(100deg,var(--profile-surface),var(--profile-surface-raised),var(--profile-surface)); background-size: 200%; animation: library-loading 1.2s infinite; }
-.library-loading i:nth-child(1) { width: 35%; }.library-loading i:nth-child(2) { width: 85%; height: 28px; }.library-loading i:nth-child(3) { width: 65%; }
+.library-empty p {
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 11px;
+}
 
-@keyframes library-course-in { from { opacity: 0; transform: translateY(24px) scale(.985); } }
-@keyframes library-loading { to { background-position: -200% 0; } }
-@keyframes library-spark { 50% { opacity: .55; transform: translateY(-5px) rotate(8deg); } }
+.library-empty a {
+  margin-top: 16px;
+  color: var(--profile-secondary);
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.library-error>span {
+  color: #ff8f83;
+  background: color-mix(in srgb, #b42318 18%, var(--profile-surface));
+}
+
+.library-loading .library-course {
+  min-height: 240px;
+  animation: none;
+}
+
+.library-loading article>span {
+  background: linear-gradient(100deg, var(--profile-surface), var(--profile-surface-raised), var(--profile-surface));
+  background-size: 200%;
+  animation: library-loading 1.2s infinite;
+}
+
+.library-loading article>div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+}
+
+.library-loading i {
+  height: 13px;
+  border-radius: 5px;
+  background: linear-gradient(100deg, var(--profile-surface), var(--profile-surface-raised), var(--profile-surface));
+  background-size: 200%;
+  animation: library-loading 1.2s infinite;
+}
+
+.library-loading i:nth-child(1) {
+  width: 35%;
+}
+
+.library-loading i:nth-child(2) {
+  width: 85%;
+  height: 28px;
+}
+
+.library-loading i:nth-child(3) {
+  width: 65%;
+}
+
+@keyframes library-course-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(.985);
+  }
+}
+
+@keyframes library-loading {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes library-spark {
+  50% {
+    opacity: .55;
+    transform: translateY(-5px) rotate(8deg);
+  }
+}
 
 @media (max-width: 1180px) {
-  .library-grid { grid-template-columns: 1fr; }
+  .library-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 680px) {
-  .library-course { grid-template-columns: 145px minmax(0,1fr); }
-  .library-cover { min-height: 220px; }
-  .library-body { padding: 19px; }
-  .library-footer { align-items: flex-start; flex-direction: column; }
-  .library-empty--courses { grid-template-columns: 1fr; gap: 12px; padding: 32px 26px; text-align: center; }
-  .library-empty-art { min-height: 180px; }
-  .library-empty-art__glow { width: 155px; height: 155px; }
-  .library-empty-art__book { width: 98px; height: 126px; }
-  .library-empty-content ul { justify-content: center; }
-  .library-empty--courses .library-empty-action { width: 100%; }
+  .library-course {
+    grid-template-columns: 145px minmax(0, 1fr);
+  }
+
+  .library-cover {
+    min-height: 220px;
+  }
+
+  .library-body {
+    padding: 19px;
+  }
+
+  .library-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .library-empty--courses {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 32px 26px;
+    text-align: center;
+  }
+
+  .library-empty-art {
+    min-height: 180px;
+  }
+
+  .library-empty-art__glow {
+    width: 155px;
+    height: 155px;
+  }
+
+  .library-empty-art__book {
+    width: 98px;
+    height: 126px;
+  }
+
+  .library-empty-content ul {
+    justify-content: center;
+  }
+
+  .library-empty--courses .library-empty-action {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-  .library-course { grid-template-columns: 1fr; }
-  .library-cover { min-height: 190px; }
-  .library-cover > span { font-size: 115px; }
-  .library-footer { flex-direction: row; align-items: center; }
+  .library-course {
+    grid-template-columns: 1fr;
+  }
+
+  .library-cover {
+    min-height: 190px;
+  }
+
+  .library-cover>span {
+    font-size: 115px;
+  }
+
+  .library-footer {
+    flex-direction: row;
+    align-items: center;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .library-course, .library-empty-art__spark { animation: none; transition: none; }
+
+  .library-course,
+  .library-empty-art__spark {
+    animation: none;
+    transition: none;
+  }
 }
 </style>

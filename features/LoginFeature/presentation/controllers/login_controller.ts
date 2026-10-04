@@ -88,32 +88,9 @@ export default class LoginController extends ControllerInterface<UserModel> {
           : null,
         autoCloseMs: isUnauthorized ? 0 : 6500,
 
-        action: isUnauthorized
-          ? {
-            label: "إرسال طلب جهاز",
-
-            callback: () => {
-              // اقفل Dialog الخطأ
-              DialogSelector.instance.errorDialog.closeDialog(
-                "dialog",
-              );
-
-              // افتح Dialog طلب الجهاز
-              requestAnimationFrame(() => {
-                DialogSelector.instance.newDeviceRequestDialog.openDialog(
-                  {
-                    dialogName: "new-device-request-dialog",
-                    titleContent: "طلب تسجيل جهاز جديد",
-                    messageContent: "برجاء إدخال البيانات لإرسال طلب تسجيل الجهاز.",
-                    imageElement: null,
-                    autoCloseMs: 0,
-                    action: null,
-                  }
-                );
-              });
-            },
-          }
-          : null,
+        // Device registration requests are temporarily disabled. Keep login
+        // limited to the submitted phone number and password.
+        action: null,
       });
 
       return false;

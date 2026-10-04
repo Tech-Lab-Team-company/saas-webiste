@@ -1,5 +1,7 @@
 import { $fetch, FetchError } from "ofetch";
 import { ApiNames } from "~/base/core/networkStructure/apiNames";
+import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
+import type WebStatus from "~/types/webStatus";
 import { HeroSectionTypeEnum } from "../types/homePage.types";
 import type {
   HomeApiSourceResult,
@@ -51,6 +53,27 @@ class HomeApiResponseError extends Error {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const toPositiveFilterId = (value: number | null): number | null =>
+  Number.isInteger(value) && Number(value) > 0 ? Number(value) : null;
+
+export interface EducationCourseFilters {
+  categoryId: CategoryIdEnum.BASIC | CategoryIdEnum.UNIVERSITY;
+  educationTypeId?: number | null;
+  stageId?: number | null;
+  yearId?: number | null;
+  subjectId?: number | null;
+  universityId?: number | null;
+  collegeId?: number | null;
+  departmentId?: number | null;
+  divisionId?: number | null;
+  universitySubjectId?: number | null;
+  page?: number;
+  perPage?: number;
+  teacherId?: number | null;
+  word?: string;
+  accessToken?: string;
+}
+
 const readEnvelopeData = (value: unknown): unknown => {
   if (!isRecord(value) || !("data" in value)) {
     throw new HomeApiResponseError();
@@ -71,6 +94,10 @@ const toSourceResult = (
 
 export class HomePageApi {
   constructor(private readonly webDomain: string) {}
+
+  async fetchWebStatus(): Promise<WebStatus> {
+    return this.get(`${ApiNames.Instance.baseUrl}fetch_web_status`) as Promise<WebStatus>;
+  }
 
   async load(): Promise<HomePageApiSources> {
     const [
@@ -103,32 +130,83 @@ export class HomePageApi {
   }
 
   async fetchCoursesByYear(
-    stageId: number,
-    yearId: number,
+    categoryId: CategoryIdEnum.BASIC | CategoryIdEnum.UNIVERSITY,
+    stageId: number | null,
+    yearId: number | null,
     page = 1,
     perPage = 9,
     teacherId: number | null = null,
     word = "",
   ): Promise<unknown> {
+    return this.fetchEducationCourses({
+      categoryId,
+      stageId,
+      yearId,
+      page,
+      perPage,
+      teacherId,
+      word,
+    });
+  }
+
+  async fetchEducationCourses({
+    categoryId,
+    educationTypeId = null,
+    stageId = null,
+    yearId = null,
+    subjectId = null,
+    universityId = null,
+    collegeId = null,
+    departmentId = null,
+    divisionId = null,
+    universitySubjectId = null,
+    page = 1,
+    perPage = 9,
+    teacherId = null,
+    word = "",
+    accessToken,
+  }: EducationCourseFilters): Promise<unknown> {
+    const usesBasicEducationFilters = categoryId === CategoryIdEnum.BASIC;
+    const usesUniversityEducationFilters =
+      categoryId === CategoryIdEnum.UNIVERSITY;
+
     return this.post(
       ApiNames.Instance.filter_courses,
       {
-        category_id: 1,
+        category_id: categoryId,
         type: 1,
-        education_type_id: null,
-        stage_id: stageId,
-        year_id: yearId,
-        subject_id: null,
-        university_id: null,
-        college_id: null,
-        department_id: null,
-        division_id: null,
-        university_subject_id: null,
+        education_type_id: toPositiveFilterId(educationTypeId),
+        stage_id: usesBasicEducationFilters
+          ? toPositiveFilterId(stageId)
+          : null,
+        year_id: usesBasicEducationFilters
+          ? toPositiveFilterId(yearId)
+          : null,
+        subject_id: usesBasicEducationFilters
+          ? toPositiveFilterId(subjectId)
+          : null,
+        university_id: usesUniversityEducationFilters
+          ? toPositiveFilterId(universityId)
+          : null,
+        college_id: usesUniversityEducationFilters
+          ? toPositiveFilterId(collegeId)
+          : null,
+        department_id: usesUniversityEducationFilters
+          ? toPositiveFilterId(departmentId)
+          : null,
+        division_id: usesUniversityEducationFilters
+          ? toPositiveFilterId(divisionId)
+          : null,
+        university_subject_id: usesUniversityEducationFilters
+          ? toPositiveFilterId(universitySubjectId)
+          : null,
         teacher_id: teacherId,
         word,
         page,
         per_page: perPage,
       },
+      undefined,
+      accessToken,
     );
   }
 

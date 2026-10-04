@@ -235,7 +235,7 @@ test("center student profile loads the full catalog without stage data", async (
   assert.match(profileCourses, /isCenterTeacherType\(settingStore\.setting\?\.type\)/u);
   assert.match(profileCourses, /if \(isCenter\.value\) return fetchAllCenterCourses\(\)/u);
   assert.match(profileCourses, /requestKey\.value,\s*async/u);
-  assert.match(profileCourses, /watch: \[isCenter, stageId, yearId\]/u);
+  assert.match(profileCourses, /watch: \[requestKey\]/u);
   assert.match(profileCourses, /api\.fetchPublicCourseCatalog\(1, perPage\)/u);
   assert.match(profileCourses, /firstPage\.pagination\.lastPage - 1/u);
   assert.match(profileCourses, /if \(!uniqueCourses\.has\(course\.id\)\)/u);
@@ -244,6 +244,33 @@ test("center student profile loads the full catalog without stage data", async (
     profileCourses.indexOf("if (isCenter.value) return fetchAllCenterCourses()") <
       profileCourses.indexOf("بيانات المرحلة الدراسية غير مكتملة"),
   );
+});
+
+test("student profile sends authenticated university education filters with named pagination", async () => {
+  const [profileCourses, api] = await Promise.all([
+    readSource("components/Profile/ProfileAvailableCourses.vue"),
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+  ]);
+
+  assert.match(profileCourses, /api\.fetchEducationCourses\(\{/u);
+  assert.match(profileCourses, /categoryId: categoryId\.value/u);
+  assert.match(
+    profileCourses,
+    /university_education_type_id[\s\S]*universityId:[\s\S]*university_id[\s\S]*collegeId:[\s\S]*college_id[\s\S]*departmentId:[\s\S]*department_id[\s\S]*divisionId:[\s\S]*division_id/u,
+  );
+  assert.match(profileCourses, /page: 1,[\s\S]*perPage: 100/u);
+  assert.match(profileCourses, /accessToken: userStore\.user\?\.apiToken/u);
+  assert.doesNotMatch(
+    profileCourses,
+    /fetchCoursesByYear\(stageId\.value, yearId\.value, 1, 100\)/u,
+  );
+  assert.match(api, /async fetchEducationCourses\(\{/u);
+  assert.match(api, /education_type_id: toPositiveFilterId\(educationTypeId\)/u);
+  assert.match(
+    api,
+    /university_id: usesUniversityEducationFilters[\s\S]*college_id: usesUniversityEducationFilters[\s\S]*department_id: usesUniversityEducationFilters[\s\S]*division_id: usesUniversityEducationFilters/u,
+  );
+  assert.match(api, /per_page: perPage,[\s\S]*accessToken/u);
 });
 
 test("center mode loads both education taxonomy and the public catalog fallback", async () => {
@@ -291,6 +318,53 @@ test("homepage automatically opens the first education year that has courses", a
   assert.match(section, /if \(!props\.catalog\) \{[\s\S]*void autoSelectHomepageCourseTab\(\)/u);
 });
 
+test("education course requests use the tenant category and omit basic filters for university tenants", async () => {
+  const [categoryEnum, api, homePage] = await Promise.all([
+    readSource("features/RegisterFeature/Core/Enums/education_type_enum.ts"),
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+    readSource("features/HomePageFeature/composables/useHomePage.ts"),
+  ]);
+
+  assert.match(categoryEnum, /resolveEducationCategoryId/u);
+  assert.match(
+    categoryEnum,
+    /hasBasicEducationSelection[\s\S]*categoryIds\.includes\(CategoryIdEnum\.BASIC\)[\s\S]*return CategoryIdEnum\.BASIC/u,
+  );
+  assert.match(
+    categoryEnum,
+    /categoryIds\.includes\(CategoryIdEnum\.UNIVERSITY\)[\s\S]*return CategoryIdEnum\.UNIVERSITY/u,
+  );
+  assert.match(api, /category_id: categoryId/u);
+  assert.match(
+    api,
+    /stage_id: usesBasicEducationFilters[\s\S]*toPositiveFilterId\(stageId\)[\s\S]*: null/u,
+  );
+  assert.match(
+    api,
+    /year_id: usesBasicEducationFilters[\s\S]*toPositiveFilterId\(yearId\)[\s\S]*: null/u,
+  );
+  assert.match(
+    homePage,
+    /api\.fetchCoursesByYear\([\s\S]*categoryId,[\s\S]*stageId,[\s\S]*yearId/u,
+  );
+  assert.match(
+    homePage,
+    /if \(categoryId === CategoryIdEnum\.BASIC && yearId > 0\)[\s\S]*await api\.fetchSubjectsByYear\(yearId\)/u,
+  );
+  assert.match(
+    homePage,
+    /\[400, 422\]\.includes[\s\S]*categoryId = CategoryIdEnum\.UNIVERSITY[\s\S]*api\.fetchCoursesByYear\([\s\S]*categoryId,[\s\S]*null,[\s\S]*null/u,
+  );
+  assert.ok(
+    homePage.indexOf('await api.fetchCoursesByYear(') <
+      homePage.indexOf('await api.fetchSubjectsByYear(yearId)'),
+  );
+  assert.match(
+    homePage,
+    /if \(!setting\.value\)[\s\S]*settingsStore\.setSetting\(await api\.fetchWebStatus\(\)\)/u,
+  );
+});
+
 test("course catalog filters by teacher through the API and shareable URL", async () => {
   const [api, homePage, section, coursePage, teacherPage] = await Promise.all([
     readSource("features/HomePageFeature/api/homePageApi.ts"),
@@ -302,7 +376,7 @@ test("course catalog filters by teacher through the API and shareable URL", asyn
 
   assert.match(api, /fetchPublicCourseCatalog\([\s\S]*teacherId: number \| null = null/u);
   assert.match(api, /teacher_id: teacherId/u);
-  assert.match(homePage, /api\.fetchCoursesByYear\(stageId, yearId, page, perPage, teacherId, word\)/u);
+  assert.match(homePage, /api\.fetchCoursesByYear\([\s\S]*categoryId,[\s\S]*stageId,[\s\S]*yearId/u);
   assert.match(homePage, /api\.fetchPublicCourseCatalog\(page, perPage, teacherId, word\)/u);
   assert.match(homePage, /course\.teacher\?\.id === teacherId/u);
   assert.match(section, /route\.query\.teacher_id/u);

@@ -20,8 +20,8 @@ export default class UserModel {
   public linkedin?: string;
   public whatsapp?: string;
   public userInfo?:UserInfo;
-  public category_id?:Number
-  public join_option_status?:Number
+  public category_id?: number
+  public join_option_status?: number
   public comment?: string
 
 
@@ -45,8 +45,8 @@ export default class UserModel {
     linkedin?: string,
     whatsapp?: string,
     userInfo?: UserInfo,
-    category_id?: Number,
-    join_option_status?: Number,
+    category_id?: number,
+    join_option_status?: number,
     comment?: string
   ) {
     this.id = id;
