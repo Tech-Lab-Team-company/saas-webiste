@@ -14,7 +14,7 @@ class ApiNames {
   public baseUrl = useBaseUrls().baseUrl + "/";
 
   //auth
-  public login = "login";
+  public login = "desktop_login";
   public register = "register";
   public logout = "logout";
   public VerifyCode = "check_code";
