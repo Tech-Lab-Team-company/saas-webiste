@@ -161,7 +161,7 @@ export default abstract class RepoInterface<T> {
       });
     } else if (error instanceof UnAuthorizedException) {
       return new DataFailed({
-        error: new ErrorModel("Unauthorized", ErrorType.unAuthorized),
+        error: new ErrorModel(error.message, ErrorType.unAuthorized),
       });
     } else if (error instanceof NotFoundException) {
       return new DataFailed({
