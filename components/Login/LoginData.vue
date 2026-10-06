@@ -6,6 +6,7 @@ import FetchPaymentMethodsParams from '~/features/fetch_payment_methods/Core/Par
 import FetchPaymentMethodController from '~/features/fetch_payment_methods/presentation/controllers/fetch_payment_method_controller';
 import { rememberAuthRedirect, sanitizeAuthRedirect } from '~/utils/authRedirect';
 import GuestAccessLink from '~/components/AuthLayout/GuestAccessLink.vue';
+import { getDeviceMac } from '~/utils/deviceMac';
 
 const router = useRouter();
 const route = useRoute();
@@ -25,6 +26,7 @@ const registerTarget = computed(() => ({
 
 onMounted(() => {
     rememberAuthRedirect(route.query.redirect);
+    void getDeviceMac();
 });
 
 
@@ -45,7 +47,8 @@ const FetchPaymentMethod = async () => {
 const LoginData = async () => {
     rememberAuthRedirect(route.query.redirect);
     window.localStorage.clear();
-    const loginParams = new LoginParams(Credential.value, LoginPassword.value);
+    const macAddress = await getDeviceMac();
+    const loginParams = new LoginParams(Credential.value, LoginPassword.value, macAddress);
     const loginController = LoginController.getInstance();
     const didLogin = await loginController.login(loginParams, router);
     if (didLogin) await FetchPaymentMethod();
