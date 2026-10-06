@@ -85,10 +85,10 @@ export default abstract class ServicesInterface {
         const message = error.response?.data.message;
         switch (statusCode) {
           case 400:
-            console.error(`BadRequestException >> ${message}`);
+            // console.error(`BadRequestException >> ${message}`);
             throw new BadRequestException(message);
           case 401:
-            console.error(`UnAuthorizedException >> ${message}`);
+            // console.error(`UnAuthorizedException >> ${message}`);
             if (auth && import.meta.client) {
               const redirect = `${window.location.pathname}${window.location.search}`;
               const userStore = useUserStore();
