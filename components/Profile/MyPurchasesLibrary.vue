@@ -416,8 +416,8 @@ onBeforeUnmount(() =>
           الوصول والفاتورة والمحتوى المتاح.
         </p>
         <div class="purchases-empty-actions">
-          <NuxtLink to="/course">تصفّح الكورسات</NuxtLink>
-          <NuxtLink to="/books">تصفّح الكتب</NuxtLink>
+          <NuxtLink to="/profilecourse">تصفّح الكورسات</NuxtLink>
+          <!-- <NuxtLink to="/books">تصفّح الكتب</NuxtLink> -->
         </div>
       </div>
     </div>
