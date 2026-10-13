@@ -37,5 +37,13 @@ export const useUserStore = defineStore('user', {
     },
   
   },
-  persist: true
+  persist: {
+    // The Nuxt plugin already restores this cookie before route guards run.
+    // Give it a lifetime so closing the browser/WebView does not discard it.
+    storage: piniaPluginPersistedstate.cookies({
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
+      sameSite: 'lax',
+    }),
+  },
 });
