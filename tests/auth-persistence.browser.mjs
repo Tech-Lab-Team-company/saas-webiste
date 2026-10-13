@@ -22,10 +22,21 @@ test('student authentication survives refresh, tab reopening and browser restart
   let rejectSession = false;
   let loginCount = 0;
   let authenticatedRequests = 0;
+  let rejectedRequests = 0;
+  let middlewareServed = false;
+  const scriptReads = [];
   const launch = async () => {
     context = await chromium.launchPersistentContext(profile, {
       headless: true,
       ...(process.env.AUTH_TEST_BROWSER ? { executablePath: process.env.AUTH_TEST_BROWSER } : {}),
+    });
+    context.on('response', response => {
+      const pathname = new URL(response.url()).pathname;
+      if (pathname.startsWith('/_nuxt/') && pathname.endsWith('.js')) {
+        scriptReads.push(response.text().then(source => {
+          if (source.includes('student-guest')) middlewareServed = true;
+        }).catch(() => {}));
+      }
     });
     await context.route('**/api/website/**', async route => {
       const request = route.request();
@@ -41,6 +52,7 @@ test('student authentication survives refresh, tab reopening and browser restart
         assert.equal(request.headers().authorization, `Bearer ${token}`);
         authenticatedRequests++;
         if (rejectSession) {
+          rejectedRequests++;
           await route.fulfill({ status: 401, json: { status: false, message: 'Unauthenticated.' } });
           return;
         }
@@ -63,13 +75,24 @@ test('student authentication survives refresh, tab reopening and browser restart
       await page.waitForFunction(() => document.body.innerText.includes('Persistence Student'));
     } catch (error) {
       console.log('Restoration diagnostics:', {
-        url: page.url(),
+        pathname: new URL(page.url()).pathname,
         cookiePresent: Boolean(await storedUser()),
-        body: (await page.locator('body').innerText()).slice(0, 400),
       });
       throw error;
     }
     assert.equal((await storedUser())?.apiToken, token);
+  };
+  const cookieMetadata = async () => {
+    const cookie = (await context.cookies(origin)).find(cookie => cookie.name === 'user');
+    const state = cookie ? JSON.parse(decodeURIComponent(cookie.value)) : null;
+    return cookie ? {
+      bytes: Buffer.byteLength(`${cookie.name}=${cookie.value}`, 'utf8'),
+      path: cookie.path, domain: cookie.domain, secure: cookie.secure,
+      sameSite: cookie.sameSite, persistent: cookie.expires > Date.now() / 1000,
+      lifetimeDays: Math.round((cookie.expires - Date.now() / 1000) / 86400),
+      stateKeys: Object.keys(state), userKeys: Object.keys(state.user || {}),
+      hasToken: Boolean(state.user?.apiToken),
+    } : { present: false };
   };
   const login = async page => {
     await page.goto(`${origin}/loginhome`);
@@ -87,6 +110,7 @@ test('student authentication survives refresh, tab reopening and browser restart
   try {
     let page = await launch();
     await login(page);
+    console.log('Cookie metadata after login (values omitted):', await cookieMetadata());
     await assertNoStoredSecrets(page);
     await page.reload();
     await dashboard(page);
@@ -97,15 +121,36 @@ test('student authentication survives refresh, tab reopening and browser restart
     await page.close();
     page = await context.newPage();
     await blankTab.close();
-    await page.goto(`${origin}/student-dashboard`);
+    // Exercise the same entry URL that students reopen, not just a protected URL.
+    await page.goto(`${origin}/`);
+    try {
+      await page.waitForURL(`${origin}/student-dashboard`, { timeout: 5000 });
+    } catch (error) {
+      console.log('Origin reopening diagnostics (values omitted):', {
+        pathname: new URL(page.url()).pathname,
+        hasPersistedUser: Boolean(await storedUser()),
+        cookie: await cookieMetadata(),
+      });
+      throw error;
+    }
     await dashboard(page);
-    console.log('PASS: close tab and reopen');
+    console.log('PASS: close tab and reopen the website origin');
+
+    const newTab = await context.newPage();
+    await newTab.goto(`${origin}/`);
+    await dashboard(newTab);
+    await newTab.close();
+    console.log('PASS: opening the website origin in a new tab');
+
+    await page.goto(`${origin}/loginhome?redirect=%2F`);
+    await dashboard(page);
+    console.log('PASS: an origin redirect does not loop through the login page');
 
     const cookie = (await context.cookies(origin)).find(cookie => cookie.name === 'user');
     console.log(`User cookie is ${cookie.expires === -1 ? 'session-only' : 'persistent'}`);
     await context.close();
     page = await launch();
-    await page.goto(`${origin}/student-dashboard`);
+    await page.goto(`${origin}/`);
     await dashboard(page);
     assert.equal(loginCount, 1, 'restoration must not require another login');
     assert.ok(cookie.expires > Date.now() / 1000 + 28 * 24 * 60 * 60);
@@ -121,6 +166,8 @@ test('student authentication survives refresh, tab reopening and browser restart
     assert.equal(await storedUser(), null);
     await page.goto(`${origin}/student-dashboard`);
     await page.waitForURL(redirectedLogin);
+    await page.goto(`${origin}/`);
+    await page.waitForURL(`${origin}/loginhome`);
     console.log('PASS: logout stays logged out after refresh and protected navigation');
 
     await login(page);
@@ -139,7 +186,15 @@ test('student authentication survives refresh, tab reopening and browser restart
     await page.waitForURL(redirectedLogin);
     assert.equal(await storedUser(), null);
     assert.ok(authenticatedRequests >= 4);
+    assert.ok(rejectedRequests >= 1);
+    console.log('Protected API trace (mocked responses):', {
+      accepted: authenticatedRequests - rejectedRequests,
+      rejected401: rejectedRequests,
+    });
     console.log('PASS: expired persistence cookie redirects safely');
+    await Promise.all(scriptReads);
+    assert.ok(middlewareServed, 'the browser must receive the new login middleware registration');
+    console.log('PASS: served JavaScript includes the new login middleware');
   } finally {
     await context?.close();
     assert.equal(dirname(resolve(profile)), resolve(tmpdir()));
