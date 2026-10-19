@@ -80,21 +80,80 @@ export default defineNuxtConfig({
         'X-Content-Type-Options': 'nosniff',
       },
     },
-    '/': { swr: 300 },
-    '/about-teacher': { swr: 3600 },
-    '/teachers': { swr: 300 },
-    '/books': { swr: 300 },
+    
+    '/': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/about-teacher': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/teachers': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/books': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
     '/books/**': {
       swr: false,
-      headers: { 'Cache-Control': 'private, no-store' },
+      headers: {
+        'Cache-Control': 'private, no-store',
+      },
     },
-    '/blogs': { swr: 300 },
-    '/blogs/**': { swr: 600 },
-    '/blog-v2/**': { swr: 600 },
-    '/app': { swr: 3600 },
-    '/fqs': { swr: 3600 },
-    '/privacy': { swr: 3600 },
-    '/terms': { swr: 3600 },
+    '/blogs': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/blogs/**': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/blog-v2/**': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/app': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/fqs': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/privacy': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+    '/terms': {
+      swr: false,
+      headers: {
+        'Cache-Control': 'no-cache, max-age=0, must-revalidate',
+      },
+    },
+
     '/_nuxt/**': {
       headers: {
         'Cache-Control': 'public, max-age=31536000, immutable',
