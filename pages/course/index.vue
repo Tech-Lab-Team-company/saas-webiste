@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import HomeCoursesSection from "~/components/home/v2/sections/HomeCoursesSection.vue";
+import UniversityCoursesSection from "~/components/home/v2/sections/UniversityCoursesSection.vue";
 import { useHomePage } from "~/features/HomePageFeature/composables/useHomePage";
+import { CategoryIdEnum } from "~/features/RegisterFeature/Core/Enums/education_type_enum";
 
 const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+const settingStore = useSettingStore();
 const requestedTeacherId = Number(route.query.teacher_id);
 const initialTeacherId = Number.isInteger(requestedTeacherId) && requestedTeacherId > 0
   ? requestedTeacherId
@@ -14,6 +19,86 @@ const { home, pending, loadCoursesByYear, loadGeneralCourses } = await useHomePa
   initialTeacherId,
   initialWord,
 });
+
+const availableEducationCategories = computed(() => {
+  const categories = settingStore.setting?.categories ?? [];
+  return [CategoryIdEnum.BASIC, CategoryIdEnum.UNIVERSITY].filter((category) =>
+    categories.includes(category),
+  );
+});
+const requestedCategory = Number(route.query.category_id);
+const accountCategory = Number(userStore.user?.category_id);
+const selectedEducationCategory = ref<
+  CategoryIdEnum.BASIC | CategoryIdEnum.UNIVERSITY
+>(
+  requestedCategory === CategoryIdEnum.UNIVERSITY ||
+    (requestedCategory !== CategoryIdEnum.BASIC &&
+      accountCategory === CategoryIdEnum.UNIVERSITY)
+    ? CategoryIdEnum.UNIVERSITY
+    : CategoryIdEnum.BASIC,
+);
+
+watch(
+  availableEducationCategories,
+  (categories) => {
+    if (!categories.length || categories.includes(selectedEducationCategory.value)) return;
+    selectedEducationCategory.value = categories[0] as
+      | CategoryIdEnum.BASIC
+      | CategoryIdEnum.UNIVERSITY;
+  },
+  { immediate: true },
+);
+
+watch(
+  () => route.query.category_id,
+  (value) => {
+    const category = Number(value);
+    if (
+      (category === CategoryIdEnum.BASIC ||
+        category === CategoryIdEnum.UNIVERSITY) &&
+      availableEducationCategories.value.includes(category)
+    ) {
+      selectedEducationCategory.value = category;
+    }
+  },
+);
+
+watch(
+  () => userStore.user?.category_id,
+  (value) => {
+    if (route.query.category_id !== undefined) return;
+    const category = Number(value);
+    if (
+      category === CategoryIdEnum.UNIVERSITY &&
+      availableEducationCategories.value.includes(category)
+    ) {
+      selectedEducationCategory.value = CategoryIdEnum.UNIVERSITY;
+    }
+  },
+);
+
+const selectEducationCategory = async (
+  category: CategoryIdEnum.BASIC | CategoryIdEnum.UNIVERSITY,
+) => {
+  if (category === selectedEducationCategory.value) return;
+  selectedEducationCategory.value = category;
+
+  const {
+    category_id: _categoryId,
+    stage_id: _stageId,
+    year_id: _yearId,
+    education_type_id: _educationTypeId,
+    university_id: _universityId,
+    college_id: _collegeId,
+    department_id: _departmentId,
+    division_id: _divisionId,
+    page: _page,
+    ...query
+  } = route.query;
+  await router.replace({
+    query: { ...query, category_id: String(category) },
+  });
+};
 
 definePageMeta({ layout: "home-v2" });
 
@@ -82,7 +167,41 @@ useHead({
         </div>
       </header>
 
+      <section
+        v-if="availableEducationCategories.length > 1"
+        class="course-category-switch"
+        aria-labelledby="course-category-switch-title"
+      >
+        <div class="container course-category-switch__inner">
+          <div>
+            <span>نوع التعليم</span>
+            <h2 id="course-category-switch-title">اختار مسار الكورسات</h2>
+          </div>
+          <div class="course-category-switch__options" role="group">
+            <button
+              type="button"
+              :class="{ active: selectedEducationCategory === CategoryIdEnum.BASIC }"
+              :aria-pressed="selectedEducationCategory === CategoryIdEnum.BASIC"
+              @click="selectEducationCategory(CategoryIdEnum.BASIC)"
+            >
+              <b>01</b>
+              <span>التعليم الأساسي</span>
+            </button>
+            <button
+              type="button"
+              :class="{ active: selectedEducationCategory === CategoryIdEnum.UNIVERSITY }"
+              :aria-pressed="selectedEducationCategory === CategoryIdEnum.UNIVERSITY"
+              @click="selectEducationCategory(CategoryIdEnum.UNIVERSITY)"
+            >
+              <b>02</b>
+              <span>التعليم الجامعي</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       <HomeCoursesSection
+        v-if="selectedEducationCategory === CategoryIdEnum.BASIC"
         :courses="home.courses"
         :teachers="home.teachers"
         :teacher-filter-enabled="home.site.hasTeacherDirectory"
@@ -91,6 +210,12 @@ useHead({
         :load-courses-by-year="loadCoursesByYear"
         :load-general-courses="loadGeneralCourses"
         catalog
+      />
+      <UniversityCoursesSection
+        v-else
+        :key="`university-${userStore.user?.id ?? 'guest'}`"
+        :initial-teacher-id="initialTeacherId"
+        :initial-word="initialWord"
       />
     </main>
 
@@ -113,6 +238,73 @@ useHead({
   min-height: 335px;
   overflow: hidden;
   background: linear-gradient(115deg, color-mix(in srgb, var(--home-v2-blue) 82%, #06113d), var(--home-v2-blue));
+  color: #fff;
+}
+
+.course-category-switch {
+  border-bottom: 1px solid var(--home-v2-line);
+  background: var(--home-v2-paper);
+}
+
+.course-category-switch__inner {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 28px;
+  padding-block: 22px;
+}
+
+.course-category-switch__inner > div:first-child > span {
+  color: var(--home-v2-coral);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.course-category-switch h2 {
+  margin: 3px 0 0;
+  color: var(--home-v2-ink);
+  font: 900 20px/1.35 var(--home-v2-heading);
+}
+
+.course-category-switch__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.course-category-switch__options button {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--home-v2-line);
+  background: var(--home-v2-surface);
+  color: var(--home-v2-ink);
+  cursor: pointer;
+  font-weight: 900;
+  text-align: right;
+}
+
+.course-category-switch__options b {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--home-v2-line);
+  color: var(--home-v2-blue);
+  font-size: 12px;
+}
+
+.course-category-switch__options button.active {
+  border-color: var(--home-v2-deep);
+  background: var(--home-v2-deep);
+  color: #fff;
+  box-shadow: inset 0 -3px var(--home-v2-coral);
+}
+
+.course-category-switch__options button.active b {
+  border-color: rgb(255 255 255 / 30%);
   color: #fff;
 }
 
@@ -202,6 +394,8 @@ useHead({
   .course-page__hero h1 { margin-top: 10px; font-size: clamp(30px, 8.5vw, 35px); line-height: 1.2; }
   .course-page__hero p { max-width: 330px; margin: 0; font-size: 12.5px; line-height: 1.7; }
   .course-page__hero-word { font-size: 44px; }
+  .course-category-switch__inner { grid-template-columns: 1fr; gap: 14px; }
+  .course-category-switch__options { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
