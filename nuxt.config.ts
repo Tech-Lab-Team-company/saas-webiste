@@ -63,6 +63,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      // Tenant identity sent only as the backend `web-domain` header.
+      webLink: process.env.NUXT_PUBLIC_WEB_LINK || process.env.WEB_LINK || '',
       // Preferred public frontend origin for canonical and absolute URLs.
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || process.env.SITE_URL || '',
       googleAnalyticsId: process.env.NUXT_PUBLIC_GOOGLE_ANALYTICS_ID || '',
@@ -78,9 +80,7 @@ export default defineNuxtConfig({
         'X-Content-Type-Options': 'nosniff',
       },
     },
-    '/': {
-      redirect: { to: '/loginhome', statusCode: 302 },
-    },
+    '/': { swr: 300 },
     '/about-teacher': { swr: 3600 },
     '/teachers': { swr: 300 },
     '/books': { swr: 300 },

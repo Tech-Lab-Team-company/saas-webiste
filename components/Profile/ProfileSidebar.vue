@@ -264,7 +264,7 @@ const uploadImage = async () => {
         </span>
         <p>تغيير كلمة المرور</p>
       </NuxtLink>
-      <!-- <NuxtLink
+      <NuxtLink
         to="/"
         class="profile-option profile-site-return"
         aria-label="الانتقال إلى الموقع الرئيسي"
@@ -276,7 +276,7 @@ const uploadImage = async () => {
           <p>الموقع الرئيسي</p>
           <small>العودة إلى واجهة المنصة</small>
         </span>
-      </NuxtLink> -->
+      </NuxtLink>
       <button
         type="button"
         class="profile-option profile-logout"

@@ -227,50 +227,25 @@ test("web-status teacher types expose the correct center capabilities", () => {
   assert.equal(supportsTeacherDirectory(TeacherTypeEnum.CENTER_TEACHER), true);
 });
 
-test("center student profile loads the full catalog without stage data", async () => {
+test("student profile loads all pages for the account education path", async () => {
   const profileCourses = await readSource(
     "components/Profile/ProfileAvailableCourses.vue",
   );
 
-  assert.match(profileCourses, /isCenterTeacherType\(settingStore\.setting\?\.type\)/u);
-  assert.match(profileCourses, /if \(isCenter\.value\) return fetchAllCenterCourses\(\)/u);
-  assert.match(profileCourses, /requestKey\.value,\s*async/u);
+  assert.match(profileCourses, /fetchAllAvailableCourses/u);
+  assert.match(profileCourses, /requestKey\.value,\s*fetchAllAvailableCourses/u);
   assert.match(profileCourses, /watch: \[requestKey\]/u);
-  assert.match(profileCourses, /api\.fetchPublicCourseCatalog\(1, perPage\)/u);
+  assert.match(profileCourses, /api\.fetchEducationCourses\(\{/u);
+  assert.match(profileCourses, /categoryId: categoryId\.value!/u);
+  assert.match(profileCourses, /universityId: toPositiveId\(userInfo\.value\?\.university_id\)/u);
+  assert.match(profileCourses, /collegeId: toPositiveId\(userInfo\.value\?\.college_id\)/u);
+  assert.match(profileCourses, /departmentId: toPositiveId\(userInfo\.value\?\.department_id\)/u);
+  assert.match(profileCourses, /divisionId: toPositiveId\(userInfo\.value\?\.division_id\)/u);
+  assert.match(profileCourses, /accessToken: userStore\.user\?\.apiToken/u);
   assert.match(profileCourses, /firstPage\.pagination\.lastPage - 1/u);
   assert.match(profileCourses, /if \(!uniqueCourses\.has\(course\.id\)\)/u);
-  assert.match(profileCourses, /بيانات المرحلة الدراسية غير مكتملة/u);
-  assert.ok(
-    profileCourses.indexOf("if (isCenter.value) return fetchAllCenterCourses()") <
-      profileCourses.indexOf("بيانات المرحلة الدراسية غير مكتملة"),
-  );
-});
-
-test("student profile sends authenticated university education filters with named pagination", async () => {
-  const [profileCourses, api] = await Promise.all([
-    readSource("components/Profile/ProfileAvailableCourses.vue"),
-    readSource("features/HomePageFeature/api/homePageApi.ts"),
-  ]);
-
-  assert.match(profileCourses, /api\.fetchEducationCourses\(\{/u);
-  assert.match(profileCourses, /categoryId: categoryId\.value/u);
-  assert.match(
-    profileCourses,
-    /university_education_type_id[\s\S]*universityId:[\s\S]*university_id[\s\S]*collegeId:[\s\S]*college_id[\s\S]*departmentId:[\s\S]*department_id[\s\S]*divisionId:[\s\S]*division_id/u,
-  );
-  assert.match(profileCourses, /page: 1,[\s\S]*perPage: 100/u);
-  assert.match(profileCourses, /accessToken: userStore\.user\?\.apiToken/u);
-  assert.doesNotMatch(
-    profileCourses,
-    /fetchCoursesByYear\(stageId\.value, yearId\.value, 1, 100\)/u,
-  );
-  assert.match(api, /async fetchEducationCourses\(\{/u);
-  assert.match(api, /education_type_id: toPositiveFilterId\(educationTypeId\)/u);
-  assert.match(
-    api,
-    /university_id: usesUniversityEducationFilters[\s\S]*college_id: usesUniversityEducationFilters[\s\S]*department_id: usesUniversityEducationFilters[\s\S]*division_id: usesUniversityEducationFilters/u,
-  );
-  assert.match(api, /per_page: perPage,[\s\S]*accessToken/u);
+  assert.match(profileCourses, /getCachedData: \(\) => undefined/u);
+  assert.match(profileCourses, /مراحل مسارك الجامعي/u);
 });
 
 test("center mode loads both education taxonomy and the public catalog fallback", async () => {
@@ -300,6 +275,29 @@ test("center course UI prefers stages and falls back to the public catalog", asy
   assert.match(card, /htmlToSeoText\(props\.course\.description\)/u);
   assert.match(card, /<p>\{\{ courseDescription \}\}<\/p>/u);
   assert.doesNotMatch(card, /<p>\{\{ course\.description/u);
+});
+
+test("course page keeps basic stages and adds a separate university hierarchy", async () => {
+  const [coursePage, universitySection, api] = await Promise.all([
+    readSource("pages/course/index.vue"),
+    readSource("components/home/v2/sections/UniversityCoursesSection.vue"),
+    readSource("features/HomePageFeature/api/homePageApi.ts"),
+  ]);
+
+  assert.match(coursePage, /التعليم الأساسي/u);
+  assert.match(coursePage, /التعليم الجامعي/u);
+  assert.match(coursePage, /v-if="selectedEducationCategory === CategoryIdEnum\.BASIC"/u);
+  assert.match(coursePage, /<UniversityCoursesSection[\s\S]*v-else/u);
+  assert.match(universitySection, /fetchUniversityEducationTypes/u);
+  assert.match(universitySection, /fetchUniversities/u);
+  assert.match(universitySection, /fetchColleges/u);
+  assert.match(universitySection, /fetchCollegeDepartments/u);
+  assert.match(universitySection, /fetchCollegeDepartmentDivisions/u);
+  assert.match(
+    universitySection,
+    /fetchEducationCourses\(\{[\s\S]*categoryId: CategoryIdEnum\.UNIVERSITY[\s\S]*educationTypeId:[\s\S]*universityId:[\s\S]*collegeId:[\s\S]*departmentId:[\s\S]*divisionId:/u,
+  );
+  assert.match(api, /async fetchUniversityEducationTypes/u);
 });
 
 test("homepage automatically opens the first education year that has courses", async () => {
