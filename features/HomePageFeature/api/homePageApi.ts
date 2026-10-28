@@ -271,6 +271,63 @@ export class HomePageApi {
     });
   }
 
+  async fetchUniversityEducationTypes(accessToken?: string): Promise<unknown> {
+    return this.post(
+      "fetch_education_type",
+      { category_id: CategoryIdEnum.UNIVERSITY },
+      undefined,
+      accessToken,
+    );
+  }
+
+  async fetchUniversities(
+    educationTypeId: number,
+    accessToken?: string,
+  ): Promise<unknown> {
+    return this.post(
+      ApiNames.Instance.university,
+      { education_type_id: educationTypeId, country_id: 1 },
+      undefined,
+      accessToken,
+    );
+  }
+
+  async fetchColleges(
+    universityId: number,
+    accessToken?: string,
+  ): Promise<unknown> {
+    return this.post(
+      ApiNames.Instance.colleges,
+      { university_id: universityId },
+      undefined,
+      accessToken,
+    );
+  }
+
+  async fetchCollegeDepartments(
+    collegeId: number,
+    accessToken?: string,
+  ): Promise<unknown> {
+    return this.post(
+      ApiNames.Instance.college_department,
+      { college_id: collegeId },
+      undefined,
+      accessToken,
+    );
+  }
+
+  async fetchCollegeDepartmentDivisions(
+    departmentId: number,
+    accessToken?: string,
+  ): Promise<unknown> {
+    return this.post(
+      ApiNames.Instance.college_department_divisions,
+      { department_id: departmentId },
+      undefined,
+      accessToken,
+    );
+  }
+
   async fetchBooks(
     page = 1,
     subjectId: number | null = null,
