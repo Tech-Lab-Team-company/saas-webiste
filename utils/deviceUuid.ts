@@ -1,8 +1,8 @@
-// Reads the physical device MAC address from the Flutter Desktop host through
-// the flutter_inappwebview JavaScript bridge (`getDeviceMac` handler).
-// Normal browsers have no bridge, so the MAC resolves to null without errors.
+// Reads the device UUID from the Flutter Desktop host through
+// the flutter_inappwebview JavaScript bridge (`getDeviceIdentifiers` handler).
+// Normal browsers have no bridge, so the UUID resolves to null without errors.
 
-const LOG_PREFIX = "[DeviceMac]";
+const LOG_PREFIX = "[DeviceUuid]";
 const PLATFORM_READY_TIMEOUT_MS = 3000;
 const HANDLER_TIMEOUT_MS = 5000;
 
@@ -10,7 +10,7 @@ type FlutterBridge = {
   callHandler?: (handlerName: string, ...args: unknown[]) => Promise<unknown>;
 };
 
-let cachedMac: string | null = null;
+let cachedUuid: string | null = null;
 let pendingRequest: Promise<string | null> | null = null;
 
 const getBridge = (): FlutterBridge | undefined =>
@@ -42,7 +42,7 @@ const waitForPlatformReady = (): Promise<boolean> =>
     });
   });
 
-const requestMacFromFlutter = async (): Promise<string | null> => {
+const requestUuidFromFlutter = async (): Promise<string | null> => {
   if (!getBridge()) {
     console.log(`${LOG_PREFIX} Flutter WebView bridge not available`);
     return null;
@@ -54,40 +54,41 @@ const requestMacFromFlutter = async (): Promise<string | null> => {
   }
 
   console.log(`${LOG_PREFIX} Flutter WebView bridge available`);
-  console.log(`${LOG_PREFIX} Requesting MAC from Flutter`);
+  console.log(`${LOG_PREFIX} Requesting UUID from Flutter`);
 
   try {
     const result = await Promise.race([
-      getBridge()!.callHandler!("getDeviceMac"),
+      getBridge()!.callHandler!("getDeviceIdentifiers"),
       new Promise<never>((_, reject) =>
         setTimeout(
-          () => reject(new Error("getDeviceMac handler timed out")),
+          () => reject(new Error("getDeviceIdentifiers handler timed out")),
           HANDLER_TIMEOUT_MS,
         ),
       ),
     ]);
 
-    const mac = typeof result === "string" ? result.trim() : "";
-    console.log(`${LOG_PREFIX} Received MAC: ${mac || "(empty)"}`);
-    return mac || null;
+    const deviceUuid = result && typeof result === "object" && "deviceUuid" in result
+      && typeof result.deviceUuid === "string" ? result.deviceUuid.trim() : "";
+    console.log(`${LOG_PREFIX} Received UUID: ${deviceUuid ? "(available)" : "(empty)"}`);
+    return deviceUuid || null;
   } catch (error) {
-    console.warn(`${LOG_PREFIX} Failed to get MAC`, error);
+    console.warn(`${LOG_PREFIX} Failed to get UUID`, error);
     return null;
   }
 };
 
-// Returns the cached MAC when known; otherwise asks Flutter again, so a login
+// Returns the cached UUID when known; otherwise asks Flutter again, so a login
 // attempt retries if the mount-time request had not resolved a value yet.
-export async function getDeviceMac(): Promise<string | null> {
+export async function getDeviceUuid(): Promise<string | null> {
   if (!import.meta.client) return null;
-  if (cachedMac) return cachedMac;
+  if (cachedUuid) return cachedUuid;
 
   if (!pendingRequest) {
-    pendingRequest = requestMacFromFlutter().finally(() => {
+    pendingRequest = requestUuidFromFlutter().finally(() => {
       pendingRequest = null;
     });
   }
 
-  cachedMac = await pendingRequest;
-  return cachedMac;
+  cachedUuid = await pendingRequest;
+  return cachedUuid;
 }
