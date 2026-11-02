@@ -80,10 +80,12 @@ const currentSecurityData = computed(() => {
 
 const fileType = computed(() => {
   const link = CourseVideoLink.value?.videoLink || '';
-  if (link.endsWith('mp4')) return 'video';
   if (link.includes('youtube') || link.includes('youtu.be')) return 'youtube';
-  if (link.endsWith('.mp3')) return 'audio';
-  if (link.endsWith('.pdf')) return 'pdf';
+  // Strip query string / hash so signed URLs (e.g. S3 "?X-Amz-...") are detected by extension
+  const path = link.split(/[?#]/)[0].toLowerCase();
+  if (/\.(mp4|webm|mov|m4v|ogv)$/.test(path)) return 'video';
+  if (/\.(mp3|wav|m4a|ogg)$/.test(path)) return 'audio';
+  if (path.endsWith('.pdf')) return 'pdf';
   return 'unknown';
 });
 
