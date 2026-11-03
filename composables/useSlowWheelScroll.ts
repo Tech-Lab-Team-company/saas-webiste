@@ -1,3 +1,5 @@
+import { onBeforeUnmount, onMounted } from "vue";
+
 // Slower, eased mouse-wheel scrolling for a scroll container (or the page).
 const WHEEL_SPEED = 0.35;
 const WHEEL_EASING = 0.12;
@@ -7,20 +9,25 @@ export const createSlowWheelScroller = (
 ) => {
   let target = 0;
   let frame = 0;
+  let lastScrollTop = 0;
 
   const step = () => {
     const el = getScroller();
-    if (!el) {
+    // Stop if something else (scrollbar drag, keyboard, scrollTo) moved it.
+    if (!el || Math.abs(el.scrollTop - lastScrollTop) > 1) {
       frame = 0;
       return;
     }
     const distance = target - el.scrollTop;
-    if (Math.abs(distance) < 0.5) {
+    if (Math.abs(distance) <= 1) {
       el.scrollTop = target;
       frame = 0;
       return;
     }
-    el.scrollTop += distance * WHEEL_EASING;
+    // At least 1px per frame: browsers may round sub-pixel scrollTop changes.
+    el.scrollTop +=
+      Math.sign(distance) * Math.max(1, Math.abs(distance) * WHEEL_EASING);
+    lastScrollTop = el.scrollTop;
     frame = requestAnimationFrame(step);
   };
 
@@ -41,7 +48,10 @@ export const createSlowWheelScroller = (
     );
 
     event.preventDefault();
-    if (!frame) frame = requestAnimationFrame(step);
+    if (!frame) {
+      lastScrollTop = el.scrollTop;
+      frame = requestAnimationFrame(step);
+    }
   };
 
   const stop = () => {

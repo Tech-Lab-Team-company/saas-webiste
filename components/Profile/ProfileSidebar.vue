@@ -13,6 +13,7 @@ import {
   createSlowWheelScroller,
   usePageSlowWheelScroll,
 } from "~/composables/useSlowWheelScroll";
+import { useCustomScrollbar } from "~/composables/useCustomScrollbar";
 const selectedImage = ref<File | null>(null);
 const imagePreview = ref<string | null>(null);
 const errorMessage = ref<string | null>(null);
@@ -26,6 +27,13 @@ const sidebarRef = ref<HTMLElement | null>(null);
 const sidebarScroller = createSlowWheelScroller(() => sidebarRef.value);
 const handleSidebarWheel = sidebarScroller.handleWheel;
 onBeforeUnmount(sidebarScroller.stop);
+
+useCustomScrollbar({
+  target: () => sidebarRef.value,
+  placement: "inside",
+  gap: 3,
+  variant: "light",
+});
 
 // The sidebar is on every student dashboard page, so it also slows the page scroll.
 usePageSlowWheelScroll();

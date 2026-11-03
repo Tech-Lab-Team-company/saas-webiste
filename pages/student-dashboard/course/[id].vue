@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ProfileSidebar from "~/components/Profile/ProfileSidebar.vue";
+import { useCustomScrollbar } from "~/composables/useCustomScrollbar";
 
 definePageMeta({
   name: "student-dashboard-course-id",
@@ -32,6 +33,19 @@ watch(
 const refreshCourseDetails = async () => {
   await refresh();
 };
+
+// Course content scrolls with the page (sidebar and topbar are sticky), so the
+// custom scrollbar drives the page scroll while sitting beside the main area.
+const courseMainRef = ref<HTMLElement | null>(null);
+const topbarRef = ref<HTMLElement | null>(null);
+
+useCustomScrollbar({
+  target: () => courseMainRef.value,
+  scroller: "page",
+  placement: "outside",
+  gap: 8,
+  topBoundary: () => topbarRef.value?.getBoundingClientRect().bottom ?? 0,
+});
 </script>
 
 <template>
@@ -40,7 +54,7 @@ const refreshCourseDetails = async () => {
       <ProfileSidebar class="profile-dashboard-sidebar" />
 
       <div class="profile-dashboard-workspace">
-        <header class="profile-dashboard-topbar">
+        <header ref="topbarRef" class="profile-dashboard-topbar">
           <nav class="dashboard-course-breadcrumb" aria-label="مسار الصفحة">
             <NuxtLink :to="{ name: 'student-dashboard' }">
               <i class="pi pi-home" aria-hidden="true" />
@@ -53,7 +67,7 @@ const refreshCourseDetails = async () => {
           </nav>
         </header>
 
-        <main class="profile-dashboard-main dashboard-course-main">
+        <main ref="courseMainRef" class="profile-dashboard-main dashboard-course-main">
           <CourseDetailsCourseTabs
             dashboard-mode
             :course-data="course || null"

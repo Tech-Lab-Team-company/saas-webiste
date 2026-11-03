@@ -650,10 +650,82 @@ body:has(.profile-redesign-page)::-webkit-scrollbar {
   color: #fff;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overscroll-behavior: contain;
 }
 
 .profile-redesign-page .profile-sidebar-container::-webkit-scrollbar {
   display: none;
+}
+
+/* Custom draggable scrollbars (see composables/useCustomScrollbar.ts). */
+.profile-redesign-page .profile-custom-scrollbar {
+  position: fixed;
+  z-index: 30;
+  width: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--profile-primary) 7%, transparent);
+  cursor: pointer;
+  opacity: 0.7;
+  touch-action: none;
+  user-select: none;
+  transition: opacity 180ms ease, background 180ms ease;
+}
+
+.profile-redesign-page .profile-custom-scrollbar[hidden] {
+  display: none;
+}
+
+.profile-redesign-page .profile-custom-scrollbar:hover,
+.profile-redesign-page .profile-custom-scrollbar.is-dragging {
+  opacity: 1;
+  background: color-mix(in srgb, var(--profile-primary) 12%, transparent);
+}
+
+.profile-redesign-page .profile-custom-scrollbar__thumb {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--profile-secondary) 72%, white);
+  cursor: grab;
+  will-change: transform;
+  transition: background 180ms ease;
+}
+
+.profile-redesign-page .profile-custom-scrollbar:hover .profile-custom-scrollbar__thumb {
+  background: var(--profile-secondary);
+}
+
+.profile-redesign-page .profile-custom-scrollbar.is-dragging .profile-custom-scrollbar__thumb {
+  background: var(--profile-secondary);
+  cursor: grabbing;
+}
+
+/* Light variant for dark surfaces such as the sidebar. */
+.profile-redesign-page .profile-custom-scrollbar--light {
+  background: color-mix(in srgb, white 10%, transparent);
+}
+
+.profile-redesign-page .profile-custom-scrollbar--light:hover,
+.profile-redesign-page .profile-custom-scrollbar--light.is-dragging {
+  background: color-mix(in srgb, white 16%, transparent);
+}
+
+.profile-redesign-page .profile-custom-scrollbar--light .profile-custom-scrollbar__thumb,
+.profile-redesign-page .profile-custom-scrollbar--light:hover .profile-custom-scrollbar__thumb {
+  background: color-mix(in srgb, white 45%, transparent);
+}
+
+.profile-redesign-page
+  .profile-custom-scrollbar--light.is-dragging
+  .profile-custom-scrollbar__thumb {
+  background: color-mix(in srgb, white 70%, transparent);
+}
+
+html.profile-scrollbar-dragging,
+html.profile-scrollbar-dragging * {
+  cursor: grabbing !important;
+  user-select: none !important;
 }
 
 .profile-redesign-page .profile-sidebar-brand {
