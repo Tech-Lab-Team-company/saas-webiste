@@ -636,34 +636,12 @@ body:has(.profile-redesign-page) {
   border-radius: 0;
   background: var(--profile-primary);
   color: #fff;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--profile-secondary) 72%, white)
-    transparent;
-  scrollbar-gutter: stable;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .profile-redesign-page .profile-sidebar-container::-webkit-scrollbar {
-  width: 7px;
-}
-
-.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar-track {
-  margin-block: 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--profile-primary) 86%, white);
-}
-
-.profile-redesign-page .profile-sidebar-container::-webkit-scrollbar-thumb {
-  min-height: 48px;
-  border: 2px solid transparent;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--profile-secondary) 72%, white);
-  background-clip: padding-box;
-}
-
-.profile-redesign-page
-  .profile-sidebar-container::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--profile-secondary) 48%, white);
-  background-clip: padding-box;
+  display: none;
 }
 
 .profile-redesign-page .profile-sidebar-brand {
