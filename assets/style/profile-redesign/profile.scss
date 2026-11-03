@@ -54,6 +54,18 @@ body:has(.profile-redesign-page) {
   background: var(--profile-canvas, #f4f7f6);
 }
 
+// Hide the page scrollbar on student dashboard pages (scrolling still works).
+html:has(.profile-redesign-page),
+body:has(.profile-redesign-page) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html:has(.profile-redesign-page)::-webkit-scrollbar,
+body:has(.profile-redesign-page)::-webkit-scrollbar {
+  display: none;
+}
+
 .app-route-view:has(.profile-redesign-page),
 .profile-redesign-page {
   width: 100%;
