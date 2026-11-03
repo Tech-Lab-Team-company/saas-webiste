@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useUserStore } from "~/stores/user";
@@ -17,6 +17,50 @@ const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 const isMobileNavigationOpen = ref(false);
+const sidebarRef = ref<HTMLElement | null>(null);
+
+// Slower, eased mouse-wheel scrolling for the sidebar.
+const WHEEL_SPEED = 0.35;
+const WHEEL_EASING = 0.12;
+let scrollTarget = 0;
+let scrollFrame = 0;
+
+const animateSidebarScroll = () => {
+  const el = sidebarRef.value;
+  if (!el) {
+    scrollFrame = 0;
+    return;
+  }
+  const distance = scrollTarget - el.scrollTop;
+  if (Math.abs(distance) < 0.5) {
+    el.scrollTop = scrollTarget;
+    scrollFrame = 0;
+    return;
+  }
+  el.scrollTop += distance * WHEEL_EASING;
+  scrollFrame = requestAnimationFrame(animateSidebarScroll);
+};
+
+const handleSidebarWheel = (event: WheelEvent) => {
+  const el = sidebarRef.value;
+  if (!el || event.ctrlKey || el.scrollHeight <= el.clientHeight) return;
+
+  const unit =
+    event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientHeight : 1;
+  const maxScroll = el.scrollHeight - el.clientHeight;
+  if (!scrollFrame) scrollTarget = el.scrollTop;
+  scrollTarget = Math.max(
+    0,
+    Math.min(maxScroll, scrollTarget + event.deltaY * unit * WHEEL_SPEED),
+  );
+
+  event.preventDefault();
+  if (!scrollFrame) scrollFrame = requestAnimationFrame(animateSidebarScroll);
+};
+
+onBeforeUnmount(() => {
+  if (scrollFrame) cancelAnimationFrame(scrollFrame);
+});
 
 const profileSectionLabels: Record<string, string> = {
   "student-dashboard": "الرئيسية",
@@ -103,7 +147,11 @@ const uploadImage = async () => {
 </script>
 
 <template>
-  <div class="profile-sidebar-container">
+  <div
+    ref="sidebarRef"
+    class="profile-sidebar-container"
+    @wheel="handleSidebarWheel"
+  >
     <div class="profile-sidebar-brand">
       <span class="profile-brand-mark" aria-hidden="true">
         <span v-if="studentIdentity.initial">{{
