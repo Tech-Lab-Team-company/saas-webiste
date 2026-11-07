@@ -35,7 +35,6 @@ const emit = defineEmits<{
 }>();
 
 const CourseVideoLink = computed(() => props.CourseVideoLink);
-const protectionConfig = useCourseProtectionConfig();
 
 const currentSecurityData = computed(() => {
   if (CourseVideoLink.value?.securityData) {
@@ -100,21 +99,7 @@ const embedVideoLink = computed(() => {
   return CourseVideoLink.value?.videoLink || '';
 });
 
-const pdfIframe = ref<HTMLIFrameElement | null>(null);
 const pdfContainer = ref<HTMLElement | null>(null);
-const pdfViewerFailed = ref(false);
-
-const protectedPdfLink = computed(() => {
-  if (
-    fileType.value !== 'pdf' ||
-    !protectionConfig.enabled ||
-    !protectionConfig.hidePdfToolbar
-  ) {
-    return embedVideoLink.value;
-  }
-  const separator = embedVideoLink.value.includes('#') ? '&' : '#';
-  return `${embedVideoLink.value}${separator}toolbar=0&navpanes=0`;
-});
 
 const reportPlaybackState = (isPlaying: boolean) => {
   emit('playbackStateChange', isPlaying);
@@ -122,10 +107,7 @@ const reportPlaybackState = (isPlaying: boolean) => {
 
 watch(
   () => [CourseVideoLink.value?.sessionId, CourseVideoLink.value?.videoLink],
-  () => {
-    pdfViewerFailed.value = false;
-    reportPlaybackState(false);
-  },
+  () => reportPlaybackState(false),
 );
 
 onBeforeUnmount(() => reportPlaybackState(false));
@@ -180,22 +162,9 @@ function openFullscreen() {
     </ClientOnly>
     <div ref="pdfContainer" class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
       <CourseDetailsProtectedPdfViewer
-        v-if="!pdfViewerFailed"
         :src="embedVideoLink"
         :title="CourseVideoLink?.title"
-        @failed="pdfViewerFailed = true"
       />
-      <iframe
-        v-else
-        ref="pdfIframe"
-        width="100%"
-        height="600"
-        :src="protectedPdfLink"
-        frameborder="0"
-        :referrerpolicy="protectionConfig.enabled && protectionConfig.pdfNoReferrer ? 'no-referrer' : undefined"
-        allowfullscreen
-        @contextmenu.prevent
-      ></iframe>
       <CourseDetailsMediaWatermark :course-id="courseId" :security-data="currentSecurityData" />
       <div class="flex justify-end">
         <button class="btn-primary" @click="openFullscreen">

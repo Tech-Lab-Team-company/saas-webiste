@@ -27,7 +27,6 @@ export function useCourseProtectionConfig() {
     disableVideoDownload: true,
     disablePictureInPicture: true,
     disableRemotePlayback: true,
-    hidePdfToolbar: true,
     pdfNoReferrer: true,
     noticeDurationMs: 2600,
     focusRestoreDelayMs: 300,

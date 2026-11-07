@@ -45,7 +45,6 @@ const mediaKind = computed<"youtube" | "video" | "audio" | "pdf" | "embed">(() =
   if (extension.value === "pdf") return "pdf";
   return "embed";
 });
-const pdfViewerFailed = ref(false);
 
 const close = () => {
   history.saveAll();
@@ -130,10 +129,9 @@ onBeforeUnmount(() => {
           ></audio>
 
           <CourseDetailsProtectedPdfViewer
-            v-else-if="mediaKind === 'pdf' && !pdfViewerFailed"
+            v-else-if="mediaKind === 'pdf'"
             :src="item.url"
             :title="item.label"
-            @failed="pdfViewerFailed = true"
           />
 
           <iframe v-else :src="item.url" :title="item.label"></iframe>

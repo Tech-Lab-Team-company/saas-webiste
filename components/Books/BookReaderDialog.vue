@@ -12,7 +12,9 @@ const emit = defineEmits<{
 
 const page = ref(1);
 const pageInput = ref("1");
-const pdfViewerFailed = ref(false);
+const isPdfUrl = computed(() =>
+  props.url.split(/[?#]/)[0].toLowerCase().endsWith(".pdf"),
+);
 const loadedPageCount = ref(0);
 const history = useBookWatchHistory({ bookId: () => props.bookId });
 const maximumPage = computed(() =>
@@ -106,11 +108,10 @@ onBeforeUnmount(() => {
 
       <main class="book-reader__content">
         <CourseDetailsProtectedPdfViewer
-          v-if="!pdfViewerFailed"
+          v-if="isPdfUrl"
           :src="url"
           :title="title"
           :page="page"
-          @failed="pdfViewerFailed = true"
           @loaded="loadedPageCount = $event"
           @page-change="setPage"
         />

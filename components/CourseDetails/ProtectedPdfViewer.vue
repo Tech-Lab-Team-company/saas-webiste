@@ -11,7 +11,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  failed: [];
   loaded: [pageCount: number];
   pageChange: [page: number];
 }>();
@@ -22,6 +21,7 @@ const RESIZE_DEBOUNCE_MS = 150;
 const protectionConfig = useCourseProtectionConfig();
 const scroller = ref<HTMLElement | null>(null);
 const isLoading = ref(true);
+const hasFailed = ref(false);
 const pageAspects = ref<number[]>([]);
 
 let pdfDocument: PDFDocumentProxy | null = null;
@@ -155,23 +155,41 @@ const teardown = () => {
   pdfDocument = null;
 };
 
-const load = async () => {
-  const currentLoad = ++loadId;
-  teardown();
-  isLoading.value = true;
-  pageAspects.value = [];
+const requestPdf = async (url: string, signal: AbortSignal, init: RequestInit = {}) => {
+  const response = await fetch(url, { ...init, signal });
+  if (!response.ok) throw new Error(`PDF request failed: ${response.status}`);
+  return new Uint8Array(await response.arrayBuffer());
+};
 
+// File hosts that block cross-origin reads are read through the site's own
+// /protected-pdf route. There is no iframe fallback: it would bring the browser's
+// Save as / Print menu back.
+const fetchPdfData = async (signal: AbortSignal) => {
+  const fileUrl = new URL(props.src, window.location.href).href;
   try {
-    fetchController = new AbortController();
-    const response = await fetch(props.src, {
+    return await requestPdf(fileUrl, signal, {
       credentials: "omit",
-      signal: fetchController.signal,
       ...(protectionConfig.pdfNoReferrer
         ? { referrerPolicy: "no-referrer" as const }
         : {}),
     });
-    if (!response.ok) throw new Error(`PDF request failed: ${response.status}`);
-    const data = new Uint8Array(await response.arrayBuffer());
+  } catch (error) {
+    if (signal.aborted) throw error;
+    console.warn("[ProtectedPdf] Direct request failed, using /protected-pdf", error);
+    return requestPdf(`/protected-pdf?url=${encodeURIComponent(fileUrl)}`, signal);
+  }
+};
+
+const load = async () => {
+  const currentLoad = ++loadId;
+  teardown();
+  isLoading.value = true;
+  hasFailed.value = false;
+  pageAspects.value = [];
+
+  try {
+    fetchController = new AbortController();
+    const data = await fetchPdfData(fetchController.signal);
     if (currentLoad !== loadId) return;
 
     const pdfjs = await import("pdfjs-dist");
@@ -218,7 +236,8 @@ const load = async () => {
   } catch (error: any) {
     if (currentLoad !== loadId) return;
     console.warn("[ProtectedPdf] Failed to load PDF", error);
-    emit("failed");
+    isLoading.value = false;
+    hasFailed.value = true;
   }
 };
 
@@ -255,6 +274,12 @@ onBeforeUnmount(() => {
     @scroll.passive="handleScroll"
   >
     <div v-if="isLoading" class="protected-pdf__loading">جاري تحميل الملف...</div>
+    <div v-else-if="hasFailed" class="protected-pdf__loading" dir="rtl">
+      <div>
+        <p>تعذر تحميل الملف.</p>
+        <button type="button" class="protected-pdf__retry" @click="load">إعادة المحاولة</button>
+      </div>
+    </div>
     <div
       v-for="(aspect, index) in pageAspects"
       :key="index"
@@ -280,6 +305,20 @@ onBeforeUnmount(() => {
   height: 100%;
   place-items: center;
   color: #fff;
+}
+
+.protected-pdf__loading p {
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.protected-pdf__retry {
+  padding: 8px 16px;
+  color: #fff;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
 }
 
 .protected-pdf__page {
