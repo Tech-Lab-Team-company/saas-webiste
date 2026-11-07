@@ -12,9 +12,15 @@ const emit = defineEmits<{
 
 const page = ref(1);
 const pageInput = ref("1");
+const pdfViewerFailed = ref(false);
+const loadedPageCount = ref(0);
 const history = useBookWatchHistory({ bookId: () => props.bookId });
-const maximumPage = computed(() => Math.max(1, Number(props.totalPages) || 1));
-const hasKnownPageCount = computed(() => Number(props.totalPages) > 0);
+const maximumPage = computed(() =>
+  Math.max(1, loadedPageCount.value || Number(props.totalPages) || 1),
+);
+const hasKnownPageCount = computed(
+  () => loadedPageCount.value > 0 || Number(props.totalPages) > 0,
+);
 const readerUrl = computed(() => {
   const source = props.url.split("#")[0];
   return `${source}#page=${page.value}&toolbar=0&navpanes=0&view=FitH`;
@@ -92,9 +98,6 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="book-reader__actions">
-          <a :href="url" target="_blank" rel="noreferrer" title="فتح في نافذة جديدة">
-            <i class="pi pi-external-link" aria-hidden="true"></i>
-          </a>
           <button type="button" title="إغلاق القارئ" @click="close">
             <i class="pi pi-times" aria-hidden="true"></i>
           </button>
@@ -102,7 +105,16 @@ onBeforeUnmount(() => {
       </header>
 
       <main class="book-reader__content">
-        <iframe :key="readerUrl" :src="readerUrl" :title="title"></iframe>
+        <CourseDetailsProtectedPdfViewer
+          v-if="!pdfViewerFailed"
+          :src="url"
+          :title="title"
+          :page="page"
+          @failed="pdfViewerFailed = true"
+          @loaded="loadedPageCount = $event"
+          @page-change="setPage"
+        />
+        <iframe v-else :key="readerUrl" :src="readerUrl" :title="title"></iframe>
       </main>
     </div>
   </Teleport>
@@ -203,7 +215,6 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
-.book-reader__actions a,
 .book-reader__actions button {
   display: grid;
   width: 42px;
@@ -219,6 +230,10 @@ onBeforeUnmount(() => {
 .book-reader__content {
   min-height: 0;
   padding: 14px;
+}
+
+.book-reader__content :deep(.protected-pdf) {
+  height: 100%;
 }
 
 .book-reader__content iframe {

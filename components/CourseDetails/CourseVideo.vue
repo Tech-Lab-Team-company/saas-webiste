@@ -102,6 +102,7 @@ const embedVideoLink = computed(() => {
 
 const pdfIframe = ref<HTMLIFrameElement | null>(null);
 const pdfContainer = ref<HTMLElement | null>(null);
+const pdfViewerFailed = ref(false);
 
 const protectedPdfLink = computed(() => {
   if (
@@ -121,7 +122,10 @@ const reportPlaybackState = (isPlaying: boolean) => {
 
 watch(
   () => [CourseVideoLink.value?.sessionId, CourseVideoLink.value?.videoLink],
-  () => reportPlaybackState(false),
+  () => {
+    pdfViewerFailed.value = false;
+    reportPlaybackState(false);
+  },
 );
 
 onBeforeUnmount(() => reportPlaybackState(false));
@@ -175,7 +179,14 @@ function openFullscreen() {
       </template>
     </ClientOnly>
     <div ref="pdfContainer" class="pdf-container" v-else-if="fileType === 'pdf'" style="width: 100%;">
+      <CourseDetailsProtectedPdfViewer
+        v-if="!pdfViewerFailed"
+        :src="embedVideoLink"
+        :title="CourseVideoLink?.title"
+        @failed="pdfViewerFailed = true"
+      />
       <iframe
+        v-else
         ref="pdfIframe"
         width="100%"
         height="600"

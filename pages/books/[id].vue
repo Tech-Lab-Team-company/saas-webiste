@@ -843,7 +843,7 @@ useHead(() => ({
       </template>
     </main>
 
-    <BookReaderDialog
+    <LazyBooksBookReaderDialog
       v-if="isReaderOpen && book && primaryAction?.kind === 'reader'"
       :url="primaryAction.url"
       :book-id="book.bookId"
@@ -851,7 +851,7 @@ useHead(() => ({
       :total-pages="book.numberOfPages"
       @close="isReaderOpen = false"
     />
-    <BookMediaDialog
+    <LazyBooksBookMediaDialog
       v-if="activeMedia"
       :key="activeMedia.key"
       :item="activeMedia"

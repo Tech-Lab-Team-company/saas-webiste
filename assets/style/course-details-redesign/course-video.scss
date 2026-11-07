@@ -44,6 +44,10 @@
   min-height: 100%;
 }
 
+.pdf-container:fullscreen :deep(.protected-pdf) {
+  height: calc(100dvh - 90px);
+}
+
 .btn-primary {
   margin-top: 12px;
   padding: 9px 16px;

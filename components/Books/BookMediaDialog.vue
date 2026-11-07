@@ -38,12 +38,14 @@ const extension = computed(() => {
     return "";
   }
 });
-const mediaKind = computed<"youtube" | "video" | "audio" | "embed">(() => {
+const mediaKind = computed<"youtube" | "video" | "audio" | "pdf" | "embed">(() => {
   if (youtubeId.value) return "youtube";
   if (["mp3", "wav", "ogg", "m4a", "aac"].includes(extension.value)) return "audio";
   if (props.item.type === 4 || ["mp4", "webm", "mov", "m4v"].includes(extension.value)) return "video";
+  if (extension.value === "pdf") return "pdf";
   return "embed";
 });
+const pdfViewerFailed = ref(false);
 
 const close = () => {
   history.saveAll();
@@ -81,7 +83,7 @@ onBeforeUnmount(() => {
             <strong>{{ item.label }}</strong>
           </div>
           <div>
-            <a :href="item.url" target="_blank" rel="noreferrer" title="فتح في نافذة جديدة">
+            <a v-if="mediaKind !== 'pdf'" :href="item.url" target="_blank" rel="noreferrer" title="فتح في نافذة جديدة">
               <i class="pi pi-external-link" aria-hidden="true"></i>
             </a>
             <button type="button" title="إغلاق" @click="close">
@@ -126,6 +128,13 @@ onBeforeUnmount(() => {
             @pause="history.saveSession(true)"
             @ended="history.markPlaybackEnded"
           ></audio>
+
+          <CourseDetailsProtectedPdfViewer
+            v-else-if="mediaKind === 'pdf' && !pdfViewerFailed"
+            :src="item.url"
+            :title="item.label"
+            @failed="pdfViewerFailed = true"
+          />
 
           <iframe v-else :src="item.url" :title="item.label"></iframe>
         </div>
